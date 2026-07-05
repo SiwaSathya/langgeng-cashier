@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Order - SmartPOS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .modal-active {
+            overflow: hidden;
+        }
+
+        /* Perbaikan scrollbar agar lebih clean */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen">
+
+    <!-- SIDEBAR -->
+    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 fixed h-screen z-20">
+        <div class="flex items-center gap-3 mb-12">
+            <div
+                class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                <i class="fas fa-store"></i>
+            </div>
+            <h1 class="text-xl font-extrabold text-slate-800 tracking-tight text-nowrap">SMARTPOS</h1>
+        </div>
+        <nav class="flex-1 space-y-2">
+            <a href="dashboard.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-th-large w-5"></i> <span>Dashboard</span>
+            </a>
+            <a href="riwayat.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-history w-5"></i> <span>Riwayat Transaksi</span>
+            </a>
+            <a href="product.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-box w-5"></i> <span>Master Produk</span>
+            </a>
+            <a href="purchase.html"
+                class="flex items-center gap-4 px-4 py-3.5 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
+                <i class="fas fa-shopping-cart w-5"></i> <span>Riwayat Purchase</span>
+            </a>
+            <a href="expense.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-wallet w-5"></i> <span>Pengeluaran</span>
+            </a>
+            <a href="retur.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-undo"></i> <span>Manajemen Retur</span>
+            </a>
+            <a href="report.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 ml-72 p-12 min-w-0">
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-800 text-slate-800 tracking-tight">Purchase Order</h1>
+                <p class="text-slate-400 mt-1 font-medium">Catat dan pantau transaksi pembelian stok barang.</p>
+            </div>
+            <button onclick="openModal()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-blue-100">
+                <i class="fas fa-plus text-sm"></i> Tambah Purchase
+            </button>
+        </div>
+
+        <!-- TABLE CARD -->
+        <div
+            class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 animate-fade-in flex flex-col overflow-hidden">
+            <!-- Search Bar -->
+            <div class="p-8 border-b border-slate-50 flex gap-4 bg-white">
+                <div class="relative flex-1">
+                    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                    <input type="text" id="searchInput" onkeyup="debounceSearch()" placeholder="Cari nomor nota..."
+                        class="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-[1.25rem] outline-none focus:border-blue-400 transition-all text-sm font-medium text-slate-600">
+                </div>
+            </div>
+
+            <!-- Table Wrapper - Fix terpotong -->
+            <div class="overflow-x-auto overflow-y-hidden">
+                <table class="w-full text-left border-collapse table-auto min-w-[1000px]">
+                    <thead class="bg-slate-50/50 text-[11px] uppercase tracking-widest text-slate-400 font-bold">
+                        <tr>
+                            <th class="px-8 py-5">Informasi Nota</th>
+                            <th class="px-6 py-5">Barang & Supplier</th>
+                            <th class="px-6 py-5">Qty</th>
+                            <th class="px-6 py-5">Total Harga</th>
+                            <th class="px-8 py-5 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchaseTableBody" class="divide-y divide-slate-50 text-slate-700">
+                        <!-- Data loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- PAGINATION SECTION - Fix Overflow & Logic -->
+            <div
+                class="p-8 bg-slate-50/30 border-t border-slate-50 flex flex-col sm:flex-row justify-between items-center gap-6">
+                <p class="text-slate-500 text-sm font-medium">
+                    Menampilkan <span id="countInfo" class="font-bold text-slate-800">0</span> transaksi
+                </p>
+                <div id="paginationControls" class="flex flex-wrap justify-end gap-2 max-w-full">
+                    <!-- Tombol pagination akan di-generate di sini -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JS LOGIC -->
+    <script>
+        const BASE_URL = "http://localhost:4000";
+        let currentPage = 1;
+        const limit = 10;
+        let searchTimer;
+
+        async function fetchPurchases() {
+            const search = document.getElementById('searchInput').value;
+            const tbody = document.getElementById('purchaseTableBody');
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/purchases?page=${currentPage}&search=${search}&limit=${limit}`);
+                const result = await res.json();
+                const purchases = result.data || [];
+                const total = result.meta?.total || 0;
+
+                if (purchases.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="py-20 text-center text-slate-400 font-medium">Belum ada data pembelian</td></tr>`;
+                } else {
+                    tbody.innerHTML = purchases.map(p => `
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="px-8 py-6">
+                                <div class="font-extrabold text-blue-600 tracking-tight">#${p.nota}</div>
+                                <div class="text-[10px] text-slate-400 font-bold uppercase mt-1">
+                                    ${new Date(p.CreatedAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                </div>
+                            </td>
+                            <td class="px-6 py-6">
+                                <div class="font-bold text-slate-700 leading-tight">${p.product?.nama || p.product?.Nama || 'Produk'}</div>
+                                <div class="flex items-center gap-1.5 mt-1.5 text-slate-400 font-bold uppercase text-[9px] tracking-wider">
+                                    <i class="fas fa-truck text-[8px]"></i>
+                                    <span>${p.supplier?.nama || p.supplier?.Nama || 'Supplier Umum'}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-6">
+                                <span class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-800 border border-blue-100">${p.qty} Unit</span>
+                            </td>
+                            <td class="px-6 py-6 font-extrabold text-slate-800">
+                                Rp ${(p.total || 0).toLocaleString('id-ID')}
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <button onclick="deletePurchase('${p.id || p.ID}')" class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-300 hover:bg-red-50 hover:text-red-500 transition-all">
+                                    <i class="fas fa-trash-alt text-sm"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                document.getElementById('countInfo').innerText = total;
+                renderPagination(total);
+            } catch (err) {
+                console.error("Fetch error", err);
+                tbody.innerHTML = `<tr><td colspan="5" class="py-10 text-center text-red-400 font-medium">Gagal mengambil data dari server.</td></tr>`;
+            }
+        }
+
+        function renderPagination(total) {
+            const totalPages = Math.ceil(total / limit);
+            const container = document.getElementById('paginationControls');
+            let html = '';
+
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const delta = 2; // Jumlah angka di sekitar halaman aktif
+            const range = [];
+            for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
+                range.push(i);
+            }
+
+            if (currentPage > delta + 2) range.unshift('...');
+            range.unshift(1);
+            if (currentPage < totalPages - (delta + 1)) range.push('...');
+            range.push(totalPages);
+
+            // --- TOMBOL PREVIOUS (KIRI) ---
+            const prevDisabled = currentPage === 1;
+            html += `
+                <button onclick="${prevDisabled ? '' : `changePage(${currentPage - 1})`}" 
+                    class="w-10 h-10 rounded-xl flex items-center justify-center transition-all border border-slate-100 
+                    ${prevDisabled ? 'text-slate-200 bg-slate-50 cursor-not-allowed' : 'text-slate-400 bg-white hover:border-blue-200 hover:text-blue-500'}">
+                    <i class="fas fa-chevron-left text-xs"></i>
+                </button>`;
+
+            // --- TOMBOL ANGKA ---
+            range.forEach(page => {
+                if (page === '...') {
+                    html += `<span class="w-10 h-10 flex items-center justify-center text-slate-400 font-bold">...</span>`;
+                } else {
+                    const isActive = currentPage === page;
+                    html += `
+                        <button onclick="changePage(${page})" 
+                            class="w-10 h-10 rounded-xl font-bold transition-all text-xs 
+                            ${isActive
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
+                            : 'bg-white text-slate-400 border border-slate-100 hover:border-blue-200 hover:text-blue-500'}">
+                            ${page}
+                        </button>`;
+                }
+            });
+
+            // --- TOMBOL NEXT (KANAN) ---
+            const nextDisabled = currentPage === totalPages;
+            html += `
+                <button onclick="${nextDisabled ? '' : `changePage(${currentPage + 1})`}" 
+                    class="w-10 h-10 rounded-xl flex items-center justify-center transition-all border border-slate-100 
+                    ${nextDisabled ? 'text-slate-200 bg-slate-50 cursor-not-allowed' : 'text-slate-400 bg-white hover:border-blue-200 hover:text-blue-500'}">
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </button>`;
+
+            container.innerHTML = html;
+        }
+
+        function changePage(p) {
+            currentPage = p;
+            fetchPurchases();
+            // Scroll ke atas tabel saat ganti halaman
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function debounceSearch() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                currentPage = 1;
+                fetchPurchases();
+            }, 500);
+        }
+
+        // Init data
+        window.onload = fetchPurchases;
+
+        // Modal triggers (Placeholders)
+        function openModal() { /* logic modal sama seperti sebelumnya */ }
+        function closeModal() { /* logic modal sama seperti sebelumnya */ }
+    </script>
+</body>
+
+</html>

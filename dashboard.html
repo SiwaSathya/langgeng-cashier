@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasir Pro - Shop Name</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&family=Courier+Prime:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        /* Styling khusus cetak nota POS standar */
+        .nota-font {
+            font-family: 'Courier Prime', monospace;
+        }
+    </style>
+</head>
+
+<body class="bg-[#F8FAFC] flex h-screen overflow-hidden">
+
+    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 z-20">
+        <div class="flex items-center gap-3 mb-12">
+            <div
+                class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                <i class="fas fa-store"></i>
+            </div>
+            <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">SMARTPOS</h1>
+        </div>
+        <nav class="flex-1 space-y-2">
+            <a href="dashboard.html"
+                class="flex items-center gap-4 px-4 py-3.5 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
+                <i class="fas fa-store"></i> <span>Dashboard</span>
+            </a>
+            <a href="riwayat.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
+            </a>
+            <a href="product.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-box"></i> <span>Master Produk</span>
+            </a>
+            <a href="purchase.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
+            </a>
+            <a href="expense.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-wallet"></i> <span>Pengeluaran</span>
+            </a>
+            <a href="retur.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-undo"></i> <span>Manajemen Retur</span>
+            </a>
+            <a href="report.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
+            </a>
+        </nav>
+        <div class="pt-8 border-t border-slate-100">
+            <div class="bg-slate-50 p-4 rounded-2xl mb-6">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">User Aktif</p>
+                <p class="font-bold text-slate-700">Desak Kasir</p>
+            </div>
+            <a href="index.html"
+                class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all">
+                <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <header class="h-20 bg-white border-b border-slate-200 px-10 flex justify-between items-center shrink-0">
+            <div class="flex items-center gap-6">
+                <div class="flex flex-col">
+                    <h2 class="text-lg font-bold text-slate-800">Kasir Utama</h2>
+                    <p id="clock" class="text-xs text-slate-400 font-medium"></p>
+                </div>
+                <button onclick="generateReportPDF()"
+                    class="bg-slate-800 hover:bg-black text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-sm transition-all">
+                    <i class="fas fa-print"></i> Cetak Setoran Shift
+                </button>
+            </div>
+            <div class="text-right">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Belanja</p>
+                <h1 id="big-total" class="text-2xl font-extrabold text-blue-600">IDR 0</h1>
+            </div>
+        </header>
+
+        <div class="flex-1 p-10 grid grid-cols-12 gap-8 overflow-y-auto custom-scroll">
+
+            <div class="col-span-12 lg:col-span-5 space-y-6">
+                <div class="bg-white p-8 rounded-[2rem] border border-slate-200 custom-shadow">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="w-8 h-8 bg-blue-50 text-blue-500 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-shopping-cart text-sm"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-800">Input Item</h3>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="relative">
+                            <label
+                                class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Cari
+                                Produk</label>
+                            <div class="relative group">
+                                <i
+                                    class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-blue-500"></i>
+                                <input type="text" id="search-prod" onkeyup="searchAPI(this.value)"
+                                    class="w-full bg-slate-50 border border-slate-100 p-4 pl-12 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-semibold transition-all"
+                                    placeholder="Ketik nama atau kode barang..." autocomplete="off">
+                            </div>
+                            <div id="res-dropdown"
+                                class="absolute left-0 right-0 top-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl z-[999] hidden max-h-60 overflow-y-auto custom-scroll">
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div class="w-[30%]">
+                                <label
+                                    class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Jumlah</label>
+                                <input type="number" id="inp-qty" value="1" min="1"
+                                    class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none font-bold text-center text-slate-700 focus:border-blue-300 transition-all">
+                            </div>
+                            <div class="flex-1">
+                                <label
+                                    class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Harga
+                                    Satuan</label>
+                                <input type="text" id="inp-price" oninput="formatInputRupiah(this)"
+                                    class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none font-bold text-blue-600 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+                                    placeholder="Rp 0">
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex justify-between items-center h-14 bg-slate-50 border border-slate-100 px-6 rounded-2xl">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Status Transaksi DP
+                                (Uang Muka)</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="inp-is-dp" onchange="toggleCustomerForm()"
+                                    class="sr-only peer">
+                                <div
+                                    class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                </div>
+                            </label>
+                        </div>
+
+                        <div id="customer-container"
+                            class="hidden space-y-4 p-5 bg-slate-50 rounded-2xl border border-slate-100 animate-in fade-in duration-300">
+                            <p
+                                class="text-[10px] font-bold text-blue-600 uppercase tracking-widest border-b border-slate-200/60 pb-1 mb-2">
+                                <i class="fas fa-user-tag mr-1"></i> Data Pelanggan (Wajib Untuk DP)
+                            </p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[10px] font-semibold text-slate-400 mb-1">Nama
+                                        Customer</label>
+                                    <input type="text" id="cust-name"
+                                        class="w-full bg-white border border-slate-200 px-3 py-2 text-sm rounded-xl font-medium outline-none focus:border-blue-400">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-semibold text-slate-400 mb-1">No.
+                                        Telepon</label>
+                                    <input type="text" id="cust-phone"
+                                        class="w-full bg-white border border-slate-200 px-3 py-2 text-sm rounded-xl font-medium outline-none focus:border-blue-400">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[10px] font-semibold text-slate-400 mb-1">No. Identitas
+                                        (KTP)</label>
+                                    <input type="text" id="cust-identity"
+                                        class="w-full bg-white border border-slate-200 px-3 py-2 text-sm rounded-xl font-medium outline-none focus:border-blue-400">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-semibold text-slate-400 mb-1">Umur</label>
+                                    <input type="number" id="cust-age" value="0"
+                                        class="w-full bg-white border border-slate-200 px-3 py-2 text-sm rounded-xl font-medium outline-none focus:border-blue-400">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-400 mb-1">Alamat
+                                    Lengkap</label>
+                                <input type="text" id="cust-address"
+                                    class="w-full bg-white border border-slate-200 px-3 py-2 text-sm rounded-xl font-medium outline-none focus:border-blue-400">
+                            </div>
+                        </div>
+
+                        <button onclick="addToCart()"
+                            class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-4 rounded-2xl font-extrabold shadow-lg shadow-emerald-100 transition-all active:scale-[0.98] mt-2">
+                            <i class="fas fa-plus mr-2"></i> ADD TO LIST
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-blue-600 p-8 rounded-[2rem] shadow-xl shadow-blue-100 text-white space-y-4">
+                    <p class="text-[10px] font-bold opacity-70 uppercase tracking-widest">Input Multi-Pembayaran</p>
+
+                    <div class="bg-white/10 p-4 rounded-2xl space-y-3 border border-white/10">
+                        <div class="grid grid-cols-12 gap-2">
+                            <div class="col-span-5">
+                                <label class="block text-[10px] font-bold text-blue-200 uppercase mb-1">Metode</label>
+                                <select id="pay-select-type" onchange="onChangePayType()"
+                                    class="w-full bg-slate-900/40 border border-white/20 p-2.5 rounded-xl outline-none font-bold text-xs text-white appearance-none cursor-pointer">
+                                    <option value="Tunai">💵 Tunai</option>
+                                    <option value="EDC">💳 EDC</option>
+                                    <option value="Transfer">🏦 Transfer</option>
+                                    <option value="Kredit">🛍️ Kredit (Leasing)</option>
+                                </select>
+                            </div>
+                            <div class="col-span-7" id="pay-bank-wrapper" style="display: none;">
+                                <label id="pay-sub-label"
+                                    class="block text-[10px] font-bold text-blue-200 uppercase mb-1">Pilih Bank</label>
+                                <select id="pay-select-bank"
+                                    class="w-full bg-slate-900/40 border border-white/20 p-2.5 rounded-xl outline-none font-bold text-xs text-white appearance-none cursor-pointer">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2 items-end">
+                            <div class="flex-1">
+                                <label class="block text-[10px] font-bold text-blue-200 uppercase mb-1">Nominal
+                                    Rupiah</label>
+                                <input type="number" id="pay-input-amount" placeholder="0"
+                                    class="w-full bg-slate-900/40 border border-white/20 p-2.5 rounded-xl outline-none font-bold text-sm placeholder:text-white/30 text-white">
+                            </div>
+                            <button onclick="addPaymentToList()"
+                                class="bg-emerald-500 hover:bg-emerald-600 text-white h-[42px] px-4 rounded-xl font-bold text-xs transition-all flex items-center gap-1 shrink-0">
+                                <i class="fas fa-plus"></i> Masuk List
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="payment-list-box"
+                        class="space-y-2 max-h-36 overflow-y-auto custom-scroll bg-black/10 p-3 rounded-xl hidden">
+                    </div>
+
+                    <div class="pt-2 border-t border-white/20 flex justify-between items-center text-sm font-bold">
+                        <span class="opacity-80">Total Diinput:</span>
+                        <span id="text-total-paid" class="text-lg text-emerald-300">IDR 0</span>
+                    </div>
+
+                    <button onclick="executePayment()"
+                        class="w-full bg-white text-blue-600 py-4 rounded-2xl font-extrabold text-lg hover:bg-slate-50 transition-all active:scale-[0.98]">
+                        PROSES TRANSAKSI
+                    </button>
+                </div>
+            </div>
+
+            <div
+                class="col-span-12 lg:col-span-7 bg-white rounded-[2rem] border border-slate-200 flex flex-col overflow-hidden custom-shadow">
+                <div class="p-8 border-b border-slate-50 flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-list-ul text-blue-500"></i>
+                        <h3 class="font-bold text-slate-800">List Order <span
+                                class="text-xs font-normal text-slate-400 italic">(Jumlah & Harga dapat diedit
+                                langsung)</span></h3>
+                    </div>
+                    <span id="item-count"
+                        class="bg-slate-100 text-slate-500 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">0
+                        Items</span>
+                </div>
+
+                <div class="flex-1 overflow-y-auto custom-scroll">
+                    <table class="w-full">
+                        <thead class="sticky top-0 bg-white shadow-sm z-10">
+                            <tr class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                <th class="p-6 text-left">Item Name</th>
+                                <th class="p-6 text-center w-28">Qty</th>
+                                <th class="p-6 text-right w-44">Harga Satuan</th>
+                                <th class="p-6 text-right w-36">Subtotal</th>
+                                <th class="p-6 w-16"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cart-table-body" class="divide-y divide-slate-50"></tbody>
+                    </table>
+
+                    <div id="empty-state" class="py-32 flex flex-col items-center justify-center text-slate-300">
+                        <i class="fas fa-shopping-basket text-6xl mb-4 opacity-10"></i>
+                        <p class="font-semibold italic opacity-40 uppercase text-xs tracking-widest">Belum ada item
+                            ditambahkan</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- NEW FORMATTED POS INVOICE TEMPLATE (SEGMENT 1 - SEGMENT 6) -->
+    <div id="print-report-template" class="hidden">
+        <div class="p-6 bg-white text-black text-xs font-mono nota-font w-[380px] leading-relaxed mx-auto">
+            <div class="text-center border-b border-dashed border-black pb-3 mb-4">
+                <h2 class="text-sm font-bold uppercase tracking-wider">REKAP SETORAN SHIFT KASIR</h2>
+                <p class="text-[11px] font-bold">F01-LANGGENG ELEKTRONIK</p>
+                <div class="text-[10px] mt-1 text-left">
+                    <div class="flex justify-between"><span>Kasir</span><span id="pdf-kasir-name">: desak kasir</span>
+                    </div>
+                    <div class="flex justify-between"><span>Waktu Cetak</span><span id="pdf-date-start">: -</span></div>
+                </div>
+            </div>
+
+            <!-- SEGMENT 1: PENJUALAN UTAMA & METODE PEMBAYARAN RINCI -->
+            <div class="mb-3">
+                <p class="font-bold border-b border-black pb-0.5 mb-1">[SEGMENTASI 1]</p>
+                <table class="w-full text-[11px] space-y-0.5">
+                    <tr>
+                        <td>Total Tunai</td>
+                        <td class="text-right font-bold">3.005.000</td>
+                    </tr>
+                    <tr>
+                        <td class="pl-2">- Uang Nilai 100.000</td>
+                        <td class="text-right">3.000.000 (30)</td>
+                    </tr>
+                    <tr>
+                        <td class="pl-2">- Uang Nilai 5.000</td>
+                        <td class="text-right">5.000 (1)</td>
+                    </tr>
+                    <tr>
+                        <td>Penjualan Kredit</td>
+                        <td class="text-right font-bold">0</td>
+                    </tr>
+                    <tr class="italic text-gray-600">
+                        <td class="pl-2">(Leasing, Nama)</td>
+                        <td class="text-right">-</td>
+                    </tr>
+                    <tr>
+                        <td>Pembayaran Keluar</td>
+                        <td class="text-right font-bold">850.000</td>
+                    </tr>
+                    <tr class="text-[10px] text-gray-700">
+                        <td class="pl-2">- BENSIN EXPANDER</td>
+                        <td class="text-right">500.000</td>
+                    </tr>
+                    <tr class="text-[10px] text-gray-700">
+                        <td class="pl-2">- PENCAIRAN NORMA</td>
+                        <td class="text-right">350.000</td>
+                    </tr>
+                </table>
+
+                <p class="font-bold text-[10px] mt-2 mb-1">Metode Pembayaran:</p>
+                <table class="w-full text-[11px]">
+                    <tr>
+                        <td>1-1128 TF BCA</td>
+                        <td class="text-right">80.000</td>
+                    </tr>
+                    <tr>
+                        <td>1-1128 TF BCA</td>
+                        <td class="text-right">2.850.000</td>
+                    </tr>
+                    <tr>
+                        <td>1-1128 TF BCA</td>
+                        <td class="text-right">4.300.000</td>
+                    </tr>
+                    <tr>
+                        <td>1-1130 TF BRI</td>
+                        <td class="text-right">445.000</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- SEGMENT 2: TOTAL SETOR -->
+            <div class="mb-3 border-t border-dashed border-black pt-2">
+                <p class="font-bold mb-1">[SEGMENT 2]</p>
+                <div class="flex justify-between font-bold text-[12px] bg-gray-100 p-1">
+                    <span>TOTAL SETOR</span>
+                    <span>5.000.000</span>
+                </div>
+            </div>
+
+            <!-- SEGMENT 3: REKAP SETOR -->
+            <div class="mb-3 border-t border-dashed border-black pt-2">
+                <p class="font-bold mb-1">[SEGMENT 3]</p>
+                <p class="font-bold text-[10px]">Rekap Setor:</p>
+                <table class="w-full text-[11px] space-y-0.5">
+                    <tr>
+                        <td>Tunai</td>
+                        <td class="text-right">3.500.000</td>
+                    </tr>
+                    <tr>
+                        <td>Kredit (Leasing, Nama)</td>
+                        <td class="text-right">1.500.000</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- SEGMENT 4: PELUNASAN -->
+            <div class="mb-3 border-t border-dashed border-black pt-2">
+                <p class="font-bold mb-1">[SEGMENT 4]</p>
+                <table class="w-full text-[11px] space-y-0.5">
+                    <tr>
+                        <td>Plns Tunai</td>
+                        <td class="text-right">0</td>
+                    </tr>
+                    <tr>
+                        <td>Plns Piutang (Nama, Metode)</td>
+                        <td class="text-right">.</td>
+                    </tr>
+                    <tr>
+                        <td>Plns Kredit (Leasing, Nama)</td>
+                        <td class="text-right">.</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- SEGMENT 5: VALIDASI TOTAL DAN SELISIH -->
+            <div class="mb-4 border-t border-dashed border-black pt-2">
+                <p class="font-bold mb-1">[SEGMENT 5]</p>
+                <table class="w-full text-[11px]">
+                    <tr class="font-bold text-[12px]">
+                        <td>Total Penjualan + Plns</td>
+                        <td class="text-right">316.000.000</td>
+                    </tr>
+                    <tr class="font-bold text-red-600">
+                        <td>Selisih</td>
+                        <td class="text-right">-18.900</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- SEGMENT 6: TANDA TANGAN (TTD) -->
+            <div class="border-t border-black pt-4 mb-2">
+                <p class="font-bold text-center mb-4">[SEGMENT 6]</p>
+                <div class="flex justify-between text-center text-[11px]">
+                    <div class="w-24">
+                        <p>(...................)</p>
+                        <p class="font-bold uppercase mt-1">Kasir</p>
+                    </div>
+                    <div class="w-24">
+                        <p>(...................)</p>
+                        <p class="font-bold uppercase mt-1">Finance</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:4000/api";
+        let currentSelectedProduct = null;
+        let cart = [];
+        let paymentList = [];
+
+        function formatInputRupiah(element) {
+            let value = element.value.replace(/[^,\d]/g, '').toString();
+            let split = value.split(',');
+            let sisa = split[0].length % 3;
+            let rupiah = split[0].substr(0, sisa);
+            let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                let separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+            element.value = value === "" ? "" : "Rp " + rupiah;
+        }
+
+        function parseRupiahToNumber(rupiahString) {
+            if (!rupiahString) return 0;
+            let cleanNumber = rupiahString.replace(/[^0-9]/g, '');
+            return parseFloat(cleanNumber) || 0;
+        }
+
+        function getUserDataFromToken() {
+            const token = localStorage.getItem('token');
+            if (!token) return null;
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (err) {
+                return null;
+            }
+        }
+
+        function toggleCustomerForm() {
+            const isDp = document.getElementById('inp-is-dp').checked;
+            const container = document.getElementById('customer-container');
+            isDp ? container.classList.remove('hidden') : container.classList.add('hidden');
+        }
+
+        function onChangePayType() {
+            const type = document.getElementById('pay-select-type').value;
+            const bankWrapper = document.getElementById('pay-bank-wrapper');
+            const subLabel = document.getElementById('pay-sub-label');
+            const selectBank = document.getElementById('pay-select-bank');
+
+            if (type === 'Tunai') {
+                bankWrapper.style.display = 'none';
+            } else if (type === 'Kredit') {
+                bankWrapper.style.display = 'block';
+                subLabel.innerText = "Pilih Leasing";
+                selectBank.innerHTML = `
+                    <option value="FIF">FIF Group</option>
+                    <option value="ADIRA">Adira Finance</option>
+                    <option value="HCI">Home Credit</option>
+                `;
+            } else {
+                bankWrapper.style.display = 'block';
+                subLabel.innerText = "Pilih Bank";
+                selectBank.innerHTML = `
+                    <option value="BCA">BCA</option>
+                    <option value="BNI">BNI</option>
+                    <option value="BRI">BRI</option>
+                    <option value="MANDIRI">MANDIRI</option>
+                `;
+            }
+        }
+
+        function addPaymentToList() {
+            const type = document.getElementById('pay-select-type').value;
+            const amount = parseFloat(document.getElementById('pay-input-amount').value || 0);
+
+            if (amount <= 0) {
+                return Swal.fire('Opps', 'Masukkan nominal rupiah yang valid!', 'warning');
+            }
+
+            let nameLabel = type;
+            if (type !== 'Tunai') {
+                const subValue = document.getElementById('pay-select-bank').value;
+                nameLabel = `${type} - ${subValue}`;
+            }
+
+            paymentList.push({ label: nameLabel, value: amount });
+            document.getElementById('pay-input-amount').value = "";
+            renderPaymentList();
+        }
+
+        function removePaymentFromList(idx) {
+            paymentList.splice(idx, 1);
+            renderPaymentList();
+        }
+
+        function renderPaymentList() {
+            const container = document.getElementById('payment-list-box');
+            const totalText = document.getElementById('text-total-paid');
+
+            if (paymentList.length === 0) {
+                container.classList.add('hidden');
+                totalText.innerText = "IDR 0";
+                return;
+            }
+
+            container.classList.remove('hidden');
+            container.innerHTML = "";
+            let grandTotalPaid = 0;
+
+            paymentList.forEach((pay, idx) => {
+                grandTotalPaid += pay.value;
+                container.innerHTML += `
+                    <div class="flex justify-between items-center bg-white/10 px-3 py-2 rounded-xl text-xs border border-white/5">
+                        <span class="font-semibold"><i class="fas fa-check-circle text-emerald-400 mr-1"></i> ${pay.label}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="font-black text-emerald-300">IDR ${pay.value.toLocaleString()}</span>
+                            <button onclick="removePaymentFromList(${idx})" class="text-red-300 hover:text-red-500">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            totalText.innerText = `IDR ${grandTotalPaid.toLocaleString()}`;
+        }
+
+        async function searchAPI(query) {
+            const dropdown = document.getElementById('res-dropdown');
+            if (query.trim().length < 1) return dropdown.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${API_URL}/products/cashier?search=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                dropdown.innerHTML = "";
+
+                if (data && data.length > 0) {
+                    dropdown.classList.remove('hidden');
+                    data.forEach(p => {
+                        const div = document.createElement('div');
+                        div.className = "p-4 hover:bg-slate-50 cursor-pointer border-b border-slate-50 flex justify-between items-center transition-all";
+                        div.innerHTML = `
+                            <div>
+                                <p class="font-bold text-slate-700">${p.Nama}</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${p.Kode} • STOK: ${p.Saldo}</p>
+                            </div>
+                            <span class="text-blue-600 font-black">IDR ${p.HJual.toLocaleString()}</span>
+                        `;
+                        div.onclick = () => {
+                            currentSelectedProduct = p;
+                            document.getElementById('search-prod').value = p.Nama;
+                            document.getElementById('inp-price').value = "Rp " + p.HJual.toLocaleString('id-ID');
+                            dropdown.classList.add('hidden');
+                        };
+                        dropdown.appendChild(div);
+                    });
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        function addToCart() {
+            if (!currentSelectedProduct) return Swal.fire('Opps', 'Pilih barang dulu!', 'error');
+            const qty = parseFloat(document.getElementById('inp-qty').value);
+            const customPrice = parseRupiahToNumber(document.getElementById('inp-price').value);
+
+            if (customPrice < currentSelectedProduct.HBeli) {
+                return Swal.fire({
+                    icon: 'error',
+                    title: 'Harga Terlalu Rendah!',
+                    text: `Harga pokok barang ini adalah IDR ${currentSelectedProduct.HBeli.toLocaleString()}.`,
+                });
+            }
+
+            const index = cart.findIndex(i => i.Kode === currentSelectedProduct.Kode);
+            if (index > -1) {
+                cart[index].qty += qty;
+                cart[index].price = customPrice;
+                cart[index].subtotal = cart[index].qty * customPrice;
+            } else {
+                cart.push({ ...currentSelectedProduct, qty, price: customPrice, subtotal: qty * customPrice });
+            }
+
+            renderCart();
+            document.getElementById('search-prod').value = "";
+            document.getElementById('inp-price').value = "";
+            currentSelectedProduct = null;
+        }
+
+        function updateCartItem(index, field, value) {
+            let parsedVal = field === 'price' ? parseRupiahToNumber(value) : (parseFloat(value) || 0);
+
+            if (field === 'qty') {
+                cart[index].qty = parsedVal < 1 ? 1 : parsedVal;
+            } else if (field === 'price') {
+                cart[index].price = parsedVal;
+            }
+
+            cart[index].subtotal = cart[index].qty * cart[index].price;
+            renderCart(false);
+        }
+
+        function renderCart(fullRender = true) {
+            const tbody = document.getElementById('cart-table-body');
+            const emptyState = document.getElementById('empty-state');
+            const countLabel = document.getElementById('item-count');
+            let total = 0;
+
+            cart.length > 0 ? emptyState.classList.add('hidden') : emptyState.classList.remove('hidden');
+            countLabel.innerText = `${cart.length} Items`;
+
+            if (fullRender) tbody.innerHTML = "";
+
+            cart.forEach((item, i) => {
+                total += item.subtotal;
+                if (fullRender) {
+                    tbody.innerHTML += `
+                        <tr class="group hover:bg-slate-50/50 transition-all">
+                            <td class="p-4">
+                                <p class="font-bold text-slate-700">${item.Nama}</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">${item.Kode}</p>
+                            </td>
+                            <td class="p-4 text-center">
+                                <input type="number" min="1" value="${item.qty}" oninput="updateCartItem(${i}, 'qty', this.value)" class="w-20 text-center bg-slate-50 border border-slate-200 rounded-lg p-1.5 font-bold">
+                            </td>
+                            <td class="p-4 text-right">
+                                <input type="text" value="Rp ${item.price.toLocaleString('id-ID')}" oninput="formatInputRupiah(this); updateCartItem(${i}, 'price', this.value)" class="w-36 text-right bg-slate-50 border border-slate-200 rounded-lg p-1.5 font-bold text-blue-600">
+                            </td>
+                            <td class="p-4 text-right font-bold text-slate-800" id="subtotal-text-${i}">IDR ${item.subtotal.toLocaleString()}</td>
+                            <td class="p-4 text-center">
+                                <button onclick="removeItem(${i})" class="text-slate-300 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    const subtotalCell = document.getElementById(`subtotal-text-${i}`);
+                    if (subtotalCell) subtotalCell.innerText = `IDR ${item.subtotal.toLocaleString()}`;
+                }
+            });
+            document.getElementById('big-total').innerText = `IDR ${total.toLocaleString()}`;
+        }
+
+        function removeItem(i) {
+            cart.splice(i, 1);
+            renderCart(true);
+        }
+
+        function generateReportPDF() {
+            const element = document.getElementById('print-report-template');
+
+            const userData = getUserDataFromToken();
+            if (userData && userData.name) {
+                document.getElementById('pdf-kasir-name').innerText = ": " + userData.name.toLowerCase();
+            }
+
+            // Set waktu cetak real-time ke struk
+            document.getElementById('pdf-date-start').innerText = ": " + new Date().toLocaleString('id-ID');
+
+            const today = new Date().toISOString().split('T')[0];
+            const opt = {
+                margin: 0.2,
+                filename: `Form_Setoran_Kasir_${today}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element.innerHTML).save();
+        }
+
+        function formatIDR(value) {
+            return `IDR ${Number(value || 0).toLocaleString('id-ID')}`;
+        }
+
+        function escapeHTML(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function getReceiptNumber(result) {
+            return result?.invoice_no
+                || result?.invoiceNumber
+                || result?.transaction_no
+                || result?.transaction_id
+                || result?.sale_id
+                || result?.data?.invoice_no
+                || result?.data?.invoiceNumber
+                || result?.data?.transaction_no
+                || result?.data?.transaction_id
+                || result?.data?.sale_id
+                || `INV-${Date.now()}`;
+        }
+
+        function printTransactionReceipt(transactionResult = {}) {
+            const userData = getUserDataFromToken() || {};
+            const totalBill = cart.reduce((s, i) => s + i.subtotal, 0);
+            const totalPaid = paymentList.reduce((s, p) => s + p.value, 0);
+            const change = Math.max(totalPaid - totalBill, 0);
+            const remaining = Math.max(totalBill - totalPaid, 0);
+            const isDp = document.getElementById('inp-is-dp').checked;
+            const invoiceNo = getReceiptNumber(transactionResult);
+            const now = new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
+
+            const customerName = document.getElementById('cust-name')?.value?.trim() || '-';
+            const customerPhone = document.getElementById('cust-phone')?.value?.trim() || '-';
+
+            const itemRows = cart.map(item => `
+                <tr>
+                    <td colspan="3" class="item-name">${escapeHTML(item.Nama)}</td>
+                </tr>
+                <tr>
+                    <td>${escapeHTML(item.Kode)}</td>
+                    <td class="center">${item.qty} x ${Number(item.price || 0).toLocaleString('id-ID')}</td>
+                    <td class="right">${Number(item.subtotal || 0).toLocaleString('id-ID')}</td>
+                </tr>
+            `).join('');
+
+            const paymentRows = paymentList.map(pay => `
+                <tr>
+                    <td>${escapeHTML(pay.label)}</td>
+                    <td class="right">${Number(pay.value || 0).toLocaleString('id-ID')}</td>
+                </tr>
+            `).join('');
+
+            const receiptHTML = `
+                <!DOCTYPE html>
+                <html lang="id">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Nota ${escapeHTML(invoiceNo)}</title>
+                    <style>
+                        @page {
+                            size: 80mm auto;
+                            margin: 0;
+                        }
+
+                        body {
+                            margin: 0;
+                            padding: 0;
+                            background: #fff;
+                            color: #000;
+                            font-family: "Courier New", monospace;
+                            font-size: 11px;
+                        }
+
+                        .receipt {
+                            width: 72mm;
+                            padding: 4mm;
+                        }
+
+                        .center { text-align: center; }
+                        .right { text-align: right; }
+                        .bold { font-weight: bold; }
+                        .line {
+                            border-top: 1px dashed #000;
+                            margin: 8px 0;
+                        }
+
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+
+                        td {
+                            vertical-align: top;
+                            padding: 1px 0;
+                        }
+
+                        .item-name {
+                            font-weight: bold;
+                            padding-top: 4px;
+                        }
+
+                        .store-name {
+                            font-size: 14px;
+                            font-weight: bold;
+                            text-transform: uppercase;
+                        }
+
+                        .thanks {
+                            margin-top: 10px;
+                            text-align: center;
+                            font-weight: bold;
+                        }
+
+                        @media print {
+                            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="receipt">
+                        <div class="center">
+                            <div class="store-name">F01-LANGGENG ELEKTRONIK</div>
+                            <div>NOTA TRANSAKSI</div>
+                        </div>
+
+                        <div class="line"></div>
+
+                        <table>
+                            <tr><td>No Nota</td><td class="right">${escapeHTML(invoiceNo)}</td></tr>
+                            <tr><td>Tanggal</td><td class="right">${escapeHTML(now)}</td></tr>
+                            <tr><td>Kasir</td><td class="right">${escapeHTML(userData.name || 'Desak Kasir')}</td></tr>
+                            <tr><td>Status</td><td class="right">${isDp ? 'DP / Uang Muka' : 'Lunas'}</td></tr>
+                            ${isDp ? `
+                                <tr><td>Customer</td><td class="right">${escapeHTML(customerName)}</td></tr>
+                                <tr><td>No HP</td><td class="right">${escapeHTML(customerPhone)}</td></tr>
+                            ` : ''}
+                        </table>
+
+                        <div class="line"></div>
+
+                        <table>
+                            ${itemRows}
+                        </table>
+
+                        <div class="line"></div>
+
+                        <table>
+                            <tr class="bold"><td>Total</td><td class="right">${Number(totalBill).toLocaleString('id-ID')}</td></tr>
+                            <tr><td>Dibayar</td><td class="right">${Number(totalPaid).toLocaleString('id-ID')}</td></tr>
+                            ${isDp ? `
+                                <tr class="bold"><td>Sisa</td><td class="right">${Number(remaining).toLocaleString('id-ID')}</td></tr>
+                            ` : `
+                                <tr><td>Kembali</td><td class="right">${Number(change).toLocaleString('id-ID')}</td></tr>
+                            `}
+                        </table>
+
+                        <div class="line"></div>
+
+                        <div class="bold">Pembayaran:</div>
+                        <table>
+                            ${paymentRows}
+                        </table>
+
+                        <div class="line"></div>
+
+                        <div class="thanks">TERIMA KASIH</div>
+                        <div class="center">Barang yang sudah dibeli tidak dapat dikembalikan.</div>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const printFrame = document.createElement('iframe');
+            printFrame.style.position = 'fixed';
+            printFrame.style.right = '0';
+            printFrame.style.bottom = '0';
+            printFrame.style.width = '0';
+            printFrame.style.height = '0';
+            printFrame.style.border = '0';
+
+            document.body.appendChild(printFrame);
+
+            const frameDoc = printFrame.contentWindow.document;
+            frameDoc.open();
+            frameDoc.write(receiptHTML);
+            frameDoc.close();
+
+            setTimeout(() => {
+                printFrame.contentWindow.focus();
+                printFrame.contentWindow.print();
+
+                setTimeout(() => {
+                    if (printFrame.parentNode) {
+                        printFrame.parentNode.removeChild(printFrame);
+                    }
+                }, 1000);
+            }, 300);
+        }
+
+
+        async function executePayment() {
+            if (cart.length === 0) return Swal.fire('Opps', 'Keranjang masih kosong!', 'warning');
+            if (paymentList.length === 0) return Swal.fire('Opps', 'Tambahkan minimal satu metode pembayaran!', 'warning');
+
+            const userData = getUserDataFromToken();
+            if (!userData || !userData.user_id) return Swal.fire('Sesi Berakhir', 'Silakan login kembali.', 'error');
+
+            const totalBill = cart.reduce((s, i) => s + i.subtotal, 0);
+            const totalPaid = paymentList.reduce((s, p) => s + p.value, 0);
+            const isDp = document.getElementById('inp-is-dp').checked;
+
+            if (!isDp && totalPaid < totalBill) {
+                return Swal.fire('Gagal', `Uang pembayaran kurang!`, 'error');
+            }
+
+            const finalPaymentMethodString = paymentList.map(p => p.label).join(", ");
+            let customerPayload = null;
+
+            if (isDp) {
+                const name = document.getElementById('cust-name').value.trim();
+                const phone = document.getElementById('cust-phone').value.trim();
+                if (!name || !phone) return Swal.fire('Form Belum Lengkap', 'Nama & No. HP Pelanggan wajib diisi untuk DP!', 'warning');
+
+                customerPayload = {
+                    id: 0, name, phone_number: phone,
+                    identity_number: document.getElementById('cust-identity').value.trim(),
+                    age: parseInt(document.getElementById('cust-age').value) || 0,
+                    address: document.getElementById('cust-address').value.trim(),
+                    created_at: new Date().toISOString(), updated_at: new Date().toISOString()
+                };
+            }
+
+            const payload = cart.map(i => ({
+                product_search: i.Nama, member_name: userData.name || "Desak",
+                qty: i.qty, price: i.price, discount: 0, payment_method: finalPaymentMethodString,
+                amount_paid: totalPaid, is_dp: isDp, customer: customerPayload, user_id: String(userData.user_id)
+            }));
+
+            Swal.fire({ title: 'Memproses...', didOpen: () => Swal.showLoading() });
+
+            try {
+                const res = await fetch(`${API_URL}/sales`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    const result = await res.json().catch(() => ({}));
+
+                    Swal.close();
+                    printTransactionReceipt(result);
+
+                    setTimeout(() => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Transaksi Berhasil!',
+                            text: 'Nota sudah dikirim ke printer.',
+                        }).then(() => location.reload());
+                    }, 500);
+                } else {
+                    const result = await res.json().catch(() => ({}));
+                    Swal.fire('Gagal', result.error || 'Terjadi kesalahan sistem', 'error');
+                }
+            } catch (err) { Swal.fire('Error', 'Server Error', 'error'); }
+        }
+
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
+        }, 1000);
+
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#search-prod')) document.getElementById('res-dropdown').classList.add('hidden');
+        });
+
+        (function sinkronisasiSidebar() {
+            const userData = getUserDataFromToken();
+            if (userData && userData.name) {
+                const userElements = document.querySelectorAll('p.font-bold.text-slate-700');
+                userElements.forEach(el => {
+                    if (el.innerText === "Desak Kasir") el.innerText = userData.name;
+                });
+            }
+        })();
+    </script>
+</body>
+
+</html>

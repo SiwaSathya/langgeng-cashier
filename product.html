@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Product - SmartPOS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        /* Prevent scrolling when modal is open */
+        .modal-active {
+            overflow: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen">
+
+    <!-- SIDEBAR (Fixed Position) -->
+    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 fixed h-screen z-20">
+        <div class="flex items-center gap-3 mb-12">
+            <div
+                class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                <i class="fas fa-store"></i>
+            </div>
+            <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">SMARTPOS</h1>
+        </div>
+
+        <nav class="flex-1 space-y-2">
+            <a href="dashboard.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-th-large"></i> <span>Dashboard</span>
+            </a>
+            <a href="riwayat.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
+            </a>
+            <a href="product.html"
+                class="flex items-center gap-4 px-4 py-3.5 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
+                <i class="fas fa-box"></i> <span>Master Produk</span>
+            </a>
+            <a href="purchase.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
+            </a>
+            <a href="expense.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-shopping-cart"></i> <span>Pengeluaran</span>
+            </a>
+            <a href="retur.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-undo"></i> <span>Manajemen Retur</span>
+            </a>
+            <a href="report.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
+            </a>
+        </nav>
+
+        <div class="pt-8 border-t border-slate-100">
+            <div class="bg-slate-50 p-4 rounded-2xl mb-6">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">User Aktif</p>
+                <p class="font-bold text-slate-700">Desak Kasir</p>
+            </div>
+            <a href="index.html"
+                class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all">
+                <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT (Margin Left to account for fixed sidebar) -->
+    <main class="flex-1 ml-72 p-12">
+
+        <!-- HEADER SECTION -->
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-800 text-slate-800 tracking-tight">Master Product</h1>
+                <p class="text-slate-400 mt-1">Kelola data barang dan stok inventaris Anda secara real-time.</p>
+            </div>
+            <button onclick="openModal()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-blue-100">
+                <i class="fas fa-plus text-sm"></i> Tambah Produk
+            </button>
+        </div>
+
+        <!-- MAIN TABLE CARD -->
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-fade-in">
+            <!-- Toolbar Table -->
+            <div class="p-8 border-b border-slate-50 flex gap-4">
+                <div class="relative flex-1">
+                    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                    <input type="text" id="searchInput" onkeyup="debounceSearch()"
+                        placeholder="Cari nama atau kode produk..."
+                        class="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-[1.25rem] outline-none focus:border-blue-400 focus:bg-white transition-all text-sm font-medium">
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50/50 text-[11px] uppercase tracking-widest text-slate-400 font-bold">
+                        <tr>
+                            <th class="px-8 py-5">Produk</th>
+                            <th class="px-6 py-5">Kategori</th>
+                            <th class="px-6 py-5">Harga Jual</th>
+                            <th class="px-6 py-5">Stok</th>
+                            <th class="px-8 py-5 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody" class="divide-y divide-slate-50 text-slate-700">
+                        <!-- Data will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination & Info -->
+            <div class="p-8 bg-slate-50/30 flex justify-between items-center">
+                <p class="text-slate-500 text-sm">Menampilkan <span id="countInfo"
+                        class="font-bold text-slate-800 text-base">0</span> produk</p>
+                <div id="paginationControls" class="flex gap-2">
+                    <!-- Pagination buttons -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL POPUP (Create/Update) -->
+    <div id="productModal"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden">
+            <div class="p-8 border-b border-slate-50 flex justify-between items-center">
+                <h3 id="modalTitle" class="text-2xl font-800 text-slate-800">Tambah Produk Baru</h3>
+                <button onclick="closeModal()" class="text-slate-300 hover:text-slate-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="productForm" class="p-8 grid grid-cols-2 gap-6">
+                <input type="hidden" id="productId">
+
+                <div class="col-span-1">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Kode
+                        Produk</label>
+                    <input type="text" id="kode" required
+                        class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold">
+                </div>
+                <div class="col-span-1">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Nama
+                        Produk</label>
+                    <input type="text" id="nama" required
+                        class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold">
+                </div>
+
+                <!-- KOLOM BARU: SATUAN -->
+                <div class="col-span-1">
+                    <label
+                        class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Satuan</label>
+                    <input type="text" id="satuan" placeholder="PCS/Unit/Box" required
+                        class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold">
+                </div>
+
+                <div class="col-span-1">
+                    <label
+                        class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Kategori</label>
+                    <select id="category_id"
+                        class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none appearance-none font-bold text-slate-700 cursor-pointer"></select>
+                </div>
+                <div class="col-span-1">
+                    <label
+                        class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Brand</label>
+                    <select id="brand_id"
+                        class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none appearance-none font-bold text-slate-700 cursor-pointer"></select>
+                </div>
+                <div class="col-span-1">
+                    <label
+                        class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Supplier</label>
+                    <select id="supplier_id"
+                        class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none appearance-none font-bold text-slate-700 cursor-pointer"></select>
+                </div>
+
+                <div class="col-span-1">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Harga
+                        Beli (Rp)</label>
+                    <input type="number" step="any" id="hbeli"
+                        class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold">
+                </div>
+
+                <!-- KOLOM BARU: HARGA POKOK -->
+                <div class="col-span-1">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Harga
+                        Pokok (Rp)</label>
+                    <input type="number" step="any" id="hpokok"
+                        class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold">
+                </div>
+
+                <div class="col-span-1">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Harga
+                        Jual (Rp)</label>
+                    <input type="number" step="any" id="hjual"
+                        class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold">
+                </div>
+
+                <!-- KOLOM BARU: SALDO -->
+                <div class="col-span-1">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Saldo /
+                        Stok Awal</label>
+                    <input type="number" step="any" id="saldo"
+                        class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold">
+                </div>
+
+                <div class="col-span-2 pt-4">
+                    <button type="submit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white p-5 rounded-2xl font-800 transition-all shadow-lg shadow-blue-100 uppercase tracking-widest">
+                        Simpan Data Produk
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const BASE_URL = "http://localhost:4000";
+        let currentPage = 1;
+        const limit = 10; // Konsistensi limit
+        let searchTimer;
+
+        window.onload = () => {
+            fetchProducts();
+            loadResources();
+        };
+
+        // 1. LOAD RESOURCES (Tetap seperti kode Anda karena sudah benar)
+        async function loadResources() {
+            try {
+                const res = await fetch(`${BASE_URL}/api/master/resources`);
+                if (!res.ok) throw new Error("Gagal ambil resource master");
+                const data = await res.json();
+                const fillSelect = (id, items) => {
+                    const el = document.getElementById(id);
+                    if (!el || !items) return;
+                    el.innerHTML = items.map(i => `<option value="${i.ID}">${i.Nama || i.Name || i.name}</option>`).join('');
+                };
+                fillSelect('category_id', data.categories);
+                fillSelect('brand_id', data.brands);
+                fillSelect('supplier_id', data.suppliers);
+            } catch (err) {
+                console.error("Master Resource Error:", err);
+            }
+        }
+
+        // 2. FETCH PRODUCTS (FIXED DATA MAPPING)
+        async function fetchProducts() {
+            const search = document.getElementById('searchInput').value;
+            const tbody = document.getElementById('productTableBody');
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/products?page=${currentPage}&search=${search}&limit=${limit}`);
+                const result = await res.json();
+
+                // Fix: Mendukung format { data: [], total: 0 } atau Array langsung
+                const products = Array.isArray(result) ? result : (result.data || []);
+                const total = result.total !== undefined ? result.total : products.length;
+
+                if (products.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="px-8 py-20 text-center text-slate-400">Data tidak ditemukan</td></tr>`;
+                    document.getElementById('countInfo').innerText = "0";
+                    renderPagination(0);
+                    return;
+                }
+
+                tbody.innerHTML = products.map(p => `
+            <tr class="hover:bg-slate-50/50 transition-colors">
+                <td class="px-8 py-5">
+                    <div class="font-bold text-slate-700">${p.Nama || p.nama || '-'}</div>
+                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">${p.Kode || p.kode || '-'}</div>
+                </td>
+                <td class="px-6 py-5 text-sm text-slate-500 font-semibold">
+                    ${p.Category ? (p.Category.Nama || p.Category.Name || p.Category.name) : (p.CategoryID || '-')}
+                </td>
+                <td class="px-6 py-5 font-bold text-slate-700">
+                    Rp ${parseFloat(p.HJual || p.Hjual || p.hjual || 0).toLocaleString('id-ID')}
+                </td>
+                <td class="px-6 py-5">
+                    <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold">${p.Saldo || p.saldo || 0} Unit</span>
+                </td>
+                <td class="px-8 py-5 text-right">
+                    <button onclick="editProduct('${p.ID || p.id}')" class="text-blue-500 hover:text-blue-700 mx-2 transition-colors"><i class="fas fa-edit"></i></button>
+                    <button onclick="deleteProduct('${p.ID || p.id}')" class="text-red-400 hover:text-red-600 mx-2 transition-colors"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+
+                document.getElementById('countInfo').innerText = total;
+                renderPagination(total);
+
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-8 py-20 text-center text-red-500">Koneksi Error: ${err.message}</td></tr>`;
+            }
+        }
+
+        // 3. LOGIKA PAGINATION (FIXED: SLIDING WINDOW)
+        function renderPagination(total) {
+            const totalPages = Math.ceil(total / limit);
+            const container = document.getElementById('paginationControls');
+
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+
+            // Tombol Previous
+            html += `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} 
+             class="px-3 py-2 rounded-xl border border-slate-100 text-slate-400 hover:bg-slate-100 disabled:opacity-30">
+             <i class="fas fa-chevron-left text-xs"></i></button>`;
+
+            // Logika angka (Hanya munculkan max 5 angka di sekitar current page)
+            let start = Math.max(1, currentPage - 2);
+            let end = Math.min(totalPages, start + 4);
+            if (end - start < 4) start = Math.max(1, end - 4);
+
+            for (let i = start; i <= end; i++) {
+                if (i < 1) continue;
+                html += `
+            <button onclick="changePage(${i})" 
+                class="w-10 h-10 rounded-xl font-bold transition-all ${currentPage === i ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-slate-400 hover:bg-slate-50 border border-slate-100'}">
+                ${i}
+            </button>
+        `;
+            }
+
+            // Tombol Next
+            html += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} 
+             class="px-3 py-2 rounded-xl border border-slate-100 text-slate-400 hover:bg-slate-100 disabled:opacity-30">
+             <i class="fas fa-chevron-right text-xs"></i></button>`;
+
+            container.innerHTML = html;
+        }
+
+        function changePage(page) {
+            if (page < 1) return;
+            currentPage = page;
+            fetchProducts();
+        }
+
+        function debounceSearch() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                currentPage = 1;
+                fetchProducts();
+            }, 500);
+        }
+
+        // 4. MODAL & SUBMIT (Tetap seperti kode Anda)
+        function openModal(isEdit = false) {
+            document.getElementById('productModal').classList.remove('hidden');
+            document.body.classList.add('modal-active');
+            if (!isEdit) {
+                document.getElementById('modalTitle').innerText = "Tambah Produk Baru";
+                document.getElementById('productForm').reset();
+                document.getElementById('productId').value = "";
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').classList.add('hidden');
+            document.body.classList.remove('modal-active');
+        }
+
+        document.getElementById('productForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('productId').value;
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${BASE_URL}/api/products/${id}` : `${BASE_URL}/api/products`;
+
+            const payload = {
+                Kode: document.getElementById('kode').value,
+                Nama: document.getElementById('nama').value,
+                Satuan: document.getElementById('satuan').value, // Baru
+                Saldo: parseFloat(document.getElementById('saldo').value || 0), // Baru
+                HBeli: parseFloat(document.getElementById('hbeli').value || 0),
+                HPokok: parseFloat(document.getElementById('hpokok').value || 0), // Baru
+                HJual: parseFloat(document.getElementById('hjual').value || 0),
+                CategoryID: parseInt(document.getElementById('category_id').value),
+                BrandID: parseInt(document.getElementById('brand_id').value),
+                SupplierID: document.getElementById('supplier_id').value, // SupplierID di struct adalah string
+            };
+
+            const res = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                closeModal();
+                fetchProducts();
+            } else {
+                alert("Gagal menyimpan data");
+            }
+        };
+
+        async function editProduct(id) {
+            const res = await fetch(`${BASE_URL}/api/products/${id}`);
+            const data = await res.json();
+            const p = data.data || data;
+
+            document.getElementById('productId').value = p.ID || p.id;
+            document.getElementById('kode').value = p.Kode || p.kode || '';
+            document.getElementById('nama').value = p.Nama || p.nama || '';
+            document.getElementById('satuan').value = p.Satuan || p.satuan || ''; // Baru
+            document.getElementById('saldo').value = p.Saldo || p.saldo || 0; // Baru
+            document.getElementById('hbeli').value = p.HBeli || p.hbeli || 0;
+            document.getElementById('hpokok').value = p.HPokok || p.hpokok || 0; // Baru
+            document.getElementById('hjual').value = p.HJual || p.hjual || 0;
+            document.getElementById('category_id').value = p.CategoryID || p.category_id;
+            document.getElementById('brand_id').value = p.BrandID || p.brand_id;
+            document.getElementById('supplier_id').value = p.SupplierID || p.supplier_id;
+
+            document.getElementById('modalTitle').innerText = "Edit Produk";
+            openModal(true);
+        }
+
+        async function deleteProduct(id) {
+            if (confirm("Apakah Anda yakin ingin menghapus produk ini?")) {
+                try {
+                    const res = await fetch(`${BASE_URL}/api/products/${id}`, { method: 'DELETE' });
+                    if (res.ok) fetchProducts();
+                    else alert("Gagal menghapus produk");
+                } catch (err) {
+                    alert("Koneksi error");
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

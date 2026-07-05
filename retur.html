@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Retur - SMARTPOS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body class="bg-[#F8FAFC] flex h-screen overflow-hidden">
+
+    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 z-20">
+        <div class="flex items-center gap-3 mb-12">
+            <div
+                class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                <i class="fas fa-store"></i>
+            </div>
+            <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">SMARTPOS</h1>
+        </div>
+
+        <nav class="flex-1 space-y-2">
+            <a href="dashboard.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-store"></i> <span>Dashboard</span>
+            </a>
+            <a href="riwayat.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
+            </a>
+            <a href="product.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-box"></i> <span>Master Produk</span>
+            </a>
+            <a href="purchase.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
+            </a>
+            <a href="expense.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-shopping-cart"></i> <span>Pengeluaran</span>
+            </a>
+            <a href="retur.html"
+                class="flex items-center gap-4 px-4 py-3.5 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
+                <i class="fas fa-undo"></i> <span>Manajemen Retur</span>
+            </a>
+            <a href="report.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
+            </a>
+        </nav>
+
+        <div class="pt-8 border-t border-slate-100">
+            <div class="bg-slate-50 p-4 rounded-2xl mb-6">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">User Active</p>
+                <p class="font-bold text-slate-700">Desak Kasir</p>
+            </div>
+            <a href="index.html"
+                class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all">
+                <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <header class="h-20 bg-white border-b border-slate-200 px-10 flex justify-between items-center shrink-0">
+            <div class="flex flex-col">
+                <h2 class="text-lg font-bold text-slate-800">Log & Kontrol Retur Barang</h2>
+                <p id="clock" class="text-xs text-slate-400 font-medium"></p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="fetchRetur()"
+                    class="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-600 px-5 py-2.5 rounded-xl font-bold border border-slate-200 transition-all">
+                    <i class="fas fa-sync-alt"></i> Refresh Table
+                </button>
+                <button onclick="openAddReturModal()"
+                    class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-200 transition-all">
+                    <i class="fas fa-plus"></i> Tambah Retur
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 p-10 overflow-y-auto custom-scroll">
+            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-8 border-b border-slate-50">
+                    <h3 class="font-bold text-slate-800">Daftar Aktivitas Retur</h3>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr
+                                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50 bg-slate-50/30">
+                                <th class="p-6 text-left">ID Retur</th>
+                                <th class="p-6 text-left">Asal Invoice</th>
+                                <th class="p-6 text-left">Nama Produk</th>
+                                <th class="p-6 text-left">Alasan Retur</th>
+                                <th class="p-6 text-center">Status System</th>
+                                <th class="p-6 text-center w-64">Tindakan Lanjutan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="retur-body" class="divide-y divide-slate-50 font-semibold text-slate-600">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="retur-empty" class="hidden py-32 flex flex-col items-center justify-center text-slate-300">
+                    <i class="fas fa-exchange-alt text-6xl mb-4 opacity-20"></i>
+                    <p class="font-semibold italic">Belum ada aktivitas retur yang terdaftar</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = "http://localhost:4000/api";
+
+        async function fetchRetur() {
+            const tbody = document.getElementById('retur-body');
+            const emptyState = document.getElementById('retur-empty');
+            tbody.innerHTML = `<tr><td colspan="6" class="py-20 text-center text-slate-400 font-medium">Memuat data log retur...</td></tr>`;
+
+            try {
+                const response = await fetch(`${API_URL}/retur`);
+                const data = await response.json();
+                tbody.innerHTML = "";
+
+                if (data && data.length > 0) {
+                    emptyState.classList.add('hidden');
+
+                    data.forEach((r) => {
+                        const id = r.ID || r.id;
+                        const status = r.Status || r.status || 'Retur Sukses';
+                        const reason = r.Reason || r.reason || '-';
+
+                        const sales = r.Sales || r.sales || {};
+                        const invoice = sales.Invoice || sales.invoice || '-';
+                        const product = sales.Product || sales.product || {};
+                        const productName = product.Nama || product.nama || 'Produk Induk';
+
+                        let badgeHtml = "";
+                        let actionButtons = "";
+
+                        if (status === "Retur Sukses") {
+                            badgeHtml = `<span class="bg-blue-50 text-blue-600 border border-blue-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Retur Sukses (Di Toko)</span>`;
+                            actionButtons = `
+                                <button onclick="triggerAction(${id}, 'batal')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all mr-1">
+                                    <i class="fas fa-times mr-1"></i> Batalkan
+                                </button>
+                                <button onclick="triggerAction(${id}, 'distributor')" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm">
+                                    <i class="fas fa-truck mr-1"></i> Ke Distributor
+                                </button>
+                            `;
+                        } else if (status === "Retur ke Distributor") {
+                            badgeHtml = `<span class="bg-amber-50 text-amber-600 border border-amber-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase animate-pulse">Menunggu Supplier</span>`;
+                            actionButtons = `
+                                <button onclick="triggerAction(${id}, 'selesai')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm w-full">
+                                    <i class="fas fa-check-circle mr-1"></i> Selesaikan Retur
+                                </button>
+                            `;
+                        } else if (status === "Retur Dibatalkan") {
+                            badgeHtml = `<span class="bg-slate-100 text-slate-400 border border-slate-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Dibatalkan</span>`;
+                            actionButtons = `<span class="text-xs italic text-slate-400 font-medium">No Action Needed</span>`;
+                        } else if (status === "Selesai (Distributor)") {
+                            badgeHtml = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Selesai Beres</span>`;
+                            actionButtons = `<span class="text-xs text-emerald-500 font-bold"><i class="fas fa-check"></i> Selesai</span>`;
+                        }
+
+                        const row = document.createElement('tr');
+                        row.className = "hover:bg-slate-50/50 transition-all";
+                        row.innerHTML = `
+                            <td class="p-6 text-slate-400 font-bold">#RET-${id}</td>
+                            <td class="p-6"><span class="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg text-xs font-bold border">#${invoice}</span></td>
+                            <td class="p-6 text-slate-800 font-bold">${productName}</td>
+                            <td class="p-6 text-xs text-slate-500 font-medium max-w-[200px] truncate" title="${reason}">${reason}</td>
+                            <td class="p-6 text-center">${badgeHtml}</td>
+                            <td class="p-6 text-center">${actionButtons}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    emptyState.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="6" class="py-20 text-center text-red-400 font-bold">Gagal mengambil data dari API Server</td></tr>`;
+            }
+        }
+
+        // FUNGSI BARU: MENAMPILKAN POP UP MODAL TAMBAH DATA RETUR
+        async function openAddReturModal() {
+            const { value: formValues } = await Swal.fire({
+                title: 'Form Pengajuan Retur Barang',
+                html: `
+                    <div class="text-left space-y-4 font-sans px-2">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ID Penjualan / Sales ID</label>
+                            <input id="swal-sales-id" type="number" placeholder="Contoh: 12" 
+                                class="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 text-sm font-semibold bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jumlah Item Diretur (Qty)</label>
+                            <input id="swal-qty" type="number" min="1" value="1" 
+                                class="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 text-sm font-semibold bg-slate-50 text-center">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Alasan Retur Kerusakan</label>
+                            <textarea id="swal-reason" placeholder="Ketik alasan detail barang diretur..." rows="3"
+                                class="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 text-sm font-semibold bg-slate-50 resize-none"></textarea>
+                        </div>
+                    </div>
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonColor: '#2563EB',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: '<i class="fas fa-save mr-1"></i> Ajukan Retur',
+                cancelButtonText: 'Batal',
+                preConfirm: () => {
+                    const salesId = document.getElementById('swal-sales-id').value.trim();
+                    const qty = document.getElementById('swal-qty').value.trim();
+                    const reason = document.getElementById('swal-reason').value.trim();
+
+                    if (!salesId) {
+                        Swal.showValidationMessage('ID Penjualan wajib diisi!');
+                        return false;
+                    }
+                    if (!qty || parseFloat(qty) <= 0) {
+                        Swal.showValidationMessage('Jumlah kuantitas harus lebih dari 0!');
+                        return false;
+                    }
+                    if (!reason) {
+                        Swal.showValidationMessage('Alasan retur tidak boleh kosong!');
+                        return false;
+                    }
+
+                    return { sales_id: parseInt(salesId), qty: parseFloat(qty), reason: reason };
+                }
+            });
+
+            if (formValues) {
+                executeAddRetur(formValues);
+            }
+        }
+
+        // FUNGSI BARU: MENGIRIM DATA TRANSAKSI RETUR BARU KE API BACKEND
+        async function executeAddRetur(payload) {
+            Swal.fire({ title: 'Menyimpan data retur...', didOpen: () => Swal.showLoading() });
+
+            try {
+                const res = await fetch(`${API_URL}/retur`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Retur Berhasil Diajukan!',
+                        text: 'Stok sistem otomatis disesuaikan.',
+                        confirmButtonColor: '#2563EB'
+                    }).then(() => fetchRetur());
+                } else {
+                    const err = await res.json();
+                    Swal.fire('Gagal Menyimpan', err.error || 'Terjadi kesalahan sistem internal', 'error');
+                }
+            } catch (e) {
+                Swal.fire('Error', 'Gagal terhubung dengan API Server', 'error');
+            }
+        }
+
+        async function triggerAction(id, type) {
+            let config = {
+                title: 'Apakah anda yakin?',
+                text: '',
+                icon: 'warning',
+                urlPath: ''
+            };
+
+            if (type === 'batal') {
+                config.text = "Membatalkan retur akan memulihkan kuantitas penjualan customer dan mengurangi stok toko kembali!";
+                config.urlPath = `/retur/${id}/batal`;
+            } else if (type === 'distributor') {
+                config.text = "Barang akan diproses keluar toko menuju pihak distributor/supplier, kuantitas produk di sistem akan berkurang!";
+                config.urlPath = `/retur/${id}/distributor`;
+            } else if (type === 'selesai') {
+                config.text = "Konfirmasi bahwa barang baru pengganti dari distributor telah diterima dengan baik di toko!";
+                config.urlPath = `/retur/${id}/selesai`;
+            }
+
+            const confirm = await Swal.fire({
+                title: config.title,
+                text: config.text,
+                icon: config.icon,
+                showCancelButton: true,
+                confirmButtonColor: '#2563EB',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: 'Ya, Eksekusi!'
+            });
+
+            if (!confirm.isConfirmed) return;
+
+            Swal.fire({ title: 'Memproses status...', didOpen: () => Swal.showLoading() });
+
+            try {
+                const res = await fetch(`${API_URL}${config.urlPath}`, { method: 'PUT' });
+                if (res.ok) {
+                    Swal.fire('Berhasil!', 'Log status retur dan mutasi kuantitas diperbarui.', 'success').then(() => fetchRetur());
+                } else {
+                    const err = await res.json();
+                    Swal.fire('Gagal', err.error || 'Terjadi kesalahan internal', 'error');
+                }
+            } catch (e) {
+                Swal.fire('Error', 'Koneksi ke server terputus', 'error');
+            }
+        }
+
+        // Init Load
+        fetchRetur();
+
+        // Live Clock
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
+        }, 1000);
+    </script>
+</body>
+
+</html>

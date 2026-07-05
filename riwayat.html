@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Transaksi - SMARTPOS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body class="bg-[#F8FAFC] flex h-screen overflow-hidden">
+
+    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 z-20">
+        <div class="flex items-center gap-3 mb-12">
+            <div
+                class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                <i class="fas fa-store"></i>
+            </div>
+            <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">SMARTPOS</h1>
+        </div>
+
+        <nav class="flex-1 space-y-2">
+            <a href="dashboard.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-th-large"></i> <span>Dashboard</span>
+            </a>
+            <a href="riwayat.html"
+                class="flex items-center gap-4 px-4 py-3.5 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
+                <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
+            </a>
+            <a href="product.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-box"></i> <span>Master Produk</span>
+            </a>
+            <a href="purchase.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
+            </a>
+            <a href="expense.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-shopping-cart"></i> <span>Pengeluaran</span>
+            </a>
+            <a href="retur.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-undo"></i> <span>Manajemen Retur</span>
+            </a>
+            <a href="report.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
+            </a>
+        </nav>
+
+        <div class="pt-8 border-t border-slate-100">
+            <div class="bg-slate-50 p-4 rounded-2xl mb-6">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">User Aktif</p>
+                <p class="font-bold text-slate-700">Desak Kasir</p>
+            </div>
+            <a href="index.html"
+                class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all">
+                <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <header class="h-20 bg-white border-b border-slate-200 px-10 flex justify-between items-center shrink-0">
+            <div class="flex flex-col">
+                <h2 class="text-lg font-bold text-slate-800">Riwayat Penjualan</h2>
+                <p id="clock" class="text-xs text-slate-400 font-medium"></p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="fetchRiwayat()"
+                    class="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-600 px-5 py-2.5 rounded-xl font-bold border border-slate-200 transition-all">
+                    <i class="fas fa-sync-alt"></i> Refresh Data
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 p-10 overflow-y-auto custom-scroll">
+            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-8 border-b border-slate-50">
+                    <h3 class="font-bold text-slate-800">Semua Transaksi</h3>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr
+                                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50 bg-slate-50/30">
+                                <th class="p-6 text-left">Invoice</th>
+                                <th class="p-6 text-left">Tanggal & Waktu</th>
+                                <th class="p-6 text-left">Produk</th>
+                                <th class="p-6 text-center">Status</th>
+                                <th class="p-6 text-left">Metode</th>
+                                <th class="p-6 text-center">Qty</th>
+                                <th class="p-6 text-right">Total Netto</th>
+                                <th class="p-6 text-right">Bayar</th>
+                                <th class="p-6 text-center w-48">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="riwayat-body" class="divide-y divide-slate-50 font-semibold text-slate-600">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="empty-state" class="hidden py-32 flex flex-col items-center justify-center text-slate-300">
+                    <i class="fas fa-folder-open text-6xl mb-4 opacity-20"></i>
+                    <p class="font-semibold italic">Belum ada data transaksi tersimpan</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = "http://localhost:4000/api";
+        let localSalesData = [];
+
+        async function fetchRiwayat() {
+            const tbody = document.getElementById('riwayat-body');
+            const emptyState = document.getElementById('empty-state');
+
+            tbody.innerHTML = `<tr><td colspan="9" class="py-20 text-center text-slate-400 font-medium">Memproses data...</td></tr>`;
+
+            try {
+                const response = await fetch(`${API_URL}/sales`);
+                const data = await response.json();
+                tbody.innerHTML = "";
+
+                if (data && data.length > 0) {
+                    localSalesData = data;
+                    emptyState.classList.add('hidden');
+
+                    data.forEach((s, idx) => {
+                        let statusBadge = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Lunas</span>`;
+                        if (s.is_dp || s.Status === "DP") {
+                            statusBadge = `<span class="bg-amber-50 text-amber-600 border border-amber-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">DP / Belum Lunas</span>`;
+                        }
+
+                        let actionButtons = "";
+                        if (s.is_dp || s.Status === "DP") {
+                            actionButtons += `
+                                <button onclick="openPelunasanModal(${idx})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all mr-1 shadow-sm">
+                                    <i class="fas fa-money-bill-wave mr-1"></i> Pelunasan
+                                </button>
+                            `;
+                        }
+                        actionButtons += `
+                            <button onclick="openReturModal(${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm">
+                                <i class="fas fa-undo mr-1"></i> Retur
+                            </button>
+                        `;
+
+                        // Mengatasi variasi uppercase/lowercase key dari struct Go JSON
+                        const invoice = s.invoice || s.Invoice || '-';
+                        const productName = s.Product ? s.Product.Nama : (s.product_search || 'Produk');
+                        const productCode = s.Product ? s.Product.Kode : '-';
+                        const paymentMethod = s.payment_method || s.PaymentMethod || 'Tunai';
+                        const qty = s.qty || s.Qty || 0;
+                        const totalNetto = s.total_netto || s.TotalNetto || 0;
+                        const amountPaid = s.amount_paid || s.AmountPaid || 0;
+
+                        const row = document.createElement('tr');
+                        row.className = "hover:bg-slate-50/50 transition-all";
+                        row.innerHTML = `
+                            <td class="p-6">
+                                <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold border border-blue-100">
+                                    #${invoice}
+                                </span>
+                            </td>
+                            <td class="p-6 text-xs text-slate-400 font-bold">
+                                ${s.CreatedAt ? new Date(s.CreatedAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-'}
+                            </td>
+                            <td class="p-6">
+                                <p class="text-slate-800 font-bold">${productName}</p>
+                                <p class="text-[10px] text-slate-400 uppercase font-black">${productCode}</p>
+                            </td>
+                            <td class="p-6 text-center">${statusBadge}</td>
+                            <td class="p-6 text-xs text-slate-500 max-w-[150px] truncate" title="${paymentMethod}">
+                                ${paymentMethod}
+                            </td>
+                            <td class="p-6 text-center font-bold">${qty}</td>
+                            <td class="p-6 text-right font-extrabold text-slate-800">IDR ${totalNetto.toLocaleString()}</td>
+                            <td class="p-6 text-right text-emerald-600 font-bold">IDR ${amountPaid.toLocaleString()}</td>
+                            <td class="p-6 text-center">${actionButtons}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    emptyState.classList.remove('hidden');
+                    tbody.innerHTML = "";
+                }
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="9" class="py-20 text-center text-red-400 font-bold">Gagal terhubung ke API Server</td></tr>`;
+            }
+        }
+
+        // --- 1. POPUP MODAL PELUNASAN MULTI-METODE ---
+        let modalPaymentList = [];
+
+        function openPelunasanModal(idx) {
+            const sale = localSalesData[idx];
+            const saleId = sale.id || sale.ID || 0;
+            const totalNetto = sale.total_netto || sale.TotalNetto || 0;
+            const amountPaid = sale.amount_paid || sale.AmountPaid || 0;
+            const sisaHutang = totalNetto - amountPaid;
+            const currentMethod = sale.payment_method || sale.PaymentMethod || 'Tunai';
+
+            modalPaymentList = [];
+
+            Swal.fire({
+                title: '<span class="text-slate-800 font-bold text-lg">Pelunasan Transaksi DP</span>',
+                html: `
+                    <div class="text-left text-sm space-y-4 p-1">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs font-semibold text-slate-600">
+                            <div class="flex justify-between mb-1"><span>Total Belanja:</span><span class="font-bold text-slate-800">IDR ${totalNetto.toLocaleString()}</span></div>
+                            <div class="flex justify-between mb-1"><span>Sudah Dibayar:</span><span class="font-bold text-emerald-600">IDR ${amountPaid.toLocaleString()}</span></div>
+                            <div class="flex justify-between border-t pt-1 font-bold text-slate-800"><span>Kekurangan / Sisa Hutang:</span><span class="text-rose-600 text-sm">IDR ${sisaHutang.toLocaleString()}</span></div>
+                        </div>
+
+                        <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100/60 space-y-3">
+                            <p class="text-[10px] font-black uppercase text-blue-600 tracking-wider"><i class="fas fa-plus mr-1"></i> Tambah Metode Pembayaran</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 font-bold mb-1">Metode</label>
+                                    <select id="modal-pay-type" onchange="toggleModalBankSelect()" class="w-full bg-white border p-2 rounded-lg text-xs font-bold outline-none">
+                                        <option value="Tunai">💵 Tunai</option>
+                                        <option value="EDC">💳 EDC</option>
+                                        <option value="Transfer">📲 Transfer</option>
+                                    </select>
+                                </div>
+                                <div id="modal-bank-wrapper" style="display:none;">
+                                    <label class="block text-[10px] text-slate-400 font-bold mb-1">Bank</label>
+                                    <select id="modal-pay-bank" class="w-full bg-white border p-2 rounded-lg text-xs font-bold outline-none">
+                                        <option value="BCA">BCA</option>
+                                        <option value="BNI">BNI</option>
+                                        <option value="BRI">BRI</option>
+                                        <option value="MANDIRI">MANDIRI</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <div class="flex-1">
+                                    <label class="block text-[10px] text-slate-400 font-bold mb-1">Nominal Rupiah</label>
+                                    <input type="number" id="modal-pay-amount" placeholder="0" class="w-full bg-white border p-2 rounded-lg text-xs font-bold outline-none">
+                                </div>
+                                <button type="button" onclick="addPaymentToModalList()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 rounded-lg font-bold h-[34px] self-end transition-all">
+                                    + Add
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="modal-list-box" class="space-y-1 bg-slate-100 p-2.5 rounded-xl hidden max-h-24 overflow-y-auto custom-scroll"></div>
+                        
+                        <div class="flex justify-between items-center font-bold text-xs px-1 text-slate-700">
+                            <span>Total Diinput:</span>
+                            <span id="modal-text-total-paid" class="text-blue-600 font-black">IDR 0</span>
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Simpan Pelunasan',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#2563EB',
+                preConfirm: () => {
+                    const totalDiinput = modalPaymentList.reduce((s, p) => s + p.value, 0);
+                    if (modalPaymentList.length === 0 || totalDiinput <= 0) {
+                        Swal.showValidationMessage('Anda belum menginput nominal pelunasan!');
+                        return false;
+                    }
+                    if (totalDiinput < sisaHutang) {
+                        Swal.showValidationMessage(`Pembayaran kurang! Kekurangan adalah IDR ${sisaHutang.toLocaleString()}`);
+                        return false;
+                    }
+
+                    const stringPelunasanBaru = modalPaymentList.map(p => p.label).join(", ");
+                    const finalMethodsCombined = `${currentMethod}, [Pelunasan: ${stringPelunasanBaru}]`;
+                    const finalTotalPaid = amountPaid + totalDiinput;
+
+                    // Mengirimkan payload update data penjualan yang spesifik ke ID terkait
+                    return {
+                        id: saleId,
+                        payment_method: finalMethodsCombined,
+                        amount_paid: finalTotalPaid,
+                        is_dp: false,
+                        status: "Lunas"
+                    };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    processPelunasanAPI(result.value);
+                }
+            });
+        }
+
+        function toggleModalBankSelect() {
+            const type = document.getElementById('modal-pay-type').value;
+            document.getElementById('modal-bank-wrapper').style.display = (type === 'Tunai') ? 'none' : 'block';
+        }
+
+        function addPaymentToModalList() {
+            const type = document.getElementById('modal-pay-type').value;
+            const amount = parseFloat(document.getElementById('modal-pay-amount').value || 0);
+
+            if (amount <= 0) return alert("Masukkan nominal yang valid!");
+
+            let label = type;
+            if (type !== 'Tunai') {
+                label = `${type} - ${document.getElementById('modal-pay-bank').value}`;
+            }
+
+            modalPaymentList.push({ label, value: amount });
+            document.getElementById('modal-pay-amount').value = "";
+            renderModalPaymentList();
+        }
+
+        function renderModalPaymentList() {
+            const box = document.getElementById('modal-list-box');
+            const totalText = document.getElementById('modal-text-total-paid');
+
+            if (modalPaymentList.length === 0) {
+                box.classList.add('hidden');
+                totalText.innerText = "IDR 0";
+                return;
+            }
+
+            box.classList.remove('hidden');
+            box.innerHTML = "";
+            let total = 0;
+
+            modalPaymentList.forEach((p, i) => {
+                total += p.value;
+                box.innerHTML += `
+                    <div class="flex justify-between bg-white px-2 py-1 rounded text-[11px] font-bold text-slate-600 border">
+                        <span>${p.label}</span>
+                        <span>IDR ${p.value.toLocaleString()}</span>
+                    </div>
+                `;
+            });
+            totalText.innerText = `IDR ${total.toLocaleString()}`;
+        }
+
+        async function processPelunasanAPI(payload) {
+            Swal.fire({ title: 'Menyimpan Pelunasan...', didOpen: () => Swal.showLoading() });
+            try {
+                // Menggunakan PUT/PATCH ke route /api/sales/:id sesuai dengan ID transaksi data DP
+                const res = await fetch(`${API_URL}/sales/${payload.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    Swal.fire('Berhasil!', 'Pelunasan transaksi telah berhasil dicatat.', 'success').then(() => fetchRiwayat());
+                } else {
+                    const err = await res.json();
+                    Swal.fire('Gagal', err.error || 'Terjadi kesalahan sistem', 'error');
+                }
+            } catch (e) { Swal.fire('Error', 'Gagal terhubung ke server', 'error'); }
+        }
+
+
+        // --- 2. POPUP MODAL RETUR BARANG PARSIAL ---
+        function openReturModal(idx) {
+            const sale = localSalesData[idx];
+            const saleId = sale.id || sale.ID || 0;
+            const maxQty = sale.qty || sale.Qty || 1;
+            const itemName = sale.Product ? sale.Product.Nama : (sale.product_search || 'Produk');
+
+            Swal.fire({
+                title: '<span class="text-slate-800 font-bold text-lg">Retur Barang Penjualan</span>',
+                html: `
+                    <div class="text-left text-sm space-y-4 p-1">
+                        <div class="bg-rose-50/50 p-4 rounded-xl border border-rose-100 text-xs font-semibold text-slate-600">
+                            <p class="font-bold text-slate-800 mb-1">Item: ${itemName}</p>
+                            <p>Maksimum Qty yang Bisa Diretur: <span class="font-black text-rose-600">${maxQty} Pcs</span></p>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] text-slate-400 font-bold mb-1 uppercase tracking-wider">Jumlah Qty Diretur</label>
+                            <input type="number" id="retur-qty" value="1" min="1" max="${maxQty}" class="w-full bg-white border p-3 rounded-xl font-bold text-slate-700 outline-none focus:border-rose-400">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] text-slate-400 font-bold mb-1 uppercase tracking-wider">Alasan Retur</label>
+                            <textarea id="retur-reason" rows="2" placeholder="Contoh: Barang cacat fisik / salah spesifikasi..." class="w-full bg-white border p-3 rounded-xl text-xs font-semibold outline-none focus:border-rose-400"></textarea>
+                        </div>
+
+                        <div class="space-y-2 pt-2 border-t">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="retur-to-company" class="w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500">
+                                <span class="text-xs font-bold text-slate-600">Kembalikan langsung barang ke Perusahaan (Supplier / Produsen)?</span>
+                            </label>
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Proses Retur',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#F43F5E',
+                preConfirm: () => {
+                    const qtyInput = parseInt(document.getElementById('retur-qty').value || 0);
+                    const reason = document.getElementById('retur-reason').value.trim();
+                    const toCompany = document.getElementById('retur-to-company').checked;
+
+                    if (qtyInput <= 0 || qtyInput > maxQty) {
+                        Swal.showValidationMessage(`Jumlah Qty retur harus berada di antara 1 s/d ${maxQty}!`);
+                        return false;
+                    }
+                    if (!reason) {
+                        Swal.showValidationMessage('Alasan retur wajib diisi!');
+                        return false;
+                    }
+
+                    // Menghasilkan payload JSON yang murni memetakan skema database domain.Retur Anda di Fiber
+                    return {
+                        sales_id: saleId,
+                        reason: reason,
+                        status: "Retur Sukses",
+                        is_retur: true,
+                        is_retur_to_company: toCompany,
+                        qty_retur: qtyInput
+                    };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    processReturAPI(result.value);
+                }
+            });
+        }
+
+        async function processReturAPI(payload) {
+            Swal.fire({ title: 'Memproses Retur...', didOpen: () => Swal.showLoading() });
+            try {
+                const res = await fetch(`${API_URL}/retur`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    Swal.fire('Retur Sukses!', 'Barang berhasil diretur dan sistem stok disesuaikan.', 'success').then(() => fetchRiwayat());
+                } else {
+                    const err = await res.json();
+                    Swal.fire('Gagal', err.error || 'Terjadi kesalahan sistem saat retur', 'error');
+                }
+            } catch (e) { Swal.fire('Error', 'Gagal terhubung ke server', 'error'); }
+        }
+
+        // Jalankan saat pertama load
+        fetchRiwayat();
+
+        // Clock Update
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
+        }, 1000);
+    </script>
+</body>
+
+</html>

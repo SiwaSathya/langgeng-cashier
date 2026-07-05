@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expenses - SmartPOS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .modal-active {
+            overflow: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen">
+
+    <!-- SIDEBAR (Fixed) -->
+    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 fixed h-screen z-20">
+        <div class="flex items-center gap-3 mb-12">
+            <div
+                class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                <i class="fas fa-store"></i>
+            </div>
+            <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">SMARTPOS</h1>
+        </div>
+        <nav class="flex-1 space-y-2">
+            <a href="dashboard.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-th-large"></i> <span>Dashboard</span>
+            </a>
+            <a href="riwayat.html"
+                class="flex items-center gap-4 px-4  py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
+            </a>
+            <a href="product.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-box"></i> <span>Master Produk</span>
+            </a>
+            <a href="purchase.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
+            </a>
+            <a href="expense.html"
+                class="flex items-center gap-4 px-4 py-3.5 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
+                <i class="fas fa-wallet"></i> <span>Pengeluaran</span>
+            </a>
+            <a href="retur.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-undo"></i> <span>Manajemen Retur</span>
+            </a>
+            <a href="report.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
+            </a>
+        </nav>
+        <div class="pt-8 border-t border-slate-100">
+            <div class="bg-slate-50 p-4 rounded-2xl mb-6">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">User Aktif</p>
+                <p class="font-bold text-slate-700">Desak Kasir</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 ml-72 p-12">
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-800 text-slate-800 tracking-tight">Expenses</h1>
+                <p class="text-slate-400 mt-1">Pantau biaya operasional dan pengeluaran kas lainnya.</p>
+            </div>
+            <button onclick="openModal()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-blue-100">
+                <i class="fas fa-plus text-sm"></i> Tambah Pengeluaran
+            </button>
+        </div>
+
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-fade-in">
+            <div class="p-8 border-b border-slate-50 flex gap-4">
+                <div class="relative flex-1">
+                    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                    <input type="text" id="searchInput" onkeyup="debounceSearch()"
+                        placeholder="Cari keterangan pengeluaran..."
+                        class="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-[1.25rem] outline-none focus:border-blue-400 transition-all text-sm font-medium">
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50/50 text-[11px] uppercase tracking-widest text-slate-400 font-bold">
+                        <tr>
+                            <th class="px-8 py-5">Tanggal</th>
+                            <th class="px-6 py-5">Keterangan</th>
+                            <th class="px-6 py-5 text-right">Jumlah (Rp)</th>
+                            <th class="px-8 py-5 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenseTableBody" class="divide-y divide-slate-50 text-slate-700"></tbody>
+                </table>
+            </div>
+
+            <div class="p-8 bg-slate-50/30 flex justify-between items-center">
+                <p class="text-slate-500 text-sm">Menampilkan <span id="countInfo"
+                        class="font-bold text-slate-800 text-base">0</span> data</p>
+                <div id="paginationControls" class="flex gap-2"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL POPUP -->
+    <div id="expenseModal"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden">
+            <div class="p-8 border-b border-slate-50 flex justify-between items-center">
+                <h3 id="modalTitle" class="text-2xl font-800 text-slate-800">Catat Pengeluaran</h3>
+                <button onclick="closeModal()" class="text-slate-300 hover:text-slate-600"><i
+                        class="fas fa-times text-xl"></i></button>
+            </div>
+            <!-- Ganti konten di dalam <form id="expenseForm"> -->
+            <form id="expenseForm" class="p-8 space-y-6">
+                <input type="hidden" id="expenseId">
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1">No. Nota</label>
+                        <input type="text" id="nota" required
+                            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold"
+                            placeholder="Contoh: EXP-001">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1">Kategori</label>
+                        <input type="text" id="kategori" required
+                            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold"
+                            placeholder="Contoh: Operasional">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1">Deskripsi</label>
+                    <textarea id="deskripsi" required rows="3"
+                        class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold text-slate-700 resize-none"
+                        placeholder="Masukkan detail pengeluaran..."></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1">Total (Rp)</label>
+                        <input type="number" id="total" required
+                            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1">Tanggal</label>
+                        <input type="date" id="tanggal" required
+                            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold text-slate-700">
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white p-5 rounded-2xl font-800 transition-all shadow-lg uppercase tracking-widest">Simpan
+                        Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = "http://localhost:4000";
+        let currentPage = 1;
+        const limit = 10;
+        let searchTimer;
+
+        window.onload = () => {
+            fetchExpenses();
+            // Set default tanggal hari ini
+            document.getElementById('tanggal').valueAsDate = new Date();
+        };
+
+        async function fetchExpenses() {
+            const search = document.getElementById('searchInput').value;
+            try {
+                const res = await fetch(`${BASE_URL}/api/expenses?page=${currentPage}&search=${search}&limit=${limit}`);
+                const result = await res.json();
+                const expenses = result.data || [];
+                const total = result.meta?.total || expenses.length;
+
+                document.getElementById('expenseTableBody').innerHTML = expenses.map(e => `
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                        <td class="px-8 py-5">
+                            <div class="font-bold text-slate-400 text-[11px] uppercase tracking-wider">
+                                ${new Date(e.CreatedAt || e.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                            </div>
+                        </td>
+                        <td class="px-6 py-5">
+                            <div class="font-bold text-slate-700">${e.deskripsi || e.deskripsi}</div>
+                        </td>
+                        <td class="px-6 py-5 text-right font-extrabold text-red-500">
+                            Rp ${(e.total || e.total || 0).toLocaleString('id-ID')}
+                        </td>
+                        <td class="px-8 py-5 text-right">
+                            <button onclick="editExpense('${e.ID || e.id}')" class="text-blue-500 hover:text-blue-700 mx-2"><i class="fas fa-edit text-xs"></i></button>
+                            <button onclick="deleteExpense('${e.ID || e.id}')" class="text-red-400 hover:text-red-600 mx-2"><i class="fas fa-trash text-xs"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                document.getElementById('countInfo').innerText = total;
+                renderPagination(total);
+            } catch (err) { console.error("Error fetching data", err); }
+        }
+
+        function renderPagination(total) {
+            const totalPages = Math.ceil(total / limit);
+            const container = document.getElementById('paginationControls');
+            let html = '';
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button onclick="changePage(${i})" class="w-10 h-10 rounded-xl font-bold transition-all ${currentPage === i ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-slate-400 border border-slate-100'}">${i}</button>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function changePage(p) { currentPage = p; fetchExpenses(); }
+        function debounceSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(() => { currentPage = 1; fetchExpenses(); }, 500); }
+
+        function openModal(isEdit = false) {
+            document.getElementById('expenseModal').classList.remove('hidden');
+            document.body.classList.add('modal-active');
+            if (!isEdit) {
+                document.getElementById('modalTitle').innerText = "Catat Pengeluaran";
+                document.getElementById('expenseForm').reset();
+                document.getElementById('expenseId').value = "";
+                document.getElementById('tanggal').valueAsDate = new Date();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('expenseModal').classList.add('hidden');
+            document.body.classList.remove('modal-active');
+        }
+
+        document.getElementById('expenseForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('expenseId').value;
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${BASE_URL}/api/expenses/${id}` : `${BASE_URL}/api/expenses`;
+
+            // Sesuai struct: nota, tanggal, deskripsi, total, kategori
+            const payload = {
+                nota: document.getElementById('nota').value,
+                kategori: document.getElementById('kategori').value,
+                deskripsi: document.getElementById('deskripsi').value,
+                total: parseFloat(document.getElementById('total').value),
+                tanggal: new Date(document.getElementById('tanggal').value).toISOString() // Gunakan format ISO untuk time.Time
+            };
+
+            const res = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) { closeModal(); fetchExpenses(); } else { alert("Gagal menyimpan data"); }
+        };
+
+        async function editExpense(id) {
+            const res = await fetch(`${BASE_URL}/api/expenses/${id}`);
+            const result = await res.json();
+            const e = result.data || result;
+
+            document.getElementById('expenseId').value = e.id || e.ID;
+            document.getElementById('keterangan').value = e.keterangan || e.Keterangan;
+            document.getElementById('jumlah').value = e.jumlah || e.Jumlah;
+
+            // Format date for input
+            const date = new Date(e.tanggal || e.CreatedAt);
+            document.getElementById('tanggal').value = date.toISOString().split('T')[0];
+
+            document.getElementById('modalTitle').innerText = "Edit Pengeluaran";
+            openModal(true);
+        }
+
+        async function deleteExpense(id) {
+            if (confirm("Hapus data pengeluaran ini?")) {
+                await fetch(`${BASE_URL}/api/expenses/${id}`, { method: 'DELETE' });
+                fetchExpenses();
+            }
+        }
+    </script>
+</body>
+
+</html>
