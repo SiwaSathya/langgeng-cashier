@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Absensi - SmartPOS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .modal-active {
+            overflow: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen">
+
+    <!-- SIDEBAR (Fixed Position) -->
+    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 fixed h-screen z-20">
+        <div class="flex items-center gap-3 mb-12">
+            <div
+                class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                <i class="fas fa-store"></i>
+            </div>
+            <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">SMARTPOS</h1>
+        </div>
+
+        <nav class="flex-1 space-y-2 overflow-y-auto pr-2">
+            <a href="dashboard.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-th-large"></i> <span>Dashboard</span>
+            </a>
+            <a href="riwayat.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
+            </a>
+            <a href="product.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-box"></i> <span>Master Produk</span>
+            </a>
+            <!-- MENU ABSENSI (AKTIF) -->
+            <a href="absensi.html"
+                class="flex items-center gap-4 px-4 py-3.5 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
+                <i class="fas fa-calendar-check"></i> <span>Absensi Karyawan</span>
+            </a>
+            <a href="purchase.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
+            </a>
+            <a href="expense.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-wallet"></i> <span>Pengeluaran</span>
+            </a>
+            <a href="retur.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-undo"></i> <span>Manajemen Retur</span>
+            </a>
+            <a href="report.html"
+                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
+            </a>
+        </nav>
+
+        <div class="pt-8 border-t border-slate-100">
+            <div class="bg-slate-50 p-4 rounded-2xl mb-6">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">User Aktif</p>
+                <p class="font-bold text-slate-700">Desak Kasir</p>
+            </div>
+            <a href="index.html"
+                class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all">
+                <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 ml-72 p-12">
+
+        <!-- HEADER SECTION -->
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-800 text-slate-800 tracking-tight">Absensi Karyawan</h1>
+                <p class="text-slate-400 mt-1">Kelola dan pantau kehadiran shift kerja karyawan Anda.</p>
+            </div>
+            <button onclick="openModal()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-blue-100">
+                <i class="fas fa-plus text-sm"></i> Input Absensi
+            </button>
+        </div>
+
+        <!-- SUMMARY CARDS -->
+        <div class="grid grid-cols-4 gap-6 mb-10 animate-fade-in">
+            <div class="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 text-lg"><i
+                        class="fas fa-user-check"></i></div>
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Hadir Hari Ini</p>
+                    <h3 id="summaryHadir" class="text-xl font-extrabold text-slate-800 mt-0.5">0</h3>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 text-lg"><i
+                        class="fas fa-envelope-open-text"></i></div>
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Izin</p>
+                    <h3 id="summaryIzin" class="text-xl font-extrabold text-slate-800 mt-0.5">0</h3>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 text-lg"><i
+                        class="fas fa-notes-medical"></i></div>
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Sakit</p>
+                    <h3 id="summarySakit" class="text-xl font-extrabold text-slate-800 mt-0.5">0</h3>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center text-red-500 text-lg"><i
+                        class="fas fa-user-times"></i></div>
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Alfa</p>
+                    <h3 id="summaryAlfa" class="text-xl font-extrabold text-slate-800 mt-0.5">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN TABLE CARD -->
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-fade-in">
+            <div class="p-8 border-b border-slate-50 flex gap-4">
+                <div class="relative flex-1">
+                    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                    <input type="text" id="searchInput" onkeyup="debounceSearch()" placeholder="Cari nama karyawan..."
+                        class="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-[1.25rem] outline-none focus:border-blue-400 focus:bg-white transition-all text-sm font-medium">
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50/50 text-[11px] uppercase tracking-widest text-slate-400 font-bold">
+                        <tr>
+                            <th class="px-8 py-5">Karyawan</th>
+                            <th class="px-6 py-5">Shift Kerja</th>
+                            <th class="px-6 py-5">Status</th>
+                            <th class="px-6 py-5">Keterangan</th>
+                            <th class="px-8 py-5 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTableBody" class="divide-y divide-slate-50 text-slate-700">
+                        <!-- Data log absensi diinjeksikan lewat js -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="p-8 bg-slate-50/30 flex justify-between items-center">
+                <p class="text-slate-500 text-sm">Menampilkan <span id="countInfo"
+                        class="font-bold text-slate-800 text-base">0</span> log absensi</p>
+                <div id="paginationControls" class="flex gap-2"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL POPUP (Input/Edit Absensi) -->
+    <div id="attendanceModal"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden">
+            <div class="p-8 border-b border-slate-50 flex justify-between items-center">
+                <h3 id="modalTitle" class="text-2xl font-800 text-slate-800">Pencatatan Absensi Baru</h3>
+                <button onclick="closeModal()" class="text-slate-300 hover:text-slate-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="attendanceForm" class="p-8 space-y-5">
+                <input type="hidden" id="attendanceId">
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Pilih
+                        Karyawan</label>
+                    <select id="employee_id" required
+                        class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none appearance-none font-bold text-slate-700 cursor-pointer focus:border-blue-400">
+                        <!-- Diisi via API Resources -->
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label
+                            class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Status
+                            Kehadiran</label>
+                        <select id="status" required
+                            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none font-bold text-slate-700 cursor-pointer focus:border-blue-400">
+                            <option value="Hadir">Hadir</option>
+                            <option value="Izin">Izin</option>
+                            <option value="Sakit">Sakit</option>
+                            <option value="Alfa">Alfa</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Shift</label>
+                        <select id="shift" required
+                            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none font-bold text-slate-700 cursor-pointer focus:border-blue-400">
+                            <option value="Pagi">Pagi</option>
+                            <option value="Siang">Siang</option>
+                            <option value="Malam">Malam</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Keterangan
+                        (Opsional)</label>
+                    <textarea id="notes" rows="3"
+                        class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-medium text-slate-700"
+                        placeholder="Contoh: Terlambat, dinas luar, atau alasan sakit..."></textarea>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white p-5 rounded-2xl font-800 transition-all shadow-lg shadow-blue-100 uppercase tracking-widest">
+                        Simpan Data Absensi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const BASE_URL = "http://127.0.0.1:4000";
+        let currentPage = 1;
+        const limit = 10;
+        let searchTimer;
+
+        window.onload = () => {
+            checkAuth();
+            fetchAttendance();
+            loadEmployees();
+        };
+
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = "index.html";
+            }
+        }
+
+        async function loadEmployees() {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`${BASE_URL}/api/master/employees`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error("Gagal mengambil data karyawan");
+                const employees = await res.json();
+
+                const selectEl = document.getElementById('employee_id');
+                selectEl.innerHTML = '<option value="" disabled selected>Pilih karyawan...</option>' +
+                    employees.map(e => `<option value="${e.ID || e.id}">${e.Nama || e.nama || e.name}</option>`).join('');
+            } catch (err) {
+                console.error("Employee Resource Error:", err);
+            }
+        }
+
+        async function fetchAttendance() {
+            const search = document.getElementById('searchInput').value;
+            const tbody = document.getElementById('attendanceTableBody');
+            const token = localStorage.getItem('token');
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/attendance?page=${currentPage}&search=${search}&limit=${limit}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+
+                const data = Array.isArray(result) ? result : (result.data || []);
+                const total = result.total !== undefined ? result.total : data.length;
+
+                // Update summary dashboard mini
+                updateSummary(data);
+
+                if (data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="px-8 py-20 text-center text-slate-400">Belum ada log absensi hari ini</td></tr>`;
+                    document.getElementById('countInfo').innerText = "0";
+                    renderPagination(0);
+                    return;
+                }
+
+                tbody.innerHTML = data.map(item => {
+                    let badgeClass = "bg-green-50 text-green-600";
+                    if (item.Status === "Izin") badgeClass = "bg-amber-50 text-amber-600";
+                    if (item.Status === "Sakit") badgeClass = "bg-blue-50 text-blue-600";
+                    if (item.Status === "Alfa") badgeClass = "bg-red-50 text-red-500";
+
+                    return `
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="px-8 py-5">
+                                <div class="font-bold text-slate-700">${item.Employee?.Nama || item.EmployeeName || 'Karyawan'}</div>
+                                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">${item.WaktuAbsen || 'Hari Ini'}</div>
+                            </td>
+                            <td class="px-6 py-5 text-sm text-slate-500 font-semibold">Shift ${item.Shift || '-'}</td>
+                            <td class="px-6 py-5">
+                                <span class="px-3 py-1 ${badgeClass} rounded-lg text-xs font-bold">${item.Status}</span>
+                            </td>
+                            <td class="px-6 py-5 text-sm text-slate-400 font-medium max-w-xs truncate">${item.Notes || item.notes || '-'}</td>
+                            <td class="px-8 py-5 text-right">
+                                <button onclick="editAttendance('${item.ID || item.id}')" class="text-blue-500 hover:text-blue-700 mx-2 transition-colors"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteAttendance('${item.ID || item.id}')" class="text-red-400 hover:text-red-600 mx-2 transition-colors"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                document.getElementById('countInfo').innerText = total;
+                renderPagination(total);
+
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-8 py-20 text-center text-red-500">Gagal memuat data absensi.</td></tr>`;
+            }
+        }
+
+        function updateSummary(data) {
+            const counts = { Hadir: 0, Izin: 0, Sakit: 0, Alfa: 0 };
+            data.forEach(item => { if (counts[item.Status] !== undefined) counts[item.Status]++; });
+
+            document.getElementById('summaryHadir').innerText = counts.Hadir;
+            document.getElementById('summaryIzin').innerText = counts.Izin;
+            document.getElementById('summarySakit').innerText = counts.Sakit;
+            document.getElementById('summaryAlfa').innerText = counts.Alfa;
+        }
+
+        function renderPagination(total) {
+            const totalPages = Math.ceil(total / limit);
+            const container = document.getElementById('paginationControls');
+
+            if (totalPages <= 1) { container.innerHTML = ''; return; }
+
+            let html = `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-3 py-2 rounded-xl border border-slate-100 text-slate-400 hover:bg-slate-100 disabled:opacity-30"><i class="fas fa-chevron-left text-xs"></i></button>`;
+
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button onclick="changePage(${i})" class="w-10 h-10 rounded-xl font-bold transition-all ${currentPage === i ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-slate-400 hover:bg-slate-50 border border-slate-100'}">${i}</button>`;
+            }
+
+            html += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-3 py-2 rounded-xl border border-slate-100 text-slate-400 hover:bg-slate-100 disabled:opacity-30"><i class="fas fa-chevron-right text-xs"></i></button>`;
+            container.innerHTML = html;
+        }
+
+        function changePage(page) {
+            if (page < 1) return;
+            currentPage = page;
+            fetchAttendance();
+        }
+
+        function debounceSearch() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => { currentPage = 1; fetchAttendance(); }, 500);
+        }
+
+        function openModal(isEdit = false) {
+            document.getElementById('attendanceModal').classList.remove('hidden');
+            document.body.classList.add('modal-active');
+            if (!isEdit) {
+                document.getElementById('modalTitle').innerText = "Pencatatan Absensi Baru";
+                document.getElementById('attendanceForm').reset();
+                document.getElementById('attendanceId').value = "";
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('attendanceModal').classList.add('hidden');
+            document.body.classList.remove('modal-active');
+        }
+
+        document.getElementById('attendanceForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('attendanceId').value;
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${BASE_URL}/api/attendance/${id}` : `${BASE_URL}/api/attendance`;
+            const token = localStorage.getItem('token');
+
+            Swal.fire({ title: 'Menyimpan data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            const payload = {
+                employee_id: parseInt(document.getElementById('employee_id').value),
+                status: document.getElementById('status').value,
+                shift: document.getElementById('shift').value,
+                notes: document.getElementById('notes').value
+            };
+
+            try {
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Data absensi diperbarui!', confirmButtonColor: '#2563EB' });
+                    closeModal();
+                    fetchAttendance();
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Gagal', text: 'Terjadi kesalahan sistem.' });
+                }
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Koneksi ke API terputus.' });
+            }
+        };
+
+        async function editAttendance(id) {
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${BASE_URL}/api/attendance/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                const item = data.data || data;
+
+                document.getElementById('attendanceId').value = item.ID || item.id;
+                document.getElementById('employee_id').value = item.employee_id || item.EmployeeID;
+                document.getElementById('status').value = item.Status || 'Hadir';
+                document.getElementById('shift').value = item.Shift || 'Pagi';
+                document.getElementById('notes').value = item.Notes || '';
+
+                document.getElementById('modalTitle').innerText = "Edit Log Absensi";
+                openModal(true);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function deleteAttendance(id) {
+            const token = localStorage.getItem('token');
+            Swal.fire({
+                title: 'Apakah anda yakin?',
+                text: "Data log absensi ini akan dihapus permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#EF4444',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: 'Ya, Hapus!'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const res = await fetch(`${BASE_URL}/api/attendance/${id}`, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        if (res.ok) {
+                            Swal.fire({ icon: 'success', title: 'Dihapus!', text: 'Data berhasil dihapus.', confirmButtonColor: '#2563EB' });
+                            fetchAttendance();
+                        }
+                    } catch (err) {
+                        Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal menghapus data.' });
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
