@@ -513,7 +513,7 @@
     </div>
 
     <script>
-        const API_URL = "http://127.0.0.1:4000/api";
+        const API_URL = "https://langgeng-cashier-backend-production.up.railway.app/api";
         let currentSelectedProduct = null;
         let cart = [];
         let paymentList = [];
@@ -1478,7 +1478,7 @@
 
             const itemRows = cart.map(item => `
                 <tr>
-                    <td colspan="3" class="item-name">${escapeHTML(item.Nama)}</td>
+                    <td colspan="3" class="item-name">${escapeHTML(item.Nama) + " " + (item.Category.Name)}</td>
                 </tr>
                 <tr>
                     <td>${escapeHTML(item.Kode)}</td>
