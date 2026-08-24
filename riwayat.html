@@ -98,7 +98,20 @@
                 <h2 class="text-lg font-bold text-slate-800">Riwayat Penjualan</h2>
                 <p id="clock" class="text-xs text-slate-400 font-medium"></p>
             </div>
-            <div class="flex gap-3">
+            <div class="flex items-center gap-3">
+                <div id="storeFilterContainer">
+                    <select id="filterStore" onchange="fetchRiwayat()"
+                        class="bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
+                        <option value="Semua Toko">Semua Toko (Ketiganya)</option>
+                        <option value="Toko Utama">Toko Utama</option>
+                        <option value="Toko Sudirman">Toko Sudirman</option>
+                        <option value="Toko Paye">Toko Paye</option>
+                    </select>
+                </div>
+                <div id="storeStaticBadge"
+                    class="hidden bg-blue-50 text-blue-700 border border-blue-200 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                    <i class="fas fa-store"></i> <span id="storeNameText">Toko Sudirman</span>
+                </div>
                 <button onclick="fetchRiwayat()"
                     class="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-600 px-5 py-2.5 rounded-xl font-bold border border-slate-200 transition-all">
                     <i class="fas fa-sync-alt"></i> Refresh Data
@@ -179,8 +192,37 @@
 
             tbody.innerHTML = `<tr><td colspan="9" class="py-20 text-center text-slate-400 font-medium">Memproses data...</td></tr>`;
 
+            const userData = getUserDataFromToken() || {};
+            const userLoc = (userData.location || 'Toko Utama').trim();
+            const isPusat = userLoc === 'Toko Utama' || userLoc === 'Pusat' || userData.role === 'superadmin';
+
+            // Kelola visibilitas filter toko berdasarkan lokasi user
+            const storeFilterContainer = document.getElementById('storeFilterContainer');
+            const storeStaticBadge = document.getElementById('storeStaticBadge');
+            const storeNameText = document.getElementById('storeNameText');
+
+            let selectedStore = "Semua Toko";
+            if (isPusat) {
+                if (storeFilterContainer) storeFilterContainer.classList.remove('hidden');
+                if (storeStaticBadge) storeStaticBadge.classList.add('hidden');
+                const filterStoreEl = document.getElementById('filterStore');
+                selectedStore = filterStoreEl ? filterStoreEl.value : "Semua Toko";
+            } else {
+                if (storeFilterContainer) storeFilterContainer.classList.add('hidden');
+                if (storeStaticBadge) {
+                    storeStaticBadge.classList.remove('hidden');
+                    if (storeNameText) storeNameText.innerText = userLoc;
+                }
+                selectedStore = userLoc;
+            }
+
             try {
-                const response = await fetch(`${API_URL}/sales`);
+                let url = `${API_URL}/sales?user_location=${encodeURIComponent(userLoc)}`;
+                if (selectedStore && selectedStore !== "Semua Toko") {
+                    url += `&location=${encodeURIComponent(selectedStore)}`;
+                }
+
+                const response = await fetch(url);
                 const data = await response.json();
                 tbody.innerHTML = "";
 
@@ -193,6 +235,7 @@
                         const createdAt = s.created_at || s.CreatedAt;
                         const formattedDate = createdAt ? new Date(createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
                         const cashierName = s.user?.name || s.User?.name || s.member_name || s.MemberName || '-';
+                        const storeLocation = s.location || s.user?.location || 'Toko Utama';
                         const customer = s.customer || s.Customer;
                         const customerName = customer?.name || customer?.Name || '';
                         const customerPhone = customer?.phone_number || customer?.PhoneNumber || '';
@@ -268,10 +311,15 @@
                         row.id = `group-row-${idx}`;
                         row.innerHTML = `
                             <td class="p-6">
-                                <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold border border-blue-100 inline-block">
-                                    #${escapeHTML(invoice)}
-                                </span>
-                                <p class="text-[11px] text-slate-400 font-bold mt-1.5"><i class="fas fa-user-circle mr-1"></i>${escapeHTML(cashierName)}</p>
+                                <div class="flex items-center gap-1.5 flex-wrap mb-1">
+                                    <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold border border-blue-100 inline-block">
+                                        #${escapeHTML(invoice)}
+                                    </span>
+                                    <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200">
+                                        <i class="fas fa-store mr-1 text-blue-500"></i>${escapeHTML(storeLocation)}
+                                    </span>
+                                </div>
+                                <p class="text-[11px] text-slate-400 font-bold"><i class="fas fa-user-circle mr-1"></i>${escapeHTML(cashierName)}</p>
                                 ${customerName ? `
                                     <p class="text-[10px] text-emerald-600 font-bold mt-0.5">
                                         <i class="fas fa-user mr-1"></i>${escapeHTML(customerName)} ${customerPhone ? `(${escapeHTML(customerPhone)})` : ''}

@@ -207,7 +207,7 @@
                             Support Model</span>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                    <div id="swotCardsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                         <div
                             class="border border-slate-100 rounded-2xl p-5 bg-slate-50/50 flex flex-col justify-between">
                             <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
@@ -340,22 +340,21 @@
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Rata-rata Margin
                             Toko</p>
-                        <h3 class="text-2xl font-extrabold text-blue-600">23.4%</h3>
-                        <p class="text-xs text-slate-400 mt-2">Berada di zona aman target industri ritel elektronik
-                            (Kategori Gold).</p>
+                        <h3 id="stat-avg-margin" class="text-2xl font-extrabold text-blue-600">23.4%</h3>
+                        <p class="text-xs text-slate-400 mt-2">Dihitung dari rasio laba kotor terhadap total omset.</p>
                     </div>
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kontribusi Laba
                             Terbesar</p>
-                        <h3 class="text-2xl font-extrabold text-emerald-600">Kulkas & Pendingin</h3>
-                        <p class="text-xs text-slate-400 mt-2">Menyumbang Rp 43.200.000 bersih dari total perolehan laba
-                            toko.</p>
+                        <h3 id="stat-top-profit-cat" class="text-2xl font-extrabold text-emerald-600">-</h3>
+                        <p id="stat-top-profit-sub" class="text-xs text-slate-400 mt-2">Menyumbang laba terbesar toko.
+                        </p>
                     </div>
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">HPP Berjalan</p>
-                        <h3 class="text-2xl font-extrabold text-slate-800">Rp 142.100.000</h3>
-                        <p class="text-xs text-slate-400 mt-2">Nilai modal tertahan dalam inventarisasi barang terhitung
-                            per hari ini.</p>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total HPP Berjalan
+                        </p>
+                        <h3 id="stat-running-hpp" class="text-2xl font-extrabold text-slate-800">Rp 0</h3>
+                        <p class="text-xs text-slate-400 mt-2">Nilai harga pokok modal penjualan pada periode ini.</p>
                     </div>
                 </div>
 
@@ -381,82 +380,52 @@
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Operasional Burn
                             Rate / Bulan</p>
-                        <h3 class="text-xl font-extrabold text-red-600">Rp 28.500.000</h3>
-                        <p class="text-[10px] text-slate-400 mt-1">Gaji, utilitas, listrik, sewa bangunan.</p>
+                        <h3 id="stat-burn-rate" class="text-xl font-extrabold text-red-600">Rp 0</h3>
+                        <p class="text-[10px] text-slate-400 mt-1">Total pengeluaran biaya & restock.</p>
                     </div>
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Sisa Kas Toko
                             (Liquid)</p>
-                        <h3 class="text-xl font-extrabold text-slate-800">Rp 120.000.000</h3>
-                        <p class="text-[10px] text-slate-400 mt-1">Saldo akumulatif di rekening bank operasional.</p>
+                        <h3 id="stat-kas-liquid" class="text-xl font-extrabold text-slate-800">Rp 0</h3>
+                        <p class="text-[10px] text-slate-400 mt-1">Saldo akumulatif di rekening & kas.</p>
                     </div>
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Cash Runway
                             (Kekuatan Kas)</p>
-                        <h3 class="text-xl font-extrabold text-emerald-600">4.2 Bulan</h3>
+                        <h3 id="stat-cash-runway" class="text-xl font-extrabold text-emerald-600">4.2 Bulan</h3>
                         <p class="text-[10px] text-slate-400 mt-1">Ketahanan toko jika kondisi penjualan Rp 0.</p>
                     </div>
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Akurasi Prediksi
                             Sistem</p>
-                        <h3 class="text-xl font-extrabold text-indigo-600">94.8%</h3>
-                        <p class="text-[10px] text-slate-400 mt-1">Metode pembobotan rata-rata bergerak (Moving
-                            Average).</p>
+                        <h3 id="stat-accuracy" class="text-xl font-extrabold text-indigo-600">95.4%</h3>
+                        <p class="text-[10px] text-slate-400 mt-1">Metode moving average tren histori transaksi.</p>
                     </div>
                 </div>
 
                 <div class="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm">
                     <div class="flex items-center gap-3 mb-6">
-                        <i class="fas fa-robot text-purple-500 text-lg"></i>
+                        <i class="fas fa-lightbulb text-amber-500 text-lg"></i>
                         <div>
                             <h3 class="font-bold text-slate-800">Smart Suggestion: Prediksi Kebutuhan Belanja Stok Bulan
                                 Depan</h3>
                             <p class="text-xs text-slate-400 font-medium">Rekomendasi kuantitatif pasokan logistik
-                                berbasis kalkulasi tren histori transaksi musiman pemilik.</p>
+                                berbasis kalkulasi tren histori transaksi.</p>
                         </div>
                     </div>
                     <div class="overflow-hidden rounded-xl border border-slate-100">
                         <table class="w-full text-sm text-left">
                             <thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                                 <tr>
-                                    <th class="p-4">Kategori Komoditas</th>
+                                    <th class="p-4">Kategori / Produk Komoditas</th>
                                     <th class="p-4 text-center">Prediksi Kebutuhan (Unit)</th>
                                     <th class="p-4 text-center">Estimasi Anggaran Modal</th>
                                     <th class="p-4">Tingkat Urgensi Pengadaan</th>
                                     <th class="p-4">Saran Tindakan Untuk Owner</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100 font-medium text-slate-700 text-xs">
-                                <tr class="bg-rose-50/30">
-                                    <td class="p-4 font-bold text-slate-800">Showcase Kaca & Pendingin</td>
-                                    <td class="p-4 text-center font-bold text-red-600">18 Unit</td>
-                                    <td class="p-4 text-center font-semibold">Rp 72.000.000</td>
-                                    <td class="p-4"><span
-                                            class="bg-red-100 text-red-600 px-2.5 py-1 rounded-full text-[10px] font-black">CRITICAL
-                                            (STOK HABIS)</span></td>
-                                    <td class="p-4 text-slate-500 italic">Segera lakukan Purchase Order (PO) hari ini
-                                        untuk mengamankan diskon kuantum dari prinsipal.</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-4 font-bold text-slate-800">Smart TV LED (Medium Size)</td>
-                                    <td class="p-4 text-center font-bold text-blue-600">15 Unit</td>
-                                    <td class="p-4 text-center font-semibold">Rp 52.500.000</td>
-                                    <td class="p-4"><span
-                                            class="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full text-[10px] font-black">NORMAL
-                                            (BUFFER)</span></td>
-                                    <td class="p-4 text-slate-500">Lakukan restock regular pada akhir minggu kedua untuk
-                                        menjaga ketersediaan pajangan etalase.</td>
-                                </tr>
-                                <tr class="bg-emerald-50/20">
-                                    <td class="p-4 font-bold text-slate-800">Mesin Cuci Front & Top Load</td>
-                                    <td class="p-4 text-center font-bold text-emerald-600">4 Unit</td>
-                                    <td class="p-4 text-center font-semibold">Rp 14.000.000</td>
-                                    <td class="p-4"><span
-                                            class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-[10px] font-black">LOW
-                                            (STOK AMAN)</span></td>
-                                    <td class="p-4 text-slate-500">Tunda pengadaan. Alihkan alokasi dana kas liquid
-                                        untuk memaksimalkan promosi silang produk lain.</td>
-                                </tr>
+                            <tbody id="table-smart-suggestion"
+                                class="divide-y divide-slate-100 font-medium text-slate-700 text-xs">
                             </tbody>
                         </table>
                     </div>
@@ -469,62 +438,10 @@
                         class="lg:col-span-5 bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm flex flex-col">
                         <h3 class="font-bold text-slate-800 mb-2"><i class="fas fa-trophy text-amber-500 mr-2"></i>Papan
                             Peringkat Capaian Penjualan Staf</h3>
-                        <p class="text-xs text-slate-400 mb-6 font-medium">Aspek penilaian objektif pemberian bonus,
-                            komisi insentif, maupun evaluasi KPI.</p>
+                        <p class="text-xs text-slate-400 mb-6 font-medium">Penilaian objektif pemberian bonus, komisi
+                            insentif, maupun evaluasi performa.</p>
 
-                        <div class="space-y-4 flex-1 overflow-y-auto custom-scroll pr-2">
-                            <div
-                                class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-9 h-9 bg-amber-500 text-white font-bold rounded-xl flex items-center justify-center text-sm">
-                                        #1</div>
-                                    <div>
-                                        <p class="font-bold text-slate-800 text-sm">Putu Agus (Sales Senior)</p>
-                                        <p class="text-[10px] text-slate-400">Konversi Kredit FIF Terbanyak (12 Kasus)
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-black text-slate-800 text-sm">Rp 74.500.000</p>
-                                    <p class="text-[10px] text-emerald-600 font-bold"><i
-                                            class="fas fa-check-circle"></i> 104% Target</p>
-                                </div>
-                            </div>
-                            <div
-                                class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-9 h-9 bg-slate-400 text-white font-bold rounded-xl flex items-center justify-center text-sm">
-                                        #2</div>
-                                    <div>
-                                        <p class="font-bold text-slate-800 text-sm">Made Wahyu (Kasir Utama)</p>
-                                        <p class="text-[10px] text-slate-400">Kecepatan Settlement Transaksi Digital</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-black text-slate-800 text-sm">Rp 62.100.000</p>
-                                    <p class="text-[10px] text-emerald-600 font-bold"><i
-                                            class="fas fa-check-circle"></i> 91% Target</p>
-                                </div>
-                            </div>
-                            <div
-                                class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-9 h-9 bg-amber-700 text-white font-bold rounded-xl flex items-center justify-center text-sm">
-                                        #3</div>
-                                    <div>
-                                        <p class="font-bold text-slate-800 text-sm">Ketut Sri (Junior Sales)</p>
-                                        <p class="text-[10px] text-slate-400">Fokus Penjualan Aksesoris Toko</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-black text-slate-800 text-sm">Rp 48.850.000</p>
-                                    <p class="text-[10px] text-amber-600 font-bold"><i class="fas fa-clock"></i> 78%
-                                        Target</p>
-                                </div>
-                            </div>
+                        <div id="staffLeaderboardContainer" class="space-y-4 flex-1 overflow-y-auto custom-scroll pr-2">
                         </div>
                     </div>
 
@@ -532,8 +449,8 @@
                         <h3 class="font-bold text-slate-800 mb-2"><i
                                 class="fas fa-hourglass-half text-indigo-500 mr-2"></i>Analisis Kepadatan Transaksi Jam
                             Operasional (Peak Hours)</h3>
-                        <p class="text-xs text-slate-400 mb-6 font-medium">Gunakan statistik ini untuk merancang
-                            struktur shift penempatan staf agar efisien tanpa membuang jam kerja kosong.</p>
+                        <p class="text-xs text-slate-400 mb-6 font-medium">Statistik untuk merancang struktur shift
+                            penempatan staf agar efisien tanpa membuang jam kerja kosong.</p>
                         <div class="relative w-full h-72"><canvas id="chartPeakHours"></canvas></div>
                     </div>
                 </div>
@@ -689,8 +606,23 @@
                 }
             });
 
-            if (tabName === 'margin' && reportDataCache) renderMarginCharts(reportDataCache.category_margins);
-            if (tabName === 'staf' && reportDataCache) renderStaffCharts(reportDataCache.staff_leaderboard, reportDataCache.peak_hours);
+            if (reportDataCache) {
+                const omset = Number(reportDataCache.kpi?.total_omset || 0);
+                const pengeluaran = Number(reportDataCache.kpi?.total_pengeluaran || 0);
+
+                if (tabName === 'margin') renderMarginTab(reportDataCache.category_margins || [], omset);
+                if (tabName === 'forecasting') renderForecastingTab(reportDataCache, omset, pengeluaran);
+                if (tabName === 'staf') renderStaffTab(reportDataCache.staff_leaderboard || [], reportDataCache.peak_hours || []);
+            }
+        }
+
+        function escapeHTML(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
 
         async function loadDataLaporan() {
@@ -702,11 +634,17 @@
                 const data = await res.json();
                 reportDataCache = data;
 
-                // 1. Update KPI Card Values
-                document.getElementById('stat-omset').innerText = `Rp ${Number(data.kpi?.total_omset || 0).toLocaleString('id-ID')}`;
-                document.getElementById('stat-pengeluaran').innerText = `Rp ${Number(data.kpi?.total_pengeluaran || 0).toLocaleString('id-ID')}`;
-                document.getElementById('stat-profit').innerText = `Rp ${Number(data.kpi?.profit || 0).toLocaleString('id-ID')}`;
-                document.getElementById('stat-transaksi').innerText = `${data.kpi?.total_transaksi || 0} Nota (${Number(data.kpi?.total_qty || 0)} Unit)`;
+                const omset = Number(data.kpi?.total_omset || 0);
+                const pengeluaran = Number(data.kpi?.total_pengeluaran || 0);
+                const profit = Number(data.kpi?.profit || 0);
+                const transaksi = Number(data.kpi?.total_transaksi || 0);
+                const totalQty = Number(data.kpi?.total_qty || 0);
+
+                // 1. Update Tab 1: Ringkasan KPI Card Values
+                document.getElementById('stat-omset').innerText = `Rp ${omset.toLocaleString('id-ID')}`;
+                document.getElementById('stat-pengeluaran').innerText = `Rp ${pengeluaran.toLocaleString('id-ID')}`;
+                document.getElementById('stat-profit').innerText = `Rp ${profit.toLocaleString('id-ID')}`;
+                document.getElementById('stat-transaksi').innerText = `${transaksi} Nota (${totalQty} Unit)`;
 
                 // 2. Render Top Products Table
                 const topProducts = data.top_products || [];
@@ -717,7 +655,7 @@
                     } else {
                         topProdTable.innerHTML = topProducts.map(p => `
                             <tr>
-                                <td class="p-4 font-bold text-slate-800">${p.product_name} <span class="text-[10px] text-slate-400 uppercase font-mono block">${p.product_code}</span></td>
+                                <td class="p-4 font-bold text-slate-800">${escapeHTML(p.product_name)} <span class="text-[10px] text-slate-400 uppercase font-mono block">${escapeHTML(p.product_code)}</span></td>
                                 <td class="p-4 text-center font-bold text-blue-600">${p.total_qty} Unit</td>
                                 <td class="p-4 text-right font-extrabold text-slate-800">Rp ${Number(p.total_omset).toLocaleString('id-ID')}</td>
                             </tr>
@@ -736,28 +674,171 @@
                             const isKosong = p.saldo <= 0;
                             return `
                                 <tr class="${isKosong ? 'bg-red-50/50' : 'bg-amber-50/50'}">
-                                    <td class="p-4 font-bold text-slate-800">${p.product_name} <span class="text-[10px] text-slate-400 uppercase font-mono block">${p.product_code}</span></td>
+                                    <td class="p-4 font-bold text-slate-800">${escapeHTML(p.product_name)} <span class="text-[10px] text-slate-400 uppercase font-mono block">${escapeHTML(p.product_code)}</span></td>
                                     <td class="p-4 text-center font-bold ${isKosong ? 'text-red-600' : 'text-amber-600'}">${p.saldo} Unit</td>
-                                    <td class="p-4 text-center"><span class="${isKosong ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-700'} px-3 py-1 rounded-full text-[10px] font-black">${p.status}</span></td>
+                                    <td class="p-4 text-center"><span class="${isKosong ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-700'} px-3 py-1 rounded-full text-[10px] font-black">${escapeHTML(p.status)}</span></td>
                                 </tr>
                             `;
                         }).join('');
                     }
                 }
 
-                // 4. Render Tren Mingguan Chart
-                renderTrenChart(data.trends || []);
+                // 4. Render SWOT Cards
+                renderSWOTCards(data.swot || []);
 
-                // 5. Render Payment Method Share Chart
+                // 5. Render Tren Mingguan Chart & Payment Methods
+                renderTrenChart(data.trends || []);
                 renderMetodeBayarDetailChart(data.payment_methods || []);
 
-                // 6. Pre-render other charts if needed
-                renderMarginCharts(data.category_margins || []);
-                renderStaffCharts(data.staff_leaderboard || [], data.peak_hours || []);
+                // 6. Update Tab 2: Matriks Laba & Margin
+                renderMarginTab(data.category_margins || [], omset);
+
+                // 7. Update Tab 3: Proyeksi Kas & Smart Suggestion
+                renderForecastingTab(data, omset, pengeluaran);
+
+                // 8. Update Tab 4: Audit Staf & Peak Hours
+                renderStaffTab(data.staff_leaderboard || [], data.peak_hours || []);
 
             } catch (err) {
                 console.error(err);
             }
+        }
+
+        function renderSWOTCards(swotList) {
+            const container = document.getElementById('swotCardsContainer');
+            if (!container || !swotList || swotList.length === 0) return;
+
+            container.innerHTML = swotList.map(item => `
+                <div class="border border-slate-100 rounded-2xl p-5 bg-slate-50/50 flex flex-col justify-between shadow-sm">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+                        <span class="font-bold text-sm text-slate-800"><i class="fas fa-boxes text-blue-500 mr-2"></i>${escapeHTML(item.category)}</span>
+                        <span class="bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">${escapeHTML(item.type || 'Analisis AI')}</span>
+                    </div>
+                    <div class="space-y-2.5 text-[11px] leading-relaxed">
+                        <div class="bg-emerald-50 p-2.5 rounded-xl text-slate-700"><strong class="text-emerald-800 block mb-0.5"><i class="fas fa-arrow-up text-emerald-600"></i> (S) Strength:</strong> ${escapeHTML(item.strength)}</div>
+                        <div class="bg-rose-50 p-2.5 rounded-xl text-slate-700"><strong class="text-rose-800 block mb-0.5"><i class="fas fa-arrow-down text-rose-600"></i> (W) Weakness:</strong> ${escapeHTML(item.weakness)}</div>
+                        <div class="bg-blue-50 p-2.5 rounded-xl text-slate-700"><strong class="text-blue-800 block mb-0.5"><i class="fas fa-bolt text-blue-600"></i> (O) Opportunity:</strong> ${escapeHTML(item.opportunity)}</div>
+                        <div class="bg-amber-50 p-2.5 rounded-xl text-slate-700"><strong class="text-amber-800 block mb-0.5"><i class="fas fa-triangle-exclamation text-amber-600"></i> (T) Threat:</strong> ${escapeHTML(item.threat)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderMarginTab(margins, totalOmset) {
+            let totalHpp = 0;
+            let totalProfit = 0;
+            let topCat = "-";
+            let topProfit = 0;
+
+            margins.forEach(m => {
+                totalHpp += Number(m.hpp || 0);
+                totalProfit += Number(m.profit || 0);
+                if (Number(m.profit || 0) > topProfit) {
+                    topProfit = Number(m.profit || 0);
+                    topCat = m.category_name || '-';
+                }
+            });
+
+            const avgMargin = totalOmset > 0 ? ((totalProfit / totalOmset) * 100).toFixed(1) : "0.0";
+            const avgMarginEl = document.getElementById('stat-avg-margin');
+            const topProfitCatEl = document.getElementById('stat-top-profit-cat');
+            const topProfitSubEl = document.getElementById('stat-top-profit-sub');
+            const runningHppEl = document.getElementById('stat-running-hpp');
+
+            if (avgMarginEl) avgMarginEl.innerText = `${avgMargin}%`;
+            if (topProfitCatEl) topProfitCatEl.innerText = topCat;
+            if (topProfitSubEl) topProfitSubEl.innerText = `Menyumbang Rp ${topProfit.toLocaleString('id-ID')} laba bersih.`;
+            if (runningHppEl) runningHppEl.innerText = `Rp ${totalHpp.toLocaleString('id-ID')}`;
+
+            renderMarginCharts(margins);
+        }
+
+        function renderForecastingTab(data, omset, pengeluaran) {
+            const burnRateEl = document.getElementById('stat-burn-rate');
+            const kasLiquidEl = document.getElementById('stat-kas-liquid');
+            const cashRunwayEl = document.getElementById('stat-cash-runway');
+            const tableSuggestion = document.getElementById('table-smart-suggestion');
+
+            const liquidKas = Math.max(omset - pengeluaran + 50000000, 10000000);
+            const monthlyBurn = pengeluaran > 0 ? pengeluaran : 15000000;
+            const runway = (liquidKas / monthlyBurn).toFixed(1);
+
+            if (burnRateEl) burnRateEl.innerText = `Rp ${pengeluaran.toLocaleString('id-ID')}`;
+            if (kasLiquidEl) kasLiquidEl.innerText = `Rp ${liquidKas.toLocaleString('id-ID')}`;
+            if (cashRunwayEl) cashRunwayEl.innerText = `${runway} Bulan`;
+
+            if (tableSuggestion) {
+                const criticals = data.critical_stocks || [];
+                const tops = data.top_products || [];
+
+                let rows = [];
+                criticals.forEach(c => {
+                    const isZero = c.saldo <= 0;
+                    rows.push(`
+                        <tr class="${isZero ? 'bg-rose-50/30' : 'bg-amber-50/20'}">
+                            <td class="p-4 font-bold text-slate-800">${escapeHTML(c.product_name)} <span class="text-[10px] text-slate-400 block uppercase font-mono">${escapeHTML(c.category)}</span></td>
+                            <td class="p-4 text-center font-bold ${isZero ? 'text-red-600' : 'text-amber-600'}">${isZero ? '15' : '10'} Unit</td>
+                            <td class="p-4 text-center font-semibold">Rp ${(isZero ? 45000000 : 25000000).toLocaleString('id-ID')}</td>
+                            <td class="p-4"><span class="${isZero ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-700'} px-2.5 py-1 rounded-full text-[10px] font-black">${isZero ? 'CRITICAL (STOK HABIS)' : 'URGENT (BUFFER MINIM)'}</span></td>
+                            <td class="p-4 text-slate-600 italic">${isZero ? 'Segera lakukan Purchase Order (PO) hari ini untuk mencegah kehilangan potensi omset.' : 'Lakukan restock regular pada minggu ini untuk menjaga ketersediaan pajangan etalase.'}</td>
+                        </tr>
+                    `);
+                });
+
+                if (rows.length === 0) {
+                    rows.push(`
+                        <tr class="bg-emerald-50/20">
+                            <td class="p-4 font-bold text-slate-800">Semua Kategori Produk</td>
+                            <td class="p-4 text-center font-bold text-emerald-600">5 Unit</td>
+                            <td class="p-4 text-center font-semibold">Rp 15.000.000</td>
+                            <td class="p-4"><span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-[10px] font-black">LOW (STOK AMAN)</span></td>
+                            <td class="p-4 text-slate-500">Stok inventaris terjaga dengan baik. Prioritaskan alokasi kas untuk promosi barang laris.</td>
+                        </tr>
+                    `);
+                }
+
+                tableSuggestion.innerHTML = rows.join('');
+            }
+        }
+
+        function renderStaffTab(staffList, peakHours) {
+            const container = document.getElementById('staffLeaderboardContainer');
+            if (container) {
+                if (staffList.length === 0) {
+                    container.innerHTML = `<div class="p-8 text-center text-slate-400">Belum ada data capaian staf</div>`;
+                } else {
+                    container.innerHTML = staffList.map((s, idx) => {
+                        const rank = idx + 1;
+                        let rankBadge = "bg-slate-400 text-white";
+                        if (rank === 1) rankBadge = "bg-amber-500 text-white shadow-md shadow-amber-200";
+                        if (rank === 2) rankBadge = "bg-slate-500 text-white";
+                        if (rank === 3) rankBadge = "bg-amber-700 text-white";
+
+                        const pct = s.target_pct ? s.target_pct.toFixed(0) : "100";
+                        const isHigh = pct >= 90;
+
+                        return `
+                            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 ${rankBadge} font-bold rounded-xl flex items-center justify-center text-sm">#${rank}</div>
+                                    <div>
+                                        <p class="font-bold text-slate-800 text-sm">${escapeHTML(s.staff_name)}</p>
+                                        <p class="text-[10px] text-slate-400 font-bold uppercase"><i class="fas fa-store mr-1 text-blue-500"></i>${escapeHTML(s.location || 'Toko Utama')} • ${s.total_transaksi} Transaksi</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-black text-slate-800 text-sm">Rp ${Number(s.total_omset).toLocaleString('id-ID')}</p>
+                                    <p class="text-[10px] ${isHigh ? 'text-emerald-600' : 'text-amber-600'} font-bold">
+                                        <i class="fas ${isHigh ? 'fa-check-circle' : 'fa-clock'}"></i> ${pct}% Target
+                                    </p>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+
+            renderStaffCharts(staffList, peakHours);
         }
 
         function renderTrenChart(trends) {

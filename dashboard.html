@@ -774,122 +774,73 @@
 
 
         async function generateShiftReceipt() {
+            const userData = getUserDataFromToken() || {};
+            const userLoc = (userData.location || 'Toko Utama').trim();
+            let selectedLocation = userLoc;
+
+            // Jika user dari Toko Utama / Pusat / Superadmin, sediakan opsi cetak per toko atau ketiganya
+            if (userLoc === 'Toko Utama' || userLoc === 'Pusat' || userData.role === 'superadmin') {
+                const { value: chosenLoc } = await Swal.fire({
+                    title: 'Pilih Lokasi Setoran Shift',
+                    text: 'Pilih toko untuk mencetak rekap setoran shift kasir:',
+                    input: 'select',
+                    inputOptions: {
+                        'Semua Toko': 'Semua Toko (Ketiganya Langsung)',
+                        'Toko Utama': 'Toko Utama',
+                        'Toko Sudirman': 'Toko Sudirman',
+                        'Toko Paye': 'Toko Paye'
+                    },
+                    inputValue: 'Semua Toko',
+                    showCancelButton: true,
+                    confirmButtonText: 'Lanjutkan',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#2563EB'
+                });
+
+                if (!chosenLoc) return;
+                selectedLocation = chosenLoc;
+            }
 
             try {
-
                 Swal.fire({
-                    title: "Mengambil Data Shift",
+                    title: `Mengambil Data Shift (${selectedLocation})`,
                     allowOutsideClick: false,
                     didOpen: () => {
                         Swal.showLoading();
                     }
                 });
 
-
-                const response = await fetch(
-                    `${API_URL}/receipt`
-                );
-
+                const queryParam = selectedLocation ? `?location=${encodeURIComponent(selectedLocation)}` : '';
+                const response = await fetch(`${API_URL}/receipt${queryParam}`);
 
                 if (!response.ok) {
-
-                    throw new Error(
-                        "HTTP ERROR " + response.status
-                    );
-
+                    throw new Error("HTTP ERROR " + response.status);
                 }
 
-
-                const result =
-                    await response.json();
-
-
-
-                console.log(
-                    "RECEIPT API RESPONSE:",
-                    result
-                );
-
-
+                const result = await response.json();
                 Swal.close();
-
-
-
-                /*
-                    FORMAT API:
-        
-                    {
-                        category:"SHIFT_RECEIPT",
-        
-                        sales:[
-                            {}
-                        ],
-        
-                        expenses:[
-                            {}
-                        ]
-                    }
-        
-                */
-
 
                 const receiptData = {
-
-                    sales:
-                        result.sales ?? [],
-
-
-                    expenses:
-                        result.expenses ?? []
-
+                    location: selectedLocation,
+                    sales: result.sales ?? [],
+                    expenses: result.expenses ?? []
                 };
 
-
-
-                if (
-                    receiptData.sales.length === 0 &&
-                    receiptData.expenses.length === 0
-                ) {
-
+                if (receiptData.sales.length === 0 && receiptData.expenses.length === 0) {
                     Swal.fire(
                         "Tidak Ada Data",
-                        "Belum ada transaksi yang dapat disetor",
+                        `Belum ada transaksi shift yang belum disetor untuk ${selectedLocation}`,
                         "info"
                     );
-
                     return;
-
                 }
 
-
-
-                generateReportPDF(
-                    receiptData
-                );
-
-
-
+                generateReportPDF(receiptData);
             } catch (error) {
-
-
-                console.error(
-                    "RECEIPT ERROR:",
-                    error
-                );
-
-
+                console.error("RECEIPT ERROR:", error);
                 Swal.close();
-
-
-                Swal.fire(
-                    "Error",
-                    "Gagal mengambil data receipt\n" + error.message,
-                    "error"
-                );
-
-
+                Swal.fire("Error", "Gagal mengambil data receipt\n" + error.message, "error");
             }
-
         }
 
         function calculateShiftSummary(
@@ -1358,7 +1309,9 @@
                 });
 
                 try {
-                    const shiftResponse = await fetch(`${API_URL}/shift/current`);
+                    const userData = getUserDataFromToken() || {};
+                    const loc = (userData.location || 'Toko Utama').trim();
+                    const shiftResponse = await fetch(`${API_URL}/shift/current?location=${encodeURIComponent(loc)}`);
                     const shiftData = await shiftResponse.json();
                     const shift = shiftData.shift || 1;
 
@@ -1368,7 +1321,8 @@
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
-                            shift: shift
+                            shift: shift,
+                            location: loc
                         })
                     });
 
@@ -1376,7 +1330,7 @@
                         await Swal.fire({
                             icon: "success",
                             title: "Shift Berhasil Ditutup",
-                            text: `Transaksi berhasil dimasukkan ke Shift ${shift}. Anda telah keluar.`,
+                            text: `Transaksi berhasil dimasukkan ke Shift ${shift} (${loc}). Anda telah keluar.`,
                             confirmButtonColor: '#2563EB'
                         });
                         localStorage.removeItem("token");
@@ -1640,6 +1594,7 @@
             const payload = {
                 member_name: userData.name || "Desak",
                 user_id: String(userData.user_id),
+                location: userData.location || "Toko Utama",
                 payment_method: finalPaymentMethodString,
                 amount_paid: totalPaid,
                 is_dp: isDp,
