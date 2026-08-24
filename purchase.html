@@ -7,6 +7,7 @@
     <title>Purchase Order - SmartPOS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
 
@@ -52,43 +53,63 @@
 
     <!-- SIDEBAR -->
     <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 fixed h-screen z-20">
-        <div class="flex items-center gap-3 mb-12">
+        <div class="flex items-center gap-3 mb-8 shrink-0">
             <div
                 class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
                 <i class="fas fa-store"></i>
             </div>
             <h1 class="text-xl font-extrabold text-slate-800 tracking-tight text-nowrap">SMARTPOS</h1>
         </div>
-        <nav class="flex-1 space-y-2">
+
+        <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
             <a href="dashboard.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-th-large w-5"></i> <span>Dashboard</span>
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-th-large"></i> <span>Dashboard</span>
             </a>
             <a href="riwayat.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-history w-5"></i> <span>Riwayat Transaksi</span>
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
             </a>
             <a href="product.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-box w-5"></i> <span>Master Produk</span>
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-box"></i> <span>Master Produk</span>
             </a>
             <a href="purchase.html"
-                class="flex items-center gap-4 px-4 py-3.5 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
-                <i class="fas fa-shopping-cart w-5"></i> <span>Riwayat Purchase</span>
+                class="flex items-center gap-4 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
+                <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
             </a>
             <a href="expense.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-wallet w-5"></i> <span>Pengeluaran</span>
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-wallet"></i> <span>Pengeluaran</span>
             </a>
             <a href="retur.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-undo"></i> <span>Manajemen Retur</span>
             </a>
+            <a href="akuntansi.html"
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-book-open"></i> <span>Jurnal & Keuangan</span>
+            </a>
+            <a href="absensi.html"
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-calendar-check"></i> <span>Absensi Karyawan</span>
+            </a>
             <a href="report.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
             </a>
         </nav>
+
+        <div class="pt-6 border-t border-slate-100 shrink-0">
+            <div class="bg-slate-50 p-4 rounded-2xl mb-4">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">User Aktif</p>
+                <p class="font-bold text-slate-700 user-name-display">Desak Kasir</p>
+            </div>
+            <a href="#" onclick="confirmLogout()"
+                class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all">
+                <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
+            </a>
+        </div>
     </aside>
 
     <!-- MAIN CONTENT -->
@@ -279,8 +300,135 @@
             }, 500);
         }
 
+        const ROLE_PERMISSIONS = {
+            'admin': ['riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'absensi.html', 'report.html'],
+            'kasir': ['dashboard.html', 'riwayat.html'],
+            'super-kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
+            'super_kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
+            'superkasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
+            'akuntan': ['akuntansi.html'],
+            'superadmin': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'akuntansi.html', 'absensi.html', 'report.html']
+        };
+
+        async function confirmLogout() {
+            const result = await Swal.fire({
+                title: 'Konfirmasi Keluar',
+                text: 'Pilih tindakan logout yang ingin Anda lakukan:',
+                icon: 'question',
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: '<i class="fas fa-check-circle mr-1"></i> Logout & Selesaikan Shift',
+                denyButtonText: '<i class="fas fa-sign-out-alt mr-1"></i> Logout Saja',
+                cancelButtonText: '<i class="fas fa-times mr-1"></i> Batal',
+                confirmButtonColor: '#2563EB',
+                denyButtonColor: '#F59E0B',
+                cancelButtonColor: '#64748B',
+                reverseButtons: true
+            });
+
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Menutup Shift...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                try {
+                    const shiftResponse = await fetch(`${BASE_URL}/api/shift/current`);
+                    const shiftData = await shiftResponse.json();
+                    const shift = shiftData.shift || 1;
+
+                    const updateResponse = await fetch(`${BASE_URL}/api/sales/update/shift`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            shift: shift
+                        })
+                    });
+
+                    if (updateResponse.ok) {
+                        await Swal.fire({
+                            icon: "success",
+                            title: "Shift Berhasil Ditutup",
+                            text: `Transaksi berhasil dimasukkan ke Shift ${shift}. Anda telah keluar.`,
+                            confirmButtonColor: '#2563EB'
+                        });
+                        localStorage.removeItem("token");
+                        window.location.href = "index.html";
+                    } else {
+                        Swal.fire("Gagal", "Gagal memperbarui shift transaksi", "error");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire("Error", "Server tidak dapat dihubungi", "error");
+                }
+            } else if (result.isDenied) {
+                localStorage.removeItem("token");
+                window.location.href = "index.html";
+            }
+        }
+
+        function getUserDataFromToken() {
+            const token = localStorage.getItem('token');
+            if (!token) return null;
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (err) {
+                return null;
+            }
+        }
+
+        function checkRoleAccess(currentPage) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+            const userData = getUserDataFromToken();
+            if (!userData) {
+                window.location.href = 'index.html';
+                return;
+            }
+            const userRole = (userData.role || 'kasir').toLowerCase().trim();
+            const allowedPages = ROLE_PERMISSIONS[userRole] || ['dashboard.html'];
+
+            if (!allowedPages.includes(currentPage)) {
+                if (userRole === 'akuntan') window.location.href = 'akuntansi.html';
+                else if (userRole === 'admin') window.location.href = 'riwayat.html';
+                else window.location.href = 'dashboard.html';
+                return;
+            }
+
+            const navLinks = document.querySelectorAll('aside nav a');
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href !== '#' && href !== 'index.html') {
+                    if (!allowedPages.includes(href)) {
+                        link.style.display = 'none';
+                    } else {
+                        link.style.display = 'flex';
+                    }
+                }
+            });
+
+            const userEls = document.querySelectorAll('.user-name-display');
+            userEls.forEach(el => {
+                el.innerText = `${userData.name || 'User'} (${userRole.toUpperCase()})`;
+            });
+        }
+
         // Init data
-        window.onload = fetchPurchases;
+        window.onload = () => {
+            checkRoleAccess('purchase.html');
+            fetchPurchases();
+        };
 
         // Modal triggers (Placeholders)
         function openModal() { /* logic modal sama seperti sebelumnya */ }

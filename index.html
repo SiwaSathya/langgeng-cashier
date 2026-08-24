@@ -46,6 +46,20 @@
     <script>
         const API_URL = "https://langgeng-cashier-backend-production.up.railway.app/api";
 
+        function getUserDataFromToken(token) {
+            if (!token) return null;
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (err) {
+                return null;
+            }
+        }
+
         async function handleLogin(e) {
             e.preventDefault();
 
@@ -77,8 +91,17 @@
                     // Simpan JWT token ke dalam localStorage browser
                     localStorage.setItem('token', result.token);
 
-                    // Alihkan user langsung ke dashboard jika login sukses
-                    window.location.href = "dashboard.html";
+                    const userData = getUserDataFromToken(result.token);
+                    const role = (userData?.role || '').toLowerCase().trim();
+
+                    // Alihkan user sesuai dengan role masing-masing
+                    if (role === 'akuntan') {
+                        window.location.href = "akuntansi.html";
+                    } else if (role === 'admin') {
+                        window.location.href = "riwayat.html";
+                    } else {
+                        window.location.href = "dashboard.html";
+                    }
                 } else {
                     // Jika API mengembalikan error status (400/401)
                     Swal.fire({

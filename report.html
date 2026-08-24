@@ -33,50 +33,58 @@
 
 <body class="bg-[#F8FAFC] flex h-screen overflow-hidden">
 
-    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 z-20">
-        <div class="flex items-center gap-3 mb-12">
+    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 z-20 shrink-0">
+        <div class="flex items-center gap-3 mb-8 shrink-0">
             <div
                 class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
                 <i class="fas fa-store"></i>
             </div>
             <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">SMARTPOS</h1>
         </div>
-        <nav class="flex-1 space-y-2 overflow-y-auto custom-scroll pr-1">
+        <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
             <a href="dashboard.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-store"></i> <span>Dashboard</span>
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-th-large"></i> <span>Dashboard</span>
             </a>
             <a href="riwayat.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
             </a>
             <a href="product.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-box"></i> <span>Master Produk</span>
             </a>
             <a href="purchase.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
             </a>
             <a href="expense.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-wallet"></i> <span>Pengeluaran</span>
             </a>
             <a href="retur.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-undo"></i> <span>Manajemen Retur</span>
             </a>
+            <a href="akuntansi.html"
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-book-open"></i> <span>Jurnal & Keuangan</span>
+            </a>
+            <a href="absensi.html"
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-calendar-check"></i> <span>Absensi Karyawan</span>
+            </a>
             <a href="report.html"
-                class="flex items-center gap-4 px-4 py-3.5 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
+                class="flex items-center gap-4 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
                 <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
             </a>
         </nav>
         <div class="pt-6 border-t border-slate-100 shrink-0">
             <div class="bg-slate-50 p-4 rounded-2xl mb-4">
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">User Aktif</p>
-                <p id="sidebar-username" class="font-bold text-slate-700">Desak Owner</p>
+                <p id="sidebar-username" class="font-bold text-slate-700 user-name-display">Desak Owner</p>
             </div>
-            <a href="index.html"
+            <a href="#" onclick="confirmLogout()"
                 class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all">
                 <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
             </a>
@@ -535,11 +543,137 @@
     </main>
 
     <script>
+        const BASE_URL = "https://langgeng-cashier-backend-production.up.railway.app";
         let chartTren = null;
         let chartMetodeDetail = null;
         let chartMargin = null;
         let chartProfitKat = null;
         let chartHours = null;
+        let reportDataCache = null;
+
+        const ROLE_PERMISSIONS = {
+            'admin': ['riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'absensi.html', 'report.html'],
+            'kasir': ['dashboard.html', 'riwayat.html'],
+            'super-kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
+            'super_kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
+            'superkasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
+            'akuntan': ['akuntansi.html'],
+            'superadmin': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'akuntansi.html', 'absensi.html', 'report.html']
+        };
+
+        async function confirmLogout() {
+            const result = await Swal.fire({
+                title: 'Konfirmasi Keluar',
+                text: 'Pilih tindakan logout yang ingin Anda lakukan:',
+                icon: 'question',
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: '<i class="fas fa-check-circle mr-1"></i> Logout & Selesaikan Shift',
+                denyButtonText: '<i class="fas fa-sign-out-alt mr-1"></i> Logout Saja',
+                cancelButtonText: '<i class="fas fa-times mr-1"></i> Batal',
+                confirmButtonColor: '#2563EB',
+                denyButtonColor: '#F59E0B',
+                cancelButtonColor: '#64748B',
+                reverseButtons: true
+            });
+
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Menutup Shift...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                try {
+                    const shiftResponse = await fetch(`${BASE_URL}/api/shift/current`);
+                    const shiftData = await shiftResponse.json();
+                    const shift = shiftData.shift || 1;
+
+                    const updateResponse = await fetch(`${BASE_URL}/api/sales/update/shift`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            shift: shift
+                        })
+                    });
+
+                    if (updateResponse.ok) {
+                        await Swal.fire({
+                            icon: "success",
+                            title: "Shift Berhasil Ditutup",
+                            text: `Transaksi berhasil dimasukkan ke Shift ${shift}. Anda telah keluar.`,
+                            confirmButtonColor: '#2563EB'
+                        });
+                        localStorage.removeItem("token");
+                        window.location.href = "index.html";
+                    } else {
+                        Swal.fire("Gagal", "Gagal memperbarui shift transaksi", "error");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire("Error", "Server tidak dapat dihubungi", "error");
+                }
+            } else if (result.isDenied) {
+                localStorage.removeItem("token");
+                window.location.href = "index.html";
+            }
+        }
+
+        function getUserDataFromToken() {
+            const token = localStorage.getItem('token');
+            if (!token) return null;
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (err) {
+                return null;
+            }
+        }
+
+        function checkRoleAccess(currentPage) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+            const userData = getUserDataFromToken();
+            if (!userData) {
+                window.location.href = 'index.html';
+                return;
+            }
+            const userRole = (userData.role || 'kasir').toLowerCase().trim();
+            const allowedPages = ROLE_PERMISSIONS[userRole] || ['dashboard.html'];
+
+            if (!allowedPages.includes(currentPage)) {
+                if (userRole === 'akuntan') window.location.href = 'akuntansi.html';
+                else if (userRole === 'admin') window.location.href = 'riwayat.html';
+                else window.location.href = 'dashboard.html';
+                return;
+            }
+
+            const navLinks = document.querySelectorAll('aside nav a');
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href !== '#' && href !== 'index.html') {
+                    if (!allowedPages.includes(href)) {
+                        link.style.display = 'none';
+                    } else {
+                        link.style.display = 'flex';
+                    }
+                }
+            });
+
+            const userEls = document.querySelectorAll('.user-name-display, #sidebar-username');
+            userEls.forEach(el => {
+                el.innerText = `${userData.name || 'User'} (${userRole.toUpperCase()})`;
+            });
+        }
 
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -555,100 +689,196 @@
                 }
             });
 
-            if (tabName === 'margin') renderMarginCharts();
-            if (tabName === 'staf') renderStaffCharts();
+            if (tabName === 'margin' && reportDataCache) renderMarginCharts(reportDataCache.category_margins);
+            if (tabName === 'staf' && reportDataCache) renderStaffCharts(reportDataCache.staff_leaderboard, reportDataCache.peak_hours);
         }
 
         async function loadDataLaporan() {
-            document.getElementById('table-top-produk').innerHTML = `
-                <tr><td class="p-4 font-bold text-slate-800">Kulkas Inverter 2 Pintu 300L</td><td class="p-4 text-center font-bold text-blue-600">14 Unit</td><td class="p-4 text-right">Rp 63.000.000</td></tr>
-                <tr><td class="p-4 font-bold text-slate-800">Smart TV 4K LED 43 Inch</td><td class="p-4 text-center font-bold text-blue-600">12 Unit</td><td class="p-4 text-right">Rp 48.000.000</td></tr>
-                <tr><td class="p-4 font-bold text-slate-800">AC Split 1/2 PK Low Watt</td><td class="p-4 text-center font-bold text-blue-600">10 Unit</td><td class="p-4 text-right">Rp 31.500.000</td></tr>
-            `;
+            const period = document.getElementById('filter-bulan').value || 'this-month';
 
-            document.getElementById('table-stok-kritis').innerHTML = `
-                <tr class="bg-red-50/50"><td class="p-4 font-bold text-slate-800">Showcase Cooler Kaca 250L</td><td class="p-4 text-center font-bold text-red-600">0 Unit</td><td class="p-4 text-center"><span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[10px] font-black">KOSONG</span></td></tr>
-                <tr class="bg-amber-50/50"><td class="p-4 font-bold text-slate-800">Kulkas Side by Side 500L</td><td class="p-4 text-center font-bold text-amber-600">1 Unit</td><td class="p-4 text-center"><span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black">CRITICAL</span></td></tr>
-            `;
+            try {
+                const res = await fetch(`${BASE_URL}/api/analytics/report?period=${period}`);
+                if (!res.ok) throw new Error("Gagal mengambil data analitik");
+                const data = await res.json();
+                reportDataCache = data;
 
-            renderTrenChart([18000000, 24500000, 15000000, 32000000, 28000000, 45000000, 22950000], [5000000, 12000000, 3500000, 4000000, 9500000, 6000000, 2100000]);
-            renderMetodeBayarDetailChart([45000000, 58000000, 32450000, 28000000, 12000000, 10000000]);
+                // 1. Update KPI Card Values
+                document.getElementById('stat-omset').innerText = `Rp ${Number(data.kpi?.total_omset || 0).toLocaleString('id-ID')}`;
+                document.getElementById('stat-pengeluaran').innerText = `Rp ${Number(data.kpi?.total_pengeluaran || 0).toLocaleString('id-ID')}`;
+                document.getElementById('stat-profit').innerText = `Rp ${Number(data.kpi?.profit || 0).toLocaleString('id-ID')}`;
+                document.getElementById('stat-transaksi').innerText = `${data.kpi?.total_transaksi || 0} Nota (${Number(data.kpi?.total_qty || 0)} Unit)`;
+
+                // 2. Render Top Products Table
+                const topProducts = data.top_products || [];
+                const topProdTable = document.getElementById('table-top-produk');
+                if (topProdTable) {
+                    if (topProducts.length === 0) {
+                        topProdTable.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400">Belum ada data penjualan produk</td></tr>`;
+                    } else {
+                        topProdTable.innerHTML = topProducts.map(p => `
+                            <tr>
+                                <td class="p-4 font-bold text-slate-800">${p.product_name} <span class="text-[10px] text-slate-400 uppercase font-mono block">${p.product_code}</span></td>
+                                <td class="p-4 text-center font-bold text-blue-600">${p.total_qty} Unit</td>
+                                <td class="p-4 text-right font-extrabold text-slate-800">Rp ${Number(p.total_omset).toLocaleString('id-ID')}</td>
+                            </tr>
+                        `).join('');
+                    }
+                }
+
+                // 3. Render Critical Stock Table
+                const criticalStocks = data.critical_stocks || [];
+                const critStockTable = document.getElementById('table-stok-kritis');
+                if (critStockTable) {
+                    if (criticalStocks.length === 0) {
+                        critStockTable.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-emerald-600 font-bold">Semua stok barang dalam kondisi aman</td></tr>`;
+                    } else {
+                        critStockTable.innerHTML = criticalStocks.map(p => {
+                            const isKosong = p.saldo <= 0;
+                            return `
+                                <tr class="${isKosong ? 'bg-red-50/50' : 'bg-amber-50/50'}">
+                                    <td class="p-4 font-bold text-slate-800">${p.product_name} <span class="text-[10px] text-slate-400 uppercase font-mono block">${p.product_code}</span></td>
+                                    <td class="p-4 text-center font-bold ${isKosong ? 'text-red-600' : 'text-amber-600'}">${p.saldo} Unit</td>
+                                    <td class="p-4 text-center"><span class="${isKosong ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-700'} px-3 py-1 rounded-full text-[10px] font-black">${p.status}</span></td>
+                                </tr>
+                            `;
+                        }).join('');
+                    }
+                }
+
+                // 4. Render Tren Mingguan Chart
+                renderTrenChart(data.trends || []);
+
+                // 5. Render Payment Method Share Chart
+                renderMetodeBayarDetailChart(data.payment_methods || []);
+
+                // 6. Pre-render other charts if needed
+                renderMarginCharts(data.category_margins || []);
+                renderStaffCharts(data.staff_leaderboard || [], data.peak_hours || []);
+
+            } catch (err) {
+                console.error(err);
+            }
         }
 
-        function renderTrenChart(penjualan, pengeluaran) {
-            const ctx = document.getElementById('chartTrenUtama').getContext('2d');
+        function renderTrenChart(trends) {
+            const ctx = document.getElementById('chartTrenUtama')?.getContext('2d');
+            if (!ctx) return;
             if (chartTren) chartTren.destroy();
+
+            const labels = trends.map(t => t.day_name);
+            const salesData = trends.map(t => t.penjualan);
+            const expenseData = trends.map(t => t.pengeluaran);
+
             chartTren = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
+                    labels: labels,
                     datasets: [
-                        { label: 'Omset Penjualan', data: penjualan, borderColor: '#3B82F6', backgroundColor: 'rgba(59, 130, 246, 0.03)', fill: true, tension: 0.3, borderWidth: 3 },
-                        { label: 'Biaya Pengeluaran', data: pengeluaran, borderColor: '#EF4444', backgroundColor: 'transparent', fill: false, tension: 0.3, borderWidth: 2, borderDash: [5, 5] }
+                        { label: 'Omset Penjualan (Rp)', data: salesData, borderColor: '#3B82F6', backgroundColor: 'rgba(59, 130, 246, 0.05)', fill: true, tension: 0.3, borderWidth: 3 },
+                        { label: 'Biaya Pengeluaran (Rp)', data: expenseData, borderColor: '#EF4444', backgroundColor: 'transparent', fill: false, tension: 0.3, borderWidth: 2, borderDash: [5, 5] }
                     ]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
             });
         }
 
-        function renderMetodeBayarDetailChart(dataArray) {
-            const ctx = document.getElementById('chartMetodeBayarDetail').getContext('2d');
+        function renderMetodeBayarDetailChart(methods) {
+            const ctx = document.getElementById('chartMetodeBayarDetail')?.getContext('2d');
+            if (!ctx) return;
             if (chartMetodeDetail) chartMetodeDetail.destroy();
+
+            let labels = methods.map(m => m.method || 'Lainnya');
+            let dataArray = methods.map(m => m.total);
+
+            if (dataArray.length === 0) {
+                labels = ['Belum ada transaksi'];
+                dataArray = [1];
+            }
+
             chartMetodeDetail = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Tunai (Cash)', 'Kredit (FIF)', 'Debit Bank', 'TF BCA', 'TF BNI', 'TF Mandiri'],
-                    datasets: [{ data: dataArray, backgroundColor: ['#10B981', '#8B5CF6', '#F59E0B', '#3B82F6', '#06B6D4', '#34D399'], borderWidth: 2 }]
+                    labels: labels,
+                    datasets: [{ data: dataArray, backgroundColor: ['#10B981', '#8B5CF6', '#F59E0B', '#3B82F6', '#06B6D4', '#EC4899', '#6366F1'], borderWidth: 2 }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 9 } } } } }
             });
         }
 
-        function renderMarginCharts() {
-            const ctx1 = document.getElementById('chartMarginHPP').getContext('2d');
-            if (chartMargin) chartMargin.destroy();
-            chartMargin = new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: ['Kulkas', 'Smart TV', 'AC Split', 'Mesin Cuci', 'Rice Cooker'],
-                    datasets: [
-                        { label: 'Omset Kotor', data: [63000000, 48000000, 31500000, 36000000, 4950000], backgroundColor: '#3B82F6' },
-                        { label: 'HPP (Modal)', data: [49000000, 38000000, 25000000, 27500000, 3700000], backgroundColor: '#94A3B8' }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
+        function renderMarginCharts(margins) {
+            const ctx1 = document.getElementById('chartMarginHPP')?.getContext('2d');
+            if (ctx1) {
+                if (chartMargin) chartMargin.destroy();
+                let labels = margins.map(m => m.category_name);
+                let omsetData = margins.map(m => m.omset_kotor);
+                let hppData = margins.map(m => m.hpp);
 
-            const ctx2 = document.getElementById('chartProfitKategori').getContext('2d');
-            if (chartProfitKat) chartProfitKat.destroy();
-            chartProfitKat = new Chart(ctx2, {
-                type: 'polarArea',
-                data: {
-                    labels: ['Pendingin', 'Visual/TV', 'Washers', 'Kitchen'],
-                    datasets: [{ data: [14000000, 10000000, 8500000, 1250000], backgroundColor: ['rgba(59, 130, 246, 0.7)', 'rgba(139, 92, 246, 0.7)', 'rgba(16, 185, 129, 0.7)', 'rgba(245, 158, 11, 0.7)'] }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
+                if (labels.length === 0) {
+                    labels = ['Kulkas', 'Smart TV', 'AC Split', 'Mesin Cuci', 'Rice Cooker'];
+                    omsetData = [63000000, 48000000, 31500000, 36000000, 4950000];
+                    hppData = [49000000, 38000000, 25000000, 27500000, 3700000];
+                }
+
+                chartMargin = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            { label: 'Omset Kotor', data: omsetData, backgroundColor: '#3B82F6' },
+                            { label: 'HPP (Modal)', data: hppData, backgroundColor: '#94A3B8' }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+
+            const ctx2 = document.getElementById('chartProfitKategori')?.getContext('2d');
+            if (ctx2) {
+                if (chartProfitKat) chartProfitKat.destroy();
+                let labels = margins.map(m => m.category_name);
+                let profitData = margins.map(m => m.profit);
+
+                if (labels.length === 0) {
+                    labels = ['Pendingin', 'Visual/TV', 'Washers', 'Kitchen'];
+                    profitData = [14000000, 10000000, 8500000, 1250000];
+                }
+
+                chartProfitKat = new Chart(ctx2, {
+                    type: 'polarArea',
+                    data: {
+                        labels: labels,
+                        datasets: [{ data: profitData, backgroundColor: ['rgba(59, 130, 246, 0.7)', 'rgba(139, 92, 246, 0.7)', 'rgba(16, 185, 129, 0.7)', 'rgba(245, 158, 11, 0.7)'] }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
         }
 
-        function renderStaffCharts() {
-            const ctx = document.getElementById('chartPeakHours').getContext('2d');
-            if (chartHours) chartHours.destroy();
-            chartHours = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['09:00', '11:00', '13:00', '15:00', '17:00', '19:00', '21:00'],
-                    datasets: [{ label: 'Jumlah Nota Masuk', data: [3, 8, 5, 12, 22, 18, 4], borderColor: '#6366F1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.4, borderWidth: 3 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
+        function renderStaffCharts(leaderboard, peakHours) {
+            const ctx = document.getElementById('chartPeakHours')?.getContext('2d');
+            if (ctx) {
+                if (chartHours) chartHours.destroy();
+                const labels = (peakHours || []).map(p => p.hour);
+                const counts = (peakHours || []).map(p => p.count);
+
+                chartHours = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels.length > 0 ? labels : ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
+                        datasets: [{ label: 'Jumlah Transaksi Penjualan', data: counts.length > 0 ? counts : [0, 2, 5, 8, 12, 18, 14, 4], borderColor: '#6366F1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.4, borderWidth: 3 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
         }
 
         setInterval(() => {
-            document.getElementById('clock').innerText = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
+            const clockEl = document.getElementById('clock');
+            if (clockEl) clockEl.innerText = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
         }, 1000);
 
         window.onload = function () {
+            checkRoleAccess('report.html');
             loadDataLaporan();
         };
     </script>

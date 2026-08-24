@@ -32,8 +32,8 @@
 
 <body class="bg-[#F8FAFC] flex h-screen overflow-hidden">
 
-    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 z-20">
-        <div class="flex items-center gap-3 mb-12">
+    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 z-20 shrink-0">
+        <div class="flex items-center gap-3 mb-8 shrink-0">
             <div
                 class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
                 <i class="fas fa-store"></i>
@@ -41,43 +41,51 @@
             <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">SMARTPOS</h1>
         </div>
 
-        <nav class="flex-1 space-y-2">
+        <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
             <a href="dashboard.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-th-large"></i> <span>Dashboard</span>
             </a>
             <a href="riwayat.html"
-                class="flex items-center gap-4 px-4 py-3.5 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
+                class="flex items-center gap-4 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
                 <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
             </a>
             <a href="product.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-box"></i> <span>Master Produk</span>
             </a>
             <a href="purchase.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
             </a>
             <a href="expense.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-shopping-cart"></i> <span>Pengeluaran</span>
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-wallet"></i> <span>Pengeluaran</span>
             </a>
             <a href="retur.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-undo"></i> <span>Manajemen Retur</span>
             </a>
+            <a href="akuntansi.html"
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-book-open"></i> <span>Jurnal & Keuangan</span>
+            </a>
+            <a href="absensi.html"
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-calendar-check"></i> <span>Absensi Karyawan</span>
+            </a>
             <a href="report.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
             </a>
         </nav>
 
-        <div class="pt-8 border-t border-slate-100">
-            <div class="bg-slate-50 p-4 rounded-2xl mb-6">
+        <div class="pt-6 border-t border-slate-100 shrink-0">
+            <div class="bg-slate-50 p-4 rounded-2xl mb-4">
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">User Aktif</p>
-                <p class="font-bold text-slate-700">Desak Kasir</p>
+                <p class="font-bold text-slate-700 user-name-display">Desak Kasir</p>
             </div>
-            <a href="index.html"
+            <a href="#" onclick="confirmLogout()"
                 class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all">
                 <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
             </a>
@@ -100,8 +108,12 @@
 
         <div class="flex-1 p-10 overflow-y-auto custom-scroll">
             <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-8 border-b border-slate-50">
-                    <h3 class="font-bold text-slate-800">Semua Transaksi</h3>
+                <div class="p-8 border-b border-slate-50 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-slate-800">Semua Transaksi (Per Nota)</h3>
+                        <p class="text-xs text-slate-400 mt-1">Data penjualan dikelompokkan berdasarkan nomor invoice.
+                        </p>
+                    </div>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -109,15 +121,15 @@
                         <thead>
                             <tr
                                 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50 bg-slate-50/30">
-                                <th class="p-6 text-left">Invoice</th>
-                                <th class="p-6 text-left">Tanggal & Waktu</th>
-                                <th class="p-6 text-left">Produk</th>
+                                <th class="p-6 text-left">Invoice & Kasir</th>
+                                <th class="p-6 text-left">Tanggal</th>
+                                <th class="p-6 text-left">Item Belanja</th>
                                 <th class="p-6 text-center">Status</th>
                                 <th class="p-6 text-left">Metode</th>
-                                <th class="p-6 text-center">Qty</th>
+                                <th class="p-6 text-center">Total Qty</th>
                                 <th class="p-6 text-right">Total Netto</th>
                                 <th class="p-6 text-right">Bayar</th>
-                                <th class="p-6 text-center w-48">Aksi</th>
+                                <th class="p-6 text-center w-52">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="riwayat-body" class="divide-y divide-slate-50 font-semibold text-slate-600">
@@ -137,6 +149,30 @@
         const API_URL = "https://langgeng-cashier-backend-production.up.railway.app/api";
         let localSalesData = [];
 
+        function escapeHTML(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function getUserDataFromToken() {
+            const token = localStorage.getItem('token');
+            if (!token) return null;
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (err) {
+                return null;
+            }
+        }
+
         async function fetchRiwayat() {
             const tbody = document.getElementById('riwayat-body');
             const emptyState = document.getElementById('empty-state');
@@ -153,59 +189,178 @@
                     emptyState.classList.add('hidden');
 
                     data.forEach((s, idx) => {
+                        const invoice = s.invoice || s.Invoice || '-';
+                        const createdAt = s.created_at || s.CreatedAt;
+                        const formattedDate = createdAt ? new Date(createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+                        const cashierName = s.user?.name || s.User?.name || s.member_name || s.MemberName || '-';
+                        const customer = s.customer || s.Customer;
+                        const customerName = customer?.name || customer?.Name || '';
+                        const customerPhone = customer?.phone_number || customer?.PhoneNumber || '';
+
+                        const isDp = s.is_dp || s.IsDp || s.status === 'DP' || s.Status === 'DP';
+                        const status = s.status || s.Status || (isDp ? 'DP' : 'Lunas');
+                        const paymentMethod = s.payment_method || s.PaymentMethod || 'Tunai';
+                        const totalNetto = Number(s.total_netto ?? s.TotalNetto ?? 0);
+                        const amountPaid = Number(s.amount_paid ?? s.AmountPaid ?? 0);
+                        const remainingAmount = Number(s.remaining_amount ?? (totalNetto - amountPaid > 0 ? totalNetto - amountPaid : 0));
+                        const items = s.items || s.Items || [];
+                        const totalQty = Number(s.total_qty ?? s.TotalQty ?? items.reduce((acc, it) => acc + Number(it.qty || it.Qty || 0), 0));
+
                         let statusBadge = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Lunas</span>`;
-                        if (s.is_dp || s.Status === "DP") {
-                            statusBadge = `<span class="bg-amber-50 text-amber-600 border border-amber-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">DP / Belum Lunas</span>`;
+                        if (isDp || status === "DP") {
+                            statusBadge = `
+                                <div class="inline-flex flex-col items-center">
+                                    <span class="bg-amber-50 text-amber-600 border border-amber-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">DP / Belum Lunas</span>
+                                    ${remainingAmount > 0 ? `<span class="text-[10px] text-rose-500 font-bold mt-1">Sisa: IDR ${remainingAmount.toLocaleString('id-ID')}</span>` : ''}
+                                </div>
+                            `;
                         }
 
                         let actionButtons = "";
-                        if (s.is_dp || s.Status === "DP") {
+                        if (isDp || status === "DP") {
                             actionButtons += `
-                                <button onclick="openPelunasanModal(${idx})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all mr-1 shadow-sm">
+                                <button onclick="openPelunasanModal(${idx})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Pelunasan Nota">
                                     <i class="fas fa-money-bill-wave mr-1"></i> Pelunasan
                                 </button>
                             `;
                         }
                         actionButtons += `
-                            <button onclick="openReturModal(${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm">
+                            <button onclick="openReturModal(${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Retur Barang">
                                 <i class="fas fa-undo mr-1"></i> Retur
                             </button>
                         `;
 
-                        // Mengatasi variasi uppercase/lowercase key dari struct Go JSON
-                        const invoice = s.invoice || s.Invoice || '-';
-                        const productName = s.Product ? s.Product.Nama : (s.product_search || 'Produk');
-                        const productCode = s.Product ? s.Product.Kode : '-';
-                        const paymentMethod = s.payment_method || s.PaymentMethod || 'Tunai';
-                        const qty = s.qty || s.Qty || 0;
-                        const totalNetto = s.total_netto || s.TotalNetto || 0;
-                        const amountPaid = s.amount_paid || s.AmountPaid || 0;
+                        if (items.length > 0) {
+                            actionButtons += `
+                                <button onclick="toggleDetailRow(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all" title="Lihat Rincian Item">
+                                    <i id="toggle-icon-${idx}" class="fas fa-chevron-down transition-transform duration-200"></i>
+                                </button>
+                            `;
+                        }
 
+                        // Ringkasan Tampilan Produk
+                        let productSummaryHTML = "";
+                        if (items.length === 0) {
+                            productSummaryHTML = `<p class="text-slate-400 italic text-xs">Tidak ada item</p>`;
+                        } else if (items.length === 1) {
+                            const firstItem = items[0];
+                            const pName = firstItem.product?.nama || firstItem.Product?.Nama || firstItem.product_search || 'Produk';
+                            const pCode = firstItem.product?.kode || firstItem.Product?.Kode || '-';
+                            productSummaryHTML = `
+                                <p class="text-slate-800 font-bold">${escapeHTML(pName)}</p>
+                                <p class="text-[10px] text-slate-400 uppercase font-black">${escapeHTML(pCode)} • ${firstItem.qty || firstItem.Qty || 1} pcs</p>
+                            `;
+                        } else {
+                            const firstItem = items[0];
+                            const pName = firstItem.product?.nama || firstItem.Product?.Nama || firstItem.product_search || 'Produk';
+                            productSummaryHTML = `
+                                <p class="text-slate-800 font-bold">${escapeHTML(pName)}</p>
+                                <div class="flex items-center gap-1.5 mt-0.5">
+                                    <span class="bg-blue-50 text-blue-600 border border-blue-100 px-1.5 py-0.5 rounded text-[10px] font-bold">+${items.length - 1} item lainnya</span>
+                                    <button onclick="toggleDetailRow(${idx})" class="text-[10px] text-slate-400 hover:text-blue-600 font-semibold underline">Lihat Detail</button>
+                                </div>
+                            `;
+                        }
+
+                        // Render Baris Utama Transaksi
                         const row = document.createElement('tr');
-                        row.className = "hover:bg-slate-50/50 transition-all";
+                        row.className = "hover:bg-slate-50/60 transition-all";
+                        row.id = `group-row-${idx}`;
                         row.innerHTML = `
                             <td class="p-6">
-                                <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold border border-blue-100">
-                                    #${invoice}
+                                <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold border border-blue-100 inline-block">
+                                    #${escapeHTML(invoice)}
                                 </span>
+                                <p class="text-[11px] text-slate-400 font-bold mt-1.5"><i class="fas fa-user-circle mr-1"></i>${escapeHTML(cashierName)}</p>
+                                ${customerName ? `
+                                    <p class="text-[10px] text-emerald-600 font-bold mt-0.5">
+                                        <i class="fas fa-user mr-1"></i>${escapeHTML(customerName)} ${customerPhone ? `(${escapeHTML(customerPhone)})` : ''}
+                                    </p>
+                                ` : ''}
                             </td>
                             <td class="p-6 text-xs text-slate-400 font-bold">
-                                ${s.CreatedAt ? new Date(s.CreatedAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-'}
+                                ${escapeHTML(formattedDate)}
                             </td>
                             <td class="p-6">
-                                <p class="text-slate-800 font-bold">${productName}</p>
-                                <p class="text-[10px] text-slate-400 uppercase font-black">${productCode}</p>
+                                ${productSummaryHTML}
                             </td>
                             <td class="p-6 text-center">${statusBadge}</td>
-                            <td class="p-6 text-xs text-slate-500 max-w-[150px] truncate" title="${paymentMethod}">
-                                ${paymentMethod}
+                            <td class="p-6 text-xs text-slate-500 max-w-[150px] truncate" title="${escapeHTML(paymentMethod)}">
+                                ${escapeHTML(paymentMethod)}
                             </td>
-                            <td class="p-6 text-center font-bold">${qty}</td>
-                            <td class="p-6 text-right font-extrabold text-slate-800">IDR ${totalNetto.toLocaleString()}</td>
-                            <td class="p-6 text-right text-emerald-600 font-bold">IDR ${amountPaid.toLocaleString()}</td>
-                            <td class="p-6 text-center">${actionButtons}</td>
+                            <td class="p-6 text-center font-bold text-slate-700">${totalQty}</td>
+                            <td class="p-6 text-right font-extrabold text-slate-800">IDR ${totalNetto.toLocaleString('id-ID')}</td>
+                            <td class="p-6 text-right text-emerald-600 font-bold">IDR ${amountPaid.toLocaleString('id-ID')}</td>
+                            <td class="p-6 text-center">
+                                <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                                    ${actionButtons}
+                                </div>
+                            </td>
                         `;
                         tbody.appendChild(row);
+
+                        // Render Subrow Rincian Item (Expandable)
+                        if (items.length > 0) {
+                            const detailRow = document.createElement('tr');
+                            detailRow.id = `detail-row-${idx}`;
+                            detailRow.className = "hidden bg-slate-50/80 border-b border-slate-200";
+
+                            const itemRowsHTML = items.map((it, itemIdx) => {
+                                const itName = it.product?.nama || it.Product?.Nama || it.product_search || `Item #${it.id || ''}`;
+                                const itCode = it.product?.kode || it.Product?.Kode || '-';
+                                const itSatuan = it.product?.satuan || it.Product?.Satuan || 'PCS';
+                                const itQty = Number(it.qty || it.Qty || 0);
+                                const itPrice = Number(it.h_jual || it.HJual || it.price || 0);
+                                const itDiscount = Number(it.discount || it.Discount || 0);
+                                const itSubtotal = Number(it.total_netto || it.TotalNetto || (itQty * itPrice - itDiscount));
+
+                                return `
+                                    <tr class="border-b border-slate-100 hover:bg-white/70 text-xs">
+                                        <td class="py-2.5 px-4 font-mono font-bold text-slate-500">${escapeHTML(itCode)}</td>
+                                        <td class="py-2.5 px-4 font-bold text-slate-700">${escapeHTML(itName)}</td>
+                                        <td class="py-2.5 px-4 text-center font-bold text-slate-600">${itQty} ${escapeHTML(itSatuan)}</td>
+                                        <td class="py-2.5 px-4 text-right font-semibold text-slate-600">IDR ${itPrice.toLocaleString('id-ID')}</td>
+                                        <td class="py-2.5 px-4 text-right text-slate-400 font-semibold">${itDiscount > 0 ? `IDR ${itDiscount.toLocaleString('id-ID')}` : '-'}</td>
+                                        <td class="py-2.5 px-4 text-right font-bold text-slate-800">IDR ${itSubtotal.toLocaleString('id-ID')}</td>
+                                        <td class="py-2.5 px-4 text-center">
+                                            <button onclick="openReturModal(${idx}, ${itemIdx})" class="bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 px-2.5 py-1 rounded-md text-[10px] font-bold transition-all shadow-sm">
+                                                <i class="fas fa-undo mr-1"></i> Retur
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('');
+
+                            detailRow.innerHTML = `
+                                <td colspan="9" class="p-4 pl-12 pr-6">
+                                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                                        <div class="bg-slate-100/60 px-4 py-2 border-b border-slate-200 flex justify-between items-center">
+                                            <span class="text-[11px] font-black uppercase text-slate-500 tracking-wider">
+                                                <i class="fas fa-boxes text-blue-500 mr-1.5"></i> Rincian Barang (#${escapeHTML(invoice)})
+                                            </span>
+                                            <span class="text-[11px] font-bold text-slate-400">${items.length} Macam Barang</span>
+                                        </div>
+                                        <table class="w-full">
+                                            <thead>
+                                                <tr class="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50 border-b border-slate-100">
+                                                    <th class="py-2 px-4 text-left">Kode</th>
+                                                    <th class="py-2 px-4 text-left">Nama Produk</th>
+                                                    <th class="py-2 px-4 text-center">Qty</th>
+                                                    <th class="py-2 px-4 text-right">Harga Satuan</th>
+                                                    <th class="py-2 px-4 text-right">Diskon</th>
+                                                    <th class="py-2 px-4 text-right">Subtotal</th>
+                                                    <th class="py-2 px-4 text-center w-28">Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${itemRowsHTML}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            `;
+                            tbody.appendChild(detailRow);
+                        }
                     });
                 } else {
                     emptyState.classList.remove('hidden');
@@ -217,31 +372,47 @@
             }
         }
 
-        // --- 1. POPUP MODAL PELUNASAN MULTI-METODE ---
+        function toggleDetailRow(idx) {
+            const detailRow = document.getElementById(`detail-row-${idx}`);
+            const toggleIcon = document.getElementById(`toggle-icon-${idx}`);
+            if (detailRow) {
+                detailRow.classList.toggle('hidden');
+                if (toggleIcon) {
+                    toggleIcon.classList.toggle('rotate-180');
+                }
+            }
+        }
+
+        // --- 1. POPUP MODAL PELUNASAN MULTI-METODE (PER NOTA) ---
         let modalPaymentList = [];
 
         function openPelunasanModal(idx) {
-            const sale = localSalesData[idx];
-            const saleId = sale.id || sale.ID || 0;
-            const totalNetto = sale.total_netto || sale.TotalNetto || 0;
-            const amountPaid = sale.amount_paid || sale.AmountPaid || 0;
-            const sisaHutang = totalNetto - amountPaid;
-            const currentMethod = sale.payment_method || sale.PaymentMethod || 'Tunai';
+            const group = localSalesData[idx];
+            if (!group) return;
+
+            const invoice = group.invoice || group.Invoice || '';
+            const totalNetto = Number(group.total_netto ?? group.TotalNetto ?? 0);
+            const amountPaid = Number(group.amount_paid ?? group.AmountPaid ?? 0);
+            const sisaHutang = Number(group.remaining_amount ?? (totalNetto - amountPaid > 0 ? totalNetto - amountPaid : 0));
+            const currentMethod = group.payment_method || group.PaymentMethod || 'Tunai';
+            const customer = group.customer || group.Customer;
+            const customerName = customer?.name || customer?.Name || '-';
 
             modalPaymentList = [];
 
             Swal.fire({
-                title: '<span class="text-slate-800 font-bold text-lg">Pelunasan Transaksi DP</span>',
+                title: `<span class="text-slate-800 font-bold text-lg">Pelunasan Transaksi (#${escapeHTML(invoice)})</span>`,
                 html: `
                     <div class="text-left text-sm space-y-4 p-1">
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs font-semibold text-slate-600">
-                            <div class="flex justify-between mb-1"><span>Total Belanja:</span><span class="font-bold text-slate-800">IDR ${totalNetto.toLocaleString()}</span></div>
-                            <div class="flex justify-between mb-1"><span>Sudah Dibayar:</span><span class="font-bold text-emerald-600">IDR ${amountPaid.toLocaleString()}</span></div>
-                            <div class="flex justify-between border-t pt-1 font-bold text-slate-800"><span>Kekurangan / Sisa Hutang:</span><span class="text-rose-600 text-sm">IDR ${sisaHutang.toLocaleString()}</span></div>
+                            <div class="flex justify-between mb-1"><span>Customer:</span><span class="font-bold text-slate-800">${escapeHTML(customerName)}</span></div>
+                            <div class="flex justify-between mb-1"><span>Total Belanja Nota:</span><span class="font-bold text-slate-800">IDR ${totalNetto.toLocaleString('id-ID')}</span></div>
+                            <div class="flex justify-between mb-1"><span>Sudah Dibayar (DP):</span><span class="font-bold text-emerald-600">IDR ${amountPaid.toLocaleString('id-ID')}</span></div>
+                            <div class="flex justify-between border-t pt-1 font-bold text-slate-800"><span>Kekurangan / Sisa Hutang:</span><span class="text-rose-600 text-sm">IDR ${sisaHutang.toLocaleString('id-ID')}</span></div>
                         </div>
 
                         <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100/60 space-y-3">
-                            <p class="text-[10px] font-black uppercase text-blue-600 tracking-wider"><i class="fas fa-plus mr-1"></i> Tambah Metode Pembayaran</p>
+                            <p class="text-[10px] font-black uppercase text-blue-600 tracking-wider"><i class="fas fa-plus mr-1"></i> Tambah Metode Pembayaran Pelunasan</p>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="block text-[10px] text-slate-400 font-bold mb-1">Metode</label>
@@ -275,7 +446,7 @@
                         <div id="modal-list-box" class="space-y-1 bg-slate-100 p-2.5 rounded-xl hidden max-h-24 overflow-y-auto custom-scroll"></div>
                         
                         <div class="flex justify-between items-center font-bold text-xs px-1 text-slate-700">
-                            <span>Total Diinput:</span>
+                            <span>Total Pelunasan Diinput:</span>
                             <span id="modal-text-total-paid" class="text-blue-600 font-black">IDR 0</span>
                         </div>
                     </div>
@@ -291,7 +462,7 @@
                         return false;
                     }
                     if (totalDiinput < sisaHutang) {
-                        Swal.showValidationMessage(`Pembayaran kurang! Kekurangan adalah IDR ${sisaHutang.toLocaleString()}`);
+                        Swal.showValidationMessage(`Pembayaran kurang! Kekurangan pelunasan adalah IDR ${sisaHutang.toLocaleString('id-ID')}`);
                         return false;
                     }
 
@@ -299,9 +470,8 @@
                     const finalMethodsCombined = `${currentMethod}, [Pelunasan: ${stringPelunasanBaru}]`;
                     const finalTotalPaid = amountPaid + totalDiinput;
 
-                    // Mengirimkan payload update data penjualan yang spesifik ke ID terkait
                     return {
-                        id: saleId,
+                        invoice: invoice,
                         payment_method: finalMethodsCombined,
                         amount_paid: finalTotalPaid,
                         is_dp: false,
@@ -310,7 +480,7 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    processPelunasanAPI(result.value);
+                    processPelunasanAPI(result.value.invoice, result.value);
                 }
             });
         }
@@ -350,51 +520,110 @@
             box.innerHTML = "";
             let total = 0;
 
-            modalPaymentList.forEach((p, i) => {
+            modalPaymentList.forEach((p) => {
                 total += p.value;
                 box.innerHTML += `
                     <div class="flex justify-between bg-white px-2 py-1 rounded text-[11px] font-bold text-slate-600 border">
-                        <span>${p.label}</span>
-                        <span>IDR ${p.value.toLocaleString()}</span>
+                        <span>${escapeHTML(p.label)}</span>
+                        <span>IDR ${p.value.toLocaleString('id-ID')}</span>
                     </div>
                 `;
             });
-            totalText.innerText = `IDR ${total.toLocaleString()}`;
+            totalText.innerText = `IDR ${total.toLocaleString('id-ID')}`;
         }
 
-        async function processPelunasanAPI(payload) {
+        async function processPelunasanAPI(invoice, payload) {
             Swal.fire({ title: 'Menyimpan Pelunasan...', didOpen: () => Swal.showLoading() });
             try {
-                // Menggunakan PUT/PATCH ke route /api/sales/:id sesuai dengan ID transaksi data DP
-                const res = await fetch(`${API_URL}/sales/${payload.id}`, {
+                const res = await fetch(`${API_URL}/sales/${encodeURIComponent(invoice)}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        payment_method: payload.payment_method,
+                        amount_paid: payload.amount_paid,
+                        is_dp: false,
+                        status: "Lunas"
+                    })
                 });
 
                 if (res.ok) {
-                    Swal.fire('Berhasil!', 'Pelunasan transaksi telah berhasil dicatat.', 'success').then(() => fetchRiwayat());
+                    Swal.fire('Berhasil!', 'Pelunasan transaksi nota telah berhasil dicatat.', 'success').then(() => fetchRiwayat());
                 } else {
-                    const err = await res.json();
-                    Swal.fire('Gagal', err.error || 'Terjadi kesalahan sistem', 'error');
+                    const err = await res.json().catch(() => ({}));
+                    Swal.fire('Gagal', err.error || err.message || 'Terjadi kesalahan sistem saat pelunasan', 'error');
                 }
             } catch (e) { Swal.fire('Error', 'Gagal terhubung ke server', 'error'); }
         }
 
 
-        // --- 2. POPUP MODAL RETUR BARANG PARSIAL ---
-        function openReturModal(idx) {
-            const sale = localSalesData[idx];
-            const saleId = sale.id || sale.ID || 0;
-            const maxQty = sale.qty || sale.Qty || 1;
-            const itemName = sale.Product ? sale.Product.Nama : (sale.product_search || 'Produk');
+        // --- 2. POPUP MODAL RETUR BARANG (PER ITEM DALAM NOTA) ---
+        function openReturModal(groupIdx, itemIdx = null) {
+            const group = localSalesData[groupIdx];
+            if (!group) return;
+
+            const items = group.items || group.Items || [];
+            if (items.length === 0) {
+                return Swal.fire('Opps', 'Tidak ada data produk dalam nota ini.', 'warning');
+            }
+
+            // Jika itemIdx ditentukan langsung
+            if (itemIdx !== null && items[itemIdx]) {
+                return showReturForm(items[itemIdx], group.invoice || group.Invoice || '');
+            }
+
+            // Jika nota hanya memiliki 1 item
+            if (items.length === 1) {
+                return showReturForm(items[0], group.invoice || group.Invoice || '');
+            }
+
+            // Jika nota memiliki banyak item dan dipanggil dari baris nota utama
+            let optionsHTML = items.map((it, i) => {
+                const itName = it.product?.nama || it.Product?.Nama || it.product_search || `Item #${it.id}`;
+                const itCode = it.product?.kode || it.Product?.Kode || '-';
+                const itQty = it.qty || it.Qty || 1;
+                return `<option value="${i}">${escapeHTML(itName)} (${escapeHTML(itCode)}) - Qty: ${itQty}</option>`;
+            }).join('');
+
+            Swal.fire({
+                title: `<span class="text-slate-800 font-bold text-lg">Pilih Barang yang Diretur</span>`,
+                html: `
+                    <div class="text-left text-sm space-y-3 p-1">
+                        <p class="text-xs text-slate-500 font-medium">Nota: <b>#${escapeHTML(group.invoice || group.Invoice)}</b> memiliki beberapa produk. Pilih produk yang ingin diproses retur:</p>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 font-bold mb-1 uppercase tracking-wider">Pilih Produk</label>
+                            <select id="select-retur-item" class="w-full bg-white border p-3 rounded-xl font-bold text-xs text-slate-700 outline-none">
+                                ${optionsHTML}
+                            </select>
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Lanjutkan',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#2563EB'
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    const selIdx = parseInt(document.getElementById('select-retur-item').value);
+                    if (!isNaN(selIdx) && items[selIdx]) {
+                        showReturForm(items[selIdx], group.invoice || group.Invoice || '');
+                    }
+                }
+            });
+        }
+
+        function showReturForm(item, invoiceNo) {
+            const saleId = item.id || item.ID || 0;
+            const maxQty = Number(item.qty || item.Qty || 1);
+            const itemName = item.product?.nama || item.Product?.Nama || item.product_search || 'Produk';
+            const itemCode = item.product?.kode || item.Product?.Kode || '-';
 
             Swal.fire({
                 title: '<span class="text-slate-800 font-bold text-lg">Retur Barang Penjualan</span>',
                 html: `
                     <div class="text-left text-sm space-y-4 p-1">
                         <div class="bg-rose-50/50 p-4 rounded-xl border border-rose-100 text-xs font-semibold text-slate-600">
-                            <p class="font-bold text-slate-800 mb-1">Item: ${itemName}</p>
+                            <p class="font-bold text-slate-800 mb-1">Item: ${escapeHTML(itemName)}</p>
+                            <p class="text-[10px] text-slate-400 uppercase font-black mb-1">Kode: ${escapeHTML(itemCode)} • Nota: #${escapeHTML(invoiceNo)}</p>
                             <p>Maksimum Qty yang Bisa Diretur: <span class="font-black text-rose-600">${maxQty} Pcs</span></p>
                         </div>
 
@@ -411,7 +640,7 @@
                         <div class="space-y-2 pt-2 border-t">
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" id="retur-to-company" class="w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500">
-                                <span class="text-xs font-bold text-slate-600">Kembalikan langsung barang ke Perusahaan (Supplier / Produsen)?</span>
+                                <span class="text-xs font-bold text-slate-600">Kembalikan langsung barang ke Perusahaan (Distributor / Pabrik)?</span>
                             </label>
                         </div>
                     </div>
@@ -434,7 +663,6 @@
                         return false;
                     }
 
-                    // Menghasilkan payload JSON yang murni memetakan skema database domain.Retur Anda di Fiber
                     return {
                         sales_id: saleId,
                         reason: reason,
@@ -463,18 +691,129 @@
                 if (res.ok) {
                     Swal.fire('Retur Sukses!', 'Barang berhasil diretur dan sistem stok disesuaikan.', 'success').then(() => fetchRiwayat());
                 } else {
-                    const err = await res.json();
-                    Swal.fire('Gagal', err.error || 'Terjadi kesalahan sistem saat retur', 'error');
+                    const err = await res.json().catch(() => ({}));
+                    Swal.fire('Gagal', err.error || err.message || 'Terjadi kesalahan sistem saat retur', 'error');
                 }
             } catch (e) { Swal.fire('Error', 'Gagal terhubung ke server', 'error'); }
         }
 
+        const ROLE_PERMISSIONS = {
+            'admin': ['riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'absensi.html', 'report.html'],
+            'kasir': ['dashboard.html', 'riwayat.html'],
+            'super-kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
+            'super_kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
+            'superkasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
+            'akuntan': ['akuntansi.html'],
+            'superadmin': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'akuntansi.html', 'absensi.html', 'report.html']
+        };
+
+        async function confirmLogout() {
+            const result = await Swal.fire({
+                title: 'Konfirmasi Keluar',
+                text: 'Pilih tindakan logout yang ingin Anda lakukan:',
+                icon: 'question',
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: '<i class="fas fa-check-circle mr-1"></i> Logout & Selesaikan Shift',
+                denyButtonText: '<i class="fas fa-sign-out-alt mr-1"></i> Logout Saja',
+                cancelButtonText: '<i class="fas fa-times mr-1"></i> Batal',
+                confirmButtonColor: '#2563EB',
+                denyButtonColor: '#F59E0B',
+                cancelButtonColor: '#64748B',
+                reverseButtons: true
+            });
+
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Menutup Shift...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                try {
+                    const shiftResponse = await fetch(`${API_URL}/shift/current`);
+                    const shiftData = await shiftResponse.json();
+                    const shift = shiftData.shift || 1;
+
+                    const updateResponse = await fetch(`${API_URL}/sales/update/shift`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            shift: shift
+                        })
+                    });
+
+                    if (updateResponse.ok) {
+                        await Swal.fire({
+                            icon: "success",
+                            title: "Shift Berhasil Ditutup",
+                            text: `Transaksi berhasil dimasukkan ke Shift ${shift}. Anda telah keluar.`,
+                            confirmButtonColor: '#2563EB'
+                        });
+                        localStorage.removeItem("token");
+                        window.location.href = "index.html";
+                    } else {
+                        Swal.fire("Gagal", "Gagal memperbarui shift transaksi", "error");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire("Error", "Server tidak dapat dihubungi", "error");
+                }
+            } else if (result.isDenied) {
+                localStorage.removeItem("token");
+                window.location.href = "index.html";
+            }
+        }
+
+        function checkRoleAccess(currentPage) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+            const userData = getUserDataFromToken();
+            if (!userData) {
+                window.location.href = 'index.html';
+                return;
+            }
+            const userRole = (userData.role || 'kasir').toLowerCase().trim();
+            const allowedPages = ROLE_PERMISSIONS[userRole] || ['dashboard.html'];
+
+            if (!allowedPages.includes(currentPage)) {
+                if (userRole === 'akuntan') window.location.href = 'akuntansi.html';
+                else if (userRole === 'admin') window.location.href = 'riwayat.html';
+                else window.location.href = 'dashboard.html';
+                return;
+            }
+
+            const navLinks = document.querySelectorAll('aside nav a');
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href !== '#' && href !== 'index.html') {
+                    if (!allowedPages.includes(href)) {
+                        link.style.display = 'none';
+                    } else {
+                        link.style.display = 'flex';
+                    }
+                }
+            });
+
+            const userEls = document.querySelectorAll('.user-name-display');
+            userEls.forEach(el => {
+                el.innerText = `${userData.name || 'User'} (${userRole.toUpperCase()})`;
+            });
+        }
+
         // Jalankan saat pertama load
+        checkRoleAccess('riwayat.html');
         fetchRiwayat();
 
         // Clock Update
         setInterval(() => {
-            document.getElementById('clock').innerText = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
+            const clockEl = document.getElementById('clock');
+            if (clockEl) clockEl.innerText = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
         }, 1000);
     </script>
 </body>

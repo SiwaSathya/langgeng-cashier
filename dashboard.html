@@ -44,48 +44,56 @@
 
 <body class="bg-[#F8FAFC] flex h-screen overflow-hidden">
 
-    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 z-20">
-        <div class="flex items-center gap-3 mb-12">
+    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 z-20 shrink-0">
+        <div class="flex items-center gap-3 mb-8 shrink-0">
             <div
                 class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
                 <i class="fas fa-store"></i>
             </div>
             <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">SMARTPOS</h1>
         </div>
-        <nav class="flex-1 space-y-2">
+        <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
             <a href="dashboard.html"
-                class="flex items-center gap-4 px-4 py-3.5 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
-                <i class="fas fa-store"></i> <span>Dashboard</span>
+                class="flex items-center gap-4 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
+                <i class="fas fa-th-large"></i> <span>Dashboard</span>
             </a>
             <a href="riwayat.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
             </a>
             <a href="product.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-box"></i> <span>Master Produk</span>
             </a>
             <a href="purchase.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
             </a>
             <a href="expense.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-wallet"></i> <span>Pengeluaran</span>
             </a>
             <a href="retur.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-undo"></i> <span>Manajemen Retur</span>
             </a>
+            <a href="akuntansi.html"
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-book-open"></i> <span>Jurnal & Keuangan</span>
+            </a>
+            <a href="absensi.html"
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-calendar-check"></i> <span>Absensi Karyawan</span>
+            </a>
             <a href="report.html"
-                class="flex items-center gap-4 px-4 py-3.5 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
+                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
                 <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
             </a>
         </nav>
-        <div class="pt-8 border-t border-slate-100">
-            <div class="bg-slate-50 p-4 rounded-2xl mb-6">
+        <div class="pt-6 border-t border-slate-100 shrink-0">
+            <div class="bg-slate-50 p-4 rounded-2xl mb-4">
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">User Aktif</p>
-                <p class="font-bold text-slate-700">Desak Kasir</p>
+                <p class="font-bold text-slate-700 user-name-display">Desak Kasir</p>
             </div>
             <a href="#" onclick="confirmLogout()"
                 class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all">
@@ -344,9 +352,9 @@
 
             <div class="mb-3">
 
-                <p class="font-bold border-b border-black pb-0.5 mb-1">
+                <!-- <p class="font-bold border-b border-black pb-0.5 mb-1">
                     [SEGMENTASI 1]
-                </p>
+                </p> -->
 
                 <table class="w-full text-[11px]">
 
@@ -389,9 +397,9 @@
 
             <div class="mb-3 border-t border-dashed border-black pt-2">
 
-                <p class="font-bold mb-1">
+                <!-- <p class="font-bold mb-1">
                     [SEGMENT 2]
-                </p>
+                </p> -->
 
                 <div class="flex justify-between font-bold text-[12px] bg-gray-100 p-1">
 
@@ -409,9 +417,9 @@
 
             <div class="mb-3 border-t border-dashed border-black pt-2">
 
-                <p class="font-bold mb-1">
+                <!-- <p class="font-bold mb-1">
                     [SEGMENT 3]
-                </p>
+                </p> -->
 
                 <p class="font-bold text-[10px]">
                     Rekap Setor:
@@ -428,9 +436,9 @@
 
             <div class="mb-3 border-t border-dashed border-black pt-2">
 
-                <p class="font-bold mb-1">
+                <!-- <p class="font-bold mb-1">
                     [SEGMENT 4]
-                </p>
+                </p> -->
 
 
                 <table id="receipt-pelunasan" class="w-full text-[11px]">
@@ -443,9 +451,9 @@
 
             <div class="mb-4 border-t border-dashed border-black pt-2">
 
-                <p class="font-bold mb-1">
+                <!-- <p class="font-bold mb-1">
                     [SEGMENT 5]
-                </p>
+                </p> -->
 
 
                 <table class="w-full text-[11px]">
@@ -480,9 +488,9 @@
 
             <div class="border-t border-black pt-4 mb-2">
 
-                <p class="font-bold text-center mb-4">
+                <!-- <p class="font-bold text-center mb-4">
                     [SEGMENT 6]
-                </p>
+                </p> -->
 
 
                 <div class="flex justify-between text-center text-[11px]">
@@ -1327,112 +1335,63 @@
 
 
         async function confirmLogout() {
-
             const result = await Swal.fire({
-
-                title: "Apakah anda yakin ingin mengakhiri shift pada hari ini?",
-
-                text: "Semua transaksi aktif akan dimasukkan ke shift berjalan.",
-
-                icon: "warning",
-
+                title: 'Konfirmasi Keluar',
+                text: 'Pilih tindakan logout yang ingin Anda lakukan:',
+                icon: 'question',
                 showCancelButton: true,
-
-                confirmButtonText: "Ya, Akhiri Shift",
-
-                cancelButtonText: "Batal"
-
+                showDenyButton: true,
+                confirmButtonText: '<i class="fas fa-check-circle mr-1"></i> Logout & Selesaikan Shift',
+                denyButtonText: '<i class="fas fa-sign-out-alt mr-1"></i> Logout Saja',
+                cancelButtonText: '<i class="fas fa-times mr-1"></i> Batal',
+                confirmButtonColor: '#2563EB',
+                denyButtonColor: '#F59E0B',
+                cancelButtonColor: '#64748B',
+                reverseButtons: true
             });
 
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Menutup Shift...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
 
-            if (!result.isConfirmed) {
-                return;
-            }
+                try {
+                    const shiftResponse = await fetch(`${API_URL}/shift/current`);
+                    const shiftData = await shiftResponse.json();
+                    const shift = shiftData.shift || 1;
 
-
-            try {
-
-
-                const shiftResponse =
-                    await fetch(`${API_URL}/shift/current`);
-
-
-                const shiftData =
-                    await shiftResponse.json();
-
-
-                const shift =
-                    shiftData.shift;
-
-
-
-                const updateResponse =
-                    await fetch(
-                        `${API_URL}/sales/update/shift`,
-                        {
-
-                            method: "PUT",
-
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-
-                            body: JSON.stringify({
-
-                                shift: shift
-
-                            })
-
-                        }
-                    );
-
-
-                if (updateResponse.ok) {
-
-
-                    await Swal.fire({
-
-                        icon: "success",
-
-                        title: "Shift Berakhir",
-
-                        text: `Transaksi berhasil ditutup pada Shift ${shift}`
-
+                    const updateResponse = await fetch(`${API_URL}/sales/update/shift`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            shift: shift
+                        })
                     });
 
-
-                    localStorage.removeItem("token");
-
-                    window.location.href = "index.html";
-
-
-                } else {
-
-
-                    Swal.fire(
-                        "Gagal",
-                        "Gagal memperbarui shift transaksi",
-                        "error"
-                    );
-
+                    if (updateResponse.ok) {
+                        await Swal.fire({
+                            icon: "success",
+                            title: "Shift Berhasil Ditutup",
+                            text: `Transaksi berhasil dimasukkan ke Shift ${shift}. Anda telah keluar.`,
+                            confirmButtonColor: '#2563EB'
+                        });
+                        localStorage.removeItem("token");
+                        window.location.href = "index.html";
+                    } else {
+                        Swal.fire("Gagal", "Gagal memperbarui shift transaksi", "error");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire("Error", "Server tidak dapat dihubungi", "error");
                 }
-
-
-            } catch (error) {
-
-
-                console.error(error);
-
-
-                Swal.fire(
-                    "Error",
-                    "Server tidak dapat dihubungi",
-                    "error"
-                );
-
-
+            } else if (result.isDenied) {
+                localStorage.removeItem("token");
+                window.location.href = "index.html";
             }
-
         }
 
 
@@ -1450,7 +1409,9 @@
         }
 
         function getReceiptNumber(result) {
-            return result?.invoice_no
+            return result?.invoice
+                || result?.data?.invoice
+                || result?.invoice_no
                 || result?.invoiceNumber
                 || result?.transaction_no
                 || result?.transaction_id
@@ -1476,16 +1437,19 @@
             const customerName = document.getElementById('cust-name')?.value?.trim() || '-';
             const customerPhone = document.getElementById('cust-phone')?.value?.trim() || '-';
 
-            const itemRows = cart.map(item => `
+            const itemRows = cart.map(item => {
+                const categoryText = (item.Category && item.Category.Name) ? ` (${escapeHTML(item.Category.Name)})` : '';
+                return `
                 <tr>
-                    <td colspan="3" class="item-name">${escapeHTML(item.Nama) + " " + (item.Category.Name)}</td>
+                    <td colspan="3" class="item-name">${escapeHTML(item.Nama) + categoryText}</td>
                 </tr>
                 <tr>
                     <td>${escapeHTML(item.Kode)}</td>
                     <td class="center">${item.qty} x ${Number(item.price || 0).toLocaleString('id-ID')}</td>
                     <td class="right">${Number(item.subtotal || 0).toLocaleString('id-ID')}</td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
 
             const paymentRows = paymentList.map(pay => `
                 <tr>
@@ -1658,27 +1622,35 @@
             }
 
             const finalPaymentMethodString = paymentList.map(p => p.label).join(", ");
-            let customerPayload = null;
+
+            const customerPayload = {
+                name: isDp ? document.getElementById('cust-name').value.trim() : "",
+                phone_number: isDp ? document.getElementById('cust-phone').value.trim() : "",
+                identity_number: isDp ? document.getElementById('cust-identity').value.trim() : "",
+                age: isDp ? (parseInt(document.getElementById('cust-age').value) || 0) : 0,
+                address: isDp ? document.getElementById('cust-address').value.trim() : ""
+            };
 
             if (isDp) {
-                const name = document.getElementById('cust-name').value.trim();
-                const phone = document.getElementById('cust-phone').value.trim();
-                if (!name || !phone) return Swal.fire('Form Belum Lengkap', 'Nama & No. HP Pelanggan wajib diisi untuk DP!', 'warning');
-
-                customerPayload = {
-                    id: 0, name, phone_number: phone,
-                    identity_number: document.getElementById('cust-identity').value.trim(),
-                    age: parseInt(document.getElementById('cust-age').value) || 0,
-                    address: document.getElementById('cust-address').value.trim(),
-                    created_at: new Date().toISOString(), updated_at: new Date().toISOString()
-                };
+                if (!customerPayload.name || !customerPayload.phone_number) {
+                    return Swal.fire('Form Belum Lengkap', 'Nama & No. HP Pelanggan wajib diisi untuk DP!', 'warning');
+                }
             }
 
-            const payload = cart.map(i => ({
-                product_search: i.Nama, member_name: userData.name || "Desak",
-                qty: i.qty, price: i.price, discount: 0, payment_method: finalPaymentMethodString,
-                amount_paid: totalPaid, is_dp: isDp, customer: customerPayload, user_id: String(userData.user_id)
-            }));
+            const payload = {
+                member_name: userData.name || "Desak",
+                user_id: String(userData.user_id),
+                payment_method: finalPaymentMethodString,
+                amount_paid: totalPaid,
+                is_dp: isDp,
+                customer: customerPayload,
+                items: cart.map(i => ({
+                    product_search: i.Kode || i.Nama,
+                    qty: i.qty,
+                    price: i.price,
+                    discount: 0
+                }))
+            };
 
             Swal.fire({ title: 'Memproses...', didOpen: () => Swal.showLoading() });
 
@@ -1718,15 +1690,58 @@
             if (!e.target.closest('#search-prod')) document.getElementById('res-dropdown').classList.add('hidden');
         });
 
-        (function sinkronisasiSidebar() {
-            const userData = getUserDataFromToken();
-            if (userData && userData.name) {
-                const userElements = document.querySelectorAll('p.font-bold.text-slate-700');
-                userElements.forEach(el => {
-                    if (el.innerText === "Desak Kasir") el.innerText = userData.name;
-                });
+        const ROLE_PERMISSIONS = {
+            'admin': ['riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'absensi.html', 'report.html'],
+            'kasir': ['dashboard.html', 'riwayat.html'],
+            'super-kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
+            'super_kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
+            'superkasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
+            'akuntan': ['akuntansi.html'],
+            'superadmin': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'akuntansi.html', 'absensi.html', 'report.html']
+        };
+
+        function checkRoleAccess(currentPage) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
             }
-        })();
+            const userData = getUserDataFromToken();
+            if (!userData) {
+                window.location.href = 'index.html';
+                return;
+            }
+            const userRole = (userData.role || 'kasir').toLowerCase().trim();
+            const allowedPages = ROLE_PERMISSIONS[userRole] || ['dashboard.html'];
+
+            if (!allowedPages.includes(currentPage)) {
+                if (userRole === 'akuntan') window.location.href = 'akuntansi.html';
+                else if (userRole === 'admin') window.location.href = 'riwayat.html';
+                else window.location.href = 'dashboard.html';
+                return;
+            }
+
+            const navLinks = document.querySelectorAll('aside nav a');
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href !== '#' && href !== 'index.html') {
+                    if (!allowedPages.includes(href)) {
+                        link.style.display = 'none';
+                    } else {
+                        link.style.display = 'flex';
+                    }
+                }
+            });
+
+            const userElements = document.querySelectorAll('.user-name-display, p.font-bold.text-slate-700');
+            userElements.forEach(el => {
+                if (el.classList.contains('user-name-display') || el.innerText === "Desak Kasir") {
+                    el.innerText = `${userData.name || 'User'} (${userRole.toUpperCase()})`;
+                }
+            });
+        }
+
+        checkRoleAccess('dashboard.html');
     </script>
 </body>
 
