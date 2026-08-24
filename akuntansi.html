@@ -880,6 +880,11 @@
 
             try {
                 const res = await fetch(url);
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    tbody.innerHTML = `<tr><td colspan="6" class="px-8 py-20 text-center text-rose-500 font-bold">Gagal memuat jurnal: ${escapeHTML(err.error || 'Server error')}</td></tr>`;
+                    return;
+                }
                 const result = await res.json();
                 const entries = result.data || [];
                 const total = result.total || 0;
@@ -1136,6 +1141,13 @@
 
             try {
                 const res = await fetch(`${BASE_URL}/api/accounting/recap?start_date=${start}&end_date=${end}`);
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500 font-bold">Gagal memuat rekapitulasi: ${escapeHTML(err.error || 'Server error')}</td></tr>`;
+                    tfoot.innerHTML = "";
+                    balanceBox.innerHTML = "";
+                    return;
+                }
                 const data = await res.json();
                 const items = data.items || [];
 
@@ -1211,9 +1223,15 @@
 
             try {
                 const res = await fetch(url);
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    container.innerHTML = `<div class="p-12 text-center text-rose-500 font-bold">Gagal memuat buku besar: ${escapeHTML(err.error || 'Server error')}</div>`;
+                    return;
+                }
+
                 const cards = await res.json();
 
-                if (!cards || cards.length === 0) {
+                if (!cards || !Array.isArray(cards) || cards.length === 0) {
                     container.innerHTML = `<div class="p-12 text-center text-slate-400">Tidak ada data akun buku besar</div>`;
                     return;
                 }
@@ -1297,6 +1315,12 @@
 
             try {
                 const res = await fetch(url);
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-rose-500 font-bold">Gagal memuat piutang dagang: ${escapeHTML(err.error || 'Server error')}</td></tr>`;
+                    tfoot.innerHTML = "";
+                    return;
+                }
                 const result = await res.json();
                 const records = result.data || [];
                 const total = result.total || 0;
