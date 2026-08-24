@@ -958,6 +958,23 @@
             if (clockEl) clockEl.innerText = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
         }, 1000);
 
+        // Global Enter Handler: Prioritize SweetAlert confirm & Active modal submit buttons
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                if (typeof Swal !== 'undefined' && Swal.isVisible()) {
+                    const activeEl = document.activeElement;
+                    if (activeEl && activeEl.tagName === 'TEXTAREA' && !e.ctrlKey) {
+                        return;
+                    }
+                    e.preventDefault();
+                    const confirmBtn = Swal.getConfirmButton();
+                    if (confirmBtn && !confirmBtn.disabled) {
+                        confirmBtn.click();
+                    }
+                }
+            }
+        });
+
         window.onload = function () {
             checkRoleAccess('report.html');
             loadDataLaporan();

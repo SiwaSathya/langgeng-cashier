@@ -1696,6 +1696,83 @@
             });
         }
 
+        // --- KEYBOARD ENTER SHORTCUTS & CONFIRM PRIORITY ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('search-prod');
+            const qtyInput = document.getElementById('inp-qty');
+            const priceInput = document.getElementById('inp-price');
+            const payAmountInput = document.getElementById('pay-input-amount');
+
+            if (searchInput) {
+                searchInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const dropdown = document.getElementById('res-dropdown');
+                        const firstItem = dropdown ? dropdown.querySelector('div') : null;
+                        if (firstItem && !dropdown.classList.contains('hidden')) {
+                            firstItem.click();
+                            if (priceInput) priceInput.focus();
+                        } else if (currentSelectedProduct) {
+                            if (priceInput) priceInput.focus();
+                        }
+                    }
+                });
+            }
+
+            if (qtyInput) {
+                qtyInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addToCart();
+                    }
+                });
+            }
+
+            if (priceInput) {
+                priceInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addToCart();
+                    }
+                });
+            }
+
+            if (payAmountInput) {
+                payAmountInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addPaymentToList();
+                    }
+                });
+            }
+        });
+
+        // Global Enter Handler: Prioritize SweetAlert confirm & Active modal submit buttons
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                // 1. Prioritaskan tombol Confirm SweetAlert2 jika modal sedang aktif
+                if (typeof Swal !== 'undefined' && Swal.isVisible()) {
+                    const activeEl = document.activeElement;
+                    if (activeEl && activeEl.tagName === 'TEXTAREA' && !e.ctrlKey) {
+                        return; // Biarkan newline di textarea
+                    }
+                    e.preventDefault();
+                    const confirmBtn = Swal.getConfirmButton();
+                    if (confirmBtn && !confirmBtn.disabled) {
+                        confirmBtn.click();
+                    }
+                    return;
+                }
+
+                // 2. Shortcut Ctrl+Enter untuk Proses Transaksi jika keranjang terisi
+                if (e.ctrlKey && cart.length > 0 && paymentList.length > 0) {
+                    e.preventDefault();
+                    executePayment();
+                    return;
+                }
+            }
+        });
+
         checkRoleAccess('dashboard.html');
     </script>
 </body>

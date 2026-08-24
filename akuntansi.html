@@ -1130,6 +1130,39 @@
         function printReport() {
             window.print();
         }
+
+        // Global Enter Handler: Prioritize SweetAlert confirm & Active modal submit buttons
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                if (typeof Swal !== 'undefined' && Swal.isVisible()) {
+                    const activeEl = document.activeElement;
+                    if (activeEl && activeEl.tagName === 'TEXTAREA' && !e.ctrlKey) {
+                        return;
+                    }
+                    e.preventDefault();
+                    const confirmBtn = Swal.getConfirmButton();
+                    if (confirmBtn && !confirmBtn.disabled) {
+                        confirmBtn.click();
+                    }
+                    return;
+                }
+
+                const activeModalForm = document.querySelector('.fixed:not(.hidden) form, [id$="Modal"]:not(.hidden) form');
+                if (activeModalForm) {
+                    const activeEl = document.activeElement;
+                    if (activeEl && activeEl.tagName === 'TEXTAREA' && !e.ctrlKey) {
+                        return;
+                    }
+                    e.preventDefault();
+                    const submitBtn = activeModalForm.querySelector('button[type="submit"], button.bg-blue-600, button.bg-emerald-600');
+                    if (submitBtn && !submitBtn.disabled) {
+                        submitBtn.click();
+                    } else if (typeof activeModalForm.requestSubmit === 'function') {
+                        activeModalForm.requestSubmit();
+                    }
+                }
+            }
+        });
     </script>
 </body>
 
