@@ -207,13 +207,17 @@
                 <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-50 flex-wrap gap-4">
                     <div>
                         <h3 class="text-xl font-800 text-slate-800">Rekapitulasi Jurnal Buku Harian</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Akumulasi saldo per akun dan verifikasi keseimbangan (Debet = Kredit).</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Akumulasi saldo per akun dan verifikasi keseimbangan
+                            (Debet = Kredit).</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <input type="date" id="recapStartDate" onchange="fetchRecap()" class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
+                        <input type="date" id="recapStartDate" onchange="fetchRecap()"
+                            class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
                         <span class="text-xs text-slate-400 font-bold">s/d</span>
-                        <input type="date" id="recapEndDate" onchange="fetchRecap()" class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
-                        <button onclick="fetchRecap()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-md">
+                        <input type="date" id="recapEndDate" onchange="fetchRecap()"
+                            class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
+                        <button onclick="fetchRecap()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-md">
                             <i class="fas fa-filter mr-1"></i> Tampilkan
                         </button>
                     </div>
@@ -221,7 +225,8 @@
 
                 <div class="overflow-x-auto mb-6">
                     <table class="w-full text-left border-collapse border border-slate-200">
-                        <thead class="bg-slate-100 text-[11px] uppercase tracking-widest text-slate-600 font-bold border-b border-slate-200">
+                        <thead
+                            class="bg-slate-100 text-[11px] uppercase tracking-widest text-slate-600 font-bold border-b border-slate-200">
                             <tr>
                                 <th class="px-6 py-4 border-r border-slate-200">Kode Akun</th>
                                 <th class="px-6 py-4 border-r border-slate-200">Nama Perkiraan (Akun)</th>
@@ -248,16 +253,21 @@
                 <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-50 flex-wrap gap-4">
                     <div>
                         <h3 class="text-xl font-800 text-slate-800">Kartu Buku Besar (General Ledger)</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Format T-Account kartu buku besar sesuai template excel standar.</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Format T-Account kartu buku besar sesuai template excel
+                            standar.</p>
                     </div>
                     <div class="flex items-center gap-3 flex-wrap">
-                        <select id="ledgerAccountSelect" onchange="fetchLedger()" class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none max-w-xs cursor-pointer">
+                        <select id="ledgerAccountSelect" onchange="fetchLedger()"
+                            class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none max-w-xs cursor-pointer">
                             <option value="0">Semua Akun Buku Besar</option>
                         </select>
-                        <input type="date" id="ledgerStartDate" onchange="fetchLedger()" class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
+                        <input type="date" id="ledgerStartDate" onchange="fetchLedger()"
+                            class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
                         <span class="text-xs text-slate-400 font-bold">s/d</span>
-                        <input type="date" id="ledgerEndDate" onchange="fetchLedger()" class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
-                        <button onclick="fetchLedger()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-md">
+                        <input type="date" id="ledgerEndDate" onchange="fetchLedger()"
+                            class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
+                        <button onclick="fetchLedger()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-md">
                             <i class="fas fa-sync-alt mr-1"></i> Tampilkan
                         </button>
                     </div>
@@ -274,9 +284,11 @@
                 <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-50">
                     <div>
                         <h3 class="text-xl font-800 text-slate-800">Bagan Akun (Chart of Accounts)</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Daftar akun perkiraan akuntansi standar operasional toko.</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Daftar akun perkiraan akuntansi standar operasional
+                            toko.</p>
                     </div>
-                    <button onclick="openAccountModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl font-bold text-xs flex items-center gap-2 shadow-md">
+                    <button onclick="openAccountModal()"
+                        class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl font-bold text-xs flex items-center gap-2 shadow-md">
                         <i class="fas fa-plus"></i> Tambah Akun Baru
                     </button>
                 </div>
@@ -306,18 +318,24 @@
                 <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-50 flex-wrap gap-4">
                     <div>
                         <h3 class="text-xl font-800 text-slate-800">Buku Pembantu Piutang Dagang</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Daftar tagihan piutang pelanggan, saldo awal, mutasi pembayaran, dan saldo akhir.</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Daftar tagihan piutang pelanggan, saldo awal, mutasi
+                            pembayaran, dan saldo akhir.</p>
                     </div>
                     <div class="flex items-center gap-3 flex-wrap">
                         <div class="relative">
-                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
-                            <input type="text" id="piutangSearch" onkeyup="debouncePiutangSearch()" placeholder="Cari pelanggan / nota..."
+                            <i
+                                class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
+                            <input type="text" id="piutangSearch" onkeyup="debouncePiutangSearch()"
+                                placeholder="Cari pelanggan / nota..."
                                 class="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl outline-none text-xs font-medium">
                         </div>
-                        <input type="date" id="piutangStartDate" onchange="fetchPiutang()" class="bg-slate-50 border border-slate-100 px-3 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
+                        <input type="date" id="piutangStartDate" onchange="fetchPiutang()"
+                            class="bg-slate-50 border border-slate-100 px-3 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
                         <span class="text-xs text-slate-400 font-bold">s/d</span>
-                        <input type="date" id="piutangEndDate" onchange="fetchPiutang()" class="bg-slate-50 border border-slate-100 px-3 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
-                        <button onclick="openPiutangModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-md flex items-center gap-1.5">
+                        <input type="date" id="piutangEndDate" onchange="fetchPiutang()"
+                            class="bg-slate-50 border border-slate-100 px-3 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
+                        <button onclick="openPiutangModal()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-md flex items-center gap-1.5">
                             <i class="fas fa-plus"></i> Tambah Piutang
                         </button>
                     </div>
@@ -325,14 +343,17 @@
 
                 <div class="overflow-x-auto mb-4">
                     <table class="w-full text-left border-collapse border border-slate-200">
-                        <thead class="bg-slate-100 text-[11px] uppercase tracking-widest text-slate-600 font-bold border-b border-slate-200">
+                        <thead
+                            class="bg-slate-100 text-[11px] uppercase tracking-widest text-slate-600 font-bold border-b border-slate-200">
                             <tr>
                                 <th class="px-6 py-4 border-r border-slate-200">Tanggal</th>
                                 <th class="px-6 py-4 border-r border-slate-200">Pelanggan / Customer</th>
                                 <th class="px-6 py-4 border-r border-slate-200">No. Nota / Invoice</th>
                                 <th class="px-6 py-4 text-right border-r border-slate-200">Saldo Awal</th>
-                                <th class="px-6 py-4 text-right border-r border-slate-200 text-rose-600">Debet (Penambahan)</th>
-                                <th class="px-6 py-4 text-right border-r border-slate-200 text-emerald-600">Kredit (Pelunasan)</th>
+                                <th class="px-6 py-4 text-right border-r border-slate-200 text-rose-600">Debet
+                                    (Penambahan)</th>
+                                <th class="px-6 py-4 text-right border-r border-slate-200 text-emerald-600">Kredit
+                                    (Pelunasan)</th>
                                 <th class="px-6 py-4 text-right border-r border-slate-200 font-bold">Saldo Akhir</th>
                                 <th class="px-6 py-4 text-center border-r border-slate-200">Status</th>
                                 <th class="px-6 py-4 text-center w-28">Aksi</th>
@@ -346,7 +367,8 @@
                 </div>
 
                 <div class="p-4 bg-slate-50/50 flex justify-between items-center rounded-xl">
-                    <p class="text-slate-500 text-xs">Menampilkan <span id="piutangCountInfo" class="font-bold text-slate-800">0</span> catatan piutang dagang</p>
+                    <p class="text-slate-500 text-xs">Menampilkan <span id="piutangCountInfo"
+                            class="font-bold text-slate-800">0</span> catatan piutang dagang</p>
                     <div id="piutangPagination" class="flex gap-2"></div>
                 </div>
             </div>
@@ -355,41 +377,55 @@
     </main>
 
     <!-- MODAL INPUT/EDIT JURNAL HARIAN -->
-    <div id="journalModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-3xl rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden max-h-[90vh] flex flex-col">
+    <div id="journalModal"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div
+            class="bg-white w-full max-w-3xl rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden max-h-[90vh] flex flex-col">
             <div class="p-8 border-b border-slate-50 flex justify-between items-center shrink-0">
                 <div>
                     <h3 id="journalModalTitle" class="text-2xl font-800 text-slate-800">Input Jurnal Buku Harian</h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Catat atau sesuaikan transaksi debet & kredit secara seimbang.</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Catat atau sesuaikan transaksi debet & kredit secara
+                        seimbang.</p>
                 </div>
                 <button onclick="closeJournalModal()" class="text-slate-300 hover:text-slate-600 transition-colors">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
 
-            <form id="journalForm" onsubmit="saveJournalEntry(event)" class="p-8 space-y-6 overflow-y-auto custom-scroll flex-1">
+            <form id="journalForm" onsubmit="saveJournalEntry(event)"
+                class="p-8 space-y-6 overflow-y-auto custom-scroll flex-1">
                 <input type="hidden" id="j_id">
 
                 <div class="grid grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Tanggal Transaksi</label>
-                        <input type="date" id="j_date" required class="w-full bg-slate-50 border border-slate-100 p-3.5 rounded-2xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                        <label
+                            class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Tanggal
+                            Transaksi</label>
+                        <input type="date" id="j_date" required
+                            class="w-full bg-slate-50 border border-slate-100 p-3.5 rounded-2xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
                     </div>
                     <div class="col-span-2">
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">No. Bukti / Referensi</label>
-                        <input type="text" id="j_ref" placeholder="Contoh: NOTA-1029 / BUKTI TRF BCA" class="w-full bg-slate-50 border border-slate-100 p-3.5 rounded-2xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">No.
+                            Bukti / Referensi</label>
+                        <input type="text" id="j_ref" placeholder="Contoh: NOTA-1029 / BUKTI TRF BCA"
+                            class="w-full bg-slate-50 border border-slate-100 p-3.5 rounded-2xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Uraian / Deskripsi Umum Transaksi</label>
-                    <input type="text" id="j_desc" required placeholder="Contoh: PENJUALAN TUNAI & PPN KELUARAN / BAYAR LISTRIK" class="w-full bg-slate-50 border border-slate-100 p-3.5 rounded-2xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Uraian
+                        / Deskripsi Umum Transaksi</label>
+                    <input type="text" id="j_desc" required
+                        placeholder="Contoh: PENJUALAN TUNAI & PPN KELUARAN / BAYAR LISTRIK"
+                        class="w-full bg-slate-50 border border-slate-100 p-3.5 rounded-2xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
                 </div>
 
                 <div class="space-y-3 pt-2">
                     <div class="flex justify-between items-center">
-                        <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Baris Akun Jurnal (Minimal 2 Baris)</label>
-                        <button type="button" onclick="addJournalRow()" class="text-blue-600 hover:text-blue-800 font-bold text-xs flex items-center gap-1">
+                        <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Baris Akun Jurnal
+                            (Minimal 2 Baris)</label>
+                        <button type="button" onclick="addJournalRow()"
+                            class="text-blue-600 hover:text-blue-800 font-bold text-xs flex items-center gap-1">
                             <i class="fas fa-plus-circle"></i> Tambah Baris Akun
                         </button>
                     </div>
@@ -400,8 +436,10 @@
                     <!-- SUMMARY BALANCE CALCULATION -->
                     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2 mt-4">
                         <div class="flex justify-between text-xs font-bold text-slate-600">
-                            <span>Total Debet: <span id="modalTotalDebet" class="text-blue-600 font-black">IDR 0</span></span>
-                            <span>Total Kredit: <span id="modalTotalKredit" class="text-blue-600 font-black">IDR 0</span></span>
+                            <span>Total Debet: <span id="modalTotalDebet" class="text-blue-600 font-black">IDR
+                                    0</span></span>
+                            <span>Total Kredit: <span id="modalTotalKredit" class="text-blue-600 font-black">IDR
+                                    0</span></span>
                         </div>
                         <div class="flex justify-between items-center text-xs font-bold pt-2 border-t border-slate-200">
                             <span id="modalBalanceStatus" class="text-rose-600 font-black flex items-center gap-1">
@@ -412,7 +450,8 @@
                 </div>
 
                 <div class="pt-4">
-                    <button type="submit" id="btnSubmitJournal" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-2xl font-800 transition-all shadow-lg shadow-blue-100 uppercase tracking-widest text-sm">
+                    <button type="submit" id="btnSubmitJournal"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-2xl font-800 transition-all shadow-lg shadow-blue-100 uppercase tracking-widest text-sm">
                         Simpan Transaksi Jurnal (Enter)
                     </button>
                 </div>
@@ -421,7 +460,8 @@
     </div>
 
     <!-- MODAL TAMBAH/EDIT AKUN COA -->
-    <div id="accountModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div id="accountModal"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden">
             <div class="p-8 border-b border-slate-50 flex justify-between items-center">
                 <h3 id="accModalTitle" class="text-xl font-800 text-slate-800">Tambah Akun Perkiraan</h3>
@@ -434,19 +474,25 @@
                 <input type="hidden" id="accId">
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Kode Akun</label>
-                    <input type="text" id="acc_code" required placeholder="Contoh: 1109" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Kode
+                        Akun</label>
+                    <input type="text" id="acc_code" required placeholder="Contoh: 1109"
+                        class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Nama Akun / Perkiraan</label>
-                    <input type="text" id="acc_name" required placeholder="Contoh: BIAYA PERAWATAN GEDUNG" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Nama Akun /
+                        Perkiraan</label>
+                    <input type="text" id="acc_name" required placeholder="Contoh: BIAYA PERAWATAN GEDUNG"
+                        class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Tipe Akun</label>
-                        <select id="acc_type" required class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-xs focus:border-blue-400">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Tipe
+                            Akun</label>
+                        <select id="acc_type" required
+                            class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-xs focus:border-blue-400">
                             <option value="ASSET">ASSET (Harta)</option>
                             <option value="LIABILITY">LIABILITY (Kewajiban)</option>
                             <option value="EQUITY">EQUITY (Modal)</option>
@@ -455,8 +501,10 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Posisi Normal</label>
-                        <select id="acc_normal" required class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-xs focus:border-blue-400">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Posisi
+                            Normal</label>
+                        <select id="acc_normal" required
+                            class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-xs focus:border-blue-400">
                             <option value="DEBET">DEBET</option>
                             <option value="KREDIT">KREDIT</option>
                         </select>
@@ -464,12 +512,15 @@
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Saldo Awal</label>
-                    <input type="number" id="acc_initial" value="0" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Saldo
+                        Awal</label>
+                    <input type="number" id="acc_initial" value="0"
+                        class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
                 </div>
 
                 <div class="pt-3">
-                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-xl font-800 transition-all shadow-md uppercase tracking-wider text-xs">
+                    <button type="submit"
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-xl font-800 transition-all shadow-md uppercase tracking-wider text-xs">
                         Simpan Akun
                     </button>
                 </div>
@@ -478,7 +529,8 @@
     </div>
 
     <!-- MODAL TAMBAH/EDIT PIUTANG DAGANG -->
-    <div id="piutangModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div id="piutangModal"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden">
             <div class="p-8 border-b border-slate-50 flex justify-between items-center">
                 <h3 id="piutangModalTitle" class="text-xl font-800 text-slate-800">Catat Piutang Dagang</h3>
@@ -492,49 +544,67 @@
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Nama Pelanggan</label>
-                        <input type="text" id="p_cust_name" required placeholder="Budi Santoso" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Nama
+                            Pelanggan</label>
+                        <input type="text" id="p_cust_name" required placeholder="Budi Santoso"
+                            class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">No. Telepon / HP</label>
-                        <input type="text" id="p_cust_phone" placeholder="0812345678" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">No.
+                            Telepon / HP</label>
+                        <input type="text" id="p_cust_phone" placeholder="0812345678"
+                            class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">No. Nota / Invoice</label>
-                        <input type="text" id="p_invoice" placeholder="PJL-..." class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">No. Nota
+                            / Invoice</label>
+                        <input type="text" id="p_invoice" placeholder="PJL-..."
+                            class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Tanggal Transaksi</label>
-                        <input type="date" id="p_date" required class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Tanggal
+                            Transaksi</label>
+                        <input type="date" id="p_date" required
+                            class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-3 gap-3">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Saldo Awal (Rp)</label>
-                        <input type="number" id="p_saldo_awal" value="0" oninput="calcPiutangSaldoAkhir()" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-xs focus:border-blue-400">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Saldo
+                            Awal (Rp)</label>
+                        <input type="number" id="p_saldo_awal" value="0" oninput="calcPiutangSaldoAkhir()"
+                            class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-xs focus:border-blue-400">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Debet / Baru (Rp)</label>
-                        <input type="number" id="p_debet" value="0" oninput="calcPiutangSaldoAkhir()" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-rose-600 text-xs focus:border-blue-400">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Debet /
+                            Baru (Rp)</label>
+                        <input type="number" id="p_debet" value="0" oninput="calcPiutangSaldoAkhir()"
+                            class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-rose-600 text-xs focus:border-blue-400">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Kredit / Bayar (Rp)</label>
-                        <input type="number" id="p_kredit" value="0" oninput="calcPiutangSaldoAkhir()" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-emerald-600 text-xs focus:border-blue-400">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Kredit /
+                            Bayar (Rp)</label>
+                        <input type="number" id="p_kredit" value="0" oninput="calcPiutangSaldoAkhir()"
+                            class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-emerald-600 text-xs focus:border-blue-400">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Saldo Akhir</label>
-                        <input type="text" id="p_saldo_akhir_display" readonly value="Rp 0" class="w-full bg-slate-100 border border-slate-200 p-3 rounded-xl font-extrabold text-blue-600 text-sm">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Saldo
+                            Akhir</label>
+                        <input type="text" id="p_saldo_akhir_display" readonly value="Rp 0"
+                            class="w-full bg-slate-100 border border-slate-200 p-3 rounded-xl font-extrabold text-blue-600 text-sm">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Status</label>
-                        <select id="p_status" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl font-bold text-slate-700 text-xs outline-none">
+                        <label
+                            class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Status</label>
+                        <select id="p_status"
+                            class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl font-bold text-slate-700 text-xs outline-none">
                             <option value="Belum Lunas">Belum Lunas</option>
                             <option value="Lunas">Lunas</option>
                         </select>
@@ -542,12 +612,15 @@
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Keterangan</label>
-                    <textarea id="p_notes" rows="2" placeholder="Catatan transaksi piutang..." class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none text-xs font-medium text-slate-700"></textarea>
+                    <label
+                        class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Keterangan</label>
+                    <textarea id="p_notes" rows="2" placeholder="Catatan transaksi piutang..."
+                        class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none text-xs font-medium text-slate-700"></textarea>
                 </div>
 
                 <div class="pt-2">
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl font-800 transition-all shadow-md uppercase tracking-wider text-xs">
+                    <button type="submit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl font-800 transition-all shadow-md uppercase tracking-wider text-xs">
                         Simpan Piutang Dagang
                     </button>
                 </div>
@@ -557,7 +630,7 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        const BASE_URL = "http://localhost:4000";
+        const BASE_URL = "https://langgeng-cashier-backend-production.up.railway.app";
         let accountsList = [];
         let journalPage = 1;
         const journalLimit = 20;
