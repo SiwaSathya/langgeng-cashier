@@ -281,6 +281,16 @@
                             `;
                         }
 
+                        // Tombol Hapus khusus Admin & Superadmin (Rollback Stok Otomatis)
+                        const userRole = (userData.role || '').toLowerCase().trim();
+                        if (userRole === 'admin' || userRole === 'superadmin') {
+                            actionButtons += `
+                                <button onclick="deleteTransaction('${escapeHTML(invoice)}')" class="bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 border border-rose-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Hapus & Batalkan Transaksi (Rollback Stok)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            `;
+                        }
+
                         // Ringkasan Tampilan Produk
                         let productSummaryHTML = "";
                         if (items.length === 0) {
@@ -482,8 +492,8 @@
                             </div>
                             <div class="flex gap-2">
                                 <div class="flex-1">
-                                    <label class="block text-[10px] text-slate-400 font-bold mb-1">Nominal Rupiah</label>
-                                    <input type="number" id="modal-pay-amount" placeholder="0" class="w-full bg-white border p-2 rounded-lg text-xs font-bold outline-none">
+                                    <label class="block text-[10px] text-slate-400 font-bold mb-1">Nominal Rupiah (Tekan Enter)</label>
+                                    <input type="number" id="modal-pay-amount" placeholder="0" value="${sisaHutang}" class="w-full bg-white border p-2 rounded-lg text-xs font-bold outline-none">
                                 </div>
                                 <button type="button" onclick="addPaymentToModalList()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 rounded-lg font-bold h-[34px] self-end transition-all">
                                     + Add
@@ -500,10 +510,37 @@
                     </div>
                 `,
                 showCancelButton: true,
-                confirmButtonText: 'Simpan Pelunasan',
+                confirmButtonText: '<i class="fas fa-check-circle mr-1"></i> Simpan Pelunasan (Enter)',
                 cancelButtonText: 'Batal',
                 confirmButtonColor: '#2563EB',
+                didOpen: () => {
+                    const amtInput = document.getElementById('modal-pay-amount');
+                    if (amtInput) {
+                        amtInput.focus();
+                        amtInput.select();
+                        amtInput.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const val = parseFloat(amtInput.value || 0);
+                                if (val > 0) {
+                                    addPaymentToModalList();
+                                } else if (modalPaymentList.length > 0) {
+                                    Swal.clickConfirm();
+                                }
+                            }
+                        });
+                    }
+                },
                 preConfirm: () => {
+                    // Jika belum dimasukkan ke list tapi input nominal terisi
+                    const amtInput = document.getElementById('modal-pay-amount');
+                    if (modalPaymentList.length === 0 && amtInput) {
+                        const directVal = parseFloat(amtInput.value || 0);
+                        if (directVal > 0) {
+                            addPaymentToModalList();
+                        }
+                    }
+
                     const totalDiinput = modalPaymentList.reduce((s, p) => s + p.value, 0);
                     if (modalPaymentList.length === 0 || totalDiinput <= 0) {
                         Swal.showValidationMessage('Anda belum menginput nominal pelunasan!');
@@ -523,12 +560,14 @@
                         payment_method: finalMethodsCombined,
                         amount_paid: finalTotalPaid,
                         is_dp: false,
-                        status: "Lunas"
+                        status: "Lunas",
+                        pelunasan_paid: totalDiinput,
+                        group_data: group
                     };
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    processPelunasanAPI(result.value.invoice, result.value);
+                    processPelunasanAPI(result.value.invoice, result.value, result.value.group_data, result.value.pelunasan_paid);
                 }
             });
         }
@@ -540,9 +579,10 @@
 
         function addPaymentToModalList() {
             const type = document.getElementById('modal-pay-type').value;
-            const amount = parseFloat(document.getElementById('modal-pay-amount').value || 0);
+            const amtInput = document.getElementById('modal-pay-amount');
+            const amount = parseFloat(amtInput.value || 0);
 
-            if (amount <= 0) return alert("Masukkan nominal yang valid!");
+            if (amount <= 0) return Swal.showValidationMessage("Masukkan nominal yang valid!");
 
             let label = type;
             if (type !== 'Tunai') {
@@ -550,7 +590,7 @@
             }
 
             modalPaymentList.push({ label, value: amount });
-            document.getElementById('modal-pay-amount').value = "";
+            amtInput.value = "";
             renderModalPaymentList();
         }
 
@@ -580,7 +620,179 @@
             totalText.innerText = `IDR ${total.toLocaleString('id-ID')}`;
         }
 
-        async function processPelunasanAPI(invoice, payload) {
+        function printPelunasanReceipt(group, newPaidAmount) {
+            const userData = getUserDataFromToken() || {};
+            const totalBill = Number(group.total_netto || 0);
+            const initialPaid = Number(group.amount_paid || 0);
+            const totalPaid = initialPaid + Number(newPaidAmount || 0);
+            const invoiceNo = group.invoice || `INV-${Date.now()}`;
+            const now = new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
+
+            const customerName = group.customer?.name || '-';
+            const customerPhone = group.customer?.phone_number || '-';
+            const items = group.items || [];
+
+            const itemRows = items.map(item => {
+                const pName = item.product?.nama || item.Product?.Nama || item.product_search || 'Produk';
+                const pCode = item.product?.kode || item.Product?.Kode || '-';
+                const itPrice = Number(item.h_jual || item.HJual || item.price || 0);
+                const itQty = Number(item.qty || item.Qty || 1);
+                const itSubtotal = Number(item.total_netto || item.TotalNetto || (itQty * itPrice));
+
+                return `
+                <tr>
+                    <td colspan="3" class="item-name">${escapeHTML(pName)}</td>
+                </tr>
+                <tr>
+                    <td>${escapeHTML(pCode)}</td>
+                    <td class="center">${itQty} x ${itPrice.toLocaleString('id-ID')}</td>
+                    <td class="right">${itSubtotal.toLocaleString('id-ID')}</td>
+                </tr>
+            `;
+            }).join('');
+
+            const receiptHTML = `
+                <!DOCTYPE html>
+                <html lang="id">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Nota Pelunasan ${escapeHTML(invoiceNo)}</title>
+                    <style>
+                        @page {
+                            size: 80mm auto;
+                            margin: 0;
+                        }
+
+                        body {
+                            margin: 0;
+                            padding: 0;
+                            background: #fff;
+                            color: #000;
+                            font-family: "Courier New", monospace;
+                            font-size: 11px;
+                        }
+
+                        .receipt {
+                            width: 72mm;
+                            padding: 4mm;
+                        }
+
+                        .center { text-align: center; }
+                        .right { text-align: right; }
+                        .bold { font-weight: bold; }
+                        .line {
+                            border-top: 1px dashed #000;
+                            margin: 8px 0;
+                        }
+
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+
+                        td {
+                            vertical-align: top;
+                            padding: 1px 0;
+                        }
+
+                        .item-name {
+                            font-weight: bold;
+                            padding-top: 4px;
+                        }
+
+                        .store-name {
+                            font-size: 13px;
+                            font-weight: bold;
+                            text-transform: uppercase;
+                        }
+
+                        .thanks {
+                            margin-top: 10px;
+                            text-align: center;
+                            font-weight: bold;
+                        }
+
+                        @media print {
+                            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="receipt">
+                        <div class="center">
+                            <div class="store-name">LANGGENG ELEKTRONIKA</div>
+                            <div style="font-size: 10px;">Jl. Gajah Mada No.7 Amlapura - Bali</div>
+                            <div style="font-size: 10px;">Telp: (0363) 22577 - 08124611382</div>
+                            <div style="font-size: 10px;">Jl. Untung Surapati, Padang Kerta, Amlapura - Bali</div>
+                            <div style="font-size: 10px;">Email: langgengtemaja8888@gmail.com</div>
+                            <div style="margin-top: 6px; font-weight: bold; font-size: 12px;">NOTA PELUNASAN (LUNAS)</div>
+                        </div>
+
+                        <div class="line"></div>
+
+                        <table>
+                            <tr><td>No Nota</td><td class="right">${escapeHTML(invoiceNo)}</td></tr>
+                            <tr><td>Waktu Lunas</td><td class="right">${escapeHTML(now)}</td></tr>
+                            <tr><td>Kasir</td><td class="right">${escapeHTML(userData.name || 'Desak Kasir')}</td></tr>
+                            <tr><td>Toko</td><td class="right">${escapeHTML(group.location || userData.location || 'Toko Utama')}</td></tr>
+                            <tr><td>Status</td><td class="right bold">LUNAS</td></tr>
+                            <tr><td>Customer</td><td class="right">${escapeHTML(customerName)}</td></tr>
+                            <tr><td>No HP</td><td class="right">${escapeHTML(customerPhone)}</td></tr>
+                        </table>
+
+                        <div class="line"></div>
+
+                        <table>
+                            ${itemRows}
+                        </table>
+
+                        <div class="line"></div>
+
+                        <table>
+                            <tr class="bold"><td>Total Tagihan</td><td class="right">${totalBill.toLocaleString('id-ID')}</td></tr>
+                            <tr><td>Pembayaran Awal (DP)</td><td class="right">${initialPaid.toLocaleString('id-ID')}</td></tr>
+                            <tr class="bold"><td>Bayar Pelunasan</td><td class="right">${Number(newPaidAmount || 0).toLocaleString('id-ID')}</td></tr>
+                            <tr class="bold"><td>Total Terbayar</td><td class="right">${totalPaid.toLocaleString('id-ID')}</td></tr>
+                            <tr class="bold"><td>Sisa Tagihan</td><td class="right">0 (LUNAS)</td></tr>
+                        </table>
+
+                        <div class="line"></div>
+
+                        <div class="thanks">TERIMA KASIH ATAS PELUNASAN ANDA</div>
+                        <div class="center">Simpan nota ini sebagai bukti sah pembayaran lunas.</div>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const printFrame = document.createElement('iframe');
+            printFrame.style.position = 'fixed';
+            printFrame.style.right = '0';
+            printFrame.style.bottom = '0';
+            printFrame.style.width = '0';
+            printFrame.style.height = '0';
+            printFrame.style.border = '0';
+
+            document.body.appendChild(printFrame);
+
+            const frameDoc = printFrame.contentWindow.document;
+            frameDoc.open();
+            frameDoc.write(receiptHTML);
+            frameDoc.close();
+
+            setTimeout(() => {
+                printFrame.contentWindow.focus();
+                printFrame.contentWindow.print();
+
+                setTimeout(() => {
+                    if (printFrame.parentNode) {
+                        printFrame.parentNode.removeChild(printFrame);
+                    }
+                }, 1000);
+            }, 300);
+        }
+
+        async function processPelunasanAPI(invoice, payload, groupData, pelunasanPaid) {
             Swal.fire({ title: 'Menyimpan Pelunasan...', didOpen: () => Swal.showLoading() });
             try {
                 const res = await fetch(`${API_URL}/sales/${encodeURIComponent(invoice)}`, {
@@ -595,7 +807,20 @@
                 });
 
                 if (res.ok) {
-                    Swal.fire('Berhasil!', 'Pelunasan transaksi nota telah berhasil dicatat.', 'success').then(() => fetchRiwayat());
+                    Swal.close();
+                    // Cetak nota pelunasan
+                    if (groupData) {
+                        printPelunasanReceipt(groupData, pelunasanPaid);
+                    }
+
+                    setTimeout(() => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Pelunasan Berhasil!',
+                            text: 'Status transaksi telah diubah menjadi Lunas dan nota pelunasan dikirim ke printer.',
+                            confirmButtonColor: '#2563EB'
+                        }).then(() => fetchRiwayat());
+                    }, 400);
                 } else {
                     const err = await res.json().catch(() => ({}));
                     Swal.fire('Gagal', err.error || err.message || 'Terjadi kesalahan sistem saat pelunasan', 'error');
@@ -745,13 +970,44 @@
             } catch (e) { Swal.fire('Error', 'Gagal terhubung ke server', 'error'); }
         }
 
+        async function deleteTransaction(invoice) {
+            const confirm = await Swal.fire({
+                title: 'Hapus & Batalkan Transaksi?',
+                html: `<p class="text-xs text-slate-600">Nota: <b>#${escapeHTML(invoice)}</b> akan dihapus dari riwayat transaksi. Seluruh stok produk akan <b>dikembalikan otomatis</b> ke saldo toko.</p>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus & Rollback Stok',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#EF4444'
+            });
+
+            if (confirm.isConfirmed) {
+                Swal.fire({ title: 'Menghapus transaksi & mengembalikan stok...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+                try {
+                    const res = await fetch(`${API_URL}/sales/${encodeURIComponent(invoice)}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (res.ok) {
+                        Swal.fire('Berhasil!', 'Transaksi telah dihapus dan seluruh stok produk berhasil dikembalikan.', 'success').then(() => fetchRiwayat());
+                    } else {
+                        const err = await res.json().catch(() => ({}));
+                        Swal.fire('Gagal', err.error || err.message || 'Gagal membatalkan transaksi', 'error');
+                    }
+                } catch (e) {
+                    Swal.fire('Error', 'Gagal terhubung ke server', 'error');
+                }
+            }
+        }
+
         const ROLE_PERMISSIONS = {
             'admin': ['riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'absensi.html', 'report.html'],
             'kasir': ['dashboard.html', 'riwayat.html'],
             'super-kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
             'super_kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
             'superkasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
-            'akuntan': ['akuntansi.html'],
+            'akuntan': ['akuntansi.html', 'purchase.html', 'expense.html', 'retur.html'],
             'superadmin': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'akuntansi.html', 'absensi.html', 'report.html']
         };
 

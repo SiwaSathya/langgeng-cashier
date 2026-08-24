@@ -117,7 +117,7 @@
         <div class="flex justify-between items-center mb-6">
             <div>
                 <h1 class="text-3xl font-800 text-slate-800 tracking-tight">Siklus Akuntansi Keuangan</h1>
-                <p class="text-slate-400 mt-1">Buku Harian, Rekapitulasi Jurnal, dan Buku Besar (General Ledger).</p>
+                <p class="text-slate-400 mt-1">Buku Harian, Rekapitulasi, Buku Besar, Bagan Akun, & Piutang Dagang.</p>
             </div>
             <div class="flex gap-3 items-center">
                 <button onclick="openJournalModal()"
@@ -145,6 +145,10 @@
                 class="tab-btn px-5 py-3 font-bold text-sm rounded-xl transition-all whitespace-nowrap text-slate-500 hover:bg-slate-100 flex items-center gap-2">
                 <i class="fas fa-list-ol"></i> 4. Bagan Akun (COA)
             </button>
+            <button onclick="switchTab('tab-piutang')" id="btn-tab-piutang"
+                class="tab-btn px-5 py-3 font-bold text-sm rounded-xl transition-all whitespace-nowrap text-slate-500 hover:bg-slate-100 flex items-center gap-2">
+                <i class="fas fa-hand-holding-usd"></i> 5. Piutang Dagang
+            </button>
         </div>
 
         <!-- TAB 1: BUKU HARIAN -->
@@ -161,10 +165,10 @@
                     </div>
                     <div class="flex items-center gap-3">
                         <input type="date" id="journalStartDate" onchange="fetchJournals()"
-                            class="bg-slate-50 border border-slate-100 px-4 py-3 rounded-xl font-bold text-xs text-slate-700 outline-none">
+                            class="bg-slate-50 border border-slate-100 px-4 py-3 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
                         <span class="text-xs text-slate-400 font-bold">s/d</span>
                         <input type="date" id="journalEndDate" onchange="fetchJournals()"
-                            class="bg-slate-50 border border-slate-100 px-4 py-3 rounded-xl font-bold text-xs text-slate-700 outline-none">
+                            class="bg-slate-50 border border-slate-100 px-4 py-3 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
                         <button onclick="fetchJournals()"
                             class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-3 rounded-xl font-bold text-xs">
                             <i class="fas fa-sync-alt"></i>
@@ -181,7 +185,7 @@
                                 <th class="px-6 py-5">Ref / Bukti</th>
                                 <th class="px-6 py-5 text-right">Debet</th>
                                 <th class="px-6 py-5 text-right">Kredit</th>
-                                <th class="px-6 py-5 text-center w-24">Aksi</th>
+                                <th class="px-6 py-5 text-center w-28">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="journalTableBody" class="divide-y divide-slate-50 text-slate-700 text-sm">
@@ -203,37 +207,32 @@
                 <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-50 flex-wrap gap-4">
                     <div>
                         <h3 class="text-xl font-800 text-slate-800">Rekapitulasi Jurnal Buku Harian</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Akumulasi saldo per akun dan verifikasi keseimbangan
-                            (Debet = Kredit).</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Akumulasi saldo per akun dan verifikasi keseimbangan (Debet = Kredit).</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <input type="date" id="recapStartDate" onchange="fetchRecap()"
-                            class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none">
+                        <input type="date" id="recapStartDate" onchange="fetchRecap()" class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
                         <span class="text-xs text-slate-400 font-bold">s/d</span>
-                        <input type="date" id="recapEndDate" onchange="fetchRecap()"
-                            class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none">
-                        <button onclick="fetchRecap()"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-md">
+                        <input type="date" id="recapEndDate" onchange="fetchRecap()" class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
+                        <button onclick="fetchRecap()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-md">
                             <i class="fas fa-filter mr-1"></i> Tampilkan
                         </button>
                     </div>
                 </div>
 
                 <div class="overflow-x-auto mb-6">
-                    <table class="w-full text-left border-collapse">
-                        <thead
-                            class="bg-slate-50 text-[11px] uppercase tracking-widest text-slate-400 font-bold border-b border-slate-100">
+                    <table class="w-full text-left border-collapse border border-slate-200">
+                        <thead class="bg-slate-100 text-[11px] uppercase tracking-widest text-slate-600 font-bold border-b border-slate-200">
                             <tr>
-                                <th class="px-6 py-4">Kode Akun</th>
-                                <th class="px-6 py-4">Nama Perkiraan (Akun)</th>
-                                <th class="px-6 py-4">Tipe Akun</th>
-                                <th class="px-6 py-4 text-right">Total Debet</th>
+                                <th class="px-6 py-4 border-r border-slate-200">Kode Akun</th>
+                                <th class="px-6 py-4 border-r border-slate-200">Nama Perkiraan (Akun)</th>
+                                <th class="px-6 py-4 border-r border-slate-200">Tipe Akun</th>
+                                <th class="px-6 py-4 text-right border-r border-slate-200">Total Debet</th>
                                 <th class="px-6 py-4 text-right">Total Kredit</th>
                             </tr>
                         </thead>
-                        <tbody id="recapTableBody" class="divide-y divide-slate-50 text-slate-700 text-sm">
+                        <tbody id="recapTableBody" class="divide-y divide-slate-100 text-slate-700 text-sm font-mono">
                         </tbody>
-                        <tfoot id="recapTableFoot" class="bg-slate-50/80 font-bold text-sm border-t-2 border-slate-200">
+                        <tfoot id="recapTableFoot" class="bg-slate-100 font-bold text-sm border-t-2 border-slate-300">
                         </tfoot>
                     </table>
                 </div>
@@ -249,21 +248,16 @@
                 <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-50 flex-wrap gap-4">
                     <div>
                         <h3 class="text-xl font-800 text-slate-800">Kartu Buku Besar (General Ledger)</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Rincian mutasi debit & kredit beserta saldo berjalan
-                            per perkiraan.</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Format T-Account kartu buku besar sesuai template excel standar.</p>
                     </div>
                     <div class="flex items-center gap-3 flex-wrap">
-                        <select id="ledgerAccountSelect" onchange="fetchLedger()"
-                            class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none max-w-xs">
+                        <select id="ledgerAccountSelect" onchange="fetchLedger()" class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none max-w-xs cursor-pointer">
                             <option value="0">Semua Akun Buku Besar</option>
                         </select>
-                        <input type="date" id="ledgerStartDate" onchange="fetchLedger()"
-                            class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none">
+                        <input type="date" id="ledgerStartDate" onchange="fetchLedger()" class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
                         <span class="text-xs text-slate-400 font-bold">s/d</span>
-                        <input type="date" id="ledgerEndDate" onchange="fetchLedger()"
-                            class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none">
-                        <button onclick="fetchLedger()"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-md">
+                        <input type="date" id="ledgerEndDate" onchange="fetchLedger()" class="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
+                        <button onclick="fetchLedger()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-md">
                             <i class="fas fa-sync-alt mr-1"></i> Tampilkan
                         </button>
                     </div>
@@ -280,11 +274,9 @@
                 <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-50">
                     <div>
                         <h3 class="text-xl font-800 text-slate-800">Bagan Akun (Chart of Accounts)</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Daftar 34 akun perkiraan akuntansi standar operasional
-                            toko.</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Daftar akun perkiraan akuntansi standar operasional toko.</p>
                     </div>
-                    <button onclick="openAccountModal()"
-                        class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl font-bold text-xs flex items-center gap-2 shadow-md">
+                    <button onclick="openAccountModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl font-bold text-xs flex items-center gap-2 shadow-md">
                         <i class="fas fa-plus"></i> Tambah Akun Baru
                     </button>
                 </div>
@@ -298,7 +290,7 @@
                                 <th class="px-6 py-4">Kategori / Tipe</th>
                                 <th class="px-6 py-4 text-center">Posisi Normal</th>
                                 <th class="px-6 py-4 text-right">Saldo Saat Ini</th>
-                                <th class="px-6 py-4 text-center w-24">Aksi</th>
+                                <th class="px-6 py-4 text-center w-28">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="coaTableBody" class="divide-y divide-slate-50 text-slate-700 text-sm">
@@ -308,71 +300,108 @@
             </div>
         </div>
 
+        <!-- TAB 5: PIUTANG DAGANG -->
+        <div id="tab-piutang" class="tab-panel space-y-6 hidden animate-fade-in">
+            <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8">
+                <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-50 flex-wrap gap-4">
+                    <div>
+                        <h3 class="text-xl font-800 text-slate-800">Buku Pembantu Piutang Dagang</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Daftar tagihan piutang pelanggan, saldo awal, mutasi pembayaran, dan saldo akhir.</p>
+                    </div>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
+                            <input type="text" id="piutangSearch" onkeyup="debouncePiutangSearch()" placeholder="Cari pelanggan / nota..."
+                                class="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl outline-none text-xs font-medium">
+                        </div>
+                        <input type="date" id="piutangStartDate" onchange="fetchPiutang()" class="bg-slate-50 border border-slate-100 px-3 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
+                        <span class="text-xs text-slate-400 font-bold">s/d</span>
+                        <input type="date" id="piutangEndDate" onchange="fetchPiutang()" class="bg-slate-50 border border-slate-100 px-3 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
+                        <button onclick="openPiutangModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-md flex items-center gap-1.5">
+                            <i class="fas fa-plus"></i> Tambah Piutang
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto mb-4">
+                    <table class="w-full text-left border-collapse border border-slate-200">
+                        <thead class="bg-slate-100 text-[11px] uppercase tracking-widest text-slate-600 font-bold border-b border-slate-200">
+                            <tr>
+                                <th class="px-6 py-4 border-r border-slate-200">Tanggal</th>
+                                <th class="px-6 py-4 border-r border-slate-200">Pelanggan / Customer</th>
+                                <th class="px-6 py-4 border-r border-slate-200">No. Nota / Invoice</th>
+                                <th class="px-6 py-4 text-right border-r border-slate-200">Saldo Awal</th>
+                                <th class="px-6 py-4 text-right border-r border-slate-200 text-rose-600">Debet (Penambahan)</th>
+                                <th class="px-6 py-4 text-right border-r border-slate-200 text-emerald-600">Kredit (Pelunasan)</th>
+                                <th class="px-6 py-4 text-right border-r border-slate-200 font-bold">Saldo Akhir</th>
+                                <th class="px-6 py-4 text-center border-r border-slate-200">Status</th>
+                                <th class="px-6 py-4 text-center w-28">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="piutangTableBody" class="divide-y divide-slate-100 text-slate-700 text-sm font-mono">
+                        </tbody>
+                        <tfoot id="piutangTableFoot" class="bg-slate-100 font-bold text-sm border-t-2 border-slate-300">
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="p-4 bg-slate-50/50 flex justify-between items-center rounded-xl">
+                    <p class="text-slate-500 text-xs">Menampilkan <span id="piutangCountInfo" class="font-bold text-slate-800">0</span> catatan piutang dagang</p>
+                    <div id="piutangPagination" class="flex gap-2"></div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
-    <!-- MODAL TAMBAH JURNAL HARIAN -->
-    <div id="journalModal"
-        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div
-            class="bg-white w-full max-w-3xl rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden max-h-[90vh] flex flex-col">
+    <!-- MODAL INPUT/EDIT JURNAL HARIAN -->
+    <div id="journalModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-3xl rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden max-h-[90vh] flex flex-col">
             <div class="p-8 border-b border-slate-50 flex justify-between items-center shrink-0">
                 <div>
-                    <h3 class="text-2xl font-800 text-slate-800">Input Jurnal Buku Harian</h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Catat transaksi debet dan kredit dengan prinsip
-                        double-entry seimbang.</p>
+                    <h3 id="journalModalTitle" class="text-2xl font-800 text-slate-800">Input Jurnal Buku Harian</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Catat atau sesuaikan transaksi debet & kredit secara seimbang.</p>
                 </div>
                 <button onclick="closeJournalModal()" class="text-slate-300 hover:text-slate-600 transition-colors">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
 
-            <form id="journalForm" onsubmit="saveJournalEntry(event)"
-                class="p-8 space-y-6 overflow-y-auto custom-scroll flex-1">
+            <form id="journalForm" onsubmit="saveJournalEntry(event)" class="p-8 space-y-6 overflow-y-auto custom-scroll flex-1">
+                <input type="hidden" id="j_id">
+
                 <div class="grid grid-cols-3 gap-4">
                     <div>
-                        <label
-                            class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Tanggal
-                            Transaksi</label>
-                        <input type="date" id="j_date" required
-                            class="w-full bg-slate-50 border border-slate-100 p-3.5 rounded-2xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Tanggal Transaksi</label>
+                        <input type="date" id="j_date" required class="w-full bg-slate-50 border border-slate-100 p-3.5 rounded-2xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
                     </div>
                     <div class="col-span-2">
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">No.
-                            Bukti / Referensi</label>
-                        <input type="text" id="j_ref" placeholder="Contoh: NOTA-1029 / BUKTI TRF BCA"
-                            class="w-full bg-slate-50 border border-slate-100 p-3.5 rounded-2xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">No. Bukti / Referensi</label>
+                        <input type="text" id="j_ref" placeholder="Contoh: NOTA-1029 / BUKTI TRF BCA" class="w-full bg-slate-50 border border-slate-100 p-3.5 rounded-2xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Uraian
-                        / Deskripsi Umum Transaksi</label>
-                    <input type="text" id="j_desc" required
-                        placeholder="Contoh: PENJUALAN TUNAI & PPN KELUARAN / BAYAR LISTRIK"
-                        class="w-full bg-slate-50 border border-slate-100 p-3.5 rounded-2xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Uraian / Deskripsi Umum Transaksi</label>
+                    <input type="text" id="j_desc" required placeholder="Contoh: PENJUALAN TUNAI & PPN KELUARAN / BAYAR LISTRIK" class="w-full bg-slate-50 border border-slate-100 p-3.5 rounded-2xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
                 </div>
 
                 <div class="space-y-3 pt-2">
                     <div class="flex justify-between items-center">
-                        <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Baris Akun Jurnal
-                            (Minimal 2 Baris)</label>
-                        <button type="button" onclick="addJournalRow()"
-                            class="text-blue-600 hover:text-blue-800 font-bold text-xs flex items-center gap-1">
+                        <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Baris Akun Jurnal (Minimal 2 Baris)</label>
+                        <button type="button" onclick="addJournalRow()" class="text-blue-600 hover:text-blue-800 font-bold text-xs flex items-center gap-1">
                             <i class="fas fa-plus-circle"></i> Tambah Baris Akun
                         </button>
                     </div>
 
                     <div id="journalRowsContainer" class="space-y-2.5">
-                        <!-- Baris diinjeksikan via JavaScript -->
                     </div>
 
                     <!-- SUMMARY BALANCE CALCULATION -->
                     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2 mt-4">
                         <div class="flex justify-between text-xs font-bold text-slate-600">
-                            <span>Total Debet: <span id="modalTotalDebet" class="text-blue-600 font-black">IDR
-                                    0</span></span>
-                            <span>Total Kredit: <span id="modalTotalKredit" class="text-blue-600 font-black">IDR
-                                    0</span></span>
+                            <span>Total Debet: <span id="modalTotalDebet" class="text-blue-600 font-black">IDR 0</span></span>
+                            <span>Total Kredit: <span id="modalTotalKredit" class="text-blue-600 font-black">IDR 0</span></span>
                         </div>
                         <div class="flex justify-between items-center text-xs font-bold pt-2 border-t border-slate-200">
                             <span id="modalBalanceStatus" class="text-rose-600 font-black flex items-center gap-1">
@@ -383,18 +412,16 @@
                 </div>
 
                 <div class="pt-4">
-                    <button type="submit" id="btnSubmitJournal"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-2xl font-800 transition-all shadow-lg shadow-blue-100 uppercase tracking-widest text-sm">
-                        Simpan Transaksi Jurnal
+                    <button type="submit" id="btnSubmitJournal" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-2xl font-800 transition-all shadow-lg shadow-blue-100 uppercase tracking-widest text-sm">
+                        Simpan Transaksi Jurnal (Enter)
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL TAMBAH AKUN COA -->
-    <div id="accountModal"
-        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <!-- MODAL TAMBAH/EDIT AKUN COA -->
+    <div id="accountModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden">
             <div class="p-8 border-b border-slate-50 flex justify-between items-center">
                 <h3 id="accModalTitle" class="text-xl font-800 text-slate-800">Tambah Akun Perkiraan</h3>
@@ -407,25 +434,19 @@
                 <input type="hidden" id="accId">
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Kode
-                        Akun</label>
-                    <input type="text" id="acc_code" required placeholder="Contoh: 1109"
-                        class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Kode Akun</label>
+                    <input type="text" id="acc_code" required placeholder="Contoh: 1109" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Nama Akun /
-                        Perkiraan</label>
-                    <input type="text" id="acc_name" required placeholder="Contoh: BIAYA PERAWATAN GEDUNG"
-                        class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Nama Akun / Perkiraan</label>
+                    <input type="text" id="acc_name" required placeholder="Contoh: BIAYA PERAWATAN GEDUNG" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Tipe
-                            Akun</label>
-                        <select id="acc_type" required
-                            class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-xs focus:border-blue-400">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Tipe Akun</label>
+                        <select id="acc_type" required class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-xs focus:border-blue-400">
                             <option value="ASSET">ASSET (Harta)</option>
                             <option value="LIABILITY">LIABILITY (Kewajiban)</option>
                             <option value="EQUITY">EQUITY (Modal)</option>
@@ -434,10 +455,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Posisi
-                            Normal</label>
-                        <select id="acc_normal" required
-                            class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-xs focus:border-blue-400">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Posisi Normal</label>
+                        <select id="acc_normal" required class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-xs focus:border-blue-400">
                             <option value="DEBET">DEBET</option>
                             <option value="KREDIT">KREDIT</option>
                         </select>
@@ -445,16 +464,91 @@
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Saldo
-                        Awal</label>
-                    <input type="number" id="acc_initial" value="0"
-                        class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Saldo Awal</label>
+                    <input type="number" id="acc_initial" value="0" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
                 </div>
 
                 <div class="pt-3">
-                    <button type="submit"
-                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-xl font-800 transition-all shadow-md uppercase tracking-wider text-xs">
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-xl font-800 transition-all shadow-md uppercase tracking-wider text-xs">
                         Simpan Akun
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL TAMBAH/EDIT PIUTANG DAGANG -->
+    <div id="piutangModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden">
+            <div class="p-8 border-b border-slate-50 flex justify-between items-center">
+                <h3 id="piutangModalTitle" class="text-xl font-800 text-slate-800">Catat Piutang Dagang</h3>
+                <button onclick="closePiutangModal()" class="text-slate-300 hover:text-slate-600 transition-colors">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+
+            <form id="piutangForm" onsubmit="savePiutang(event)" class="p-8 space-y-4">
+                <input type="hidden" id="p_id">
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Nama Pelanggan</label>
+                        <input type="text" id="p_cust_name" required placeholder="Budi Santoso" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">No. Telepon / HP</label>
+                        <input type="text" id="p_cust_phone" placeholder="0812345678" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">No. Nota / Invoice</label>
+                        <input type="text" id="p_invoice" placeholder="PJL-..." class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Tanggal Transaksi</label>
+                        <input type="date" id="p_date" required class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-blue-400">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Saldo Awal (Rp)</label>
+                        <input type="number" id="p_saldo_awal" value="0" oninput="calcPiutangSaldoAkhir()" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-slate-700 text-xs focus:border-blue-400">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Debet / Baru (Rp)</label>
+                        <input type="number" id="p_debet" value="0" oninput="calcPiutangSaldoAkhir()" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-rose-600 text-xs focus:border-blue-400">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Kredit / Bayar (Rp)</label>
+                        <input type="number" id="p_kredit" value="0" oninput="calcPiutangSaldoAkhir()" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none font-bold text-emerald-600 text-xs focus:border-blue-400">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Saldo Akhir</label>
+                        <input type="text" id="p_saldo_akhir_display" readonly value="Rp 0" class="w-full bg-slate-100 border border-slate-200 p-3 rounded-xl font-extrabold text-blue-600 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Status</label>
+                        <select id="p_status" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl font-bold text-slate-700 text-xs outline-none">
+                            <option value="Belum Lunas">Belum Lunas</option>
+                            <option value="Lunas">Lunas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Keterangan</label>
+                    <textarea id="p_notes" rows="2" placeholder="Catatan transaksi piutang..." class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl outline-none text-xs font-medium text-slate-700"></textarea>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl font-800 transition-all shadow-md uppercase tracking-wider text-xs">
+                        Simpan Piutang Dagang
                     </button>
                 </div>
             </form>
@@ -463,11 +557,14 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        const BASE_URL = "https://langgeng-cashier-backend-production.up.railway.app";
+        const BASE_URL = "http://localhost:4000";
         let accountsList = [];
         let journalPage = 1;
         const journalLimit = 20;
+        let piutangPage = 1;
+        const piutangLimit = 20;
         let searchTimer;
+        let piutangSearchTimer;
 
         const ROLE_PERMISSIONS = {
             'admin': ['riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'absensi.html', 'report.html'],
@@ -475,69 +572,9 @@
             'super-kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
             'super_kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
             'superkasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
-            'akuntan': ['akuntansi.html'],
+            'akuntan': ['akuntansi.html', 'purchase.html', 'expense.html', 'retur.html'],
             'superadmin': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'akuntansi.html', 'absensi.html', 'report.html']
         };
-
-        async function confirmLogout() {
-            const result = await Swal.fire({
-                title: 'Konfirmasi Keluar',
-                text: 'Pilih tindakan logout yang ingin Anda lakukan:',
-                icon: 'question',
-                showCancelButton: true,
-                showDenyButton: true,
-                confirmButtonText: '<i class="fas fa-check-circle mr-1"></i> Logout & Selesaikan Shift',
-                denyButtonText: '<i class="fas fa-sign-out-alt mr-1"></i> Logout Saja',
-                cancelButtonText: '<i class="fas fa-times mr-1"></i> Batal',
-                confirmButtonColor: '#2563EB',
-                denyButtonColor: '#F59E0B',
-                cancelButtonColor: '#64748B',
-                reverseButtons: true
-            });
-
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Menutup Shift...',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
-
-                try {
-                    const shiftResponse = await fetch(`${BASE_URL}/api/shift/current`);
-                    const shiftData = await shiftResponse.json();
-                    const shift = shiftData.shift || 1;
-
-                    const updateResponse = await fetch(`${BASE_URL}/api/sales/update/shift`, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            shift: shift
-                        })
-                    });
-
-                    if (updateResponse.ok) {
-                        await Swal.fire({
-                            icon: "success",
-                            title: "Shift Berhasil Ditutup",
-                            text: `Transaksi berhasil dimasukkan ke Shift ${shift}. Anda telah keluar.`,
-                            confirmButtonColor: '#2563EB'
-                        });
-                        localStorage.removeItem("token");
-                        window.location.href = "index.html";
-                    } else {
-                        Swal.fire("Gagal", "Gagal memperbarui shift transaksi", "error");
-                    }
-                } catch (error) {
-                    console.error(error);
-                    Swal.fire("Error", "Server tidak dapat dihubungi", "error");
-                }
-            } else if (result.isDenied) {
-                localStorage.removeItem("token");
-                window.location.href = "index.html";
-            }
-        }
 
         function getUserDataFromToken() {
             const token = localStorage.getItem('token');
@@ -606,19 +643,22 @@
             const today = now.toISOString().split('T')[0];
 
             document.getElementById('j_date').value = today;
+            document.getElementById('p_date').value = today;
             document.getElementById('journalStartDate').value = firstDay;
             document.getElementById('journalEndDate').value = today;
             document.getElementById('recapStartDate').value = firstDay;
             document.getElementById('recapEndDate').value = today;
             document.getElementById('ledgerStartDate').value = firstDay;
             document.getElementById('ledgerEndDate').value = today;
+            document.getElementById('piutangStartDate').value = firstDay;
+            document.getElementById('piutangEndDate').value = today;
         }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-panel').forEach(el => el.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
 
-            const tabs = ['tab-jurnal', 'tab-rekap', 'tab-ledger', 'tab-coa'];
+            const tabs = ['tab-jurnal', 'tab-rekap', 'tab-ledger', 'tab-coa', 'tab-piutang'];
             tabs.forEach(t => {
                 const btn = document.getElementById('btn-' + t);
                 if (t === tabId) {
@@ -631,6 +671,7 @@
             if (tabId === 'tab-rekap') fetchRecap();
             if (tabId === 'tab-ledger') fetchLedger();
             if (tabId === 'tab-coa') fetchAccounts();
+            if (tabId === 'tab-piutang') fetchPiutang();
         }
 
         // ==========================================
@@ -641,7 +682,6 @@
                 const res = await fetch(`${BASE_URL}/api/accounting/accounts`);
                 accountsList = await res.json();
 
-                // Populate COA Table
                 const tbody = document.getElementById('coaTableBody');
                 if (tbody) {
                     tbody.innerHTML = accountsList.map(a => `
@@ -652,14 +692,13 @@
                             <td class="px-6 py-4 text-center font-bold text-xs ${a.normal_position === 'DEBET' ? 'text-blue-600' : 'text-emerald-600'}">${a.normal_position}</td>
                             <td class="px-6 py-4 text-right font-extrabold text-slate-800">Rp ${Number(a.current_balance || 0).toLocaleString('id-ID')}</td>
                             <td class="px-6 py-4 text-center">
-                                <button onclick="editAccount(${a.ID})" class="text-blue-500 hover:text-blue-700 mx-1"><i class="fas fa-edit"></i></button>
-                                <button onclick="deleteAccount(${a.ID})" class="text-red-400 hover:text-red-600 mx-1"><i class="fas fa-trash"></i></button>
+                                <button onclick="editAccount(${a.ID})" class="text-blue-500 hover:text-blue-700 mx-1" title="Edit Akun"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteAccount(${a.ID})" class="text-red-400 hover:text-red-600 mx-1" title="Hapus Akun"><i class="fas fa-trash"></i></button>
                             </td>
                         </tr>
                     `).join('');
                 }
 
-                // Populate Ledger Dropdown
                 const ledgerSel = document.getElementById('ledgerAccountSelect');
                 if (ledgerSel) {
                     ledgerSel.innerHTML = '<option value="0">Semua Akun Buku Besar</option>' +
@@ -799,10 +838,13 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-3 text-xs font-mono font-bold text-slate-400">${entry.reference || it.account?.code || '-'}</td>
-                                <td class="px-6 py-3 text-right font-bold text-slate-800">${it.debet > 0 ? `Rp ${Number(it.debet).toLocaleString('id-ID')}` : '-'}</td>
-                                <td class="px-6 py-3 text-right font-bold text-slate-800">${it.kredit > 0 ? `Rp ${Number(it.kredit).toLocaleString('id-ID')}` : '-'}</td>
+                                <td class="px-6 py-3 text-right font-bold text-slate-800 font-mono">${it.debet > 0 ? `Rp ${Number(it.debet).toLocaleString('id-ID')}` : '-'}</td>
+                                <td class="px-6 py-3 text-right font-bold text-slate-800 font-mono">${it.kredit > 0 ? `Rp ${Number(it.kredit).toLocaleString('id-ID')}` : '-'}</td>
                                 <td class="px-6 py-3 text-center align-top">
-                                    ${isFirst ? `<button onclick="deleteJournal(${entry.ID})" class="text-red-400 hover:text-red-600 transition-colors" title="Hapus Jurnal"><i class="fas fa-trash"></i></button>` : ''}
+                                    ${isFirst ? `
+                                        <button onclick="editJournal(${entry.ID})" class="text-blue-500 hover:text-blue-700 mx-1 transition-colors" title="Edit Jurnal"><i class="fas fa-edit"></i></button>
+                                        <button onclick="deleteJournal(${entry.ID})" class="text-red-400 hover:text-red-600 mx-1 transition-colors" title="Hapus Jurnal"><i class="fas fa-trash"></i></button>
+                                    ` : ''}
                                 </td>
                             </tr>
                         `;
@@ -820,24 +862,27 @@
             searchTimer = setTimeout(() => { journalPage = 1; fetchJournals(); }, 400);
         }
 
-        function openJournalModal() {
+        function openJournalModal(isEdit = false) {
             document.getElementById('journalModal').classList.remove('hidden');
-            document.getElementById('journalForm').reset();
-            document.getElementById('j_date').value = new Date().toISOString().split('T')[0];
+            if (!isEdit) {
+                document.getElementById('journalModalTitle').innerText = "Input Jurnal Buku Harian";
+                document.getElementById('journalForm').reset();
+                document.getElementById('j_id').value = "";
+                document.getElementById('j_date').value = new Date().toISOString().split('T')[0];
 
-            // Render 2 initial rows (Debit & Credit)
-            const container = document.getElementById('journalRowsContainer');
-            container.innerHTML = "";
-            addJournalRow(0, "DEBET");
-            addJournalRow(0, "KREDIT");
-            calcJournalTotals();
+                const container = document.getElementById('journalRowsContainer');
+                container.innerHTML = "";
+                addJournalRow(0, "DEBET");
+                addJournalRow(0, "KREDIT");
+                calcJournalTotals();
+            }
         }
 
         function closeJournalModal() {
             document.getElementById('journalModal').classList.add('hidden');
         }
 
-        function addJournalRow(presetAccId = 0, defaultType = "DEBET") {
+        function addJournalRow(presetAccId = 0, defaultType = "DEBET", debetVal = "", kreditVal = "", descVal = "") {
             const container = document.getElementById('journalRowsContainer');
             const rowIdx = container.children.length;
 
@@ -854,10 +899,10 @@
                     </select>
                 </div>
                 <div class="col-span-3">
-                    <input type="number" placeholder="Debet (Rp)" class="w-full bg-white border border-slate-200 p-2 rounded-lg font-bold text-right text-blue-600 j-debet outline-none" value="${defaultType === 'DEBET' ? '' : '0'}" oninput="calcJournalTotals()">
+                    <input type="number" placeholder="Debet (Rp)" class="w-full bg-white border border-slate-200 p-2 rounded-lg font-bold text-right text-blue-600 j-debet outline-none" value="${debetVal !== '' ? debetVal : (defaultType === 'DEBET' ? '' : '0')}" oninput="calcJournalTotals()">
                 </div>
                 <div class="col-span-3">
-                    <input type="number" placeholder="Kredit (Rp)" class="w-full bg-white border border-slate-200 p-2 rounded-lg font-bold text-right text-emerald-600 j-kredit outline-none" value="${defaultType === 'KREDIT' ? '' : '0'}" oninput="calcJournalTotals()">
+                    <input type="number" placeholder="Kredit (Rp)" class="w-full bg-white border border-slate-200 p-2 rounded-lg font-bold text-right text-emerald-600 j-kredit outline-none" value="${kreditVal !== '' ? kreditVal : (defaultType === 'KREDIT' ? '' : '0')}" oninput="calcJournalTotals()">
                 </div>
                 <div class="col-span-1 text-center">
                     <button type="button" onclick="removeJournalRow('j_row_${rowIdx}')" class="text-slate-300 hover:text-red-500 font-bold text-sm">
@@ -901,7 +946,7 @@
                 statusEl.className = "text-emerald-600 font-black flex items-center gap-1";
                 statusEl.innerHTML = `<i class="fas fa-check-circle"></i> Jurnal Seimbang (Balance)`;
                 submitBtn.disabled = false;
-                submitBtn.className = "w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-2xl font-800 transition-all shadow-lg shadow-blue-100 uppercase tracking-widest text-sm";
+                submitBtn.className = "w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-2xl font-800 transition-all shadow-lg shadow-blue-100 uppercase tracking-widest text-sm cursor-pointer";
             } else {
                 statusEl.className = "text-rose-600 font-black flex items-center gap-1";
                 statusEl.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Belum Seimbang (Selisih: IDR ${Math.abs(diff).toLocaleString('id-ID')})`;
@@ -910,6 +955,7 @@
 
         async function saveJournalEntry(e) {
             e.preventDefault();
+            const id = document.getElementById('j_id').value;
             const date = document.getElementById('j_date').value;
             const desc = document.getElementById('j_desc').value.trim();
             const ref = document.getElementById('j_ref').value.trim();
@@ -932,9 +978,12 @@
 
             Swal.fire({ title: 'Menyimpan jurnal...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${BASE_URL}/api/accounting/journals/${id}` : `${BASE_URL}/api/accounting/journals`;
+
             try {
-                const res = await fetch(`${BASE_URL}/api/accounting/journals`, {
-                    method: 'POST',
+                const res = await fetch(url, {
+                    method: method,
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         date: date,
@@ -954,6 +1003,31 @@
                 }
             } catch (err) {
                 Swal.fire('Error', 'Koneksi ke API terputus', 'error');
+            }
+        }
+
+        async function editJournal(id) {
+            try {
+                const res = await fetch(`${BASE_URL}/api/accounting/journals/${id}`);
+                const entry = await res.json();
+
+                document.getElementById('j_id').value = entry.ID;
+                document.getElementById('j_date').value = entry.date ? entry.date.split('T')[0] : '';
+                document.getElementById('j_ref').value = entry.reference || '';
+                document.getElementById('j_desc').value = entry.description || '';
+
+                const container = document.getElementById('journalRowsContainer');
+                container.innerHTML = "";
+
+                const items = entry.items || [];
+                items.forEach(it => {
+                    addJournalRow(it.account_id, it.debet > 0 ? "DEBET" : "KREDIT", it.debet, it.kredit, it.description);
+                });
+
+                document.getElementById('journalModalTitle').innerText = "Edit Jurnal Buku Harian";
+                openJournalModal(true);
+            } catch (e) {
+                console.error(e);
             }
         }
 
@@ -985,7 +1059,7 @@
             const tfoot = document.getElementById('recapTableFoot');
             const balanceBox = document.getElementById('recapBalanceBox');
 
-            tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400">Menghitung rekapitulasi jurnal...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-mono">Menghitung rekapitulasi jurnal...</td></tr>`;
 
             try {
                 const res = await fetch(`${BASE_URL}/api/accounting/recap?start_date=${start}&end_date=${end}`);
@@ -993,26 +1067,26 @@
                 const items = data.items || [];
 
                 if (items.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400">Tidak ada mutasi jurnal pada periode ini</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-mono">Tidak ada mutasi jurnal pada periode ini</td></tr>`;
                     tfoot.innerHTML = "";
                     balanceBox.innerHTML = "";
                     return;
                 }
 
                 tbody.innerHTML = items.map(it => `
-                    <tr class="hover:bg-slate-50/50">
-                        <td class="px-6 py-3 font-mono font-bold text-slate-600">${it.account_code}</td>
-                        <td class="px-6 py-3 font-bold text-slate-800">${it.account_name}</td>
-                        <td class="px-6 py-3"><span class="bg-slate-100 px-2 py-0.5 rounded text-xs font-bold text-slate-500">${it.account_type}</span></td>
-                        <td class="px-6 py-3 text-right font-bold text-slate-800">${it.total_debet > 0 ? `Rp ${Number(it.total_debet).toLocaleString('id-ID')}` : '-'}</td>
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-3 font-mono font-bold text-slate-600 border-r border-slate-200">${it.account_code}</td>
+                        <td class="px-6 py-3 font-bold text-slate-800 border-r border-slate-200">${it.account_name}</td>
+                        <td class="px-6 py-3 border-r border-slate-200"><span class="bg-slate-100 px-2 py-0.5 rounded text-xs font-bold text-slate-500">${it.account_type}</span></td>
+                        <td class="px-6 py-3 text-right font-bold text-slate-800 border-r border-slate-200">${it.total_debet > 0 ? `Rp ${Number(it.total_debet).toLocaleString('id-ID')}` : '-'}</td>
                         <td class="px-6 py-3 text-right font-bold text-slate-800">${it.total_kredit > 0 ? `Rp ${Number(it.total_kredit).toLocaleString('id-ID')}` : '-'}</td>
                     </tr>
                 `).join('');
 
                 tfoot.innerHTML = `
                     <tr>
-                        <td colspan="3" class="px-6 py-4 font-black uppercase">JUMLAH TOTAL</td>
-                        <td class="px-6 py-4 text-right font-black text-blue-600 text-base">Rp ${Number(data.total_debet || 0).toLocaleString('id-ID')}</td>
+                        <td colspan="3" class="px-6 py-4 font-black uppercase border-r border-slate-300">JUMLAH TOTAL</td>
+                        <td class="px-6 py-4 text-right font-black text-blue-600 text-base border-r border-slate-300">Rp ${Number(data.total_debet || 0).toLocaleString('id-ID')}</td>
                         <td class="px-6 py-4 text-right font-black text-emerald-600 text-base">Rp ${Number(data.total_kredit || 0).toLocaleString('id-ID')}</td>
                     </tr>
                 `;
@@ -1049,7 +1123,7 @@
         }
 
         // ==========================================
-        // 4. BUKU BESAR (GENERAL LEDGER)
+        // 4. BUKU BESAR (GENERAL LEDGER - EXCEL STYLE)
         // ==========================================
         async function fetchLedger() {
             const start = document.getElementById('ledgerStartDate').value;
@@ -1057,7 +1131,7 @@
             const accId = document.getElementById('ledgerAccountSelect').value;
             const container = document.getElementById('ledgerCardsContainer');
 
-            container.innerHTML = `<div class="p-12 text-center text-slate-400">Menyusun kartu buku besar...</div>`;
+            container.innerHTML = `<div class="p-12 text-center text-slate-400 font-mono">Menyusun kartu buku besar...</div>`;
 
             let url = `${BASE_URL}/api/accounting/ledger?start_date=${start}&end_date=${end}`;
             if (accId > 0) url += `&account_id=${accId}`;
@@ -1072,49 +1146,54 @@
                 }
 
                 container.innerHTML = cards.map(card => {
-                    const txRows = (card.transactions || []).map(tx => `
-                        <tr class="hover:bg-slate-50/50 text-xs">
-                            <td class="px-4 py-2.5 text-slate-500 font-medium">${new Date(tx.date).toLocaleDateString('id-ID', { dateStyle: 'medium' })}</td>
-                            <td class="px-4 py-2.5 font-bold text-slate-700">${tx.description}</td>
-                            <td class="px-4 py-2.5 font-mono text-slate-400">${tx.entry_number || '-'}</td>
-                            <td class="px-4 py-2.5 text-right font-bold text-slate-800">${tx.debet > 0 ? `Rp ${Number(tx.debet).toLocaleString('id-ID')}` : '-'}</td>
-                            <td class="px-4 py-2.5 text-right font-bold text-slate-800">${tx.kredit > 0 ? `Rp ${Number(tx.kredit).toLocaleString('id-ID')}` : '-'}</td>
+                    const year = start ? new Date(start).getFullYear() : new Date().getFullYear();
+                    const txRows = (card.transactions || []).map((tx, idx) => `
+                        <tr class="hover:bg-slate-50 text-xs font-mono">
+                            <td class="px-4 py-2.5 border-r border-slate-200 text-slate-500 font-semibold">${new Date(tx.date).toLocaleDateString('id-ID', { dateStyle: 'medium' })}</td>
+                            <td class="px-4 py-2.5 border-r border-slate-200 font-bold text-slate-700">${escapeHTML(tx.description)}</td>
+                            <td class="px-4 py-2.5 border-r border-slate-200 text-slate-400">${escapeHTML(tx.entry_number || '-')}</td>
+                            <td class="px-4 py-2.5 border-r border-slate-200 text-right font-bold text-slate-800">${tx.debet > 0 ? `Rp ${Number(tx.debet).toLocaleString('id-ID')}` : '-'}</td>
+                            <td class="px-4 py-2.5 border-r border-slate-200 text-right font-bold text-slate-800">${tx.kredit > 0 ? `Rp ${Number(tx.kredit).toLocaleString('id-ID')}` : '-'}</td>
                             <td class="px-4 py-2.5 text-right font-extrabold text-blue-600">Rp ${Number(tx.balance || 0).toLocaleString('id-ID')}</td>
                         </tr>
                     `).join('');
 
                     return `
-                        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                            <div class="bg-slate-100/70 p-4 border-b border-slate-200 flex justify-between items-center">
-                                <div>
-                                    <span class="text-xs font-black uppercase text-blue-600 bg-blue-50 px-2 py-0.5 rounded mr-2">${card.account_code}</span>
-                                    <span class="text-sm font-extrabold text-slate-800">${card.account_name}</span>
-                                    <span class="text-[11px] font-bold text-slate-400 ml-2">(${card.account_type} • Normal: ${card.normal_position})</span>
+                        <div class="bg-white rounded-2xl border-2 border-slate-300 overflow-hidden shadow-sm">
+                            <div class="bg-slate-100 p-5 border-b-2 border-slate-300">
+                                <div class="text-center font-black tracking-widest text-slate-800 text-sm mb-3 uppercase">
+                                    [ KARTU BUKU BESAR ]
                                 </div>
-                                <div class="text-xs font-bold text-slate-600">
-                                    Saldo Awal: <span class="font-extrabold text-slate-800">Rp ${Number(card.initial_balance || 0).toLocaleString('id-ID')}</span>
+                                <div class="grid grid-cols-3 gap-4 text-xs font-bold text-slate-700 bg-white p-3 rounded-xl border border-slate-200">
+                                    <div>Nama Perkiraan: <span class="text-blue-700 font-black">${escapeHTML(card.account_name)}</span></div>
+                                    <div>No. Perkiraan: <span class="font-mono text-slate-900">${escapeHTML(card.account_code)}</span></div>
+                                    <div class="text-right">Tahun Buku: <span class="text-slate-900 font-extrabold">${year}</span></div>
+                                </div>
+                                <div class="flex justify-between items-center mt-2 px-1 text-xs font-semibold text-slate-500">
+                                    <span>Tipe: <b>${card.account_type}</b> • Posisi Normal: <b>${card.normal_position}</b></span>
+                                    <span>Saldo Awal: <b class="text-slate-900 font-mono">Rp ${Number(card.initial_balance || 0).toLocaleString('id-ID')}</b></span>
                                 </div>
                             </div>
-                            <table class="w-full text-left">
-                                <thead class="bg-slate-50 text-[10px] uppercase text-slate-400 font-bold border-b border-slate-100">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-50 text-[10px] uppercase text-slate-600 font-bold border-b border-slate-300">
                                     <tr>
-                                        <th class="px-4 py-2.5">Tanggal</th>
-                                        <th class="px-4 py-2.5">Uraian / Keterangan</th>
-                                        <th class="px-4 py-2.5">No. Bukti</th>
-                                        <th class="px-4 py-2.5 text-right">Debet</th>
-                                        <th class="px-4 py-2.5 text-right">Kredit</th>
-                                        <th class="px-4 py-2.5 text-right">Saldo Akhir</th>
+                                        <th class="px-4 py-3 border-r border-slate-200">TANGGAL</th>
+                                        <th class="px-4 py-3 border-r border-slate-200">URAIAN / KETERANGAN</th>
+                                        <th class="px-4 py-3 border-r border-slate-200">NO. BUKTI</th>
+                                        <th class="px-4 py-3 text-right border-r border-slate-200">DEBET</th>
+                                        <th class="px-4 py-3 text-right border-r border-slate-200">KREDIT</th>
+                                        <th class="px-4 py-3 text-right">SALDO AKHIR</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-100 text-slate-700">
-                                    ${txRows.length > 0 ? txRows : `<tr><td colspan="6" class="p-4 text-center text-slate-400 text-xs italic">Tidak ada transaksi pada periode ini</td></tr>`}
+                                <tbody class="divide-y divide-slate-200 text-slate-700">
+                                    ${txRows.length > 0 ? txRows : `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs italic font-mono">Tidak ada mutasi transaksi pada periode ini</td></tr>`}
                                 </tbody>
-                                <tfoot class="bg-slate-50/60 font-bold text-xs border-t border-slate-200">
+                                <tfoot class="bg-slate-100 font-bold text-xs border-t-2 border-slate-300">
                                     <tr>
-                                        <td colspan="3" class="px-4 py-3 text-right">TOTAL MUTASI & SALDO AKHIR</td>
-                                        <td class="px-4 py-3 text-right text-blue-600 font-bold">Rp ${Number(card.total_debet || 0).toLocaleString('id-ID')}</td>
-                                        <td class="px-4 py-3 text-right text-emerald-600 font-bold">Rp ${Number(card.total_kredit || 0).toLocaleString('id-ID')}</td>
-                                        <td class="px-4 py-3 text-right text-slate-900 font-black text-sm">Rp ${Number(card.ending_balance || 0).toLocaleString('id-ID')}</td>
+                                        <td colspan="3" class="px-4 py-3 text-right border-r border-slate-300">JUMLAH MUTASI & SALDO AKHIR</td>
+                                        <td class="px-4 py-3 text-right text-blue-700 font-black font-mono border-r border-slate-300">Rp ${Number(card.total_debet || 0).toLocaleString('id-ID')}</td>
+                                        <td class="px-4 py-3 text-right text-emerald-700 font-black font-mono border-r border-slate-300">Rp ${Number(card.total_kredit || 0).toLocaleString('id-ID')}</td>
+                                        <td class="px-4 py-3 text-right text-slate-900 font-black font-mono text-sm">Rp ${Number(card.ending_balance || 0).toLocaleString('id-ID')}</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -1124,6 +1203,199 @@
 
             } catch (e) {
                 console.error(e);
+            }
+        }
+
+        // ==========================================
+        // 5. PIUTANG DAGANG (ACCOUNTS RECEIVABLE)
+        // ==========================================
+        async function fetchPiutang() {
+            const search = document.getElementById('piutangSearch').value;
+            const start = document.getElementById('piutangStartDate').value;
+            const end = document.getElementById('piutangEndDate').value;
+            const tbody = document.getElementById('piutangTableBody');
+            const tfoot = document.getElementById('piutangTableFoot');
+
+            let url = `${BASE_URL}/api/accounting/piutang?page=${piutangPage}&limit=${piutangLimit}`;
+            if (search) url += `&search=${encodeURIComponent(search)}`;
+            if (start && end) url += `&start_date=${start}&end_date=${end}`;
+
+            tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-slate-400 font-mono">Memuat data piutang dagang...</td></tr>`;
+
+            try {
+                const res = await fetch(url);
+                const result = await res.json();
+                const records = result.data || [];
+                const total = result.total || 0;
+
+                document.getElementById('piutangCountInfo').innerText = total;
+
+                if (records.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-slate-400 font-mono">Tidak ada catatan piutang dagang</td></tr>`;
+                    tfoot.innerHTML = "";
+                    return;
+                }
+
+                let sumSaldoAwal = 0;
+                let sumDebet = 0;
+                let sumKredit = 0;
+                let sumSaldoAkhir = 0;
+
+                tbody.innerHTML = records.map(p => {
+                    sumSaldoAwal += Number(p.saldo_awal || 0);
+                    sumDebet += Number(p.debet || 0);
+                    sumKredit += Number(p.kredit || 0);
+                    sumSaldoAkhir += Number(p.saldo_akhir || 0);
+
+                    const isLunas = p.status === 'Lunas' || p.saldo_akhir <= 0;
+                    const dateFormatted = p.tanggal ? new Date(p.tanggal).toLocaleDateString('id-ID', { dateStyle: 'medium' }) : '-';
+
+                    return `
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-6 py-3 font-semibold text-slate-500 border-r border-slate-200">${dateFormatted}</td>
+                            <td class="px-6 py-3 font-bold text-slate-800 border-r border-slate-200">
+                                <div>${escapeHTML(p.customer_name || 'Pelanggan')}</div>
+                                ${p.customer_phone ? `<div class="text-[10px] text-slate-400">${escapeHTML(p.customer_phone)}</div>` : ''}
+                            </td>
+                            <td class="px-6 py-3 text-xs font-mono font-bold text-blue-600 border-r border-slate-200">${escapeHTML(p.sales_invoice || '-')}</td>
+                            <td class="px-6 py-3 text-right font-bold text-slate-600 border-r border-slate-200">Rp ${Number(p.saldo_awal || 0).toLocaleString('id-ID')}</td>
+                            <td class="px-6 py-3 text-right font-bold text-rose-600 border-r border-slate-200">Rp ${Number(p.debet || 0).toLocaleString('id-ID')}</td>
+                            <td class="px-6 py-3 text-right font-bold text-emerald-600 border-r border-slate-200">Rp ${Number(p.kredit || 0).toLocaleString('id-ID')}</td>
+                            <td class="px-6 py-3 text-right font-extrabold text-slate-900 border-r border-slate-200">Rp ${Number(p.saldo_akhir || 0).toLocaleString('id-ID')}</td>
+                            <td class="px-6 py-3 text-center border-r border-slate-200">
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${isLunas ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${escapeHTML(p.status)}</span>
+                            </td>
+                            <td class="px-6 py-3 text-center">
+                                <button onclick="editPiutang(${p.ID})" class="text-blue-500 hover:text-blue-700 mx-1" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button onclick="deletePiutang(${p.ID})" class="text-red-400 hover:text-red-600 mx-1" title="Hapus"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                tfoot.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="px-6 py-4 font-black uppercase border-r border-slate-300">TOTAL REKAP PIUTANG</td>
+                        <td class="px-6 py-4 text-right font-black border-r border-slate-300">Rp ${sumSaldoAwal.toLocaleString('id-ID')}</td>
+                        <td class="px-6 py-4 text-right font-black text-rose-600 border-r border-slate-300">Rp ${sumDebet.toLocaleString('id-ID')}</td>
+                        <td class="px-6 py-4 text-right font-black text-emerald-600 border-r border-slate-300">Rp ${sumKredit.toLocaleString('id-ID')}</td>
+                        <td class="px-6 py-4 text-right font-black text-blue-700 border-r border-slate-300">Rp ${sumSaldoAkhir.toLocaleString('id-ID')}</td>
+                        <td colspan="2"></td>
+                    </tr>
+                `;
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function debouncePiutangSearch() {
+            clearTimeout(piutangSearchTimer);
+            piutangSearchTimer = setTimeout(() => { piutangPage = 1; fetchPiutang(); }, 400);
+        }
+
+        function openPiutangModal(isEdit = false) {
+            document.getElementById('piutangModal').classList.remove('hidden');
+            if (!isEdit) {
+                document.getElementById('piutangModalTitle').innerText = "Catat Piutang Dagang Baru";
+                document.getElementById('piutangForm').reset();
+                document.getElementById('p_id').value = "";
+                document.getElementById('p_date').value = new Date().toISOString().split('T')[0];
+                calcPiutangSaldoAkhir();
+            }
+        }
+
+        function closePiutangModal() {
+            document.getElementById('piutangModal').classList.add('hidden');
+        }
+
+        function calcPiutangSaldoAkhir() {
+            const awal = parseFloat(document.getElementById('p_saldo_awal').value) || 0;
+            const debet = parseFloat(document.getElementById('p_debet').value) || 0;
+            const kredit = parseFloat(document.getElementById('p_kredit').value) || 0;
+            const akhir = awal + debet - kredit;
+
+            document.getElementById('p_saldo_akhir_display').value = `Rp ${akhir.toLocaleString('id-ID')}`;
+            if (akhir <= 0 && debet > 0) {
+                document.getElementById('p_status').value = "Lunas";
+            }
+        }
+
+        async function savePiutang(e) {
+            e.preventDefault();
+            const id = document.getElementById('p_id').value;
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${BASE_URL}/api/accounting/piutang/${id}` : `${BASE_URL}/api/accounting/piutang`;
+
+            const payload = {
+                customer_name: document.getElementById('p_cust_name').value.trim(),
+                customer_phone: document.getElementById('p_cust_phone').value.trim(),
+                sales_invoice: document.getElementById('p_invoice').value.trim(),
+                tanggal: document.getElementById('p_date').value,
+                saldo_awal: parseFloat(document.getElementById('p_saldo_awal').value) || 0,
+                debet: parseFloat(document.getElementById('p_debet').value) || 0,
+                kredit: parseFloat(document.getElementById('p_kredit').value) || 0,
+                status: document.getElementById('p_status').value,
+                keterangan: document.getElementById('p_notes').value.trim()
+            };
+
+            Swal.fire({ title: 'Menyimpan piutang...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            try {
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    Swal.fire('Berhasil!', 'Data piutang dagang tersimpan.', 'success');
+                    closePiutangModal();
+                    fetchPiutang();
+                } else {
+                    const err = await res.json();
+                    Swal.fire('Gagal', err.error || 'Terjadi kesalahan', 'error');
+                }
+            } catch (e) {
+                Swal.fire('Error', 'Koneksi gagal', 'error');
+            }
+        }
+
+        async function editPiutang(id) {
+            try {
+                const res = await fetch(`${BASE_URL}/api/accounting/piutang/${id}`);
+                const p = await res.json();
+
+                document.getElementById('p_id').value = p.ID;
+                document.getElementById('p_cust_name').value = p.customer_name || '';
+                document.getElementById('p_cust_phone').value = p.customer_phone || '';
+                document.getElementById('p_invoice').value = p.sales_invoice || '';
+                document.getElementById('p_date').value = p.tanggal ? p.tanggal.split('T')[0] : '';
+                document.getElementById('p_saldo_awal').value = p.saldo_awal || 0;
+                document.getElementById('p_debet').value = p.debet || 0;
+                document.getElementById('p_kredit').value = p.kredit || 0;
+                document.getElementById('p_status').value = p.status || 'Belum Lunas';
+                document.getElementById('p_notes').value = p.keterangan || '';
+                calcPiutangSaldoAkhir();
+
+                document.getElementById('piutangModalTitle').innerText = "Edit Piutang Dagang";
+                openPiutangModal(true);
+            } catch (e) { console.error(e); }
+        }
+
+        async function deletePiutang(id) {
+            const confirm = await Swal.fire({
+                title: 'Hapus Piutang?',
+                text: 'Data piutang ini akan dihapus permanen.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Ya, Hapus'
+            });
+            if (confirm.isConfirmed) {
+                const res = await fetch(`${BASE_URL}/api/accounting/piutang/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    Swal.fire('Dihapus!', 'Data piutang telah dihapus.', 'success');
+                    fetchPiutang();
+                }
             }
         }
 

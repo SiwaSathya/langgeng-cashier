@@ -150,43 +150,68 @@
         <!-- TAB 1: LOG ABSENSI KARYAWAN -->
         <div id="tab-absensi" class="tab-panel space-y-8 animate-fade-in">
             <!-- SUMMARY CARDS -->
-            <div class="grid grid-cols-4 gap-6">
-                <div class="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-sm flex items-center gap-4">
-                    <div
-                        class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 text-lg">
-                        <i class="fas fa-user-check"></i>
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 text-sm shrink-0">
+                        <i class="fas fa-sun"></i>
                     </div>
                     <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Hadir Hari Ini</p>
-                        <h3 id="summaryHadir" class="text-xl font-extrabold text-slate-800 mt-0.5">0</h3>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pagi</p>
+                        <h3 id="summaryPagi" class="text-base font-extrabold text-slate-800 mt-0.5">0</h3>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-sm flex items-center gap-4">
-                    <div
-                        class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 text-lg">
-                        <i class="fas fa-envelope-open-text"></i>
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 text-sm shrink-0">
+                        <i class="fas fa-cloud-sun"></i>
                     </div>
                     <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Izin</p>
-                        <h3 id="summaryIzin" class="text-xl font-extrabold text-slate-800 mt-0.5">0</h3>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Siang</p>
+                        <h3 id="summarySiang" class="text-base font-extrabold text-slate-800 mt-0.5">0</h3>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-sm flex items-center gap-4">
-                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 text-lg">
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-600 text-sm shrink-0">
+                        <i class="fas fa-umbrella-beach"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Libur</p>
+                        <h3 id="summaryLibur" class="text-base font-extrabold text-slate-700 mt-0.5">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 text-sm shrink-0">
+                        <i class="fas fa-business-time"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Lembur</p>
+                        <h3 id="summaryLembur" class="text-base font-extrabold text-purple-700 mt-0.5">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 text-sm shrink-0">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bantu</p>
+                        <h3 id="summaryBantu" class="text-base font-extrabold text-indigo-700 mt-0.5">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600 text-sm shrink-0">
                         <i class="fas fa-notes-medical"></i>
                     </div>
                     <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Sakit</p>
-                        <h3 id="summarySakit" class="text-xl font-extrabold text-slate-800 mt-0.5">0</h3>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sakit</p>
+                        <h3 id="summarySakit" class="text-base font-extrabold text-rose-700 mt-0.5">0</h3>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-sm flex items-center gap-4">
-                    <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center text-red-500 text-lg">
-                        <i class="fas fa-user-times"></i>
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 bg-cyan-50 rounded-xl flex items-center justify-center text-cyan-600 text-sm shrink-0">
+                        <i class="fas fa-file-signature"></i>
                     </div>
                     <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Alfa</p>
-                        <h3 id="summaryAlfa" class="text-xl font-extrabold text-slate-800 mt-0.5">0</h3>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dispensasi</p>
+                        <h3 id="summaryDispensasi" class="text-base font-extrabold text-cyan-700 mt-0.5">0</h3>
                     </div>
                 </div>
             </div>
@@ -315,10 +340,13 @@
                             class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Status</label>
                         <select id="att_status" required
                             class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none font-bold text-slate-700 cursor-pointer focus:border-blue-400">
-                            <option value="Hadir">Hadir</option>
-                            <option value="Izin">Izin</option>
+                            <option value="Pagi">Pagi</option>
+                            <option value="Siang">Siang</option>
+                            <option value="Libur">Libur</option>
+                            <option value="Lembur">Lembur</option>
+                            <option value="Bantu">Bantu (Setengah Lembur)</option>
                             <option value="Sakit">Sakit</option>
-                            <option value="Alfa">Alfa</option>
+                            <option value="Dispensasi">Dispensasi</option>
                         </select>
                     </div>
                     <div>
@@ -436,7 +464,7 @@
             'super-kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
             'super_kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
             'superkasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
-            'akuntan': ['akuntansi.html'],
+            'akuntan': ['akuntansi.html', 'purchase.html', 'expense.html', 'retur.html'],
             'superadmin': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'akuntansi.html', 'absensi.html', 'report.html']
         };
 
@@ -627,10 +655,13 @@
                 }
 
                 tbody.innerHTML = data.map(item => {
-                    let badgeClass = "bg-green-50 text-green-600 border border-green-200";
-                    if (item.status === "Izin") badgeClass = "bg-amber-50 text-amber-600 border border-amber-200";
-                    if (item.status === "Sakit") badgeClass = "bg-blue-50 text-blue-600 border border-blue-200";
-                    if (item.status === "Alfa" || item.status === "Alpha") badgeClass = "bg-red-50 text-red-500 border border-red-200";
+                    let badgeClass = "bg-emerald-50 text-emerald-700 border border-emerald-200";
+                    if (item.status === "Siang") badgeClass = "bg-blue-50 text-blue-700 border border-blue-200";
+                    if (item.status === "Libur") badgeClass = "bg-slate-100 text-slate-700 border border-slate-200";
+                    if (item.status === "Lembur") badgeClass = "bg-purple-50 text-purple-700 border border-purple-200";
+                    if (item.status === "Bantu" || item.status === "Setengah Lembur") badgeClass = "bg-indigo-50 text-indigo-700 border border-indigo-200";
+                    if (item.status === "Sakit") badgeClass = "bg-rose-50 text-rose-700 border border-rose-200";
+                    if (item.status === "Dispensasi" || item.status === "Izin") badgeClass = "bg-cyan-50 text-cyan-700 border border-cyan-200";
 
                     const dateFormatted = item.date ? new Date(item.date).toLocaleDateString('id-ID', { dateStyle: 'medium' }) : '-';
                     const checkIn = item.check_in ? new Date(item.check_in).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-';
@@ -639,20 +670,20 @@
                     return `
                         <tr class="hover:bg-slate-50/50 transition-colors">
                             <td class="px-8 py-5">
-                                <div class="font-bold text-slate-700">${item.user?.name || item.user_id}</div>
-                                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">${item.user?.role || 'Karyawan'} • ${item.user?.location || 'Pusat'}</div>
+                                <div class="font-bold text-slate-700">${escapeHTML(item.user?.name || item.user_id)}</div>
+                                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">${escapeHTML(item.user?.role || 'Karyawan')} • ${escapeHTML(item.user?.location || 'Pusat')}</div>
                             </td>
                             <td class="px-6 py-5">
                                 <div class="font-semibold text-slate-600">${dateFormatted}</div>
                                 <div class="text-[11px] text-blue-600 font-bold">Shift ${item.shift}</div>
                             </td>
                             <td class="px-6 py-5">
-                                <span class="px-3 py-1 ${badgeClass} rounded-lg text-xs font-bold">${item.status}</span>
+                                <span class="px-3 py-1 ${badgeClass} rounded-lg text-xs font-bold">${escapeHTML(item.status)}</span>
                             </td>
                             <td class="px-6 py-5 text-sm text-slate-600 font-mono font-semibold">
                                 <i class="fas fa-sign-in-alt text-emerald-500 mr-1"></i>${checkIn} &nbsp;—&nbsp; <i class="fas fa-sign-out-alt text-rose-400 mr-1"></i>${checkOut}
                             </td>
-                            <td class="px-6 py-5 text-sm text-slate-400 font-medium max-w-xs truncate">${item.notes || '-'}</td>
+                            <td class="px-6 py-5 text-sm text-slate-400 font-medium max-w-xs truncate">${escapeHTML(item.notes || '-')}</td>
                             <td class="px-8 py-5 text-right">
                                 <button onclick="editAttendance(${item.ID})" class="text-blue-500 hover:text-blue-700 mx-2 transition-colors" title="Edit"><i class="fas fa-edit"></i></button>
                                 <button onclick="deleteAttendance(${item.ID})" class="text-red-400 hover:text-red-600 mx-2 transition-colors" title="Hapus"><i class="fas fa-trash"></i></button>
@@ -676,10 +707,21 @@
                 const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
                 if (res.ok) {
                     const s = await res.json();
-                    document.getElementById('summaryHadir').innerText = s.hadir || 0;
-                    document.getElementById('summaryIzin').innerText = s.izin || 0;
-                    document.getElementById('summarySakit').innerText = s.sakit || 0;
-                    document.getElementById('summaryAlfa').innerText = s.alfa || 0;
+                    const elPagi = document.getElementById('summaryPagi');
+                    const elSiang = document.getElementById('summarySiang');
+                    const elLibur = document.getElementById('summaryLibur');
+                    const elLembur = document.getElementById('summaryLembur');
+                    const elBantu = document.getElementById('summaryBantu');
+                    const elSakit = document.getElementById('summarySakit');
+                    const elDispensasi = document.getElementById('summaryDispensasi');
+
+                    if (elPagi) elPagi.innerText = s.pagi || 0;
+                    if (elSiang) elSiang.innerText = s.siang || 0;
+                    if (elLibur) elLibur.innerText = s.libur || 0;
+                    if (elLembur) elLembur.innerText = s.lembur || 0;
+                    if (elBantu) elBantu.innerText = s.bantu || 0;
+                    if (elSakit) elSakit.innerText = s.sakit || 0;
+                    if (elDispensasi) elDispensasi.innerText = s.dispensasi || 0;
                 }
             } catch (e) {
                 console.error(e);
