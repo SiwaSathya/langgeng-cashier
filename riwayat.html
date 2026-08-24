@@ -364,7 +364,7 @@
                             detailRow.className = "hidden bg-slate-50/80 border-b border-slate-200";
 
                             const itemRowsHTML = items.map((it, itemIdx) => {
-                                const itName = it.product?.nama || it.Product?.Nama || it.product_search || `Item #${it.id || ''}`;
+                                const itName = it.product?.nama || it.product?.Nama || it.Product?.Nama || it.product_search || `Item #${it.id || ''}`;
                                 const itCode = it.product?.kode || it.Product?.Kode || '-';
                                 const itSatuan = it.product?.satuan || it.Product?.Satuan || 'PCS';
                                 const itQty = Number(it.qty || it.Qty || 0);
