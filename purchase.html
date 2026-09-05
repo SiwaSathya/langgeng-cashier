@@ -490,95 +490,143 @@
         }
 
 
-        let supplierTimer;
 
-        function searchSupplier() {
-
-            clearTimeout(supplierTimer);
-
-            supplierTimer = setTimeout(async () => {
-
-                const keyword = document.getElementById('supplierSearch').value.toLowerCase();
-
-                const res = await fetch(`${BASE_URL}/api/suppliers`);
-                const result = await res.json();
-
-                const data = (result.data || []).filter(item =>
-                    item.name.toLowerCase().includes(keyword)
-                );
-
-                const box = document.getElementById('supplierDropdown');
-
-                box.innerHTML = data.map(s => `
-                    <div onclick="selectSupplier('${s.id}','${s.name}')"
-                        class="p-3 hover:bg-blue-50 cursor-pointer">
-                        <b>${s.name}</b>
-                    </div>
-                `).join('');
-
-                box.classList.remove('hidden');
-
-            }, 300);
-        }
-
-
-        function selectSupplier(id, name) {
-
-            document.getElementById('supplier_id').value = id;
-            document.getElementById('supplierSearch').value = name;
-
-            document.getElementById('supplierDropdown')
-                .classList.add('hidden');
-        }
-
-
+        let supplierCache = [];
 
         let productTimer;
 
+
+        // Load semua produk saat klik pertama
+        async function loadProductDropdown() {
+
+            await fetchProduct("");
+
+        }
+
+
+
+        // Search produk langsung ke API
         function searchProduct() {
 
             clearTimeout(productTimer);
 
-            productTimer = setTimeout(async () => {
+
+            productTimer = setTimeout(() => {
 
                 const keyword =
-                    document.getElementById('productSearch').value;
+                    document.getElementById('productSearch')
+                        .value
+                        .trim();
 
 
-                const res = await fetch(
-                    `${BASE_URL}/api/products/?search=${keyword}&page=1&limit=10`
-                );
-
-                const result = await res.json();
-
-                const box =
-                    document.getElementById('productDropdown');
-
-
-                box.innerHTML =
-                    (result.data || []).map(p => `
-
-                    <div onclick="selectProduct(${p.ID}, '${p.Nama}', ${p.HBeli})"
-                    class="p-3 hover:bg-blue-50 cursor-pointer">
-
-                    <div class="font-bold">${p.Nama}</div>
-                    <div class="text-xs text-slate-400">
-                    ${p.Kode} -
-                    Rp ${Number(p.HBeli).toLocaleString('id-ID')}
-                    </div>
-
-                    </div>
-
-                `).join('');
-
-
-                box.classList.remove('hidden');
+                fetchProduct(keyword);
 
 
             }, 300);
 
         }
 
+
+
+        async function fetchProduct(keyword) {
+
+            try {
+
+
+                const res = await fetch(
+                    `${BASE_URL}/api/products/?search=${encodeURIComponent(keyword)}&page=1&limit=50`
+                );
+
+
+                const result = await res.json();
+
+
+                renderProduct(result.data || []);
+
+
+
+            } catch (err) {
+
+                console.error("Product search error:", err);
+
+            }
+
+        }
+
+
+
+
+        function renderProduct(data) {
+
+            const box =
+                document.getElementById('productDropdown');
+
+
+            if (data.length === 0) {
+
+                box.innerHTML = `
+        <div class="p-3 text-slate-400">
+            Produk tidak ditemukan
+        </div>`;
+
+                box.classList.remove('hidden');
+
+                return;
+
+            }
+
+
+
+            box.innerHTML =
+                data.map(p => {
+
+
+                    const id =
+                        p.ID || p.id || "";
+
+
+                    const nama =
+                        p.Nama || p.nama || "-";
+
+
+                    const kode =
+                        p.Kode || p.kode || "-";
+
+
+                    const harga =
+                        p.HBeli || p.hbeli || 0;
+
+
+
+                    return `
+
+        <div onclick="selectProduct('${id}','${String(nama).replace(/'/g, "\\'")}',${harga})"
+             class="p-3 hover:bg-blue-50 cursor-pointer border-b">
+
+
+             <div class="font-bold">
+                ${nama}
+             </div>
+
+
+             <div class="text-xs text-slate-400">
+                ${kode} -
+                Rp ${Number(harga).toLocaleString('id-ID')}
+             </div>
+
+
+        </div>
+
+        `;
+
+
+                }).join('');
+
+
+
+            box.classList.remove('hidden');
+
+        }
 
 
         function selectProduct(id, name, harga) {
@@ -586,12 +634,9 @@
             document.getElementById('product_id').value = id;
             document.getElementById('productSearch').value = name;
             document.getElementById('h_beli').value = harga;
-
-            document.getElementById('productDropdown')
-                .classList.add('hidden');
+            document.getElementById('productDropdown').classList.add('hidden');
 
         }
-
 
 
         document.getElementById('purchaseForm')
@@ -694,8 +739,9 @@
 
                 <div class="relative">
                     <label class="text-sm font-bold text-slate-600">Supplier</label>
-                    <input id="supplierSearch" oninput="searchSupplier()" autocomplete="off"
-                        placeholder="Cari supplier..." class="w-full border rounded-xl px-4 py-3 mt-2">
+                    <input id="supplierSearch" onfocus="loadSupplierDropdown()" oninput="searchSupplier()"
+                        autocomplete="off" placeholder="Cari supplier..."
+                        class="w-full border rounded-xl px-4 py-3 mt-2">
 
                     <input type="hidden" id="supplier_id">
 
@@ -707,8 +753,8 @@
 
                 <div class="relative">
                     <label class="text-sm font-bold text-slate-600">Produk</label>
-                    <input id="productSearch" oninput="searchProduct()" autocomplete="off" placeholder="Cari produk..."
-                        class="w-full border rounded-xl px-4 py-3 mt-2">
+                    <input id="productSearch" onfocus="loadProductDropdown()" oninput="searchProduct()"
+                        autocomplete="off" placeholder="Cari produk..." class="w-full border rounded-xl px-4 py-3 mt-2">
 
                     <input type="hidden" id="product_id">
 
@@ -753,6 +799,528 @@
             </form>
         </div>
     </div>
+
+
+    <script>
+        // FINAL PRODUCT SEARCH PATCH
+        // Override function lama agar tidak terjadi konflik
+
+        window.productTimerFinal = null;
+
+        window.loadProductDropdown = async function () {
+            await window.fetchProductFinal("");
+        };
+
+        window.searchProduct = function () {
+
+            clearTimeout(window.productTimerFinal);
+
+            window.productTimerFinal = setTimeout(() => {
+
+                const keyword =
+                    document.getElementById("productSearch")
+                        ?.value
+                        ?.trim() || "";
+
+                window.fetchProductFinal(keyword);
+
+            }, 300);
+        };
+
+
+        window.fetchProductFinal = async function (keyword) {
+
+            try {
+
+                const response = await fetch(
+                    `${BASE_URL}/api/products/?search=${encodeURIComponent(keyword)}&page=1&limit=50`
+                );
+
+                const result = await response.json();
+
+                console.log("PRODUCT SEARCH:", keyword);
+
+                window.renderProductFinal(result.data || []);
+
+            } catch (error) {
+
+                console.error("Product fetch error:", error);
+
+            }
+
+        };
+
+
+        window.renderProductFinal = function (products) {
+
+            const dropdown =
+                document.getElementById("productDropdown");
+
+            if (!dropdown) return;
+
+
+            if (products.length === 0) {
+
+                dropdown.innerHTML = `
+            <div class="p-3 text-slate-400">
+                Produk tidak ditemukan
+            </div>
+        `;
+
+                dropdown.classList.remove("hidden");
+                return;
+            }
+
+
+            dropdown.innerHTML = products.map(p => {
+
+                const id = p.ID ?? p.id ?? "";
+                const nama = p.Nama ?? p.nama ?? "";
+                const kode = p.Kode ?? p.kode ?? "";
+                const harga = p.HBeli ?? p.hBeli ?? p.hbeli ?? 0;
+
+
+                return `
+        <div onclick="selectProductFinal('${id}','${String(nama).replaceAll("'", "\\'")}',${harga})"
+             class="p-3 cursor-pointer hover:bg-blue-50 border-b">
+
+            <div class="font-bold">${nama}</div>
+
+            <div class="text-xs text-slate-400">
+                ${kode} -
+                Rp ${Number(harga).toLocaleString("id-ID")}
+            </div>
+
+        </div>
+        `;
+
+            }).join("");
+
+
+            dropdown.classList.remove("hidden");
+
+        };
+
+
+        window.selectProductFinal = function (id, name, harga) {
+
+            const productId = document.getElementById("product_id");
+            const productSearch = document.getElementById("productSearch");
+            const hBeli = document.getElementById("h_beli");
+            const dropdown = document.getElementById("productDropdown");
+
+
+            if (productId) productId.value = id;
+            if (productSearch) productSearch.value = name;
+            if (hBeli) hBeli.value = harga;
+            if (dropdown) dropdown.classList.add("hidden");
+
+        };
+
+
+        // Alihkan select onclick lama jika dipanggil
+        window.selectProduct = window.selectProductFinal;
+
+    </script>
+
+
+    <script>
+        // ===== FINAL DROPDOWN FIX : SUPPLIER + PRODUCT =====
+
+        let supplierDataCache = [];
+        let supplierSearchTimer = null;
+        let productSearchTimerFinal = null;
+
+
+        // ================= SUPPLIER =================
+
+        // klik input supplier
+        async function loadSupplierDropdown() {
+
+            try {
+
+                if (supplierDataCache.length === 0) {
+
+                    const response = await fetch(
+                        `${BASE_URL}/api/suppliers`
+                    );
+
+                    const result = await response.json();
+
+                    console.log("SUPPLIER RESPONSE:", result);
+
+                    supplierDataCache = result.data || [];
+
+                }
+
+
+                renderSupplierDropdown(
+                    supplierDataCache
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Supplier error:",
+                    error
+                );
+
+            }
+
+        }
+
+
+
+        function searchSupplier() {
+
+            clearTimeout(
+                supplierSearchTimer
+            );
+
+
+            supplierSearchTimer =
+                setTimeout(() => {
+
+
+                    const keyword =
+                        document
+                            .getElementById("supplierSearch")
+                            .value
+                            .toLowerCase()
+                            .trim();
+
+
+
+                    const filtered =
+                        supplierDataCache.filter(item => {
+
+
+                            const name =
+                                String(
+                                    item.Name ??
+                                    item.name ??
+                                    ""
+                                )
+                                    .toLowerCase();
+
+
+                            return name.includes(keyword);
+
+
+                        });
+
+
+
+                    renderSupplierDropdown(
+                        filtered
+                    );
+
+
+                }, 300);
+
+        }
+
+
+
+
+        function renderSupplierDropdown(data) {
+
+            const dropdown =
+                document.getElementById(
+                    "supplierDropdown"
+                );
+
+
+            if (!dropdown) return;
+
+
+
+            if (data.length === 0) {
+
+                dropdown.innerHTML =
+                    `
+        <div class="p-3 text-slate-400">
+            Supplier tidak ditemukan
+        </div>
+        `;
+
+                dropdown.classList.remove("hidden");
+
+                return;
+
+            }
+
+
+
+            dropdown.innerHTML =
+                data.map(item => {
+
+
+                    const id =
+                        item.ID ??
+                        item.id ??
+                        "";
+
+
+                    const name =
+                        item.Name ??
+                        item.name ??
+                        "";
+
+
+
+                    return `
+
+        <div
+        onclick="selectSupplierFixed('${id}','${name.replaceAll("'", "\\'")}')"
+        class="p-3 cursor-pointer hover:bg-blue-50 border-b">
+
+            ${name}
+
+        </div>
+
+        `;
+
+
+                }).join("");
+
+
+
+            dropdown.classList.remove(
+                "hidden"
+            );
+
+        }
+
+
+
+        function selectSupplierFixed(id, name) {
+
+            document.getElementById(
+                "supplier_id"
+            ).value = id;
+
+
+            document.getElementById(
+                "supplierSearch"
+            ).value = name;
+
+
+            document.getElementById(
+                "supplierDropdown"
+            )
+                .classList.add("hidden");
+
+        }
+
+
+
+        // ================= PRODUCT =================
+
+
+        function searchProduct() {
+
+            clearTimeout(
+                productSearchTimerFinal
+            );
+
+
+            productSearchTimerFinal =
+                setTimeout(() => {
+
+
+                    const keyword =
+                        document
+                            .getElementById(
+                                "productSearch"
+                            )
+                            .value
+                            .trim();
+
+
+
+                    fetchProductFixed(
+                        keyword
+                    );
+
+
+                }, 300);
+
+        }
+
+
+
+        async function loadProductDropdown() {
+
+            fetchProductFixed("");
+
+        }
+
+
+
+        async function fetchProductFixed(keyword) {
+
+
+            try {
+
+
+                const response =
+                    await fetch(
+
+                        `${BASE_URL}/api/products/?search=${encodeURIComponent(keyword)}&page=1&limit=50`
+
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                console.log(
+                    "PRODUCT RESPONSE:",
+                    result
+                );
+
+
+                renderProductFixed(
+                    result.data || []
+                );
+
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Product error:",
+                    error
+                );
+
+            }
+
+        }
+
+
+
+
+        function renderProductFixed(data) {
+
+            const dropdown =
+                document.getElementById(
+                    "productDropdown"
+                );
+
+
+            if (!dropdown) return;
+
+
+
+            if (data.length === 0) {
+
+                dropdown.innerHTML =
+                    `
+        <div class="p-3 text-slate-400">
+        Produk tidak ditemukan
+        </div>
+        `;
+
+                dropdown.classList.remove("hidden");
+
+                return;
+
+            }
+
+
+
+            dropdown.innerHTML =
+                data.map(item => {
+
+
+                    const id =
+                        item.ID ??
+                        item.id;
+
+
+                    const nama =
+                        item.Nama ??
+                        item.nama ??
+                        "";
+
+
+                    const kode =
+                        item.Kode ??
+                        item.kode ??
+                        "";
+
+
+                    const harga =
+                        item.HBeli ??
+                        item.hBeli ??
+                        item.hbeli ??
+                        0;
+
+
+
+                    return `
+
+        <div
+        onclick="selectProductFixed('${id}','${nama.replaceAll("'", "\\'")}',${harga})"
+        class="p-3 cursor-pointer hover:bg-blue-50 border-b">
+
+
+            <div class="font-bold">
+            ${nama}
+            </div>
+
+
+            <div class="text-xs text-slate-400">
+            ${kode} -
+            Rp ${Number(harga).toLocaleString("id-ID")}
+            </div>
+
+
+        </div>
+
+        `;
+
+
+                }).join("");
+
+
+
+            dropdown.classList.remove(
+                "hidden"
+            );
+
+        }
+
+
+
+        function selectProductFixed(id, name, harga) {
+
+            document.getElementById(
+                "product_id"
+            ).value = id;
+
+
+            document.getElementById(
+                "productSearch"
+            ).value = name;
+
+
+            document.getElementById(
+                "h_beli"
+            ).value = harga;
+
+
+            document.getElementById(
+                "productDropdown"
+            )
+                .classList.add("hidden");
+
+        }
+
+    </script>
 
 </body>
 
