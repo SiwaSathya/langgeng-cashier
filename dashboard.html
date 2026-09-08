@@ -8,7 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&family=Courier+Prime:wght@400;700&display=swap');
 
@@ -152,6 +151,72 @@
             width: 32mm;
             text-align: center;
         }
+
+        main {
+            min-width: 0;
+        }
+
+        :focus-visible {
+            outline: 2px solid #2563eb;
+            outline-offset: 3px;
+        }
+
+        :root {
+            scrollbar-color: #cbd5e1 #f1f1f1;
+            scrollbar-width: thin;
+        }
+
+        button:disabled {
+            opacity: .6;
+            cursor: wait;
+        }
+
+        @media (max-width: 900px) {
+            body {
+                display: block !important;
+                height: auto !important;
+                overflow: auto !important;
+            }
+
+            body>aside {
+                width: 100%;
+                padding: 1rem;
+            }
+
+            aside nav {
+                display: flex;
+                overflow-x: auto;
+                gap: .5rem;
+            }
+
+            aside nav a {
+                flex-shrink: 0;
+            }
+
+            main>header {
+                height: auto;
+                padding: 1rem;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            main>header>div:first-child {
+                flex-wrap: wrap;
+                gap: .5rem;
+            }
+
+            main>div {
+                padding: 1rem !important;
+                gap: 1rem !important;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+                animation: none !important;
+            }
+        }
     </style>
 </head>
 
@@ -208,10 +273,10 @@
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">User Aktif</p>
                 <p class="font-bold text-slate-700 user-name-display">Desak Kasir</p>
             </div>
-            <a href="#" onclick="confirmLogout()"
+            <button type="button" onclick="confirmLogout()"
                 class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all">
                 <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
-            </a>
+            </button>
         </div>
     </aside>
 
@@ -246,13 +311,15 @@
 
                     <div class="space-y-6">
                         <div class="relative">
-                            <label
+                            <label for="search-prod"
                                 class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Cari
                                 Produk</label>
                             <div class="relative group">
                                 <i
                                     class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-blue-500"></i>
-                                <input type="text" id="search-prod" onkeyup="searchAPI(this.value)"
+                                <input type="text" id="search-prod"
+                                    oninput="if (!event.isComposing) searchAPI(this.value)"
+                                    oncompositionend="searchAPI(this.value)"
                                     class="w-full bg-slate-50 border border-slate-100 p-4 pl-12 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-semibold transition-all"
                                     placeholder="Ketik nama atau kode barang..." autocomplete="off">
                             </div>
@@ -263,13 +330,13 @@
 
                         <div class="flex gap-4">
                             <div class="w-[30%]">
-                                <label
+                                <label for="inp-qty"
                                     class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Jumlah</label>
                                 <input type="number" id="inp-qty" value="1" min="1"
                                     class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none font-bold text-center text-slate-700 focus:border-blue-300 transition-all">
                             </div>
                             <div class="flex-1">
-                                <label
+                                <label for="inp-price"
                                     class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">Harga
                                     Satuan</label>
                                 <input type="text" id="inp-price" oninput="formatInputRupiah(this)"
@@ -282,7 +349,7 @@
                             class="flex justify-between items-center h-14 bg-slate-50 border border-slate-100 px-6 rounded-2xl">
                             <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Status Transaksi DP
                                 (Uang Muka)</span>
-                            <label class="relative inline-flex items-center cursor-pointer">
+                            <label for="cust-name" class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="inp-is-dp" onchange="toggleCustomerForm()"
                                     class="sr-only peer">
                                 <div
@@ -305,7 +372,8 @@
                                         class="w-full bg-white border border-slate-200 px-3 py-2 text-sm rounded-xl font-medium outline-none focus:border-blue-400">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-semibold text-slate-400 mb-1">No.
+                                    <label for="cust-phone"
+                                        class="block text-[10px] font-semibold text-slate-400 mb-1">No.
                                         Telepon</label>
                                     <input type="text" id="cust-phone"
                                         class="w-full bg-white border border-slate-200 px-3 py-2 text-sm rounded-xl font-medium outline-none focus:border-blue-400">
@@ -313,19 +381,22 @@
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-[10px] font-semibold text-slate-400 mb-1">No. Identitas
+                                    <label for="cust-identity"
+                                        class="block text-[10px] font-semibold text-slate-400 mb-1">No. Identitas
                                         (KTP)</label>
                                     <input type="text" id="cust-identity"
                                         class="w-full bg-white border border-slate-200 px-3 py-2 text-sm rounded-xl font-medium outline-none focus:border-blue-400">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-semibold text-slate-400 mb-1">Umur</label>
+                                    <label for="cust-age"
+                                        class="block text-[10px] font-semibold text-slate-400 mb-1">Umur</label>
                                     <input type="number" id="cust-age" value="0"
                                         class="w-full bg-white border border-slate-200 px-3 py-2 text-sm rounded-xl font-medium outline-none focus:border-blue-400">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-semibold text-slate-400 mb-1">Alamat
+                                <label for="cust-address"
+                                    class="block text-[10px] font-semibold text-slate-400 mb-1">Alamat
                                     Lengkap</label>
                                 <input type="text" id="cust-address"
                                     class="w-full bg-white border border-slate-200 px-3 py-2 text-sm rounded-xl font-medium outline-none focus:border-blue-400">
@@ -345,7 +416,8 @@
                     <div class="bg-white/10 p-4 rounded-2xl space-y-3 border border-white/10">
                         <div class="grid grid-cols-12 gap-2">
                             <div class="col-span-5">
-                                <label class="block text-[10px] font-bold text-blue-200 uppercase mb-1">Metode</label>
+                                <label for="pay-select-type"
+                                    class="block text-[10px] font-bold text-blue-200 uppercase mb-1">Metode</label>
                                 <select id="pay-select-type" onchange="onChangePayType()"
                                     class="w-full bg-slate-900/40 border border-white/20 p-2.5 rounded-xl outline-none font-bold text-xs text-white appearance-none cursor-pointer">
                                     <option value="Tunai">💵 Tunai</option>
@@ -355,7 +427,7 @@
                                 </select>
                             </div>
                             <div class="col-span-7" id="pay-bank-wrapper" style="display: none;">
-                                <label id="pay-sub-label"
+                                <label for="pay-select-bank" id="pay-sub-label"
                                     class="block text-[10px] font-bold text-blue-200 uppercase mb-1">Pilih Bank</label>
                                 <select id="pay-select-bank"
                                     class="w-full bg-slate-900/40 border border-white/20 p-2.5 rounded-xl outline-none font-bold text-xs text-white appearance-none cursor-pointer">
@@ -365,7 +437,8 @@
 
                         <div class="flex gap-2 items-end">
                             <div class="flex-1">
-                                <label class="block text-[10px] font-bold text-blue-200 uppercase mb-1">Nominal
+                                <label for="pay-input-amount"
+                                    class="block text-[10px] font-bold text-blue-200 uppercase mb-1">Nominal
                                     Rupiah</label>
                                 <input type="number" id="pay-input-amount" placeholder="0"
                                     class="w-full bg-slate-900/40 border border-white/20 p-2.5 rounded-xl outline-none font-bold text-sm placeholder:text-white/30 text-white">
@@ -432,222 +505,53 @@
     </main>
 
     <!-- NEW FORMATTED POS INVOICE TEMPLATE (SEGMENT 1 - SEGMENT 6) -->
-    <div id="print-report-template" class="hidden">
-
-        <div class="shift-receipt">
-
-            <div class="text-center border-b border-dashed border-black pb-3 mb-4">
-
-                <h2 class="text-sm font-bold uppercase tracking-wider">
-                    REKAP SETORAN SHIFT KASIR
-                </h2>
-
-                <p class="text-[12px] font-bold uppercase">
-                    LANGGENG ELEKTRONIKA
-                </p>
-                <p class="text-[9px]">
-                    Jl. Gajah Mada No.7 Amlapura - Bali • (0363) 22577 - 08124611382
-                </p>
-                <p class="text-[9px]">
-                    Jl. Untung Surapati, Padang Kerta, Amlapura - Bali
-                </p>
-                <p class="text-[9px]">
-                    Email: langgengtemaja8888@gmail.com
-                </p>
-
-                <div class="text-[10px] mt-1 text-left">
-
-                    <div class="flex justify-between">
-                        <span>Kasir</span>
-                        <span id="pdf-kasir-name">:</span>
-                    </div>
-
-                    <div class="flex justify-between">
-                        <span>Waktu Cetak</span>
-                        <span id="pdf-date-start">:</span>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="mb-3">
-
-                <!-- <p class="font-bold border-b border-black pb-0.5 mb-1">
-                    [SEGMENTASI 1]
-                </p> -->
-
-                <table class="w-full text-[11px]">
-
-                    <tr>
-                        <td>Total Tunai</td>
-                        <td id="receipt-total-tunai" class="text-right font-bold">
-                            0
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>Penjualan Kredit</td>
-                        <td id="receipt-total-kredit" class="text-right font-bold">
-                            0
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>Pembayaran Keluar</td>
-                        <td id="receipt-total-expense" class="text-right font-bold">
-                            0
-                        </td>
-                    </tr>
-
-                </table>
-
-
-                <table id="receipt-expense-list" class="w-full text-[10px]"></table>
-
-                <p class="font-bold text-[10px] mt-2 mb-1">
-                    Metode Pembayaran:
-                </p>
-
-                <table id="receipt-payment-method" class="w-full text-[11px]">
-
-                </table>
-
-            </div>
-
-
-
-            <div class="mb-3 border-t border-dashed border-black pt-2">
-
-                <!-- <p class="font-bold mb-1">
-                    [SEGMENT 2]
-                </p> -->
-
-                <div class="flex justify-between font-bold text-[12px] bg-gray-100 p-1">
-
-                    <span>TOTAL SETOR</span>
-
-                    <span id="receipt-total-setor">
-                        0
-                    </span>
-
-                </div>
-
-            </div>
-
-
-
-            <div class="mb-3 border-t border-dashed border-black pt-2">
-
-                <!-- <p class="font-bold mb-1">
-                    [SEGMENT 3]
-                </p> -->
-
-                <p class="font-bold text-[10px]">
-                    Rekap Setor:
-                </p>
-
-
-                <table id="receipt-summary-payment" class="w-full text-[11px]">
-
-                </table>
-
-            </div>
-
-
-
-            <div class="mb-3 border-t border-dashed border-black pt-2">
-
-                <!-- <p class="font-bold mb-1">
-                    [SEGMENT 4]
-                </p> -->
-
-
-                <table id="receipt-pelunasan" class="w-full text-[11px]">
-
-                </table>
-
-            </div>
-
-
-
-            <div class="mb-4 border-t border-dashed border-black pt-2">
-
-                <!-- <p class="font-bold mb-1">
-                    [SEGMENT 5]
-                </p> -->
-
-
-                <table class="w-full text-[11px]">
-
-                    <tr class="font-bold text-[12px]">
-
-                        <td>Total Penjualan + Plns</td>
-
-                        <td id="receipt-total-penjualan" class="text-right">
-                            0
-                        </td>
-
-                    </tr>
-
-
-                    <tr class="font-bold">
-
-                        <td>Selisih</td>
-
-                        <td id="receipt-selisih" class="text-right">
-                            0
-                        </td>
-
-                    </tr>
-
-
-                </table>
-
-            </div>
-
-
-
-            <div class="border-t border-black pt-4 mb-2">
-
-                <!-- <p class="font-bold text-center mb-4">
-                    [SEGMENT 6]
-                </p> -->
-
-
-                <div class="flex justify-between text-center text-[11px]">
-
-                    <div class="w-24">
-                        <p>(...................)</p>
-                        <p class="font-bold uppercase mt-1">
-                            Kasir
-                        </p>
-                    </div>
-
-
-                    <div class="w-24">
-                        <p>(...................)</p>
-                        <p class="font-bold uppercase mt-1">
-                            Finance
-                        </p>
-                    </div>
-
-
-                </div>
-
-            </div>
-
-
-        </div>
-
-    </div>
+    <!-- NEW FORMATTED POS INVOICE TEMPLATE (SEGMENT 1 - SEGMENT 6) - Moved to printShiftReceipt function -->
 
     <script>
         const API_URL = "https://langgeng-cashier-backend-production.up.railway.app/api";
         let currentSelectedProduct = null;
         let cart = [];
         let paymentList = [];
+
+
+        let paymentPending = false;
+        let searchVersion = 0;
+        let searchController = null;
+        let searchTimer = null;
+
+        function printHTML(html) {
+            return new Promise((resolve, reject) => {
+                const frame = document.createElement('iframe');
+                frame.title = 'Pratinjau cetak nota';
+                frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
+                frame.onload = async () => {
+                    try {
+                        const target = frame.contentWindow;
+                        if (target.document.fonts) await target.document.fonts.ready;
+                        target.addEventListener('afterprint', () => frame.remove(), { once: true });
+                        target.focus();
+                        target.print();
+                        // Some browsers do not emit afterprint. Retain the frame until next print/unload.
+                        resolve();
+                    } catch (error) { frame.remove(); reject(error); }
+                };
+                frame.srcdoc = html;
+                document.body.appendChild(frame);
+            });
+        }
+
+        async function apiFetch(url, options = {}) {
+            const headers = new Headers(options.headers || {});
+            const token = localStorage.getItem('token');
+            if (token) headers.set('Authorization', `Bearer ${token}`);
+            return fetch(url, { ...options, headers });
+        }
+
+        function validLine(qty, price, cost = 0) {
+            return Number.isFinite(qty) && qty > 0 && Number.isFinite(price)
+                && price > 0 && Number.isFinite(cost) && price >= cost
+                && Number.isFinite(qty * price);
+        }
 
         function formatInputRupiah(element) {
             let value = element.value.replace(/[^,\d]/g, '').toString();
@@ -665,10 +569,10 @@
             element.value = value === "" ? "" : "Rp " + rupiah;
         }
 
-        function parseRupiahToNumber(rupiahString) {
-            if (!rupiahString) return 0;
-            let cleanNumber = rupiahString.replace(/[^0-9]/g, '');
-            return parseFloat(cleanNumber) || 0;
+        function parseRupiahToNumber(value) {
+            const cleaned = String(value ?? '').replace(/^Rp\s*/i, '').trim();
+            if (!/^(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d{1,2})?$/.test(cleaned)) return NaN;
+            return Number(cleaned.replace(/\./g, '').replace(',', '.'));
         }
 
         function getUserDataFromToken() {
@@ -680,7 +584,9 @@
                 const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
                     return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                 }).join(''));
-                return JSON.parse(jsonPayload);
+                const data = JSON.parse(jsonPayload);
+                if (data.exp != null && (!Number.isFinite(Number(data.exp)) || Number(data.exp) * 1000 <= Date.now())) return null;
+                return data;
             } catch (err) {
                 return null;
             }
@@ -724,7 +630,7 @@
             const type = document.getElementById('pay-select-type').value;
             const amount = parseFloat(document.getElementById('pay-input-amount').value || 0);
 
-            if (amount <= 0) {
+            if (!Number.isFinite(amount) || amount <= 0) {
                 return Swal.fire('Opps', 'Masukkan nominal rupiah yang valid!', 'warning');
             }
 
@@ -762,10 +668,10 @@
                 grandTotalPaid += pay.value;
                 container.innerHTML += `
                     <div class="flex justify-between items-center bg-white/10 px-3 py-2 rounded-xl text-xs border border-white/5">
-                        <span class="font-semibold"><i class="fas fa-check-circle text-emerald-400 mr-1"></i> ${pay.label}</span>
+                        <span class="font-semibold"><i class="fas fa-check-circle text-emerald-400 mr-1"></i> ${escapeHTML(pay.label)}</span>
                         <div class="flex items-center gap-3">
-                            <span class="font-black text-emerald-300">IDR ${pay.value.toLocaleString()}</span>
-                            <button onclick="removePaymentFromList(${idx})" class="text-red-300 hover:text-red-500">
+                            <span class="font-black text-emerald-300">IDR ${pay.value.toLocaleString('id-ID')}</span>
+                            <button aria-label="Hapus pembayaran" onclick="removePaymentFromList(${idx})" class="text-red-300 hover:text-red-500">
                                 <i class="fas fa-times-circle"></i>
                             </button>
                         </div>
@@ -773,40 +679,55 @@
                 `;
             });
 
-            totalText.innerText = `IDR ${grandTotalPaid.toLocaleString()}`;
+            totalText.innerText = `IDR ${grandTotalPaid.toLocaleString('id-ID')}`;
         }
 
-        async function searchAPI(query) {
+        function searchAPI(query) {
+            currentSelectedProduct = null;
+            document.getElementById('inp-price').value = '';
+            clearTimeout(searchTimer);
+            searchController?.abort();
+            const version = ++searchVersion;
             const dropdown = document.getElementById('res-dropdown');
-            if (query.trim().length < 1) return dropdown.classList.add('hidden');
+            dropdown.replaceChildren();
+            dropdown.classList.add('hidden');
+            if (!query.trim()) return;
+            searchTimer = setTimeout(() => loadProducts(query.trim(), version), 300);
+        }
 
+        async function loadProducts(query, version) {
+            const dropdown = document.getElementById('res-dropdown');
+            searchController = new AbortController();
+            dropdown.textContent = 'Mencari produk...';
+            dropdown.classList.remove('hidden');
             try {
-                const response = await fetch(`${API_URL}/products/cashier?search=${encodeURIComponent(query)}`);
+                const response = await apiFetch(`${API_URL}/products/cashier?search=${encodeURIComponent(query)}`, { signal: searchController.signal });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
-                dropdown.innerHTML = "";
-
-                if (data && data.length > 0) {
-                    dropdown.classList.remove('hidden');
-                    data.forEach(p => {
-                        const div = document.createElement('div');
-                        div.className = "p-4 hover:bg-slate-50 cursor-pointer border-b border-slate-50 flex justify-between items-center transition-all";
-                        div.innerHTML = `
-                            <div>
-                                <p class="font-bold text-slate-700">${p.Nama}</p>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${p.Kode} • STOK: ${p.Saldo}</p>
-                            </div>
-                            <span class="text-blue-600 font-black">IDR ${p.HJual.toLocaleString()}</span>
-                        `;
-                        div.onclick = () => {
-                            currentSelectedProduct = p;
-                            document.getElementById('search-prod').value = p.Nama;
-                            document.getElementById('inp-price').value = "Rp " + p.HJual.toLocaleString('id-ID');
-                            dropdown.classList.add('hidden');
-                        };
-                        dropdown.appendChild(div);
-                    });
-                }
-            } catch (err) { console.error(err); }
+                if (version !== searchVersion) return;
+                if (!Array.isArray(data)) throw new Error('Format data produk tidak valid');
+                dropdown.replaceChildren();
+                if (!data.length) dropdown.textContent = 'Produk tidak ditemukan.';
+                data.forEach(raw => {
+                    const p = { ...raw, HJual: Number(raw.HJual), HBeli: Number(raw.HBeli ?? 0) };
+                    if (!p.Kode || !p.Nama || !Number.isFinite(p.HJual) || !Number.isFinite(p.HBeli)) return;
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'w-full text-left p-4 hover:bg-slate-50 border-b border-slate-50 flex justify-between items-center';
+                    button.innerHTML = `<span><strong>${escapeHTML(p.Nama)}</strong><br><small>${escapeHTML(p.Kode)} • STOK: ${escapeHTML(p.Saldo ?? '-')}</small></span><span>${formatIDR(p.HJual)}</span>`;
+                    button.onclick = () => {
+                        currentSelectedProduct = p;
+                        document.getElementById('search-prod').value = p.Nama;
+                        document.getElementById('inp-price').value = 'Rp ' + p.HJual.toLocaleString('id-ID');
+                        dropdown.classList.add('hidden');
+                    };
+                    dropdown.appendChild(button);
+                });
+                if (!dropdown.childNodes.length) dropdown.textContent = 'Data produk tidak valid.';
+            } catch (error) {
+                if (error.name === 'AbortError' || version !== searchVersion) return;
+                dropdown.textContent = 'Gagal memuat produk. Periksa koneksi atau sesi login, lalu ketik ulang.';
+            }
         }
 
         function addToCart() {
@@ -814,11 +735,11 @@
             const qty = parseFloat(document.getElementById('inp-qty').value);
             const customPrice = parseRupiahToNumber(document.getElementById('inp-price').value);
 
-            if (customPrice < currentSelectedProduct.HBeli) {
+            if (!validLine(qty, customPrice, currentSelectedProduct.HBeli)) {
                 return Swal.fire({
                     icon: 'error',
-                    title: 'Harga Terlalu Rendah!',
-                    text: `Harga pokok barang ini adalah IDR ${currentSelectedProduct.HBeli.toLocaleString()}.`,
+                    title: 'Jumlah atau harga tidak valid!',
+                    text: `Jumlah dan harga harus lebih dari nol. Harga pokok barang ini adalah IDR ${currentSelectedProduct.HBeli.toLocaleString('id-ID')}.`,
                 });
             }
 
@@ -838,16 +759,19 @@
         }
 
         function updateCartItem(index, field, value) {
-            let parsedVal = field === 'price' ? parseRupiahToNumber(value) : (parseFloat(value) || 0);
-
-            if (field === 'qty') {
-                cart[index].qty = parsedVal < 1 ? 1 : parsedVal;
-            } else if (field === 'price') {
-                cart[index].price = parsedVal;
+            const item = cart[index];
+            if (!item || !['qty', 'price'].includes(field)) return;
+            const parsed = field === 'price' ? parseRupiahToNumber(value) : Number(value);
+            const qty = field === 'qty' ? parsed : item.qty;
+            const price = field === 'price' ? parsed : item.price;
+            if (!validLine(qty, price, Number(item.HBeli ?? 0))) {
+                renderCart(true);
+                return Swal.fire('Input tidak valid', 'Jumlah dan harga harus positif. Harga tidak boleh di bawah harga pokok.', 'warning');
             }
-
-            cart[index].subtotal = cart[index].qty * cart[index].price;
-            renderCart(false);
+            item.qty = qty;
+            item.price = price;
+            item.subtotal = qty * price;
+            renderCart(true);
         }
 
         function renderCart(fullRender = true) {
@@ -867,27 +791,27 @@
                     tbody.innerHTML += `
                         <tr class="group hover:bg-slate-50/50 transition-all">
                             <td class="p-4">
-                                <p class="font-bold text-slate-700">${item.Nama}</p>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase">${item.Kode}</p>
+                                <p class="font-bold text-slate-700">${escapeHTML(item.Nama)}</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">${escapeHTML(item.Kode)}</p>
                             </td>
                             <td class="p-4 text-center">
-                                <input type="number" min="1" value="${item.qty}" oninput="updateCartItem(${i}, 'qty', this.value)" class="w-20 text-center bg-slate-50 border border-slate-200 rounded-lg p-1.5 font-bold">
+                                <input type="number" min="1" value="${item.qty}" onchange="updateCartItem(${i}, 'qty', this.value)" class="w-20 text-center bg-slate-50 border border-slate-200 rounded-lg p-1.5 font-bold">
                             </td>
                             <td class="p-4 text-right">
-                                <input type="text" value="Rp ${item.price.toLocaleString('id-ID')}" oninput="formatInputRupiah(this); updateCartItem(${i}, 'price', this.value)" class="w-36 text-right bg-slate-50 border border-slate-200 rounded-lg p-1.5 font-bold text-blue-600">
+                                <input type="text" value="Rp ${item.price.toLocaleString('id-ID')}" onchange="formatInputRupiah(this); updateCartItem(${i}, 'price', this.value)" class="w-36 text-right bg-slate-50 border border-slate-200 rounded-lg p-1.5 font-bold text-blue-600">
                             </td>
-                            <td class="p-4 text-right font-bold text-slate-800" id="subtotal-text-${i}">IDR ${item.subtotal.toLocaleString()}</td>
+                            <td class="p-4 text-right font-bold text-slate-800" id="subtotal-text-${i}">IDR ${item.subtotal.toLocaleString('id-ID')}</td>
                             <td class="p-4 text-center">
-                                <button onclick="removeItem(${i})" class="text-slate-300 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+                                <button aria-label="Hapus item" onclick="removeItem(${i})" class="text-slate-300 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
                             </td>
                         </tr>
                     `;
                 } else {
                     const subtotalCell = document.getElementById(`subtotal-text-${i}`);
-                    if (subtotalCell) subtotalCell.innerText = `IDR ${item.subtotal.toLocaleString()}`;
+                    if (subtotalCell) subtotalCell.innerText = `IDR ${item.subtotal.toLocaleString('id-ID')}`;
                 }
             });
-            document.getElementById('big-total').innerText = `IDR ${total.toLocaleString()}`;
+            document.getElementById('big-total').innerText = `IDR ${total.toLocaleString('id-ID')}`;
         }
 
         function removeItem(i) {
@@ -897,6 +821,8 @@
 
 
         async function generateShiftReceipt() {
+            if (paymentPending) return;
+
             const userData = getUserDataFromToken() || {};
             const userLoc = (userData.location || 'Toko Utama').trim();
             let selectedLocation = userLoc;
@@ -934,7 +860,7 @@
                 });
 
                 const queryParam = selectedLocation ? `?location=${encodeURIComponent(selectedLocation)}` : '';
-                const response = await fetch(`${API_URL}/receipt${queryParam}`);
+                const response = await apiFetch(`${API_URL}/receipt${queryParam}`);
 
                 if (!response.ok) {
                     throw new Error("HTTP ERROR " + response.status);
@@ -958,7 +884,7 @@
                     return;
                 }
 
-                await generateReportPDF(receiptData);
+                await printShiftReceipt(receiptData);
             } catch (error) {
                 console.error("RECEIPT ERROR:", error);
                 Swal.close();
@@ -966,423 +892,223 @@
             }
         }
 
-        function calculateShiftSummary(
-            receiptData
-        ) {
-
-
-            const sales =
-                receiptData.sales ?? [];
-
-
-            const expenses =
-                receiptData.expenses ?? [];
-
-
-
-            let totalTunai = 0;
-
-            let totalKredit = 0;
-
-            let totalPenjualan = 0;
-
-            let totalExpense = 0;
-
-
-            let paymentSummary = {};
-
-
-
-
-            sales.forEach(item => {
-
-
-                const total =
-                    Number(
-
-                        item.total_netto ??
-
-                        item.TotalNetto ??
-
-                        item.totalNetto ??
-
-                        0
-
-                    );
-
-
-
-                totalPenjualan += total;
-
-
-
-                const method =
-
-                    item.payment_method ??
-
-                    item.PaymentMethod ??
-
-                    "LAINNYA";
-
-
-
-
-                if (
-
-                    String(method)
-                        .toLowerCase()
-                        .includes("cash")
-
-                    ||
-
-                    String(method)
-                        .toLowerCase()
-                        .includes("tunai")
-
-                ) {
-
-                    totalTunai += total;
-
-
-                } else {
-
-
-                    totalKredit += total;
-
-                }
-
-
-
-
-                paymentSummary[method] =
-
-                    (
-                        paymentSummary[method] || 0
-                    )
-
-                    +
-
-                    total;
-
-
-
-            });
-
-
-
-
-
-            expenses.forEach(item => {
-
-
-                totalExpense += Number(
-
-                    item.total ??
-
-                    item.Total ??
-
-                    0
-
-                );
-
-
-            });
-
-
-
-
-
-            return {
-                totalTunai,
-                totalKredit,
-                totalPenjualan,
-                totalExpense,
-                paymentSummary,
-                expenses
-
+        function calculateShiftSummary(receiptData = {}) {
+            const sales = receiptData.sales ?? [];
+            const expenses = receiptData.expenses ?? [];
+            if (!Array.isArray(sales) || !Array.isArray(expenses)) throw new Error('Format rekap shift tidak valid');
+            const money = value => {
+                const n = Number(value);
+                if (value == null || value === '' || !Number.isFinite(n) || n < 0) throw new Error('Nominal rekap shift tidak valid');
+                return n;
             };
-
-
+            const cashMethod = method => /^(tunai|cash)$/i.test(String(method).trim());
+            let totalTunai = 0, totalKredit = 0, totalPenjualan = 0, totalExpense = 0;
+            const paymentSummary = Object.create(null);
+            sales.forEach(item => {
+                const total = money(item.total_netto ?? item.TotalNetto ?? item.totalNetto);
+                totalPenjualan += total;
+                const method = String(item.payment_method ?? item.PaymentMethod ?? '').trim();
+                // The current sales payload sends labels only, without amounts per method.
+                // Do not invent a cash split or print a misleading cash deposit.
+                if (!method || method.includes(',')) throw new Error('Rekap memerlukan rincian nominal per metode pembayaran dari backend untuk transaksi campuran.');
+                const paid = item.amount_paid ?? item.AmountPaid;
+                if ((item.is_dp === true || item.is_dp === 1 || item.is_dp === 'true') && paid == null) throw new Error('Nominal DP belum tersedia pada data rekap.');
+                const received = paid == null ? total : Math.min(money(paid), total);
+                paymentSummary[method] = (paymentSummary[method] ?? 0) + received;
+                if (cashMethod(method)) totalTunai += received;
+                else totalKredit += received;
+            });
+            expenses.forEach(item => {
+                const amount = money(item.total ?? item.Total);
+                const method = item.payment_method ?? item.PaymentMethod;
+                // Legacy expense data has no payment method and historically represents cash.
+                if (!method || cashMethod(method)) totalExpense += amount;
+            });
+            return { totalTunai, totalKredit, totalPenjualan, totalExpense, paymentSummary, expenses };
         }
 
+        async function printShiftReceipt(receiptData = {}) {
+            const summary = calculateShiftSummary(receiptData);
+            const userData = getUserDataFromToken();
+            const now = new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
 
-        async function generateReportPDF(receiptData = {}) {
-
-
-            const summary =
-                calculateShiftSummary(
-                    receiptData
-                );
-
-
-
-            const sales =
-                receiptData.sales || [];
-
-
-
-            const expenses =
-                receiptData.expenses || [];
-
-
-
-            console.log(
-                "SUMMARY RECEIPT:",
-                summary
-            );
-
-
-
-            function setValue(id, value) {
-
-                const el =
-                    document.getElementById(id);
-
-
-                if (el) {
-
-                    el.innerText = value;
-
-                }
-
-            }
-
-
-
-
-            // ======================
-            // HEADER
-            // ======================
-
-
-            const userData =
-                getUserDataFromToken();
-
-
-
-            setValue(
-                "pdf-kasir-name",
-                ": " +
-                (userData?.name || "-")
-            );
-
-
-            setValue(
-                "pdf-date-start",
-                ": " +
-                new Date()
-                    .toLocaleString("id-ID")
-            );
-
-
-
-
-
-            // ======================
-            // SEGMENT 1
-            // ======================
-
-
-            setValue(
-                "receipt-total-tunai",
-                formatIDR(
-                    summary.totalTunai
-                )
-            );
-
-
-
-            setValue(
-                "receipt-total-kredit",
-                formatIDR(
-                    summary.totalKredit
-                )
-            );
-
-
-
-            setValue(
-                "receipt-total-expense",
-                formatIDR(
-                    summary.totalExpense
-                )
-            );
-
-
-
-
-
-            // ======================
-            // METODE PEMBAYARAN
-            // ======================
-
-
-            const paymentTable =
-                document.getElementById(
-                    "receipt-payment-method"
-                );
-
-
-
-            if (paymentTable) {
-
-
-                paymentTable.innerHTML = "";
-
-
-                Object.entries(
-                    summary.paymentSummary
-                )
-                    .forEach(
-                        ([method, total]) => {
-
-
-                            paymentTable.innerHTML += `
-
+            const paymentRows = Object.entries(summary.paymentSummary).map(([method, total]) => `
                 <tr>
-
-                    <td>
-                        ${method}
-                    </td>
-
-
-                    <td class="text-right">
-
-                        ${formatIDR(total)}
-
-                    </td>
-
+                    <td>${escapeHTML(method)}</td>
+                    <td class="text-right">${formatIDR(total)}</td>
                 </tr>
+            `).join('');
 
-                `;
+            const expenseRows = summary.expenses.map(item => `
+                <tr>
+                    <td>- ${escapeHTML(item.deskripsi ?? item.Deskripsi ?? "-")}</td>
+                <td class="text-right">${formatIDR(item.total ?? item.Total ?? 0)}</td>
+                </tr >
+                `).join('');
 
-
+            const shiftReceiptHTML = `
+                <!DOCTYPE html >
+                    <html lang="id">
+                        <head >
+                        <meta charset="UTF-8">
+                            <title > Rekap Setoran Shift</title >
+                                <style>
+                                    @page {
+                                        size: 80mm auto;
+                                    margin: 0;
                         }
-                    );
-
-            }
-
-
-
-
-
-            // ======================
-            // EXPENSE
-            // ======================
-
-
-            const expenseTable =
-                document.getElementById(
-                    "receipt-expense-list"
-                );
-
-
-
-            if (expenseTable) {
-
-
-                expenseTable.innerHTML = "";
-
-
-                expenses.forEach(item => {
-
-
-                    expenseTable.innerHTML += `
-
-            <tr>
-
-                <td>
-                - ${item.deskripsi ??
-                        item.Deskripsi ??
-                        "-"
+                                    body {
+                                        margin: 0;
+                                    padding: 0;
+                                    background: #fff;
+                                    color: #000;
+                                    font-family: "Courier New", monospace;
+                                    font-size: 9pt;
+                                    line-height: 1.35;
                         }
-                </td>
-
-
-                <td class="text-right">
-
-                ${formatIDR(
-                            item.total ??
-                            item.Total ??
-                            0
-                        )
+                                    .shift-receipt {
+                                        box-sizing: border-box;
+                                    width: 74mm; /* 80mm total width-3mm margin on each side */
+                                    margin: 0;
+                                    padding: 3mm; /* Use padding instead of width and margin for consistency */
+                                    background: #fff;
+                                    color: #000;
+                                    font-family: "Courier New", monospace;
+                                    font-size: 9pt;
+                                    line-height: 1.35;
                         }
+                                    .shift-receipt * {box-sizing: border-box; }
+                                    .shift-receipt p, .shift-receipt h2 {margin: 0; }
+                                    .shift-receipt h2 {font-size: 10pt; letter-spacing: 0; }
+                                    .shift-receipt table {width: 100%; border-collapse: collapse; font-size: 9pt; }
+                                    .shift-receipt td {padding: 1mm 0; vertical-align: top; overflow-wrap: anywhere; }
+                                    .shift-receipt td:first-child {padding-right: 2mm; }
+                                    .shift-receipt td:last-child {text-align: right; white-space: nowrap; }
+                                    .shift-receipt tr { break-inside: avoid; page-break-inside: avoid; }
+                        .shift-receipt > div {margin-bottom: 3mm; }
+                        .shift-receipt > div:first-child {text-align: center; border-bottom: 1px dashed #000; padding-bottom: 3mm; }
+                        .shift-receipt > div:first-child > p {font-size: 8pt; }
+                        .shift-receipt > div:first-child > p:first-of-type {font-size: 10pt; font-weight: bold; }
+                        .shift-receipt > div:first-child > div {font-size: 8pt; text-align: left; margin-top: 2mm; }
+                                    .shift-receipt .flex {display: flex; justify-content: space-between; gap: 2mm; }
+                        .shift-receipt .flex > span:last-child {text-align: right; overflow-wrap: anywhere; }
+                                    .shift-receipt .text-right {text-align: right; }
+                                    .shift-receipt .font-bold {font-weight: bold; }
+                                    .shift-receipt .border-t {border-top: 1px dashed #000; padding-top: 2mm; }
+                        .shift-receipt > div:last-child { break-inside: avoid; page-break-inside: avoid; padding-top: 5mm; }
+                        .shift-receipt > div:last-child .flex > div {width: 32mm; text-align: center; }
+                                    @media print {body {-webkit-print - color-adjust: exact; print-color-adjust: exact; } }
+                                </style>
+                </head >
+                <body>
+                    <div class="shift-receipt">
+                        <div class="text-center border-b border-dashed border-black pb-3 mb-4">
+                            <h2 class="text-sm font-bold uppercase tracking-wider">
+                                REKAP SETORAN SHIFT KASIR
+                            </h2>
+                            <p class="text-[12px] font-bold uppercase">
+                                LANGGENG ELEKTRONIKA
+                            </p >
+                <p class="text-[9px]">
+            Jl.Gajah Mada No.7 Amlapura-Bali • (0363) 22577-08124611382
+                            </p >
+                <p class="text-[9px]">
+            Jl.Untung Surapati, Padang Kerta, Amlapura-Bali
+                            </p >
+                <p class="text-[9px]">
+            Email: langgengtemaja8888@gmail.com
+                            </p >
+                <div class="text-[10px] mt-1 text-left">
+                    <div class="flex justify-between">
+                        <span > Kasir</span >
+                            <span>: ${escapeHTML(userData?.name || "-")}</span>
+                                </div >
+                <div class="flex justify-between">
+                    <span > Waktu Cetak</span >
+                        <span>: ${escapeHTML(now)}</span>
+                                </div >
+                            </div >
+                        </div >
 
-                </td>
+                <div class="mb-3">
+                    <table class="w-full text-[11px]">
+                        <tr >
+                                    <td>Total Tunai</td>
+                                    <td class="text-right font-bold">${formatIDR(summary.totalTunai)}</td>
+                                </tr >
+                <tr>
+                    <td>Pembayaran Non-Tunai</td>
+                    <td class="text-right font-bold">${formatIDR(summary.totalKredit)}</td>
+                                </tr >
+                <tr>
+                    <td>Pengeluaran Tunai</td>
+                    <td class="text-right font-bold">${formatIDR(summary.totalExpense)}</td>
+                                </tr >
+                            </table >
+
+                ${expenseRows ? `
+                            <p class="font-bold text-[10px] mt-2 mb-1">
+                                Pengeluaran:
+                            </p>
+                            <table class="w-full text-[10px]">
+                                ${expenseRows}
+                            </table>
+                            ` : ''}
+
+                            ${paymentRows ? `
+                            <p class="font-bold text-[10px] mt-2 mb-1">
+                                Metode Pembayaran:
+                            </p>
+                            <table class="w-full text-[11px]">
+                                ${paymentRows}
+                            </table>
+                            ` : ''}
+                        </div>
+
+                        <div class="mb-3 border-t border-dashed border-black pt-2">
+                            <div class="flex justify-between font-bold text-[12px] bg-gray-100 p-1">
+                                <span>TOTAL SETOR</span>
+                                <span>${formatIDR(summary.totalTunai - summary.totalExpense)}</span>
+                            </div>
+                        </div>
 
 
-            </tr>
 
+
+
+                        <div class="mb-4 border-t border-dashed border-black pt-2">
+                            <table class="w-full text-[11px]">
+                                <tr class="font-bold text-[12px]">
+                                    <td>Total Penjualan</td>
+                                    <td class="text-right">${formatIDR(summary.totalPenjualan)}</td>
+                                </tr>
+                                
+                            </table>
+                        </div>
+
+                        <div class="border-t border-black pt-4 mb-2">
+                            <div class="flex justify-between text-center text-[11px]">
+                                <div class="w-24">
+                                    <p>(...................)</p>
+                                    <p class="font-bold uppercase mt-1">Kasir</p>
+                                </div>
+                                <div class="w-24">
+                                    <p>(...................)</p>
+                                    <p class="font-bold uppercase mt-1">Finance</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </body>
+                </html>
             `;
 
-
-                });
-
-
-            }
-
-
-
-
-
-            // ======================
-            // TOTAL
-            // ======================
-
-
-            setValue(
-                "receipt-total-setor",
-                formatIDR(
-                    summary.totalTunai -
-                    summary.totalExpense
-                )
-            );
-
-
-
-            setValue(
-                "receipt-total-penjualan",
-                formatIDR(
-                    summary.totalPenjualan
-                )
-            );
-
-
-
-            setValue(
-                "receipt-selisih",
-                formatIDR(0)
-            );
-
-
-
-
-
-            // ======================
-            // PDF
-            // ======================
-
-
-            // Keep the source at its physical print width; never scale a Letter page down.
-            const receipt = document.querySelector('#print-report-template .shift-receipt').cloneNode(true);
-            await html2pdf()
-                .set({
-                    margin: [3, 3, 3, 3],
-                    filename: `Setoran_Shift_${Date.now()}.pdf`,
-                    image: { type: "png" },
-                    html2canvas: { scale: 3, backgroundColor: "#ffffff" },
-                    jsPDF: { unit: "mm", format: [80, 210], orientation: "portrait" },
-                    pagebreak: { mode: ['css', 'legacy'], avoid: ['tr'] }
-                })
-                .from(receipt)
-                .save();
-
-
+            return printHTML(shiftReceiptHTML);
         }
 
-
-
         async function confirmLogout() {
+            if (paymentPending) return;
+
             const result = await Swal.fire({
                 title: 'Konfirmasi Keluar',
                 text: 'Pilih tindakan logout yang ingin Anda lakukan:',
@@ -1408,11 +1134,13 @@
                 try {
                     const userData = getUserDataFromToken() || {};
                     const loc = (userData.location || 'Toko Utama').trim();
-                    const shiftResponse = await fetch(`${API_URL}/shift/current?location=${encodeURIComponent(loc)}`);
+                    const shiftResponse = await apiFetch(`${API_URL}/shift/current?location=${encodeURIComponent(loc)}`);
+                    if (!shiftResponse.ok) throw new Error('Gagal mengambil shift aktif');
                     const shiftData = await shiftResponse.json();
-                    const shift = shiftData.shift || 1;
+                    const shift = shiftData.shift;
+                    if (shift == null || shift === '') throw new Error('Shift aktif tidak ditemukan');
 
-                    const updateResponse = await fetch(`${API_URL}/sales/update/shift`, {
+                    const updateResponse = await apiFetch(`${API_URL}/sales/update/shift`, {
                         method: "PUT",
                         headers: {
                             "Content-Type": "application/json"
@@ -1447,7 +1175,8 @@
 
 
         function formatIDR(value) {
-            return `IDR ${Number(value || 0).toLocaleString('id-ID')}`;
+            const amount = Number(value ?? 0);
+            return Number.isFinite(amount) ? `IDR ${amount.toLocaleString('id-ID')}` : 'IDR tidak valid';
         }
 
         function escapeHTML(value) {
@@ -1472,7 +1201,7 @@
                 || result?.data?.transaction_no
                 || result?.data?.transaction_id
                 || result?.data?.sale_id
-                || `INV-${Date.now()}`;
+                || 'Nomor belum dikirim server';
         }
 
         function printTransactionReceipt(transactionResult = {}) {
@@ -1633,35 +1362,14 @@
                 </html>
             `;
 
-            const printFrame = document.createElement('iframe');
-            printFrame.style.position = 'fixed';
-            printFrame.style.right = '0';
-            printFrame.style.bottom = '0';
-            printFrame.style.width = '0';
-            printFrame.style.height = '0';
-            printFrame.style.border = '0';
-
-            document.body.appendChild(printFrame);
-
-            const frameDoc = printFrame.contentWindow.document;
-            frameDoc.open();
-            frameDoc.write(receiptHTML);
-            frameDoc.close();
-
-            setTimeout(() => {
-                printFrame.contentWindow.focus();
-                printFrame.contentWindow.print();
-
-                setTimeout(() => {
-                    if (printFrame.parentNode) {
-                        printFrame.parentNode.removeChild(printFrame);
-                    }
-                }, 1000);
-            }, 300);
+            return printHTML(receiptHTML);
         }
 
-
         async function executePayment() {
+            if (paymentPending) return;
+            if (cart.some(i => !validLine(i.qty, i.price, Number(i.HBeli ?? 0))) || paymentList.some(p => !Number.isFinite(p.value) || p.value <= 0)) {
+                return Swal.fire('Input tidak valid', 'Periksa jumlah, harga, dan nominal pembayaran.', 'error');
+            }
             if (cart.length === 0) return Swal.fire('Opps', 'Keranjang masih kosong!', 'warning');
             if (paymentList.length === 0) return Swal.fire('Opps', 'Tambahkan minimal satu metode pembayaran!', 'warning');
 
@@ -1672,6 +1380,9 @@
             const totalPaid = paymentList.reduce((s, p) => s + p.value, 0);
             const isDp = document.getElementById('inp-is-dp').checked;
 
+            if (!Number.isFinite(totalBill) || !Number.isFinite(totalPaid)) {
+                return Swal.fire('Nominal tidak valid', 'Total transaksi melewati batas angka yang dapat diproses.', 'error');
+            }
             if (!isDp && totalPaid < totalBill) {
                 return Swal.fire('Gagal', `Uang pembayaran kurang!`, 'error');
             }
@@ -1708,10 +1419,14 @@
                 }))
             };
 
-            Swal.fire({ title: 'Memproses...', didOpen: () => Swal.showLoading() });
+            paymentPending = true;
+            const controls = [...document.querySelectorAll('main button, main input, main select')];
+            const disabledBefore = controls.map(el => el.disabled);
+            controls.forEach(el => el.disabled = true);
+            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, allowEscapeKey: false, didOpen: () => Swal.showLoading() });
 
             try {
-                const res = await fetch(`${API_URL}/sales`, {
+                const res = await apiFetch(`${API_URL}/sales`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -1721,20 +1436,34 @@
                     const result = await res.json().catch(() => ({}));
 
                     Swal.close();
-                    printTransactionReceipt(result);
-
-                    setTimeout(() => {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Transaksi Berhasil!',
-                            text: 'Nota sudah dikirim ke printer.',
-                        }).then(() => location.reload());
-                    }, 500);
+                    // Payment is committed. A printer failure must never offer another sale submission.
+                    let printFailed = false;
+                    try { await printTransactionReceipt(result); } catch (error) { printFailed = true; }
+                    cart = [];
+                    paymentList = [];
+                    renderCart();
+                    renderPaymentList();
+                    currentSelectedProduct = null;
+                    ['cust-name', 'cust-phone', 'cust-identity', 'cust-address', 'search-prod', 'inp-price', 'pay-input-amount'].forEach(id => document.getElementById(id).value = '');
+                    document.getElementById('cust-age').value = '0';
+                    document.getElementById('inp-qty').value = '1';
+                    document.getElementById('inp-is-dp').checked = false;
+                    toggleCustomerForm();
+                    await Swal.fire({
+                        icon: printFailed ? 'warning' : 'success',
+                        title: 'Transaksi tersimpan',
+                        text: printFailed ? 'Cetak nota gagal. Buka riwayat untuk mencetak ulang. Jangan ulangi pembayaran.' : 'Dialog cetak telah dibuka. Periksa hasil cetak pada printer.',
+                    });
                 } else {
                     const result = await res.json().catch(() => ({}));
                     Swal.fire('Gagal', result.error || 'Terjadi kesalahan sistem', 'error');
                 }
-            } catch (err) { Swal.fire('Error', 'Server Error', 'error'); }
+            } catch (err) {
+                await Swal.fire('Status transaksi belum diketahui', 'Koneksi terputus. Periksa riwayat transaksi sebelum mencoba kembali agar transaksi tidak tercatat dua kali.', 'warning');
+            } finally {
+                paymentPending = false;
+                controls.forEach((el, i) => el.disabled = disabledBefore[i]);
+            }
         }
 
         setInterval(() => {
@@ -1743,7 +1472,7 @@
         }, 1000);
 
         document.addEventListener('click', e => {
-            if (!e.target.closest('#search-prod')) document.getElementById('res-dropdown').classList.add('hidden');
+            if (!e.target.closest('#search-prod, #res-dropdown')) document.getElementById('res-dropdown').classList.add('hidden');
         });
 
         const ROLE_PERMISSIONS = {
@@ -1806,10 +1535,10 @@
 
             if (searchInput) {
                 searchInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === 'Enter' && !e.ctrlKey && !e.isComposing && !e.repeat && !Swal.isVisible()) {
                         e.preventDefault();
                         const dropdown = document.getElementById('res-dropdown');
-                        const firstItem = dropdown ? dropdown.querySelector('div') : null;
+                        const firstItem = dropdown ? dropdown.querySelector('button') : null;
                         if (firstItem && !dropdown.classList.contains('hidden')) {
                             firstItem.click();
                             if (priceInput) priceInput.focus();
@@ -1822,7 +1551,7 @@
 
             if (qtyInput) {
                 qtyInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === 'Enter' && !e.ctrlKey && !e.isComposing && !e.repeat && !Swal.isVisible()) {
                         e.preventDefault();
                         addToCart();
                     }
@@ -1831,7 +1560,7 @@
 
             if (priceInput) {
                 priceInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === 'Enter' && !e.ctrlKey && !e.isComposing && !e.repeat && !Swal.isVisible()) {
                         e.preventDefault();
                         addToCart();
                     }
@@ -1840,7 +1569,7 @@
 
             if (payAmountInput) {
                 payAmountInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === 'Enter' && !e.ctrlKey && !e.isComposing && !e.repeat && !Swal.isVisible()) {
                         e.preventDefault();
                         addPaymentToList();
                     }
@@ -1848,32 +1577,17 @@
             }
         });
 
-        // Global Enter Handler: Prioritize SweetAlert confirm & Active modal submit buttons
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                // 1. Prioritaskan tombol Confirm SweetAlert2 jika modal sedang aktif
-                if (typeof Swal !== 'undefined' && Swal.isVisible()) {
-                    const activeEl = document.activeElement;
-                    if (activeEl && activeEl.tagName === 'TEXTAREA' && !e.ctrlKey) {
-                        return; // Biarkan newline di textarea
-                    }
-                    e.preventDefault();
-                    const confirmBtn = Swal.getConfirmButton();
-                    if (confirmBtn && !confirmBtn.disabled) {
-                        confirmBtn.click();
-                    }
-                    return;
-                }
-
-                // 2. Shortcut Ctrl+Enter untuk Proses Transaksi jika keranjang terisi
-                if (e.ctrlKey && cart.length > 0 && paymentList.length > 0) {
-                    e.preventDefault();
-                    executePayment();
-                    return;
-                }
+            if (e.isComposing || e.repeat || e.defaultPrevented || Swal.isVisible()) return;
+            if (e.key === 'Enter' && e.ctrlKey && cart.length && paymentList.length) {
+                e.preventDefault();
+                executePayment();
             }
         });
 
+        onChangePayType();
+        renderCart();
+        renderPaymentList();
         checkRoleAccess('dashboard.html');
     </script>
 </body>
