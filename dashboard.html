@@ -856,7 +856,12 @@
                                 <style>
                     ${RECEIPT_BASE_CSS}
                     .shift-receipt p, .shift-receipt h2 { margin: 0; }
-                    .shift-receipt h2 { font-size: 12px; font-weight: bold; }
+                    /* Samakan ukuran cetak shift dengan nota transaksi */
+                    .shift-receipt {
+                        font-size: 11px;
+                        line-height: normal;
+                    }
+                    .shift-receipt h2 { font-size: 14px; font-weight: bold; }
                     .shift-receipt td:first-child { overflow-wrap: anywhere; }
                     .shift-receipt td:last-child { text-align: right; white-space: nowrap; }
                     .shift-receipt tr { break-inside: avoid; page-break-inside: avoid; }
