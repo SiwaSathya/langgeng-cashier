@@ -39,119 +39,6 @@
             font-family: 'Courier Prime', monospace;
         }
 
-        /* Setoran shift: 80 mm paper minus 3 mm margin on each side. */
-        .shift-receipt {
-            box-sizing: border-box;
-            width: 74mm;
-            margin: 0;
-            padding: 0;
-            background: #fff;
-            color: #000;
-            font-family: "Courier New", monospace;
-            font-size: 9pt;
-            line-height: 1.35;
-        }
-
-        .shift-receipt * {
-            box-sizing: border-box;
-        }
-
-        .shift-receipt p,
-        .shift-receipt h2 {
-            margin: 0;
-        }
-
-        .shift-receipt h2 {
-            font-size: 10pt;
-            letter-spacing: 0;
-        }
-
-        .shift-receipt table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 9pt;
-        }
-
-        .shift-receipt td {
-            padding: 1mm 0;
-            vertical-align: top;
-            overflow-wrap: anywhere;
-        }
-
-        .shift-receipt td:first-child {
-            padding-right: 2mm;
-        }
-
-        .shift-receipt td:last-child {
-            text-align: right;
-            white-space: nowrap;
-        }
-
-        .shift-receipt tr {
-            break-inside: avoid;
-            page-break-inside: avoid;
-        }
-
-        .shift-receipt>div {
-            margin-bottom: 3mm;
-        }
-
-        .shift-receipt>div:first-child {
-            text-align: center;
-            border-bottom: 1px dashed #000;
-            padding-bottom: 3mm;
-        }
-
-        .shift-receipt>div:first-child>p {
-            font-size: 8pt;
-        }
-
-        .shift-receipt>div:first-child>p:first-of-type {
-            font-size: 10pt;
-            font-weight: bold;
-        }
-
-        .shift-receipt>div:first-child>div {
-            font-size: 8pt;
-            text-align: left;
-            margin-top: 2mm;
-        }
-
-        .shift-receipt .flex {
-            display: flex;
-            justify-content: space-between;
-            gap: 2mm;
-        }
-
-        .shift-receipt .flex>span:last-child {
-            text-align: right;
-            overflow-wrap: anywhere;
-        }
-
-        .shift-receipt .text-right {
-            text-align: right;
-        }
-
-        .shift-receipt .font-bold {
-            font-weight: bold;
-        }
-
-        .shift-receipt .border-t {
-            border-top: 1px dashed #000;
-            padding-top: 2mm;
-        }
-
-        .shift-receipt>div:last-child {
-            break-inside: avoid;
-            page-break-inside: avoid;
-            padding-top: 5mm;
-        }
-
-        .shift-receipt>div:last-child .flex>div {
-            width: 32mm;
-            text-align: center;
-        }
-
         main {
             min-width: 0;
         }
@@ -518,6 +405,20 @@
         let searchVersion = 0;
         let searchController = null;
         let searchTimer = null;
+
+        const RECEIPT_BASE_CSS = `
+            @page { size: 80mm auto; margin: 0; }
+            body {
+                margin: 0; padding: 0; background: #fff; color: #000;
+                font-family: "Courier New", monospace; font-size: 11px; line-height: normal;
+            }
+            .receipt, .shift-receipt {
+                box-sizing: content-box; width: 72mm; padding: 4mm; margin: 0;
+            }
+            table { width: 100%; border-collapse: collapse; font-size: inherit; }
+            td { vertical-align: top; padding: 1px 0; }
+            @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+        `;
 
         function printHTML(html) {
             return new Promise((resolve, reject) => {
@@ -953,52 +854,27 @@
                         <meta charset="UTF-8">
                             <title > Rekap Setoran Shift</title >
                                 <style>
-                                    @page {
-                                        size: 80mm auto;
-                                    margin: 0;
-                        }
-                                    body {
-                                        margin: 0;
-                                    padding: 0;
-                                    background: #fff;
-                                    color: #000;
-                                    font-family: "Courier New", monospace;
-                                    font-size: 9pt;
-                                    line-height: 1.35;
-                        }
-                                    .shift-receipt {
-                                        box-sizing: border-box;
-                                    width: 74mm; /* 80mm total width-3mm margin on each side */
-                                    margin: 0;
-                                    padding: 3mm; /* Use padding instead of width and margin for consistency */
-                                    background: #fff;
-                                    color: #000;
-                                    font-family: "Courier New", monospace;
-                                    font-size: 9pt;
-                                    line-height: 1.35;
-                        }
-                                    .shift-receipt * {box-sizing: border-box; }
-                                    .shift-receipt p, .shift-receipt h2 {margin: 0; }
-                                    .shift-receipt h2 {font-size: 10pt; letter-spacing: 0; }
-                                    .shift-receipt table {width: 100%; border-collapse: collapse; font-size: 9pt; }
-                                    .shift-receipt td {padding: 1mm 0; vertical-align: top; overflow-wrap: anywhere; }
-                                    .shift-receipt td:first-child {padding-right: 2mm; }
-                                    .shift-receipt td:last-child {text-align: right; white-space: nowrap; }
-                                    .shift-receipt tr { break-inside: avoid; page-break-inside: avoid; }
-                        .shift-receipt > div {margin-bottom: 3mm; }
-                        .shift-receipt > div:first-child {text-align: center; border-bottom: 1px dashed #000; padding-bottom: 3mm; }
-                        .shift-receipt > div:first-child > p {font-size: 8pt; }
-                        .shift-receipt > div:first-child > p:first-of-type {font-size: 10pt; font-weight: bold; }
-                        .shift-receipt > div:first-child > div {font-size: 8pt; text-align: left; margin-top: 2mm; }
-                                    .shift-receipt .flex {display: flex; justify-content: space-between; gap: 2mm; }
-                        .shift-receipt .flex > span:last-child {text-align: right; overflow-wrap: anywhere; }
-                                    .shift-receipt .text-right {text-align: right; }
-                                    .shift-receipt .font-bold {font-weight: bold; }
-                                    .shift-receipt .border-t {border-top: 1px dashed #000; padding-top: 2mm; }
-                        .shift-receipt > div:last-child { break-inside: avoid; page-break-inside: avoid; padding-top: 5mm; }
-                        .shift-receipt > div:last-child .flex > div {width: 32mm; text-align: center; }
-                                    @media print {body {-webkit-print - color-adjust: exact; print-color-adjust: exact; } }
-                                </style>
+                    ${RECEIPT_BASE_CSS}
+                    .shift-receipt p, .shift-receipt h2 { margin: 0; }
+                    .shift-receipt h2 { font-size: 12px; font-weight: bold; }
+                    .shift-receipt td:first-child { overflow-wrap: anywhere; }
+                    .shift-receipt td:last-child { text-align: right; white-space: nowrap; }
+                    .shift-receipt tr { break-inside: avoid; page-break-inside: avoid; }
+                    .shift-receipt > div { margin-bottom: 8px; }
+                    .shift-receipt > div:first-child {
+                        text-align: center; border-bottom: 1px dashed #000; padding-bottom: 8px;
+                    }
+                    .shift-receipt > div:first-child > p { font-size: 10px; }
+                    .shift-receipt > div:first-child > p:first-of-type { font-size: 14px; font-weight: bold; }
+                    .shift-receipt > div:first-child > div { font-size: 11px; text-align: left; margin-top: 6px; }
+                    .shift-receipt .flex { display: flex; justify-content: space-between; gap: 2mm; }
+                    .shift-receipt .flex > span:last-child { text-align: right; overflow-wrap: anywhere; }
+                    .shift-receipt .text-right { text-align: right; }
+                    .shift-receipt .font-bold { font-weight: bold; }
+                    .shift-receipt .border-t { border-top: 1px dashed #000; padding-top: 8px; }
+                    .shift-receipt > div:last-child { break-inside: avoid; page-break-inside: avoid; padding-top: 5mm; }
+                    .shift-receipt > div:last-child .flex > div { width: 32mm; text-align: center; }
+                </style>
                 </head >
                 <body>
                     <div class="shift-receipt">
@@ -1245,24 +1121,7 @@
                     <meta charset="UTF-8">
                     <title>Nota ${escapeHTML(invoiceNo)}</title>
                     <style>
-                        @page {
-                            size: 80mm auto;
-                            margin: 0;
-                        }
-
-                        body {
-                            margin: 0;
-                            padding: 0;
-                            background: #fff;
-                            color: #000;
-                            font-family: "Courier New", monospace;
-                            font-size: 11px;
-                        }
-
-                        .receipt {
-                            width: 72mm;
-                            padding: 4mm;
-                        }
+                        ${RECEIPT_BASE_CSS}
 
                         .center { text-align: center; }
                         .right { text-align: right; }
@@ -1272,17 +1131,7 @@
                             margin: 8px 0;
                         }
 
-                        table {
-                            width: 100%;
-                            border-collapse: collapse;
-                        }
-
-                        td {
-                            vertical-align: top;
-                            padding: 1px 0;
-                        }
-
-                        .item-name {
+.item-name {
                             font-weight: bold;
                             padding-top: 4px;
                         }
