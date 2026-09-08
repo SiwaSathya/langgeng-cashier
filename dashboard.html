@@ -480,6 +480,8 @@ td {
                 const frame = document.createElement('iframe');
 
                 frame.title = 'Pratinjau cetak nota';
+                frame.setAttribute('aria-hidden', 'true');
+                frame.style.visibility = 'hidden';
                 frame.style.position = 'fixed';
                 frame.style.right = '0';
                 frame.style.bottom = '0';
