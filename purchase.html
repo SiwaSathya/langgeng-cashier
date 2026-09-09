@@ -742,6 +742,77 @@
             });
         });
 
+
+        // DELETE PURCHASE
+        async function deletePurchase(id) {
+
+            if (!id) {
+                Swal.fire(
+                    "Error",
+                    "ID purchase tidak ditemukan",
+                    "error"
+                );
+                return;
+            }
+
+            const confirmDelete = await Swal.fire({
+                title: "Hapus Purchase?",
+                text: "Data pembelian akan dihapus dan stok akan dikembalikan.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Ya, Hapus",
+                cancelButtonText: "Batal",
+                confirmButtonColor: "#dc2626",
+                cancelButtonColor: "#64748b"
+            });
+
+            if (!confirmDelete.isConfirmed) {
+                return;
+            }
+
+            try {
+
+                const response = await fetch(
+                    `${BASE_URL}/api/purchases/${id}`,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    }
+                );
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        result.message || "Gagal menghapus purchase"
+                    );
+                }
+
+                await Swal.fire(
+                    "Berhasil",
+                    "Data purchase berhasil dihapus",
+                    "success"
+                );
+
+                fetchPurchases();
+
+            } catch (error) {
+
+                console.error(
+                    "Delete purchase error:",
+                    error
+                );
+
+                Swal.fire(
+                    "Error",
+                    error.message,
+                    "error"
+                );
+            }
+        }
+
     </script>
 
     <!-- TAMBAH PURCHASE MODAL -->
