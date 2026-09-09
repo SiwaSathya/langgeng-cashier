@@ -639,8 +639,16 @@
         }
 
 
-        document.getElementById('purchaseForm')
-            .addEventListener('submit', async function (e) {
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const purchaseForm = document.getElementById('purchaseForm');
+
+            if (!purchaseForm) {
+                console.error('purchaseForm tidak ditemukan');
+                return;
+            }
+
+            purchaseForm.addEventListener('submit', async function (e) {
 
                 e.preventDefault();
 
@@ -653,6 +661,8 @@
                     Number(document.getElementById('h_beli').value);
 
 
+
+                console.log("USER LOGIN:", getUserDataFromToken());
 
                 const body = {
 
@@ -676,12 +686,26 @@
                         qty * hBeli,
 
                     user_id:
-                        getUserDataFromToken()?.id || "",
+                        (() => {
+                            const user = getUserDataFromToken() || {};
+                            return user.id ||
+                                user.ID ||
+                                user.user_id ||
+                                user.userID ||
+                                "";
+                        })(),
 
                     location:
-                        document.getElementById('location').value
+                        (() => {
+                            const user = getUserDataFromToken() || {};
+                            return user.location ||
+                                document.getElementById('location').value ||
+                                "Toko Utama";
+                        })()
                 };
 
+
+                console.log("PURCHASE PAYLOAD:", body);
 
                 const res = await fetch(
                     `${BASE_URL}/api/purchases`,
@@ -716,6 +740,7 @@
                 fetchPurchases();
 
             });
+        });
 
     </script>
 
