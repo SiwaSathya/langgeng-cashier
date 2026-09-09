@@ -217,9 +217,16 @@
             }
 
             try {
-                let url = `${API_URL}/sales?user_location=${encodeURIComponent(userLoc)}`;
+                let url = `${API_URL}/sales`;
+
+                // Superadmin dapat melihat seluruh transaksi semua toko.
+                // Role lain tetap menggunakan pembatasan lokasi lama.
+                if (userData.role !== 'superadmin') {
+                    url += `?user_location=${encodeURIComponent(userLoc)}`;
+                }
+
                 if (selectedStore && selectedStore !== "Semua Toko") {
-                    url += `&location=${encodeURIComponent(selectedStore)}`;
+                    url += `${url.includes('?') ? '&' : '?'}location=${encodeURIComponent(selectedStore)}`;
                 }
 
                 const response = await fetch(url);
