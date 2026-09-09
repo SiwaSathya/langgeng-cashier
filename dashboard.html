@@ -406,112 +406,36 @@
         let searchController = null;
         let searchTimer = null;
 
-
         const RECEIPT_BASE_CSS = `
-@page {
-    size: 80mm auto;
-    margin: 0;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-html, body {
-    width: 80mm;
-    margin: 0;
-    padding: 0;
-    background: #fff;
-    color: #000;
-}
-
-body {
-    font-family: "Courier New", monospace;
-    font-size: 11px;
-    line-height: 1.35;
-}
-
-.receipt, .shift-receipt {
-    width: 80mm;
-    padding: 4mm;
-    margin: 0;
-    box-sizing: border-box;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 11px;
-}
-
-td {
-    vertical-align: top;
-    padding: 1px 0;
-}
-
-.center { text-align: center; }
-.right { text-align: right; }
-.bold { font-weight: bold; }
-
-.line {
-    border-top: 1px dashed #000;
-    margin: 8px 0;
-}
-
-@media print {
-    html, body {
-        width: 80mm;
-    }
-
-    .receipt, .shift-receipt {
-        width: 80mm;
-    }
-
-    body {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-}
-`;
-
+            @page { size: 80mm auto; margin: 0; }
+            body {
+                margin: 0; padding: 0; background: #fff; color: #000;
+                font-family: "Courier New", monospace; font-size: 11px; line-height: normal;
+            }
+            .receipt, .shift-receipt {
+                box-sizing: content-box; width: 72mm; padding: 4mm; margin: 0;
+            }
+            table { width: 100%; border-collapse: collapse; font-size: inherit; }
+            td { vertical-align: top; padding: 1px 0; }
+            @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+        `;
 
         function printHTML(html) {
             return new Promise((resolve, reject) => {
                 const frame = document.createElement('iframe');
-
                 frame.title = 'Pratinjau cetak nota';
-                frame.setAttribute('aria-hidden', 'true');
-                frame.style.visibility = 'hidden';
-                frame.style.position = 'fixed';
-                frame.style.right = '0';
-                frame.style.bottom = '0';
-                frame.style.width = '0';
-                frame.style.height = '0';
-                frame.style.border = '0';
-
+                frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
                 frame.onload = async () => {
                     try {
                         const target = frame.contentWindow;
-
-                        if (target.document.fonts) {
-                            await target.document.fonts.ready;
-                        }
-
+                        if (target.document.fonts) await target.document.fonts.ready;
+                        target.addEventListener('afterprint', () => frame.remove(), { once: true });
                         target.focus();
-
-                        target.addEventListener('afterprint', () => {
-                            frame.remove();
-                            resolve();
-                        }, { once: true });
-
                         target.print();
-
-                    } catch (err) {
-                        frame.remove();
-                        reject(err);
-                    }
+                        // Some browsers do not emit afterprint. Retain the frame until next print/unload.
+                        resolve();
+                    } catch (error) { frame.remove(); reject(error); }
                 };
-
                 frame.srcdoc = html;
                 document.body.appendChild(frame);
             });
@@ -567,6 +491,35 @@ td {
             } catch (err) {
                 return null;
             }
+        }
+
+
+
+        // Master data header toko berdasarkan lokasi user login
+        function getStoreInfo() {
+            return getStoreHeader();
+        }
+
+        function getStoreHeader() {
+            const userData = getUserDataFromToken() || {};
+            const location = (userData.location || "Toko Utama").trim();
+
+            const stores = {
+                "Toko Utama": {
+                    address: "Jl. Gajah Mada No. 7 Amlapura, Karangasem Bali",
+                    phone: "Telp. (0363)22577 Hp. 08124611382"
+                },
+                "Toko Paye": {
+                    address: "Jl. Untung Surapati No. 8, Karangasem Bali",
+                    phone: "Hp. 082314723344"
+                },
+                "Toko Sudirman": {
+                    address: "Jl. Jendral Sudirman No. 9, Karangasem Bali",
+                    phone: "Hp. 082314723345"
+                }
+            };
+
+            return stores[location] || stores["Toko Utama"];
         }
 
         function toggleCustomerForm() {
@@ -907,6 +860,7 @@ td {
         async function printShiftReceipt(receiptData = {}) {
             const summary = calculateShiftSummary(receiptData);
             const userData = getUserDataFromToken();
+            const store = getStoreInfo();
             const now = new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
 
             const paymentRows = Object.entries(summary.paymentSummary).map(([method, total]) => `
@@ -931,13 +885,8 @@ td {
                             <title > Rekap Setoran Shift</title >
                                 <style>
                     ${RECEIPT_BASE_CSS}
-                    .shift-receipt p, .shift-receipt h2 { font-size:14px; font-weight:bold; }
-                    /* Samakan ukuran cetak shift dengan nota transaksi */
-                    .shift-receipt {
-                        font-size: 11px;
-                        line-height: normal;
-                    }
-                    .shift-receipt h2 { font-size:14px; font-weight:bold; }
+                    .shift-receipt p, .shift-receipt h2 { margin: 0; }
+                    .shift-receipt h2 { font-size: 12px; font-weight: bold; }
                     .shift-receipt td:first-child { overflow-wrap: anywhere; }
                     .shift-receipt td:last-child { text-align: right; white-space: nowrap; }
                     .shift-receipt tr { break-inside: avoid; page-break-inside: avoid; }
@@ -945,7 +894,7 @@ td {
                     .shift-receipt > div:first-child {
                         text-align: center; border-bottom: 1px dashed #000; padding-bottom: 8px;
                     }
-                    .shift-receipt > div:first-child > p { font-size:11px; }
+                    .shift-receipt > div:first-child > p { font-size: 10px; }
                     .shift-receipt > div:first-child > p:first-of-type { font-size: 14px; font-weight: bold; }
                     .shift-receipt > div:first-child > div { font-size: 11px; text-align: left; margin-top: 6px; }
                     .shift-receipt .flex { display: flex; justify-content: space-between; gap: 2mm; }
@@ -958,7 +907,7 @@ td {
                 </style>
                 </head >
                 <body>
-                    <div class="receipt shift-receipt">
+                    <div class="shift-receipt">
                         <div class="text-center border-b border-dashed border-black pb-3 mb-4">
                             <h2 class="text-sm font-bold uppercase tracking-wider">
                                 REKAP SETORAN SHIFT KASIR
@@ -967,10 +916,10 @@ td {
                                 LANGGENG ELEKTRONIKA
                             </p >
                 <p class="text-[9px]">
-            Jl.Gajah Mada No.7 Amlapura-Bali • (0363) 22577-08124611382
+            ${escapeHTML(getStoreInfo().address)}
                             </p >
                 <p class="text-[9px]">
-            Jl.Untung Surapati, Padang Kerta, Amlapura-Bali
+            ${escapeHTML(getStoreInfo().phone)}
                             </p >
                 <p class="text-[9px]">
             Email: langgengtemaja8888@gmail.com
@@ -1238,9 +1187,8 @@ td {
                     <div class="receipt">
                         <div class="center">
                             <div class="store-name">LANGGENG ELEKTRONIKA</div>
-                            <div style="font-size: 10px; margin-top: 2px;">Jl. Gajah Mada No.7 Amlapura - Bali</div>
-                            <div style="font-size: 10px;">Telp: (0363) 22577 - 08124611382</div>
-                            <div style="font-size: 10px;">Jl. Untung Surapati, Padang Kerta, Amlapura - Bali</div>
+                             <div style="font-size: 10px; margin-top: 2px;">${escapeHTML(getStoreInfo().address)}</div>
+                             <div style="font-size: 10px;">${escapeHTML(getStoreInfo().phone)}</div>
                             <div style="font-size: 10px;">Email: langgengtemaja8888@gmail.com</div>
                             <div style="margin-top: 6px; font-weight: bold; font-size: 12px;">NOTA TRANSAKSI</div>
                         </div>
