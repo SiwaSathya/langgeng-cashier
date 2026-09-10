@@ -125,7 +125,7 @@
                 <h1 class="text-3xl font-800 text-slate-800 tracking-tight">Master Product</h1>
                 <p class="text-slate-400 mt-1">Kelola data barang dan stok inventaris Anda secara real-time.</p>
             </div>
-            <button onclick="openModal()"
+            <button id="addProductButton" onclick="openModal()"
                 class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-blue-100">
                 <i class="fas fa-plus text-sm"></i> Tambah Produk
             </button>
@@ -257,7 +257,7 @@
                 </div>
 
                 <div class="col-span-2 pt-4">
-                    <button type="submit"
+                    <button type="submit" id="submitProductButton"
                         class="w-full bg-blue-600 hover:bg-blue-700 text-white p-5 rounded-2xl font-800 transition-all shadow-lg shadow-blue-100 uppercase tracking-widest">
                         Simpan Data Produk
                     </button>
@@ -272,6 +272,7 @@
         let currentPage = 1;
         const limit = 10; // Konsistensi limit
         let searchTimer;
+        let isSuperSubKasir = false;
 
         window.onload = () => {
             fetchProducts();
@@ -333,8 +334,10 @@
                     <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold">${p.Saldo || p.saldo || 0} Unit</span>
                 </td>
                 <td class="px-8 py-5 text-right">
+                    ${isSuperSubKasir ? '-' : `
                     <button onclick="editProduct('${p.ID || p.id}')" class="text-blue-500 hover:text-blue-700 mx-2 transition-colors"><i class="fas fa-edit"></i></button>
                     <button onclick="deleteProduct('${p.ID || p.id}')" class="text-red-400 hover:text-red-600 mx-2 transition-colors"><i class="fas fa-trash"></i></button>
+                    `}
                 </td>
             </tr>
         `).join('');
@@ -405,10 +408,26 @@
         function openModal(isEdit = false) {
             document.getElementById('productModal').classList.remove('hidden');
             document.body.classList.add('modal-active');
-            if (!isEdit) {
-                document.getElementById('modalTitle').innerText = "Tambah Produk Baru";
-                document.getElementById('productForm').reset();
-                document.getElementById('productId').value = "";
+
+            const form = document.getElementById('productForm');
+            const formElements = form.querySelectorAll('input, select, textarea, button[type="submit"]');
+            const modalTitle = document.getElementById('modalTitle');
+            const submitButton = document.getElementById('submitProductButton');
+
+            if (isSuperSubKasir) {
+                modalTitle.innerText = "Detail Produk";
+                formElements.forEach(el => el.disabled = true);
+                if (submitButton) submitButton.style.display = 'none'; // Hide submit button for view-only
+            } else {
+                if (!isEdit) {
+                    modalTitle.innerText = "Tambah Produk Baru";
+                    form.reset();
+                    document.getElementById('productId').value = "";
+                } else {
+                    modalTitle.innerText = "Edit Produk"; // For edit mode, title will be set again by editProduct
+                }
+                formElements.forEach(el => el.disabled = false);
+                if (submitButton) submitButton.style.display = ''; // Show submit button for editable mode
             }
         }
 
@@ -419,6 +438,8 @@
 
         document.getElementById('productForm').onsubmit = async (e) => {
             e.preventDefault();
+            if (isSuperSubKasir) return; // Prevent submission for supersubkasir
+
             const id = document.getElementById('productId').value;
             const method = id ? 'PUT' : 'POST';
             const url = id ? `${BASE_URL}/api/products/${id}` : `${BASE_URL}/api/products`;
@@ -451,6 +472,31 @@
         };
 
         async function editProduct(id) {
+            // If supersubkasir, prevent editing, just open for view
+            if (isSuperSubKasir) {
+                openModal(true); // Open modal in view-only mode
+                // Fetch data to populate for viewing
+                const res = await fetch(`${BASE_URL}/api/products/${id}`);
+                const data = await res.json();
+                const p = data.data || data;
+
+                document.getElementById('productId').value = p.ID || p.id;
+                document.getElementById('kode').value = p.Kode || p.kode || '';
+                document.getElementById('nama').value = p.Nama || p.nama || '';
+                document.getElementById('satuan').value = p.Satuan || p.satuan || '';
+                document.getElementById('saldo').value = p.Saldo || p.saldo || 0;
+                document.getElementById('hbeli').value = p.HBeli || p.hbeli || 0;
+                document.getElementById('hpokok').value = p.HPokok || p.hpokok || 0;
+                document.getElementById('hjual').value = p.HJual || p.hjual || 0;
+                document.getElementById('category_id').value = p.CategoryID || p.category_id;
+                document.getElementById('brand_id').value = p.BrandID || p.brand_id;
+                document.getElementById('supplier_id').value = p.SupplierID || p.supplier_id;
+
+                document.getElementById('modalTitle').innerText = "Detail Produk";
+                return;
+            }
+
+            // Original edit functionality for other roles
             const res = await fetch(`${BASE_URL}/api/products/${id}`);
             const data = await res.json();
             const p = data.data || data;
@@ -458,10 +504,10 @@
             document.getElementById('productId').value = p.ID || p.id;
             document.getElementById('kode').value = p.Kode || p.kode || '';
             document.getElementById('nama').value = p.Nama || p.nama || '';
-            document.getElementById('satuan').value = p.Satuan || p.satuan || ''; // Baru
-            document.getElementById('saldo').value = p.Saldo || p.saldo || 0; // Baru
+            document.getElementById('satuan').value = p.Satuan || p.satuan || '';
+            document.getElementById('saldo').value = p.Saldo || p.saldo || 0;
             document.getElementById('hbeli').value = p.HBeli || p.hbeli || 0;
-            document.getElementById('hpokok').value = p.HPokok || p.hpokok || 0; // Baru
+            document.getElementById('hpokok').value = p.HPokok || p.hpokok || 0;
             document.getElementById('hjual').value = p.HJual || p.hjual || 0;
             document.getElementById('category_id').value = p.CategoryID || p.category_id;
             document.getElementById('brand_id').value = p.BrandID || p.brand_id;
@@ -472,6 +518,8 @@
         }
 
         async function deleteProduct(id) {
+            if (isSuperSubKasir) return; // Prevent deletion for supersubkasir
+
             if (confirm("Apakah Anda yakin ingin menghapus produk ini?")) {
                 try {
                     const res = await fetch(`${BASE_URL}/api/products/${id}`, { method: 'DELETE' });
@@ -489,6 +537,7 @@
             'super-kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
             'super_kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
             'superkasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
+            'supersubkasir': ['dashboard.html', 'riwayat.html', 'product.html'],
             'akuntan': ['akuntansi.html', 'purchase.html', 'expense.html', 'retur.html'],
             'superadmin': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'akuntansi.html', 'absensi.html', 'report.html']
         };
@@ -591,6 +640,9 @@
             const userRole = (userData.role || 'kasir').toLowerCase().trim();
             const allowedPages = ROLE_PERMISSIONS[userRole] || ['dashboard.html'];
 
+            // Set global flag for supersubkasir
+            isSuperSubKasir = (userRole === 'supersubkasir');
+
             if (!allowedPages.includes(currentPage)) {
                 if (userRole === 'akuntan') window.location.href = 'akuntansi.html';
                 else if (userRole === 'admin') window.location.href = 'riwayat.html';
@@ -614,6 +666,14 @@
             userEls.forEach(el => {
                 el.innerText = `${userData.name || 'User'} (${userRole.toUpperCase()})`;
             });
+
+            // Apply restrictions for supersubkasir
+            if (isSuperSubKasir) {
+                const addProductBtn = document.getElementById('addProductButton');
+                if (addProductBtn) {
+                    addProductBtn.style.display = 'none'; // Hide the add product button
+                }
+            }
         }
 
         // Global Enter Handler: Prioritize SweetAlert confirm & Active modal submit buttons
