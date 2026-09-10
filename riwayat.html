@@ -162,6 +162,40 @@
         const API_URL = "https://langgeng-cashier-backend-production.up.railway.app/api";
         let localSalesData = [];
 
+        const RECEIPT_BASE_CSS = `
+            @page { size: 80mm auto; margin: 0; }
+            body {
+                margin: 0; padding: 0; background: #fff; color: #000;
+                font-family: "Courier New", monospace; font-size: 11px; line-height: normal;
+            }
+            .receipt, .shift-receipt {
+                box-sizing: content-box; width: 72mm; padding: 4mm; margin: 0;
+            }
+            table { width: 100%; border-collapse: collapse; font-size: inherit; }
+            td { vertical-align: top; padding: 1px 0; }
+            @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+        `;
+
+        function printHTML(html) {
+            return new Promise((resolve, reject) => {
+                const frame = document.createElement('iframe');
+                frame.title = 'Pratinjau cetak nota';
+                frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
+                frame.onload = async () => {
+                    try {
+                        const target = frame.contentWindow;
+                        if (target.document.fonts) await target.document.fonts.ready;
+                        target.addEventListener('afterprint', () => frame.remove(), { once: true });
+                        target.focus();
+                        target.print();
+                        resolve();
+                    } catch (error) { frame.remove(); reject(error); }
+                };
+                frame.srcdoc = html;
+                document.body.appendChild(frame);
+            });
+        }
+
         function escapeHTML(value) {
             return String(value ?? '')
                 .replace(/&/g, '&amp;')
@@ -184,6 +218,29 @@
             } catch (err) {
                 return null;
             }
+        }
+
+        // Master data header toko berdasarkan lokasi user login
+        function getStoreInfo() {
+            const userData = getUserDataFromToken() || {};
+            const location = (userData.location || "Toko Utama").trim();
+
+            const stores = {
+                "Toko Utama": {
+                    address: "Jl. Gajah Mada No. 7 Amlapura, Karangasem Bali",
+                    phone: "Telp. (0363)22577 Hp. 08124611382"
+                },
+                "Toko Paye": {
+                    address: "Jl. Untung Surapati No. 8, Karangasem Bali",
+                    phone: "Hp. 082314723344"
+                },
+                "Toko Sudirman": {
+                    address: "Jl. Jendral Sudirman No. 9, Karangasem Bali",
+                    phone: "Hp. 082314723345"
+                }
+            };
+
+            return stores[location] || stores["Toko Utama"];
         }
 
         async function fetchRiwayat() {
@@ -629,6 +686,7 @@
 
         function printPelunasanReceipt(group, newPaidAmount) {
             const userData = getUserDataFromToken() || {};
+            const store = getStoreInfo();
             const totalBill = Number(group.total_netto || 0);
             const initialPaid = Number(group.amount_paid || 0);
             const totalPaid = initialPaid + Number(newPaidAmount || 0);
@@ -665,62 +723,27 @@
                     <meta charset="UTF-8">
                     <title>Nota Pelunasan ${escapeHTML(invoiceNo)}</title>
                     <style>
-                        @page {
-                            size: 80mm auto;
-                            margin: 0;
-                        }
-
-                        body {
-                            margin: 0;
-                            padding: 0;
-                            background: #fff;
-                            color: #000;
-                            font-family: "Courier New", monospace;
-                            font-size: 11px;
-                        }
-
-                        .receipt {
-                            width: 72mm;
-                            padding: 4mm;
-                        }
-
-                        .center { text-align: center; }
-                        .right { text-align: right; }
-                        .bold { font-weight: bold; }
-                        .line {
+                        ${RECEIPT_BASE_CSS}
+                        .receipt .center { text-align: center; }
+                        .receipt .right { text-align: right; }
+                        .receipt .bold { font-weight: bold; }
+                        .receipt .line {
                             border-top: 1px dashed #000;
                             margin: 8px 0;
                         }
-
-                        table {
-                            width: 100%;
-                            border-collapse: collapse;
-                        }
-
-                        td {
-                            vertical-align: top;
-                            padding: 1px 0;
-                        }
-
-                        .item-name {
+                        .receipt .item-name {
                             font-weight: bold;
                             padding-top: 4px;
                         }
-
-                        .store-name {
-                            font-size: 13px;
+                        .receipt .store-name {
+                            font-size: 14px;
                             font-weight: bold;
                             text-transform: uppercase;
                         }
-
-                        .thanks {
+                        .receipt .thanks {
                             margin-top: 10px;
                             text-align: center;
                             font-weight: bold;
-                        }
-
-                        @media print {
-                            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                         }
                     </style>
                 </head>
@@ -728,9 +751,8 @@
                     <div class="receipt">
                         <div class="center">
                             <div class="store-name">LANGGENG ELEKTRONIKA</div>
-                            <div style="font-size: 10px;">Jl. Gajah Mada No.7 Amlapura - Bali</div>
-                            <div style="font-size: 10px;">Telp: (0363) 22577 - 08124611382</div>
-                            <div style="font-size: 10px;">Jl. Untung Surapati, Padang Kerta, Amlapura - Bali</div>
+                            <div style="font-size: 10px; margin-top: 2px;">${escapeHTML(store.address)}</div>
+                            <div style="font-size: 10px;">${escapeHTML(store.phone)}</div>
                             <div style="font-size: 10px;">Email: langgengtemaja8888@gmail.com</div>
                             <div style="margin-top: 6px; font-weight: bold; font-size: 12px;">NOTA PELUNASAN (LUNAS)</div>
                         </div>
@@ -772,31 +794,7 @@
                 </html>
             `;
 
-            const printFrame = document.createElement('iframe');
-            printFrame.style.position = 'fixed';
-            printFrame.style.right = '0';
-            printFrame.style.bottom = '0';
-            printFrame.style.width = '0';
-            printFrame.style.height = '0';
-            printFrame.style.border = '0';
-
-            document.body.appendChild(printFrame);
-
-            const frameDoc = printFrame.contentWindow.document;
-            frameDoc.open();
-            frameDoc.write(receiptHTML);
-            frameDoc.close();
-
-            setTimeout(() => {
-                printFrame.contentWindow.focus();
-                printFrame.contentWindow.print();
-
-                setTimeout(() => {
-                    if (printFrame.parentNode) {
-                        printFrame.parentNode.removeChild(printFrame);
-                    }
-                }, 1000);
-            }, 300);
+            printHTML(receiptHTML);
         }
 
         async function processPelunasanAPI(invoice, payload, groupData, pelunasanPaid) {
