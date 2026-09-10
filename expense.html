@@ -177,9 +177,30 @@
                     </div>
                     <div>
                         <label class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1">Kategori</label>
-                        <input type="text" id="kategori" required
-                            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold"
-                            placeholder="Contoh: Operasional">
+                        <select id="kategori" required
+                            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold">
+                            <option value="">Pilih Kategori</option>
+                            <option value="Pembelian Stok Barang">HPP - Pembelian Stok Barang</option>
+                            <option value="Pembelian Bahan Baku">HPP - Pembelian Bahan Baku</option>
+                            <option value="Gaji & Upah Karyawan">OpEx - Gaji & Upah Karyawan</option>
+                            <option value="Utilitas (Listrik, Air, Internet)">OpEx - Utilitas</option>
+                            <option value="Keperluan Kantor & Gudang">OpEx - Keperluan Kantor & Gudang</option>
+                            <option value="Perawatan Alat & Inventaris">OpEx - Perawatan Alat & Inventaris</option>
+                            <option value="Sewa Tempat">OpEx - Sewa Tempat</option>
+                            <option value="Langganan Server & Cloud Service">SaaS - Server & Cloud</option>
+                            <option value="Biaya Domain & Hosting">SaaS - Domain & Hosting</option>
+                            <option value="Pembelian Inventaris & Peralatan">CapEx - Inventaris</option>
+                            <option value="Biaya Admin Bank">Non Operasional - Admin Bank</option>
+                            <option value="Pajak">Non Operasional - Pajak</option>
+                            <option value="Bunga Pinjaman">Non Operasional - Bunga Pinjaman</option>
+                            <option value="Pengeluaran Non-Beban - Prive">Pengeluaran Non-Beban - Prive</option>
+                            <option value="Biaya Operasional - Konsumsi & Kesejahteraan Karyawan">Biaya Operasional -
+                                Konsumsi & Kesejahteraan Karyawan</option>
+                            <option value="Biaya Operasional - Keperluan Representasi /
+                                Jamuan Bisnis">Biaya Operasional - Keperluan Representasi /
+                                Jamuan Bisnis</option>
+
+                        </select>
                     </div>
                 </div>
 
@@ -236,11 +257,15 @@
                     <tr class="hover:bg-slate-50/50 transition-colors">
                         <td class="px-8 py-5">
                             <div class="font-bold text-slate-400 text-[11px] uppercase tracking-wider">
-                                ${new Date(e.CreatedAt || e.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                ${new Date(e.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                             </div>
+                            <p class="text-[11px] text-slate-400 font-bold"><i class="fas fa-user-circle mr-1"></i>${escapeHTML(e.user?.name || e.user?.Name || 'Kasir')}</p>
                         </td>
                         <td class="px-6 py-5">
                             <div class="font-bold text-slate-700">${e.deskripsi || e.deskripsi}</div>
+                        </td>
+                        <td class="px-6 py-5">
+                            <div class="font-bold text-slate-700">${e.kategori || e.kategori}</div>
                         </td>
                         <td class="px-6 py-5 text-right font-extrabold text-red-500">
                             Rp ${(e.total || e.total || 0).toLocaleString('id-ID')}
@@ -292,13 +317,27 @@
             const method = id ? 'PUT' : 'POST';
             const url = id ? `${BASE_URL}/api/expenses/${id}` : `${BASE_URL}/api/expenses`;
 
-            // Sesuai struct: nota, tanggal, deskripsi, total, kategori
+            const userData = getUserDataFromToken() || {};
+
             const payload = {
                 nota: document.getElementById('nota').value,
                 kategori: document.getElementById('kategori').value,
                 deskripsi: document.getElementById('deskripsi').value,
-                total: parseFloat(document.getElementById('total').value),
-                tanggal: new Date(document.getElementById('tanggal').value).toISOString() // Gunakan format ISO untuk time.Time
+                total: Number(document.getElementById('total').value),
+                tanggal: new Date(
+                    document.getElementById('tanggal').value
+                ).toISOString(),
+
+                user_id:
+                    userData.id ||
+                    userData.ID ||
+                    userData.user_id ||
+                    userData.userID ||
+                    "",
+
+                location:
+                    userData.location ||
+                    "Toko Utama"
             };
 
             const res = await fetch(url, {
@@ -316,8 +355,10 @@
             const e = result.data || result;
 
             document.getElementById('expenseId').value = e.id || e.ID;
-            document.getElementById('keterangan').value = e.keterangan || e.Keterangan;
-            document.getElementById('jumlah').value = e.jumlah || e.Jumlah;
+            document.getElementById('nota').value = e.nota || "";
+            document.getElementById('kategori').value = e.kategori || "";
+            document.getElementById('deskripsi').value = e.deskripsi || "";
+            document.getElementById('total').value = e.total || 0;
 
             // Format date for input
             const date = new Date(e.tanggal || e.CreatedAt);
