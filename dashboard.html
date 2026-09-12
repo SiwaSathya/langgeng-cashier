@@ -236,7 +236,7 @@
                             class="flex justify-between items-center h-14 bg-slate-50 border border-slate-100 px-6 rounded-2xl">
                             <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Status Transaksi DP
                                 (Uang Muka)</span>
-                            <label for="inp-is-dp" class="relative inline-flex items-center cursor-pointer">
+                            <label for="cust-name" class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="inp-is-dp" onchange="toggleCustomerForm()"
                                     class="sr-only peer">
                                 <div
@@ -493,46 +493,10 @@
             }
         }
 
-
-
-        // Master data header toko berdasarkan lokasi user login
-        function getStoreInfo() {
-            return getStoreHeader();
-        }
-
-        function getStoreHeader() {
-            const userData = getUserDataFromToken() || {};
-            const location = (userData.location || "Toko Utama").trim();
-
-            const stores = {
-                "Toko Utama": {
-                    address: "Jl. Gajah Mada No. 7 Amlapura, Karangasem Bali",
-                    phone: "Telp. (0363)22577 Hp. 08124611382"
-                },
-                "Toko Paye": {
-                    address: "Jl. Untung Surapati No. 8, Karangasem Bali",
-                    phone: "Hp. 082314723344"
-                },
-                "Toko Sudirman": {
-                    address: "Jl. Jendral Sudirman No. 9, Karangasem Bali",
-                    phone: "Hp. 082314723345"
-                }
-            };
-
-            return stores[location] || stores["Toko Utama"];
-        }
-
         function toggleCustomerForm() {
-            const checkbox = document.getElementById('inp-is-dp');
+            const isDp = document.getElementById('inp-is-dp').checked;
             const container = document.getElementById('customer-container');
-
-            if (!checkbox || !container) return;
-
-            if (checkbox.checked) {
-                container.classList.remove('hidden');
-            } else {
-                container.classList.add('hidden');
-            }
+            isDp ? container.classList.remove('hidden') : container.classList.add('hidden');
         }
 
         function onChangePayType() {
@@ -847,13 +811,25 @@
                 const method = String(item.payment_method ?? item.PaymentMethod ?? '').trim();
                 // The current sales payload sends labels only, without amounts per method.
                 // Do not invent a cash split or print a misleading cash deposit.
-                if (!method || method.includes(',')) throw new Error('Rekap memerlukan rincian nominal per metode pembayaran dari backend untuk transaksi campuran.');
                 const paid = item.amount_paid ?? item.AmountPaid;
-                if ((item.is_dp === true || item.is_dp === 1 || item.is_dp === 'true') && paid == null) throw new Error('Nominal DP belum tersedia pada data rekap.');
                 const received = paid == null ? total : Math.min(money(paid), total);
-                paymentSummary[method] = (paymentSummary[method] ?? 0) + received;
-                if (cashMethod(method)) totalTunai += received;
-                else totalKredit += received;
+
+                const methods = method.split(',').map(m => m.replace(/\[Pelunasan:\s*|\s*\]/g, '').trim()).filter(Boolean);
+
+                if (methods.length === 0) {
+                    paymentSummary['LAINNYA'] = (paymentSummary['LAINNYA'] ?? 0) + received;
+                    if (cashMethod('LAINNYA')) totalTunai += received;
+                    else totalKredit += received;
+                } else {
+                    // Distribute the received amount among the identified methods.
+                    // This is a simplification. Ideally, backend would provide amounts per sub-method.
+                    const amountPerMethod = received / methods.length;
+                    methods.forEach(m => {
+                        paymentSummary[m] = (paymentSummary[m] ?? 0) + amountPerMethod;
+                        if (cashMethod(m)) totalTunai += amountPerMethod;
+                        else totalKredit += amountPerMethod;
+                    });
+                }
             });
             expenses.forEach(item => {
                 const amount = money(item.total ?? item.Total);
@@ -867,7 +843,6 @@
         async function printShiftReceipt(receiptData = {}) {
             const summary = calculateShiftSummary(receiptData);
             const userData = getUserDataFromToken();
-            const store = getStoreInfo();
             const now = new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
 
             const paymentRows = Object.entries(summary.paymentSummary).map(([method, total]) => `
@@ -893,7 +868,12 @@
                                 <style>
                     ${RECEIPT_BASE_CSS}
                     .shift-receipt p, .shift-receipt h2 { margin: 0; }
-                    .shift-receipt h2 { font-size: 12px; font-weight: bold; }
+                    /* Samakan ukuran cetak shift dengan nota transaksi */
+                    .shift-receipt {
+                        font-size: 11px;
+                        line-height: normal;
+                    }
+                    .shift-receipt h2 { font-size: 14px; font-weight: bold; }
                     .shift-receipt td:first-child { overflow-wrap: anywhere; }
                     .shift-receipt td:last-child { text-align: right; white-space: nowrap; }
                     .shift-receipt tr { break-inside: avoid; page-break-inside: avoid; }
@@ -923,10 +903,10 @@
                                 LANGGENG ELEKTRONIKA
                             </p >
                 <p class="text-[9px]">
-            ${escapeHTML(getStoreInfo().address)}
+            Jl.Gajah Mada No.7 Amlapura-Bali • (0363) 22577-08124611382
                             </p >
                 <p class="text-[9px]">
-            ${escapeHTML(getStoreInfo().phone)}
+            Jl.Untung Surapati, Padang Kerta, Amlapura-Bali
                             </p >
                 <p class="text-[9px]">
             Email: langgengtemaja8888@gmail.com
@@ -1168,7 +1148,7 @@
                             margin: 8px 0;
                         }
 
-                        .item-name {
+.item-name {
                             font-weight: bold;
                             padding-top: 4px;
                         }
@@ -1194,8 +1174,9 @@
                     <div class="receipt">
                         <div class="center">
                             <div class="store-name">LANGGENG ELEKTRONIKA</div>
-                             <div style="font-size: 10px; margin-top: 2px;">${escapeHTML(getStoreInfo().address)}</div>
-                             <div style="font-size: 10px;">${escapeHTML(getStoreInfo().phone)}</div>
+                            <div style="font-size: 10px; margin-top: 2px;">Jl. Gajah Mada No.7 Amlapura - Bali</div>
+                            <div style="font-size: 10px;">Telp: (0363) 22577 - 08124611382</div>
+                            <div style="font-size: 10px;">Jl. Untung Surapati, Padang Kerta, Amlapura - Bali</div>
                             <div style="font-size: 10px;">Email: langgengtemaja8888@gmail.com</div>
                             <div style="margin-top: 6px; font-weight: bold; font-size: 12px;">NOTA TRANSAKSI</div>
                         </div>
@@ -1366,7 +1347,6 @@
             'super-kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
             'super_kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
             'superkasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
-            'supersubkasir': ['dashboard.html', 'riwayat.html', 'product.html'],
             'akuntan': ['akuntansi.html', 'purchase.html', 'expense.html', 'retur.html'],
             'superadmin': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'akuntansi.html', 'absensi.html', 'report.html']
         };
