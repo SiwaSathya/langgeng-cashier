@@ -493,6 +493,30 @@
             }
         }
 
+        function getStoreHeaderByLocation() {
+            const userData = getUserDataFromToken() || {};
+            const location = userData.location;
+
+            const stores = {
+                "Toko Utama": {
+                    address: "Jl. Gajah Mada No. 7 Amlapura, Karangasem Bali",
+                    phone: "(0363)22577 - 08124611382"
+                },
+                "Toko Paye": {
+                    address: "Jl. Untung Surapati no. 8, Karangasem Bali",
+                    phone: "082314723344"
+                },
+                "Toko Sudirman": {
+                    address: "Jl. Jendral Sudirman no. 9 Karangasem Bali",
+                    phone: "082314723345"
+                }
+            };
+            console.log("User data:", userData);
+            console.log("Store location:", location, "Header:", stores[location] || stores["Toko Utama"]);
+
+            return stores[location] || stores["Toko Utama"];
+        }
+
         function toggleCustomerForm() {
             const isDp = document.getElementById('inp-is-dp').checked;
             const container = document.getElementById('customer-container');
@@ -843,6 +867,7 @@
         async function printShiftReceipt(receiptData = {}) {
             const summary = calculateShiftSummary(receiptData);
             const userData = getUserDataFromToken();
+            const storeHeader = getStoreHeaderByLocation();
             const now = new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
 
             const paymentRows = Object.entries(summary.paymentSummary).map(([method, total]) => `
@@ -903,10 +928,10 @@
                                 LANGGENG ELEKTRONIKA
                             </p >
                 <p class="text-[9px]">
-            Jl.Gajah Mada No.7 Amlapura-Bali • (0363) 22577-08124611382
+                ${escapeHTML(storeHeader.address)}
                             </p >
                 <p class="text-[9px]">
-            Jl.Untung Surapati, Padang Kerta, Amlapura-Bali
+            ${escapeHTML(storeHeader.phone)}
                             </p >
                 <p class="text-[9px]">
             Email: langgengtemaja8888@gmail.com
@@ -1099,6 +1124,7 @@
 
         function printTransactionReceipt(transactionResult = {}) {
             const userData = getUserDataFromToken() || {};
+            const storeHeader = getStoreHeaderByLocation();
             const totalBill = cart.reduce((s, i) => s + i.subtotal, 0);
             const totalPaid = paymentList.reduce((s, p) => s + p.value, 0);
             const change = Math.max(totalPaid - totalBill, 0);
@@ -1174,9 +1200,8 @@
                     <div class="receipt">
                         <div class="center">
                             <div class="store-name">LANGGENG ELEKTRONIKA</div>
-                            <div style="font-size: 10px; margin-top: 2px;">Jl. Gajah Mada No.7 Amlapura - Bali</div>
-                            <div style="font-size: 10px;">Telp: (0363) 22577 - 08124611382</div>
-                            <div style="font-size: 10px;">Jl. Untung Surapati, Padang Kerta, Amlapura - Bali</div>
+                            <div style="font-size: 10px; margin-top: 2px;">    ${escapeHTML(storeHeader.address)}</div>
+                            <div style="font-size: 10px;">Telp: ${escapeHTML(storeHeader.phone)}</div>
                             <div style="font-size: 10px;">Email: langgengtemaja8888@gmail.com</div>
                             <div style="margin-top: 6px; font-weight: bold; font-size: 12px;">NOTA TRANSAKSI</div>
                         </div>
