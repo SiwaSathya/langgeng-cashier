@@ -870,6 +870,45 @@
             const storeHeader = getStoreHeaderByLocation();
             const now = new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
 
+            const detailSalesRows = (receiptData.sales || []).map(item => {
+
+                const tanggal = new Date(item.CreatedAt)
+                    .toLocaleString('id-ID', {
+                        dateStyle: 'short',
+                        timeStyle: 'medium'
+                    });
+
+                return `
+                    <tr>
+                        <td colspan="2">
+                            <b>${escapeHTML(item.invoice || "-")}</b>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            ${escapeHTML(item.product?.Nama || "-")}
+                        </td>
+                        <td class="text-right">
+                            ${formatIDR(item.total_netto)}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2">
+                            ${escapeHTML(tanggal)}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2">
+                            <br>
+                        </td>
+                    </tr>
+                `;
+
+            }).join('');
+
             const paymentRows = Object.entries(summary.paymentSummary).map(([method, total]) => `
                 <tr>
                     <td>${escapeHTML(method)}</td>
@@ -995,13 +1034,20 @@
 
 
                         <div class="mb-4 border-t border-dashed border-black pt-2">
+
                             <table class="w-full text-[11px]">
+
+                                ${detailSalesRows}
+
                                 <tr class="font-bold text-[12px]">
                                     <td>Total Penjualan</td>
-                                    <td class="text-right">${formatIDR(summary.totalPenjualan)}</td>
+                                    <td class="text-right">
+                                        ${formatIDR(summary.totalPenjualan)}
+                                    </td>
                                 </tr>
-                                
+
                             </table>
+
                         </div>
 
                         <div class="border-t border-black pt-4 mb-2">
