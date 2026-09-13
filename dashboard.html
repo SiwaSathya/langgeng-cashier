@@ -746,75 +746,157 @@
 
 
         async function generateShiftReceipt() {
+
             if (paymentPending) return;
 
+
             const userData = getUserDataFromToken() || {};
+
+
             const userLoc = (userData.location || 'Toko Utama').trim();
+
             let selectedLocation = userLoc;
 
-            // Jika user dari Toko Utama / Pusat / Superadmin, sediakan opsi cetak per toko atau ketiganya
-            if (userLoc === 'Toko Utama' || userLoc === 'Pusat' || userData.role === 'superadmin') {
+
+            if (
+                userLoc === 'Toko Utama' ||
+                userLoc === 'Pusat' ||
+                userData.role === 'superadmin'
+            ) {
+
                 const { value: chosenLoc } = await Swal.fire({
+
                     title: 'Pilih Lokasi Setoran Shift',
+
                     text: 'Pilih toko untuk mencetak rekap setoran shift kasir:',
+
                     input: 'select',
+
                     inputOptions: {
                         'Semua Toko': 'Semua Toko (Ketiganya Langsung)',
                         'Toko Utama': 'Toko Utama',
                         'Toko Sudirman': 'Toko Sudirman',
                         'Toko Paye': 'Toko Paye'
                     },
+
                     inputValue: 'Semua Toko',
+
                     showCancelButton: true,
+
                     confirmButtonText: 'Lanjutkan',
+
                     cancelButtonText: 'Batal',
+
                     confirmButtonColor: '#2563EB'
+
                 });
 
+
                 if (!chosenLoc) return;
+
+
                 selectedLocation = chosenLoc;
+
             }
 
+
             try {
+
+
                 Swal.fire({
+
                     title: `Mengambil Data Shift (${selectedLocation})`,
+
                     allowOutsideClick: false,
+
                     didOpen: () => {
                         Swal.showLoading();
                     }
+
                 });
 
-                const queryParam = selectedLocation ? `?location=${encodeURIComponent(selectedLocation)}` : '';
-                const response = await apiFetch(`${API_URL}/receipt${queryParam}`);
+
+
+                const queryParam = selectedLocation
+                    ? `?location=${encodeURIComponent(selectedLocation)}`
+                    : '';
+
+
+
+                const response = await apiFetch(
+                    `${API_URL}/receipt${queryParam}`
+                );
+
+
 
                 if (!response.ok) {
-                    throw new Error("HTTP ERROR " + response.status);
+
+                    throw new Error(
+                        "HTTP ERROR " + response.status
+                    );
+
                 }
 
+
+
                 const result = await response.json();
+
+
+
                 Swal.close();
 
+
+
                 const receiptData = {
+
                     location: selectedLocation,
+
                     sales: result.sales ?? [],
+
                     expenses: result.expenses ?? []
+
                 };
 
-                if (receiptData.sales.length === 0 && receiptData.expenses.length === 0) {
+
+
+                if (
+                    receiptData.sales.length === 0 &&
+                    receiptData.expenses.length === 0
+                ) {
+
                     Swal.fire(
                         "Tidak Ada Data",
                         `Belum ada transaksi shift yang belum disetor untuk ${selectedLocation}`,
                         "info"
                     );
+
                     return;
+
                 }
 
+
+
                 await printShiftReceipt(receiptData);
+
+
+
             } catch (error) {
+
+
                 console.error("RECEIPT ERROR:", error);
+
+
                 Swal.close();
-                Swal.fire("Error", "Gagal mengambil data receipt\n" + error.message, "error");
+
+
+                Swal.fire(
+                    "Error",
+                    "Gagal mengambil data receipt\n" + error.message,
+                    "error"
+                );
+
             }
+
         }
 
         function calculateShiftSummary(receiptData = {}) {
@@ -865,209 +947,643 @@
         }
 
         async function printShiftReceipt(receiptData = {}) {
-            const summary = calculateShiftSummary(receiptData);
-            const userData = getUserDataFromToken();
+
+            const userData = getUserDataFromToken() || {};
             const storeHeader = getStoreHeaderByLocation();
-            const now = new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
 
-            const detailSalesRows = (receiptData.sales || []).map(item => {
+            const now = new Date().toLocaleString('id-ID', {
+                dateStyle: 'short',
+                timeStyle: 'medium'
+            });
 
-                const tanggal = new Date(item.CreatedAt)
-                    .toLocaleString('id-ID', {
-                        dateStyle: 'short',
-                        timeStyle: 'medium'
-                    });
 
-                return `
-                    <tr>
-                        <td colspan="2">
-                            <b>${escapeHTML(item.invoice || "-")}</b>
-                        </td>
-                    </tr>
+            // =====================================
+            // HITUNG ULANG DARI TOTAL_NETTO
+            // =====================================
 
-                    <tr>
-                        <td>
-                            ${escapeHTML(item.product?.Nama || "-")}
-                        </td>
-                        <td class="text-right">
-                            ${formatIDR(item.total_netto)}
-                        </td>
-                    </tr>
+            let totalTunai = 0;
+            let totalNonTunai = 0;
 
-                    <tr>
-                        <td colspan="2">
-                            ${escapeHTML(tanggal)}
-                        </td>
-                    </tr>
 
-                    <tr>
-                        <td colspan="2">
-                            <br>
-                        </td>
-                    </tr>
-                `;
+            const paymentGroups = {};
 
-            }).join('');
 
-            const paymentRows = Object.entries(summary.paymentSummary).map(([method, total]) => `
-                <tr>
-                    <td>${escapeHTML(method)}</td>
-                    <td class="text-right">${formatIDR(total)}</td>
-                </tr>
-            `).join('');
+            (receiptData.sales || []).forEach(item => {
 
-            const expenseRows = summary.expenses.map(item => `
-                <tr>
-                    <td>- ${escapeHTML(item.deskripsi ?? item.Deskripsi ?? "-")}</td>
-                <td class="text-right">${formatIDR(item.total ?? item.Total ?? 0)}</td>
-                </tr >
-                `).join('');
 
-            const shiftReceiptHTML = `
-                <!DOCTYPE html >
-                    <html lang="id">
-                        <head >
-                        <meta charset="UTF-8">
-                            <title > Rekap Setoran Shift</title >
-                                <style>
-                    ${RECEIPT_BASE_CSS}
-                    .shift-receipt p, .shift-receipt h2 { margin: 0; }
-                    /* Samakan ukuran cetak shift dengan nota transaksi */
-                    .shift-receipt {
-                        font-size: 11px;
-                        line-height: normal;
-                    }
-                    .shift-receipt h2 { font-size: 14px; font-weight: bold; }
-                    .shift-receipt td:first-child { overflow-wrap: anywhere; }
-                    .shift-receipt td:last-child { text-align: right; white-space: nowrap; }
-                    .shift-receipt tr { break-inside: avoid; page-break-inside: avoid; }
-                    .shift-receipt > div { margin-bottom: 8px; }
-                    .shift-receipt > div:first-child {
-                        text-align: center; border-bottom: 1px dashed #000; padding-bottom: 8px;
-                    }
-                    .shift-receipt > div:first-child > p { font-size: 10px; }
-                    .shift-receipt > div:first-child > p:first-of-type { font-size: 14px; font-weight: bold; }
-                    .shift-receipt > div:first-child > div { font-size: 11px; text-align: left; margin-top: 6px; }
-                    .shift-receipt .flex { display: flex; justify-content: space-between; gap: 2mm; }
-                    .shift-receipt .flex > span:last-child { text-align: right; overflow-wrap: anywhere; }
-                    .shift-receipt .text-right { text-align: right; }
-                    .shift-receipt .font-bold { font-weight: bold; }
-                    .shift-receipt .border-t { border-top: 1px dashed #000; padding-top: 8px; }
-                    .shift-receipt > div:last-child { break-inside: avoid; page-break-inside: avoid; padding-top: 5mm; }
-                    .shift-receipt > div:last-child .flex > div { width: 32mm; text-align: center; }
-                </style>
-                </head >
-                <body>
-                    <div class="shift-receipt">
-                        <div class="text-center border-b border-dashed border-black pb-3 mb-4">
-                            <h2 class="text-sm font-bold uppercase tracking-wider">
-                                REKAP SETORAN SHIFT KASIR
-                            </h2>
-                            <p class="text-[12px] font-bold uppercase">
-                                LANGGENG ELEKTRONIKA
-                            </p >
-                <p class="text-[9px]">
-                ${escapeHTML(storeHeader.address)}
-                            </p >
-                <p class="text-[9px]">
-            ${escapeHTML(storeHeader.phone)}
-                            </p >
-                <p class="text-[9px]">
-            Email: langgengtemaja8888@gmail.com
-                            </p >
-                <div class="text-[10px] mt-1 text-left">
-                    <div class="flex justify-between">
-                        <span > Kasir</span >
-                            <span>: ${escapeHTML(userData?.name || "-")}</span>
-                                </div >
-                <div class="flex justify-between">
-                    <span > Waktu Cetak</span >
-                        <span>: ${escapeHTML(now)}</span>
-                                </div >
-                            </div >
-                        </div >
+                let method = String(
+                    item.payment_method || "LAINNYA"
+                ).trim();
 
-                <div class="mb-3">
-                    <table class="w-full text-[11px]">
-                        <tr >
-                                    <td>Total Tunai</td>
-                                    <td class="text-right font-bold">${formatIDR(summary.totalTunai)}</td>
-                                </tr >
-                <tr>
-                    <td>Pembayaran Non-Tunai</td>
-                    <td class="text-right font-bold">${formatIDR(summary.totalKredit)}</td>
-                                </tr >
-                <tr>
-                    <td>Pengeluaran Tunai</td>
-                    <td class="text-right font-bold">${formatIDR(summary.totalExpense)}</td>
-                                </tr >
-                            </table >
 
-                ${expenseRows ? `
-                            <p class="font-bold text-[10px] mt-2 mb-1">
-                                Pengeluaran:
-                            </p>
-                            <table class="w-full text-[10px]">
-                                ${expenseRows}
-                            </table>
-                            ` : ''}
 
-                            ${paymentRows ? `
-                            <p class="font-bold text-[10px] mt-2 mb-1">
-                                Metode Pembayaran:
-                            </p>
-                            <table class="w-full text-[11px]">
-                                ${paymentRows}
-                            </table>
-                            ` : ''}
-                        </div>
+                // Bersihkan label tambahan
+                method = method
+                    .replace(/\[Pelunasan:.*?\]/g, '')
+                    .replace(/,\s*$/g, '')
+                    .trim();
 
-                        <div class="mb-3 border-t border-dashed border-black pt-2">
-                            <div class="flex justify-between font-bold text-[12px] bg-gray-100 p-1">
-                                <span>TOTAL SETOR</span>
-                                <span>${formatIDR(summary.totalTunai - summary.totalExpense)}</span>
-                            </div>
-                        </div>
+
+
+                const amount = Number(
+                    item.total_netto || 0
+                );
+
+
+
+                // Hitung tunai asli dari total netto
+
+                if (
+                    method.toLowerCase() === "tunai" ||
+                    method.toLowerCase() === "cash"
+                ) {
+
+                    totalTunai += amount;
+
+                } else {
+
+                    totalNonTunai += amount;
+
+                }
 
 
 
 
 
-                        <div class="mb-4 border-t border-dashed border-black pt-2">
+                // Group pembayaran
 
-                            <table class="w-full text-[11px]">
+                if (!paymentGroups[method]) {
 
-                                ${detailSalesRows}
+                    paymentGroups[method] = {
 
-                                <tr class="font-bold text-[12px]">
-                                    <td>Total Penjualan</td>
-                                    <td class="text-right">
-                                        ${formatIDR(summary.totalPenjualan)}
-                                    </td>
-                                </tr>
+                        total: 0,
+                        rows: []
 
-                            </table>
+                    };
 
-                        </div>
+                }
 
-                        <div class="border-t border-black pt-4 mb-2">
-                            <div class="flex justify-between text-center text-[11px]">
-                                <div class="w-24">
-                                    <p>(...................)</p>
-                                    <p class="font-bold uppercase mt-1">Kasir</p>
-                                </div>
-                                <div class="w-24">
-                                    <p>(...................)</p>
-                                    <p class="font-bold uppercase mt-1">Finance</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </body>
-                </html>
+
+
+                paymentGroups[method].total += amount;
+
+
+                paymentGroups[method].rows.push(amount);
+
+
+            });
+
+
+
+
+
+
+            // =====================================
+            // DETAIL PEMBAYARAN
+            // =====================================
+
+
+            const paymentDetailRows = Object.entries(paymentGroups)
+                .map(([method, data]) => {
+
+
+                    let html = `
+
+            <div style="margin-top:8px">
+
+                <div class="flex font-bold">
+
+                    <span>
+                        ${escapeHTML(method)}
+                    </span>
+
+
+                    <span>
+                        ${formatIDR(data.total)}
+                    </span>
+
+
+                </div>
+
             `;
 
+
+
+                    // selain tunai tampilkan rincian nominal
+
+                    if (
+                        method.toLowerCase() !== "tunai" &&
+                        method.toLowerCase() !== "cash"
+                    ) {
+
+
+                        data.rows.forEach(value => {
+
+
+                            html += `
+
+                    <div class="flex">
+
+                        <span>
+                            
+                        </span>
+
+
+                        <span>
+                            ${formatIDR(value)}
+                        </span>
+
+
+                    </div>
+
+                    `;
+
+
+                        });
+
+
+                    }
+
+
+
+                    html += `</div>`;
+
+
+                    return html;
+
+
+                })
+                .join('');
+
+
+
+
+
+
+
+
+            // =====================================
+            // PENGELUARAN
+            // =====================================
+
+
+            const expenseRows = (receiptData.expenses || [])
+                .map(item => {
+
+
+                    const desc =
+                        item.deskripsi ??
+                        item.Deskripsi ??
+                        "-";
+
+
+                    const total =
+                        item.total ??
+                        item.Total ??
+                        0;
+
+
+
+                    return `
+
+            <div class="flex">
+
+                <span>
+                    ${escapeHTML(desc)}
+                </span>
+
+
+                <span>
+                    ${formatIDR(total)}
+                </span>
+
+
+            </div>
+
+            `;
+
+
+                })
+                .join('');
+
+
+
+
+
+
+
+            // =====================================
+            // HTML RECEIPT
+            // =====================================
+
+
+            const shiftReceiptHTML = `
+
+<!DOCTYPE html>
+
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+
+
+<title>Rekap Setoran Shift</title>
+
+
+<style>
+
+${RECEIPT_BASE_CSS}
+
+
+.shift-receipt {
+
+    font-size:11px;
+    line-height:1.2;
+
+}
+
+
+.flex {
+
+    display:flex;
+    justify-content:space-between;
+
+}
+
+
+.font-bold {
+
+    font-weight:bold;
+
+}
+
+
+.text-center {
+
+    text-align:center;
+
+}
+
+
+.border-top {
+
+    border-top:1px dashed #000;
+    padding-top:8px;
+    margin-top:8px;
+
+}
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+<div class="shift-receipt">
+
+
+
+
+
+
+<div class="text-center">
+
+
+<h2>
+REKAP SETORAN SHIFT KASIR
+</h2>
+
+
+<p>
+LANGGENG ELEKTRONIKA
+</p>
+
+
+<p>
+${escapeHTML(storeHeader.address)}
+</p>
+
+
+<p>
+${escapeHTML(storeHeader.phone)}
+</p>
+
+
+<p>
+Email: langgengtemaja8888@gmail.com
+</p>
+
+
+
+<br>
+
+
+<div style="text-align:left">
+
+
+<div class="flex">
+
+<span>
+Kasir
+</span>
+
+
+<span>
+: ${escapeHTML(userData.name || "-")}
+</span>
+
+
+</div>
+
+
+
+<div class="flex">
+
+<span>
+Tanggal
+</span>
+
+
+<span>
+: ${escapeHTML(now)}
+</span>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="border-top">
+
+
+<div class="flex font-bold">
+
+<span>
+Total Tunai
+</span>
+
+
+<span>
+${formatIDR(totalTunai)}
+</span>
+
+
+</div>
+
+
+
+<div class="flex">
+
+<span>
+Penjualan Voucher
+</span>
+
+
+<span>
+0
+</span>
+
+
+</div>
+
+
+
+<div class="flex">
+
+<span>
+Penjualan Kredit
+</span>
+
+
+<span>
+0
+</span>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="border-top">
+
+
+${expenseRows ? `
+
+<div class="font-bold">
+Pengeluaran
+</div>
+
+
+${expenseRows}
+
+
+` : ''}
+
+
+</div>
+
+
+
+
+
+
+
+<div class="border-top">
+
+
+${paymentDetailRows}
+
+
+</div>
+
+
+
+
+
+
+
+<div class="border-top">
+
+
+<div class="flex font-bold">
+
+
+<span>
+Tot Setor
+</span>
+
+
+<span>
+${formatIDR(totalTunai)}
+</span>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="border-top">
+
+
+<div class="font-bold">
+
+Rekap Setoran
+
+</div>
+
+
+
+<div class="flex">
+
+<span>
+- Tunai
+</span>
+
+
+<span>
+${formatIDR(totalTunai)}
+</span>
+
+
+</div>
+
+
+
+
+<div class="flex">
+
+<span>
+- Kredit
+</span>
+
+
+<span>
+ 0
+</span>
+
+
+</div>
+
+
+
+
+<div class="flex">
+
+<span>
+- Merchant
+</span>
+
+
+<span>
+0
+</span>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<div style="margin-top:40px">
+
+
+<div class="flex text-center">
+
+
+<div style="width:50%">
+
+(....................)
+
+<br>
+
+Kasir
+
+
+</div>
+
+
+
+<div style="width:50%">
+
+(....................)
+
+<br>
+
+Finance
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+</div>
+
+
+</body>
+
+
+</html>
+
+
+`;
+
+
+
             return printHTML(shiftReceiptHTML);
+
+
         }
 
         async function confirmLogout() {
