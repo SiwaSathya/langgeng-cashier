@@ -575,8 +575,8 @@
 
                             const itemRowsHTML = items.map((it, itemIdx) => {
                                 const itName = it.product?.nama || it.product?.Nama || it.Product?.Nama || it.product_search || `Item #${it.id || ''}`;
-                                const itCode = it.product?.kode || it.Product?.Kode || '-';
-                                const itSatuan = it.product?.satuan || it.Product?.Satuan || 'PCS';
+                                const itCode = it.product?.kode || it.product?.Kode || '-';
+                                const itSatuan = it.product?.satuan || it.product?.Satuan || 'PCS';
                                 const itQty = Number(it.qty || it.Qty || 0);
                                 const itPrice = Number(it.h_jual || it.HJual || it.price || 0);
                                 const itDiscount = Number(it.discount || it.Discount || 0);
@@ -852,8 +852,8 @@
             const items = group.items || [];
 
             const itemRows = items.map(item => {
-                const pName = item.product?.nama || item.Product?.Nama || item.product_search || 'Produk';
-                const pCode = item.product?.kode || item.Product?.Kode || '-';
+                const pName = item.product?.nama || item.product?.Nama || item.product_search || 'Produk';
+                const pCode = item.product?.kode || item.product?.Kode || '-';
                 const itPrice = Number(item.h_jual || item.HJual || item.price || 0);
                 const itQty = Number(item.qty || item.Qty || 1);
                 const itSubtotal = Number(item.total_netto || item.TotalNetto || (itQty * itPrice));
@@ -1271,8 +1271,8 @@
             }
 
             const itemRows = items.map(item => {
-                const pName = item.product?.nama || item.Product?.Nama || item.product_search || 'Produk';
-                const pCode = item.product?.kode || item.Product?.Kode || '-';
+                const pName = item.Product?.nama || item.product?.Nama || item.product_search || 'Produk';
+                const pCode = item.Product?.kode || item.product?.Kode || '-';
                 const itPrice = Number(item.h_jual || item.HJual || item.price || 0);
                 const itQty = Number(item.qty || item.Qty || 1);
                 const itSubtotal = Number(item.total_netto || item.TotalNetto || (itQty * itPrice));
@@ -1358,8 +1358,8 @@
         function showReturForm(item, invoiceNo) {
             const saleId = item.id || item.ID || 0;
             const maxQty = Number(item.qty || item.Qty || 1);
-            const itemName = item.product?.nama || item.Product?.Nama || item.product_search || 'Produk';
-            const itemCode = item.product?.kode || item.Product?.Kode || '-';
+            const itemName = item.product?.nama || item.product?.Nama || item.product_search || 'Produk';
+            const itemCode = item.product?.kode || item.product?.Kode || '-';
 
             Swal.fire({
                 title: '<span class="text-slate-800 font-bold text-lg">Retur Barang Penjualan</span>',
