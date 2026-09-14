@@ -1076,8 +1076,8 @@
             else if (isDp) statusNota = "DP / UANG MUKA";
 
             const itemRows = items.map(item => {
-                const pName = item.product?.nama || item.Product?.Nama || item.product_search || 'Produk';
-                const pCode = item.product?.kode || item.Product?.Kode || '-';
+                const pName = item.product?.nama || item.product?.Nama || item.product_search || 'Produk';
+                const pCode = item.product?.kode || item.product?.Kode || '-';
                 const itPrice = Number(item.h_jual || item.HJual || item.price || 0);
                 const itQty = Number(item.qty || item.Qty || 1);
                 const itSubtotal = Number(item.total_netto || item.TotalNetto || (itQty * itPrice));
