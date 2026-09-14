@@ -232,15 +232,31 @@
                             </div>
                         </div>
 
+                        <!-- Switch DP -->
                         <div
                             class="flex justify-between items-center h-14 bg-slate-50 border border-slate-100 px-6 rounded-2xl">
                             <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Status Transaksi DP
                                 (Uang Muka)</span>
                             <label for="inp-is-dp" class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="inp-is-dp" onchange="toggleCustomerForm()"
-                                    class="sr-only peer">
+                                <input type="checkbox" id="inp-is-dp" onchange="onToggleDP()" class="sr-only peer">
                                 <div
                                     class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Switch BON / UTANG (BARU) -->
+                        <div
+                            class="flex justify-between items-center h-14 bg-amber-50/60 border border-amber-200/60 px-6 rounded-2xl mt-3">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-file-invoice-dollar text-amber-600"></i>
+                                <span class="text-xs font-bold text-amber-800 uppercase tracking-wider">Transaksi Bon /
+                                    Utang (Bayar Rp 0)</span>
+                            </div>
+                            <label for="inp-is-bon" class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="inp-is-bon" onchange="onToggleBon()" class="sr-only peer">
+                                <div
+                                    class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500">
                                 </div>
                             </label>
                         </div>
@@ -565,7 +581,14 @@
                 nameLabel = `${type} - ${subValue}`;
             }
 
-            paymentList.push({ label: nameLabel, value: amount });
+            // Simpan data lengkap untuk keperluan display dan payload API
+            paymentList.push({
+                label: nameLabel,
+                value: amount,
+                type: nameLabel,
+                amount: String(amount)
+            });
+
             document.getElementById('pay-input-amount').value = "";
             renderPaymentList();
         }
@@ -697,6 +720,37 @@
             item.price = price;
             item.subtotal = qty * price;
             renderCart(true);
+        }
+
+        function onToggleDP() {
+            const isDp = document.getElementById('inp-is-dp').checked;
+            if (isDp) {
+                document.getElementById('inp-is-bon').checked = false;
+            }
+            toggleCustomerForm();
+        }
+
+        function onToggleBon() {
+            const isBon = document.getElementById('inp-is-bon').checked;
+            if (isBon) {
+                document.getElementById('inp-is-dp').checked = false;
+                // Kosongkan list pembayaran jika user memilih Bon penuh (0 bayar)
+                paymentList = [];
+                renderPaymentList();
+            }
+            toggleCustomerForm();
+        }
+
+        function toggleCustomerForm() {
+            const isDp = document.getElementById('inp-is-dp').checked;
+            const isBon = document.getElementById('inp-is-bon').checked;
+            const container = document.getElementById('customer-container');
+
+            if (isDp || isBon) {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
         }
 
         function renderCart(fullRender = true) {
@@ -947,7 +1001,6 @@
         }
 
         async function printShiftReceipt(receiptData = {}) {
-
             const userData = getUserDataFromToken() || {};
             const storeHeader = getStoreHeaderByLocation();
 
@@ -956,658 +1009,258 @@
                 timeStyle: 'medium'
             });
 
-
             // =====================================
-            // HITUNG ULANG DARI TOTAL_NETTO
+            // PENGOLAHAN DATA MULTI-PAYMENT
             // =====================================
-
             let totalTunai = 0;
+            let totalKredit = 0;
+            let totalMerchant = 0;
             let totalNonTunai = 0;
-
-
             const paymentGroups = {};
 
+            const isCash = (str) => /^(tunai|cash)$/i.test(String(str || '').trim());
+            const isCreditMethod = (str) => /^(kredit|bon|utang|leasing|fif|adira|hci)/i.test(String(str || '').trim());
 
             (receiptData.sales || []).forEach(item => {
+                const methods = item.payment_methods || item.PaymentMethods || [];
 
+                if (Array.isArray(methods) && methods.length > 0) {
+                    // 1. Ambil data presisi dari tabel payment_methods
+                    methods.forEach(pm => {
+                        const type = (pm.type || pm.Type || 'Lainnya').trim();
+                        const amount = parseFloat(pm.amount || pm.Amount || 0);
 
-                let method = String(
-                    item.payment_method || "LAINNYA"
-                ).trim();
+                        if (!Number.isFinite(amount) || amount <= 0) return;
 
+                        if (isCash(type)) {
+                            totalTunai += amount;
+                        } else {
+                            totalNonTunai += amount;
+                            if (isCreditMethod(type)) {
+                                totalKredit += amount;
+                            } else {
+                                totalMerchant += amount;
+                            }
+                        }
 
-
-                // Bersihkan label tambahan
-                method = method
-                    .replace(/\[Pelunasan:.*?\]/g, '')
-                    .replace(/,\s*$/g, '')
-                    .trim();
-
-
-
-                const amount = Number(
-                    item.total_netto || 0
-                );
-
-
-
-                // Hitung tunai asli dari total netto
-
-                if (
-                    method.toLowerCase() === "tunai" ||
-                    method.toLowerCase() === "cash"
-                ) {
-
-                    totalTunai += amount;
-
+                        if (!paymentGroups[type]) {
+                            paymentGroups[type] = { total: 0, rows: [] };
+                        }
+                        paymentGroups[type].total += amount;
+                        paymentGroups[type].rows.push(amount);
+                    });
                 } else {
+                    // 2. Fallback untuk data nota lama
+                    let method = String(item.payment_method || item.PaymentMethod || 'Tunai').trim();
+                    method = method
+                        .replace(/\[Pelunasan:.*?\]/g, '')
+                        .replace(/,\s*$/g, '')
+                        .trim();
 
-                    totalNonTunai += amount;
+                    const amount = Number(item.total_netto || item.TotalNetto || 0);
 
+                    if (isCash(method)) {
+                        totalTunai += amount;
+                    } else {
+                        totalNonTunai += amount;
+                        if (isCreditMethod(method)) {
+                            totalKredit += amount;
+                        } else {
+                            totalMerchant += amount;
+                        }
+                    }
+
+                    if (!paymentGroups[method]) {
+                        paymentGroups[method] = { total: 0, rows: [] };
+                    }
+                    paymentGroups[method].total += amount;
+                    paymentGroups[method].rows.push(amount);
                 }
-
-
-
-
-
-                // Group pembayaran
-
-                if (!paymentGroups[method]) {
-
-                    paymentGroups[method] = {
-
-                        total: 0,
-                        rows: []
-
-                    };
-
-                }
-
-
-
-                paymentGroups[method].total += amount;
-
-
-                paymentGroups[method].rows.push(amount);
-
-
             });
 
             const totalKeseluruhan = totalTunai + totalNonTunai;
 
-
-
-
-
-
             // =====================================
             // DETAIL PEMBAYARAN
             // =====================================
-
-
             const paymentDetailRows = Object.entries(paymentGroups)
                 .map(([method, data]) => {
-
-
                     let html = `
-
-            <div style="margin-top:8px">
-
-                <div class="flex font-bold">
-
-                    <span>
-                        ${escapeHTML(method)}
-                    </span>
-
-
-                    <span>
-                        ${formatIDR(data.total)}
-                    </span>
-
-
-                </div>
-
+                <div style="margin-top:8px">
+                    <div class="flex font-bold">
+                        <span>${escapeHTML(method)}</span>
+                        <span>${formatIDR(data.total)}</span>
+                    </div>
             `;
 
-
-
-                    // selain tunai tampilkan rincian nominal
-
-                    if (
-                        method.toLowerCase() !== "tunai" &&
-                        method.toLowerCase() !== "cash"
-                    ) {
-
-
+                    // Selain tunai tampilkan rincian nominal ke bawah
+                    if (!isCash(method)) {
                         data.rows.forEach(value => {
-
-
                             html += `
-
-                    <div class="flex">
-
-                        <span>
-                            
-                        </span>
-
-
-                        <span>
-                            ${formatIDR(value)}
-                        </span>
-
-
-                    </div>
-
+                        <div class="flex">
+                            <span></span>
+                            <span>${formatIDR(value)}</span>
+                        </div>
                     `;
-
-
                         });
-
-
                     }
 
-
-
                     html += `</div>`;
-
-
                     return html;
-
-
                 })
                 .join('');
-
-
-
-
-
-
-
 
             // =====================================
             // PENGELUARAN
             // =====================================
-
-
             const expenseRows = (receiptData.expenses || [])
                 .map(item => {
-
-
-                    const desc =
-                        item.deskripsi ??
-                        item.Deskripsi ??
-                        "-";
-
-
-                    const total =
-                        item.total ??
-                        item.Total ??
-                        0;
-
-
+                    const desc = item.deskripsi ?? item.Deskripsi ?? "-";
+                    const total = item.total ?? item.Total ?? 0;
 
                     return `
-
-            <div class="flex">
-
-                <span>
-                    ${escapeHTML(desc)}
-                </span>
-
-
-                <span>
-                    ${formatIDR(total)}
-                </span>
-
-
-            </div>
-
+                <div class="flex">
+                    <span>${escapeHTML(desc)}</span>
+                    <span>${formatIDR(total)}</span>
+                </div>
             `;
-
-
                 })
                 .join('');
 
-
-
-
-
-
-
             // =====================================
-            // HTML RECEIPT
+            // HTML RECEIPT (LAYOUT & DESAIN ASLI)
             // =====================================
-
-
             const shiftReceiptHTML = `
-
 <!DOCTYPE html>
-
 <html lang="id">
-
 <head>
-
 <meta charset="UTF-8">
-
-
 <title>Rekap Setoran Shift</title>
-
-
 <style>
-
 ${RECEIPT_BASE_CSS}
 
-
 .shift-receipt {
-
-    font-size:11px;
-    line-height:1.2;
-
+    font-size: 11px;
+    line-height: 1.2;
 }
-
 
 .flex {
-
-    display:flex;
-    justify-content:space-between;
-
+    display: flex;
+    justify-content: space-between;
 }
-
 
 .font-bold {
-
-    font-weight:bold;
-
+    font-weight: bold;
 }
-
 
 .text-center {
-
-    text-align:center;
-
+    text-align: center;
 }
-
 
 .border-top {
-
-    border-top:1px dashed #000;
-    padding-top:8px;
-    margin-top:8px;
-
+    border-top: 1px dashed #000;
+    padding-top: 8px;
+    margin-top: 8px;
 }
-
-
 </style>
-
-
 </head>
-
-
 <body>
-
-
 <div class="shift-receipt">
 
-
-
-
-
-
 <div class="text-center">
-
-
-<h2>
-REKAP SETORAN SHIFT KASIR
-</h2>
-
-
-<p>
-LANGGENG ELEKTRONIKA
-</p>
-
-
-<p>
-${escapeHTML(storeHeader.address)}
-</p>
-
-
-<p>
-${escapeHTML(storeHeader.phone)}
-</p>
-
-
-<p>
-Email: langgengtemaja8888@gmail.com
-</p>
-
-
-
-<br>
-
-
-<div style="text-align:left">
-
-
-<div class="flex">
-
-<span>
-Kasir
-</span>
-
-
-<span>
-: ${escapeHTML(userData.name || "-")}
-</span>
-
-
+    <h2>REKAP SETORAN SHIFT KASIR</h2>
+    <p>LANGGENG ELEKTRONIKA</p>
+    <p>${escapeHTML(storeHeader.address)}</p>
+    <p>${escapeHTML(storeHeader.phone)}</p>
+    <p>Email: langgengtemaja8888@gmail.com</p>
+    <br>
+    <div style="text-align:left">
+        <div class="flex">
+            <span>Kasir</span>
+            <span>: ${escapeHTML(userData.name || "-")}</span>
+        </div>
+        <div class="flex">
+            <span>Tanggal</span>
+            <span>: ${escapeHTML(now)}</span>
+        </div>
+    </div>
 </div>
-
-
-
-<div class="flex">
-
-<span>
-Tanggal
-</span>
-
-
-<span>
-: ${escapeHTML(now)}
-</span>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
 
 <div class="border-top">
-
-
-<div class="flex font-bold">
-
-<span>
-Total Tunai
-</span>
-
-
-<span>
-${formatIDR(totalTunai)}
-</span>
-
-
+    <div class="flex font-bold">
+        <span>Total Tunai</span>
+        <span>${formatIDR(totalTunai)}</span>
+    </div>
+    <div class="flex">
+        <span>Penjualan Voucher</span>
+        <span>0</span>
+    </div>
+    <div class="flex">
+        <span>Penjualan Kredit</span>
+        <span>${formatIDR(totalKredit)}</span>
+    </div>
 </div>
-
-
-
-<div class="flex">
-
-<span>
-Penjualan Voucher
-</span>
-
-
-<span>
-0
-</span>
-
-
-</div>
-
-
-
-<div class="flex">
-
-<span>
-Penjualan Kredit
-</span>
-
-
-<span>
-0
-</span>
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
 
 <div class="border-top">
-
-
-${expenseRows ? `
-
-<div class="font-bold">
-Pengeluaran
+    ${expenseRows ? `
+        <div class="font-bold">Pengeluaran</div>
+        ${expenseRows}
+    ` : ''}
 </div>
-
-
-${expenseRows}
-
-
-` : ''}
-
-
-</div>
-
-
-
-
-
-
 
 <div class="border-top">
-
-
-${paymentDetailRows}
-
-
+    ${paymentDetailRows}
 </div>
-
-
-
-
-
-
 
 <div class="border-top">
-
-
-<div class="flex font-bold">
-
-
-<span>
-Tot Setor
-</span>
-
-
-<span>
-${formatIDR(totalTunai)}
-</span>
-
-
+    <div class="flex font-bold">
+        <span>Tot Setor</span>
+        <span>${formatIDR(totalTunai)}</span>
+    </div>
 </div>
-
-
-</div>
-
 
 <div class="border-top">
-
-
-<div class="flex font-bold">
-
-
-<span>
-Tot Keseluruhan
-</span>
-
-
-<span>
-${formatIDR(totalKeseluruhan)}
-</span>
-
-
+    <div class="flex font-bold">
+        <span>Tot Keseluruhan</span>
+        <span>${formatIDR(totalKeseluruhan)}</span>
+    </div>
 </div>
-
-
-</div>
-
-
-
-
-
-
-
 
 <div class="border-top">
-
-
-<div class="font-bold">
-
-Rekap Setoran
-
+    <div class="font-bold">Rekap Setoran</div>
+    <div class="flex">
+        <span>- Tunai</span>
+        <span>${formatIDR(totalTunai)}</span>
+    </div>
+    <div class="flex">
+        <span>- Kredit</span>
+        <span>${formatIDR(totalKredit)}</span>
+    </div>
+    <div class="flex">
+        <span>- Merchant</span>
+        <span>${formatIDR(totalMerchant)}</span>
+    </div>
 </div>
-
-
-
-<div class="flex">
-
-<span>
-- Tunai
-</span>
-
-
-<span>
-${formatIDR(totalTunai)}
-</span>
-
-
-</div>
-
-
-
-
-<div class="flex">
-
-<span>
-- Kredit
-</span>
-
-
-<span>
- 0
-</span>
-
-
-</div>
-
-
-
-
-<div class="flex">
-
-<span>
-- Merchant
-</span>
-
-
-<span>
-0
-</span>
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-
 
 <div style="margin-top:40px">
-
-
-<div class="flex text-center">
-
-
-<div style="width:50%">
-
-(....................)
-
-<br>
-
-Kasir
-
-
+    <div class="flex text-center">
+        <div style="width:50%">
+            (....................)<br>
+            Kasir
+        </div>
+        <div style="width:50%">
+            (....................)<br>
+            Finance
+        </div>
+    </div>
 </div>
 
-
-
-<div style="width:50%">
-
-(....................)
-
-<br>
-
-Finance
-
-
 </div>
-
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-</div>
-
-
 </body>
-
-
 </html>
-
-
-`;
-
-
+    `;
 
             return printHTML(shiftReceiptHTML);
-
-
         }
 
         async function confirmLogout() {
@@ -1716,168 +1369,277 @@ Finance
             const change = Math.max(totalPaid - totalBill, 0);
             const remaining = Math.max(totalBill - totalPaid, 0);
             const isDp = document.getElementById('inp-is-dp').checked;
+            const isBon = document.getElementById('inp-is-bon').checked;
             const invoiceNo = getReceiptNumber(transactionResult);
             const now = new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
 
             const customerName = document.getElementById('cust-name')?.value?.trim() || '-';
             const customerPhone = document.getElementById('cust-phone')?.value?.trim() || '-';
 
+            let statusNota = "LUNAS";
+            if (isBon) statusNota = "BON / UTANG";
+            else if (isDp) statusNota = "DP / UANG MUKA";
+
             const itemRows = cart.map(item => {
                 const categoryText = (item.Category && item.Category.Name) ? ` (${escapeHTML(item.Category.Name)})` : '';
                 return `
-                <tr>
-                    <td colspan="3" class="item-name">${escapeHTML(item.Nama) + categoryText}</td>
-                </tr>
-                <tr>
-                    <td>${escapeHTML(item.Kode)}</td>
-                    <td class="center">${item.qty} x ${Number(item.price || 0).toLocaleString('id-ID')}</td>
-                    <td class="right">${Number(item.subtotal || 0).toLocaleString('id-ID')}</td>
-                </tr>
-            `;
+        <tr>
+            <td colspan="3" class="item-name">${escapeHTML(item.Nama) + categoryText}</td>
+        </tr>
+        <tr>
+            <td>${escapeHTML(item.Kode)}</td>
+            <td class="center">${item.qty} x ${Number(item.price || 0).toLocaleString('id-ID')}</td>
+            <td class="right">${Number(item.subtotal || 0).toLocaleString('id-ID')}</td>
+        </tr>
+        `;
             }).join('');
 
-            const paymentRows = paymentList.map(pay => `
-                <tr>
-                    <td>${escapeHTML(pay.label)}</td>
-                    <td class="right">${Number(pay.value || 0).toLocaleString('id-ID')}</td>
-                </tr>
-            `).join('');
+            const paymentRows = (paymentList.length > 0) ? paymentList.map(pay => `
+        <tr>
+            <td>${escapeHTML(pay.label)}</td>
+            <td class="right">${Number(pay.value || 0).toLocaleString('id-ID')}</td>
+        </tr>
+    `).join('') : `
+        <tr>
+            <td>Bon / Utang</td>
+            <td class="right">0</td>
+        </tr>
+    `;
 
-            const receiptHTML = `
-                <!DOCTYPE html>
-                <html lang="id">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Nota ${escapeHTML(invoiceNo)}</title>
-                    <style>
-                        ${RECEIPT_BASE_CSS}
+            // Tentukan jumlah rangkap lembar: 3 lembar jika Bon, 1 lembar jika transaksi biasa
+            const copySheets = isBon
+                ? [
+                    "LEMBAR 1: KASIR / TOKO",
+                    "LEMBAR 2: PELANGGAN",
+                    "LEMBAR 3: ARSIP / FINANCE"
+                ]
+                : [""];
 
-                        .center { text-align: center; }
-                        .right { text-align: right; }
-                        .bold { font-weight: bold; }
-                        .line {
-                            border-top: 1px dashed #000;
-                            margin: 8px 0;
-                        }
+            // Template generator untuk satu badan nota
+            const generateSingleReceipt = (copyLabel) => `
+        <div class="receipt">
+            ${copyLabel ? `
+                <div class="copy-badge">*** ${copyLabel} ***</div>
+            ` : ''}
 
-.item-name {
-                            font-weight: bold;
-                            padding-top: 4px;
-                        }
+            <div class="center">
+                <div class="store-name">LANGGENG ELEKTRONIKA</div>
+                <div style="font-size: 10px; margin-top: 2px;">${escapeHTML(storeHeader.address)}</div>
+                <div style="font-size: 10px;">Telp: ${escapeHTML(storeHeader.phone)}</div>
+                <div style="font-size: 10px;">Email: langgengtemaja8888@gmail.com</div>
+                <div style="margin-top: 6px; font-weight: bold; font-size: 12px;">
+                    ${isBon ? 'NOTA BON / TAGIHAN UTANG' : 'NOTA TRANSAKSI'}
+                </div>
+            </div>
 
-                        .store-name {
-                            font-size: 14px;
-                            font-weight: bold;
-                            text-transform: uppercase;
-                        }
+            <div class="line"></div>
 
-                        .thanks {
-                            margin-top: 10px;
-                            text-align: center;
-                            font-weight: bold;
-                        }
+            <table>
+                <tr><td>No Nota</td><td class="right">${escapeHTML(invoiceNo)}</td></tr>
+                <tr><td>Tanggal</td><td class="right">${escapeHTML(now)}</td></tr>
+                <tr><td>Kasir</td><td class="right">${escapeHTML(userData.name || 'Desak Kasir')}</td></tr>
+                <tr><td>Status</td><td class="right font-bold">${statusNota}</td></tr>
+                ${(isDp || isBon) ? `
+                    <tr><td>Pelanggan</td><td class="right font-bold">${escapeHTML(customerName)}</td></tr>
+                    <tr><td>No HP</td><td class="right">${escapeHTML(customerPhone)}</td></tr>
+                ` : ''}
+            </table>
 
-                        @media print {
-                            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="receipt">
-                        <div class="center">
-                            <div class="store-name">LANGGENG ELEKTRONIKA</div>
-                            <div style="font-size: 10px; margin-top: 2px;">    ${escapeHTML(storeHeader.address)}</div>
-                            <div style="font-size: 10px;">Telp: ${escapeHTML(storeHeader.phone)}</div>
-                            <div style="font-size: 10px;">Email: langgengtemaja8888@gmail.com</div>
-                            <div style="margin-top: 6px; font-weight: bold; font-size: 12px;">NOTA TRANSAKSI</div>
-                        </div>
+            <div class="line"></div>
 
-                        <div class="line"></div>
+            <table>
+                ${itemRows}
+            </table>
 
-                        <table>
-                            <tr><td>No Nota</td><td class="right">${escapeHTML(invoiceNo)}</td></tr>
-                            <tr><td>Tanggal</td><td class="right">${escapeHTML(now)}</td></tr>
-                            <tr><td>Kasir</td><td class="right">${escapeHTML(userData.name || 'Desak Kasir')}</td></tr>
-                            <tr><td>Status</td><td class="right">${isDp ? 'DP / Uang Muka' : 'Lunas'}</td></tr>
-                            ${isDp ? `
-                                <tr><td>Customer</td><td class="right">${escapeHTML(customerName)}</td></tr>
-                                <tr><td>No HP</td><td class="right">${escapeHTML(customerPhone)}</td></tr>
-                            ` : ''}
-                        </table>
+            <div class="line"></div>
 
-                        <div class="line"></div>
+            <table>
+                <tr class="bold"><td>Total Tagihan</td><td class="right">${Number(totalBill).toLocaleString('id-ID')}</td></tr>
+                <tr><td>Dibayar</td><td class="right">${Number(totalPaid).toLocaleString('id-ID')}</td></tr>
+                ${(isDp || isBon) ? `
+                    <tr class="bold" style="font-size: 12px;">
+                        <td>SISA UTANG</td>
+                        <td class="right">${Number(remaining).toLocaleString('id-ID')}</td>
+                    </tr>
+                ` : `
+                    <tr><td>Kembali</td><td class="right">${Number(change).toLocaleString('id-ID')}</td></tr>
+                `}
+            </table>
 
-                        <table>
-                            ${itemRows}
-                        </table>
+            <div class="line"></div>
 
-                        <div class="line"></div>
+            <div class="bold">Metode Pembayaran:</div>
+            <table>
+                ${paymentRows}
+            </table>
 
-                        <table>
-                            <tr class="bold"><td>Total</td><td class="right">${Number(totalBill).toLocaleString('id-ID')}</td></tr>
-                            <tr><td>Dibayar</td><td class="right">${Number(totalPaid).toLocaleString('id-ID')}</td></tr>
-                            ${isDp ? `
-                                <tr class="bold"><td>Sisa</td><td class="right">${Number(remaining).toLocaleString('id-ID')}</td></tr>
-                            ` : `
-                                <tr><td>Kembali</td><td class="right">${Number(change).toLocaleString('id-ID')}</td></tr>
-                            `}
-                        </table>
-
-                        <div class="line"></div>
-
-                        <div class="bold">Pembayaran:</div>
-                        <table>
-                            ${paymentRows}
-                        </table>
-
-                        <div class="line"></div>
-
-                        <div class="thanks">TERIMA KASIH</div>
-                        <div class="center">Barang yang sudah dibeli tidak dapat dikembalikan.</div>
+            ${isBon ? `
+                <div class="line"></div>
+                <div style="font-size: 9px; line-height: 1.2; text-align: justify; margin: 4px 0;">
+                    * Saya menyatakan telah menerima barang tersebut dalam keadaan baik dan berjanji akan melunasi sisa tagihan sesuai kesepakatan.
+                </div>
+                <div style="margin-top: 18px; display: flex; justify-content: space-between; text-align: center; font-size: 10px;">
+                    <div style="width: 45%;">
+                        Pelanggan,<br><br><br>
+                        ( ${escapeHTML(customerName)} )
                     </div>
-                </body>
-                </html>
-            `;
+                    <div style="width: 45%;">
+                        Kasir,<br><br><br>
+                        ( ${escapeHTML(userData.name || 'Kasir')} )
+                    </div>
+                </div>
+            ` : `
+                <div class="line"></div>
+                <div class="thanks">TERIMA KASIH</div>
+                <div class="center" style="font-size: 9px;">Barang yang sudah dibeli tidak dapat dikembalikan.</div>
+            `}
+        </div>
+    `;
 
-            return printHTML(receiptHTML);
+            // Gabungkan 3 lembar nota
+            const allReceiptsHTML = copySheets.map(label => generateSingleReceipt(label)).join('');
+
+            const fullHTML = `
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+            <meta charset="UTF-8">
+            <title>Nota ${escapeHTML(invoiceNo)}</title>
+            <style>
+                ${RECEIPT_BASE_CSS}
+
+                .center { text-align: center; }
+                .right { text-align: right; }
+                .bold { font-weight: bold; }
+                .line {
+                    border-top: 1px dashed #000;
+                    margin: 6px 0;
+                }
+                .item-name {
+                    font-weight: bold;
+                    padding-top: 4px;
+                }
+                .store-name {
+                    font-size: 14px;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                }
+                .thanks {
+                    margin-top: 8px;
+                    text-align: center;
+                    font-weight: bold;
+                }
+                .copy-badge {
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 10px;
+                    border: 1px solid #000;
+                    padding: 2px;
+                    margin-bottom: 6px;
+                    letter-spacing: 0.5px;
+                }
+
+                /* Menangani pemisahan lembar rangkap untuk printer */
+                .receipt {
+                    page-break-after: always;
+                    break-after: page;
+                    margin-bottom: 20px;
+                }
+                .receipt:last-child {
+                    page-break-after: auto;
+                    break-after: auto;
+                    margin-bottom: 0;
+                }
+
+                @media print {
+                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    .receipt {
+                        page-break-after: always;
+                        break-after: page;
+                    }
+                    .receipt:last-child {
+                        page-break-after: auto;
+                        break-after: auto;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            ${allReceiptsHTML}
+        </body>
+        </html>
+    `;
+
+            return printHTML(fullHTML);
         }
 
         async function executePayment() {
             if (paymentPending) return;
-            if (cart.some(i => !validLine(i.qty, i.price, Number(i.HBeli ?? 0))) || paymentList.some(p => !Number.isFinite(p.value) || p.value <= 0)) {
-                return Swal.fire('Input tidak valid', 'Periksa jumlah, harga, dan nominal pembayaran.', 'error');
-            }
+
             if (cart.length === 0) return Swal.fire('Opps', 'Keranjang masih kosong!', 'warning');
-            if (paymentList.length === 0) return Swal.fire('Opps', 'Tambahkan minimal satu metode pembayaran!', 'warning');
+            if (cart.some(i => !validLine(i.qty, i.price, Number(i.HBeli ?? 0)))) {
+                return Swal.fire('Input tidak valid', 'Periksa kembali jumlah dan harga belanjaan.', 'error');
+            }
+
+            const isDp = document.getElementById('inp-is-dp').checked;
+            const isBon = document.getElementById('inp-is-bon').checked;
+
+            // Jika BUKAN Bon, auto-tambah input nominal jika kasir belum klik "Masuk List"
+            if (!isBon && paymentList.length === 0) {
+                const inputAmount = parseFloat(document.getElementById('pay-input-amount').value || 0);
+                if (Number.isFinite(inputAmount) && inputAmount > 0) {
+                    addPaymentToList();
+                }
+            }
+
+            // Transaksi biasa & DP wajib punya pembayaran, transaksi Bon boleh tanpa pembayaran
+            if (!isBon && paymentList.length === 0) {
+                return Swal.fire('Opps', 'Tambahkan minimal satu metode pembayaran!', 'warning');
+            }
 
             const userData = getUserDataFromToken();
-            if (!userData || !userData.user_id) return Swal.fire('Sesi Berakhir', 'Silakan login kembali.', 'error');
+            if (!userData || !userData.user_id) {
+                return Swal.fire('Sesi Berakhir', 'Silakan login kembali.', 'error');
+            }
 
             const totalBill = cart.reduce((s, i) => s + i.subtotal, 0);
             const totalPaid = paymentList.reduce((s, p) => s + p.value, 0);
-            const isDp = document.getElementById('inp-is-dp').checked;
 
-            if (!Number.isFinite(totalBill) || !Number.isFinite(totalPaid)) {
-                return Swal.fire('Nominal tidak valid', 'Total transaksi melewati batas angka yang dapat diproses.', 'error');
+            // Validasi pembayaran cukup jika bukan DP & bukan Bon
+            if (!isDp && !isBon && totalPaid < totalBill) {
+                return Swal.fire('Gagal', `Uang pembayaran kurang! Total: ${formatIDR(totalBill)}, Dibayar: ${formatIDR(totalPaid)}`, 'error');
             }
-            if (!isDp && totalPaid < totalBill) {
-                return Swal.fire('Gagal', `Uang pembayaran kurang!`, 'error');
-            }
-
-            const finalPaymentMethodString = paymentList.map(p => p.label).join(", ");
 
             const customerPayload = {
-                name: isDp ? document.getElementById('cust-name').value.trim() : "",
-                phone_number: isDp ? document.getElementById('cust-phone').value.trim() : "",
-                identity_number: isDp ? document.getElementById('cust-identity').value.trim() : "",
-                age: isDp ? (parseInt(document.getElementById('cust-age').value) || 0) : 0,
-                address: isDp ? document.getElementById('cust-address').value.trim() : ""
+                name: (isDp || isBon) ? document.getElementById('cust-name').value.trim() : "",
+                phone_number: (isDp || isBon) ? document.getElementById('cust-phone').value.trim() : "",
+                identity_number: (isDp || isBon) ? document.getElementById('cust-identity').value.trim() : "",
+                age: (isDp || isBon) ? (parseInt(document.getElementById('cust-age').value) || 0) : 0,
+                address: (isDp || isBon) ? document.getElementById('cust-address').value.trim() : ""
             };
 
-            if (isDp) {
-                if (!customerPayload.name || !customerPayload.phone_number) {
-                    return Swal.fire('Form Belum Lengkap', 'Nama & No. HP Pelanggan wajib diisi untuk DP!', 'warning');
-                }
+            if ((isDp || isBon) && (!customerPayload.name || !customerPayload.phone_number)) {
+                return Swal.fire('Data Pelanggan Wajib', 'Nama dan No. HP Pelanggan wajib diisi untuk transaksi Bon / DP!', 'warning');
+            }
+
+            // Siapkan payment methods
+            let paymentMethodsPayload = [];
+            let finalPaymentMethodString = "";
+
+            if (isBon && paymentList.length === 0) {
+                finalPaymentMethodString = "Bon / Utang";
+                paymentMethodsPayload.push({
+                    type: "Bon / Utang",
+                    amount: "0",
+                    status: "Belum Lunas"
+                });
+            } else {
+                paymentMethodsPayload = paymentList.map(p => ({
+                    type: p.label,
+                    amount: String(p.value),
+                    status: isDp ? "DP" : (isBon ? "Bon" : "Lunas")
+                }));
+                finalPaymentMethodString = paymentList.map(p => p.label).join(", ");
             }
 
             const payload = {
@@ -1887,20 +1649,24 @@ Finance
                 payment_method: finalPaymentMethodString,
                 amount_paid: totalPaid,
                 is_dp: isDp,
+                is_bon: isBon,
                 customer: customerPayload,
                 items: cart.map(i => ({
                     product_search: i.Kode || i.Nama,
                     qty: i.qty,
                     price: i.price,
                     discount: 0
-                }))
+                })),
+                payment_method_detail: paymentMethodsPayload[0] || null,
+                payment_methods: paymentMethodsPayload
             };
 
             paymentPending = true;
             const controls = [...document.querySelectorAll('main button, main input, main select')];
             const disabledBefore = controls.map(el => el.disabled);
             controls.forEach(el => el.disabled = true);
-            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, allowEscapeKey: false, didOpen: () => Swal.showLoading() });
+
+            Swal.fire({ title: 'Menyimpan Transaksi...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             try {
                 const res = await apiFetch(`${API_URL}/sales`, {
@@ -1911,32 +1677,38 @@ Finance
 
                 if (res.ok) {
                     const result = await res.json().catch(() => ({}));
-
                     Swal.close();
-                    // Payment is committed. A printer failure must never offer another sale submission.
+
                     let printFailed = false;
-                    try { await printTransactionReceipt(result); } catch (error) { printFailed = true; }
+                    try { await printTransactionReceipt(result); } catch (e) { printFailed = true; }
+
                     cart = [];
                     paymentList = [];
                     renderCart();
                     renderPaymentList();
                     currentSelectedProduct = null;
-                    ['cust-name', 'cust-phone', 'cust-identity', 'cust-address', 'search-prod', 'inp-price', 'pay-input-amount'].forEach(id => document.getElementById(id).value = '');
+
+                    ['cust-name', 'cust-phone', 'cust-identity', 'cust-address', 'search-prod', 'inp-price', 'pay-input-amount'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.value = '';
+                    });
                     document.getElementById('cust-age').value = '0';
                     document.getElementById('inp-qty').value = '1';
                     document.getElementById('inp-is-dp').checked = false;
+                    document.getElementById('inp-is-bon').checked = false;
                     toggleCustomerForm();
+
                     await Swal.fire({
                         icon: printFailed ? 'warning' : 'success',
-                        title: 'Transaksi tersimpan',
-                        text: printFailed ? 'Cetak nota gagal. Buka riwayat untuk mencetak ulang. Jangan ulangi pembayaran.' : 'Dialog cetak telah dibuka. Periksa hasil cetak pada printer.',
+                        title: isBon ? 'Bon Transaksi Berhasil Dibuat' : 'Transaksi Tersimpan',
+                        text: printFailed ? 'Cetak nota gagal, buka riwayat untuk cetak ulang.' : 'Nota transaksi berhasil dicetak.',
                     });
                 } else {
                     const result = await res.json().catch(() => ({}));
                     Swal.fire('Gagal', result.error || 'Terjadi kesalahan sistem', 'error');
                 }
             } catch (err) {
-                await Swal.fire('Status transaksi belum diketahui', 'Koneksi terputus. Periksa riwayat transaksi sebelum mencoba kembali agar transaksi tidak tercatat dua kali.', 'warning');
+                await Swal.fire('Error', 'Koneksi terputus ke server.', 'error');
             } finally {
                 paymentPending = false;
                 controls.forEach((el, i) => el.disabled = disabledBefore[i]);

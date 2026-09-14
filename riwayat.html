@@ -129,6 +129,76 @@
                     </div>
                 </div>
 
+                <!-- FILTER TOOLBAR -->
+                <div class="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-filter text-blue-600"></i>
+                            <h4 class="font-bold text-slate-800 text-sm uppercase tracking-wider">Filter Transaksi</h4>
+                        </div>
+                        <button type="button" onclick="resetFilters()"
+                            class="text-xs font-bold text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1.5">
+                            <i class="fas fa-redo-alt"></i> Reset Filter
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                        <!-- 1. Tanggal Mulai -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Dari
+                                Tanggal</label>
+                            <input type="date" id="filterStartDate" onchange="fetchRiwayat()"
+                                class="w-full bg-slate-50 border border-slate-200 px-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500">
+                        </div>
+
+                        <!-- 2. Tanggal Selesai -->
+                        <div>
+                            <label
+                                class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Sampai
+                                Tanggal</label>
+                            <input type="date" id="filterEndDate" onchange="fetchRiwayat()"
+                                class="w-full bg-slate-50 border border-slate-200 px-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500">
+                        </div>
+
+                        <!-- 3. Pencarian Member / Pelanggan -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nama
+                                Member / Kasir</label>
+                            <div class="relative">
+                                <i
+                                    class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                <input type="text" id="filterMember" placeholder="Cari nama..."
+                                    onkeyup="handleMemberKeyup(event)"
+                                    class="w-full bg-slate-50 border border-slate-200 pl-8 pr-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500">
+                            </div>
+                        </div>
+
+                        <!-- 4. Metode Pembayaran -->
+                        <div>
+                            <label
+                                class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Metode
+                                Bayar</label>
+                            <select id="filterMethod" onchange="fetchRiwayat()"
+                                class="w-full bg-slate-50 border border-slate-200 px-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500">
+                                <option value="">Semua Metode</option>
+                                <option value="Tunai">💵 Tunai</option>
+                                <option value="Bayar Tunai">💵 Bayar Tunai</option>
+                                <option value="EDC">💳 EDC</option>
+                                <option value="Transfer">🏦 Transfer</option>
+                                <option value="Bon / Utang">📄 Bon / Utang</option>
+                            </select>
+                        </div>
+
+                        <!-- 5. Tombol Cari -->
+                        <div class="flex items-end">
+                            <button onclick="fetchRiwayat()"
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2">
+                                <i class="fas fa-search"></i> Terapkan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full">
                         <thead>
@@ -243,6 +313,36 @@
             return stores[location] || stores["Toko Utama"];
         }
 
+        let memberSearchTimer = null;
+
+        function handleMemberKeyup(event) {
+            if (event.key === 'Enter') {
+                clearTimeout(memberSearchTimer);
+                fetchRiwayat();
+                return;
+            }
+            clearTimeout(memberSearchTimer);
+            memberSearchTimer = setTimeout(() => {
+                fetchRiwayat();
+            }, 400);
+        }
+
+        function resetFilters() {
+            const startEl = document.getElementById('filterStartDate');
+            const endEl = document.getElementById('filterEndDate');
+            const memberEl = document.getElementById('filterMember');
+            const methodEl = document.getElementById('filterMethod');
+            const storeEl = document.getElementById('filterStore');
+
+            if (startEl) startEl.value = '';
+            if (endEl) endEl.value = '';
+            if (memberEl) memberEl.value = '';
+            if (methodEl) methodEl.value = '';
+            if (storeEl) storeEl.value = 'Semua Toko';
+
+            fetchRiwayat();
+        }
+
         async function fetchRiwayat() {
             const tbody = document.getElementById('riwayat-body');
             const emptyState = document.getElementById('empty-state');
@@ -253,7 +353,7 @@
             const userLoc = (userData.location || 'Toko Utama').trim();
             const isPusat = userLoc === 'Toko Utama' || userLoc === 'Pusat' || userData.role === 'superadmin';
 
-            // Kelola visibilitas filter toko berdasarkan lokasi user
+            // Kelola visibilitas filter toko berdasarkan peran
             const storeFilterContainer = document.getElementById('storeFilterContainer');
             const storeStaticBadge = document.getElementById('storeStaticBadge');
             const storeNameText = document.getElementById('storeNameText');
@@ -274,17 +374,47 @@
             }
 
             try {
-                let url = `${API_URL}/sales`;
+                const params = new URLSearchParams();
 
-                // Superadmin dapat melihat seluruh transaksi semua toko.
-                // Role lain tetap menggunakan pembatasan lokasi lama.
+                // 1. Lokasi User login
                 if (userData.role !== 'superadmin') {
-                    url += `?user_location=${encodeURIComponent(userLoc)}`;
+                    params.append('user_location', userLoc);
                 }
 
-                if (selectedStore && selectedStore !== "Semua Toko") {
-                    url += `${url.includes('?') ? '&' : '?'}location=${encodeURIComponent(selectedStore)}`;
+                // 2. Filter Lokasi Toko
+                if (selectedStore && selectedStore !== "Semua Toko" && selectedStore !== "All") {
+                    params.append('location', selectedStore);
                 }
+
+                // 3. Filter Tanggal (Backend membutuhkan start_date & end_date terisi bersamaan)
+                let startDate = document.getElementById('filterStartDate')?.value || '';
+                let endDate = document.getElementById('filterEndDate')?.value || '';
+
+                if (startDate && !endDate) {
+                    endDate = startDate; // Jika hanya memilih satu tanggal, set rentang hari tersebut
+                } else if (!startDate && endDate) {
+                    startDate = endDate;
+                }
+
+                if (startDate && endDate) {
+                    params.append('start_date', startDate);
+                    params.append('end_date', endDate);
+                }
+
+                // 4. Filter Member / Kasir
+                const member = document.getElementById('filterMember')?.value.trim();
+                if (member) {
+                    params.append('member', member);
+                }
+
+                // 5. Filter Metode Pembayaran
+                const method = document.getElementById('filterMethod')?.value;
+                if (method) {
+                    params.append('method', method);
+                }
+
+                const queryString = params.toString();
+                const url = `${API_URL}/sales${queryString ? '?' + queryString : ''}`;
 
                 const response = await fetch(url);
                 const data = await response.json();
@@ -304,58 +434,76 @@
                         const customerName = customer?.name || customer?.Name || '';
                         const customerPhone = customer?.phone_number || customer?.PhoneNumber || '';
 
+                        const isBon = s.is_bon || s.IsBon || s.status === 'Bon' || s.Status === 'Bon';
                         const isDp = s.is_dp || s.IsDp || s.status === 'DP' || s.Status === 'DP';
-                        const status = s.status || s.Status || (isDp ? 'DP' : 'Lunas');
+                        const status = s.status || s.Status || (isBon ? 'Bon' : (isDp ? 'DP' : 'Lunas'));
                         const paymentMethod = s.payment_method || s.PaymentMethod || 'Tunai';
                         const totalNetto = Number(s.total_netto ?? s.TotalNetto ?? 0);
                         const amountPaid = Number(s.amount_paid ?? s.AmountPaid ?? 0);
                         const remainingAmount = Number(s.remaining_amount ?? (totalNetto - amountPaid > 0 ? totalNetto - amountPaid : 0));
                         const items = s.items || s.Items || [];
                         const totalQty = Number(s.total_qty ?? s.TotalQty ?? items.reduce((acc, it) => acc + Number(it.qty || it.Qty || 0), 0));
+                        const hasPelunasan = paymentMethod.includes('[Pelunasan:') || (status === 'Lunas' && (isBon || isDp || customerName));
 
                         let statusBadge = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Lunas</span>`;
-                        if (isDp || status === "DP") {
+                        if (isBon || status === "Bon") {
                             statusBadge = `
-                                <div class="inline-flex flex-col items-center">
-                                    <span class="bg-amber-50 text-amber-600 border border-amber-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">DP / Belum Lunas</span>
-                                    ${remainingAmount > 0 ? `<span class="text-[10px] text-rose-500 font-bold mt-1">Sisa: IDR ${remainingAmount.toLocaleString('id-ID')}</span>` : ''}
-                                </div>
-                            `;
+                        <div class="inline-flex flex-col items-center">
+                            <span class="bg-rose-50 text-rose-600 border border-rose-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">BON / UTANG</span>
+                            <span class="text-[10px] text-rose-500 font-bold mt-1">Sisa: IDR ${remainingAmount.toLocaleString('id-ID')}</span>
+                        </div>
+                    `;
+                        } else if (isDp || status === "DP") {
+                            statusBadge = `
+                        <div class="inline-flex flex-col items-center">
+                            <span class="bg-amber-50 text-amber-600 border border-amber-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">DP / Belum Lunas</span>
+                            ${remainingAmount > 0 ? `<span class="text-[10px] text-rose-500 font-bold mt-1">Sisa: IDR ${remainingAmount.toLocaleString('id-ID')}</span>` : ''}
+                        </div>
+                    `;
                         }
 
                         let actionButtons = "";
-                        if (isDp || status === "DP") {
+                        // 1. Tombol Pelunasan (Hanya muncul jika belum lunas)
+                        if (isDp || isBon || status === "DP" || status === "Bon") {
                             actionButtons += `
-                                <button onclick="openPelunasanModal(${idx})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Pelunasan Nota">
-                                    <i class="fas fa-money-bill-wave mr-1"></i> Pelunasan
-                                </button>
-                            `;
+        <button onclick="openPelunasanModal(${idx})" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Pelunasan Nota">
+            <i class="fas fa-money-bill-wave mr-1"></i> Pelunasan
+        </button>
+    `;
                         }
-                        actionButtons += `
-                            <button onclick="openReturModal(${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Retur Barang">
-                                <i class="fas fa-undo mr-1"></i> Retur
-                            </button>
-                        `;
 
+                        // 2. Tombol Cetak Ulang Nota Pelunasan (Muncul jika transaksi telah dilunasi)
+                        if (hasPelunasan) {
+                            actionButtons += `
+        <button onclick="reprintPelunasanReceipt(${idx})" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Cetak Ulang Bukti Pelunasan">
+            <i class="fas fa-file-invoice-dollar mr-1"></i> Nota Lunas
+        </button>
+    `;
+                        }
+
+                        // 3. Tombol Cetak Ulang Nota Transaksi Utama (Selalu ada untuk semua transaksi)
+                        actionButtons += `
+    <button onclick="reprintSaleReceipt(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Cetak Ulang Nota Transaksi">
+        <i class="fas fa-print"></i>
+    </button>
+`;
+
+                        // 4. Tombol Retur Barang
+                        actionButtons += `
+    <button onclick="openReturModal(${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Retur Barang">
+        <i class="fas fa-undo"></i>
+    </button>
+`;
+
+                        // 5. Tombol Expand Rincian Item
                         if (items.length > 0) {
                             actionButtons += `
-                                <button onclick="toggleDetailRow(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all" title="Lihat Rincian Item">
-                                    <i id="toggle-icon-${idx}" class="fas fa-chevron-down transition-transform duration-200"></i>
-                                </button>
-                            `;
+        <button onclick="toggleDetailRow(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1.5 rounded-lg text-xs font-bold transition-all" title="Lihat Rincian Item">
+            <i id="toggle-icon-${idx}" class="fas fa-chevron-down transition-transform duration-200"></i>
+        </button>
+    `;
                         }
 
-                        // Tombol Hapus khusus Admin & Superadmin (Rollback Stok Otomatis)
-                        const userRole = (userData.role || '').toLowerCase().trim();
-                        if (userRole === 'admin' || userRole === 'superadmin') {
-                            actionButtons += `
-                                <button onclick="deleteTransaction('${escapeHTML(invoice)}')" class="bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 border border-rose-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Hapus & Batalkan Transaksi (Rollback Stok)">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            `;
-                        }
-
-                        // Ringkasan Tampilan Produk
                         let productSummaryHTML = "";
                         if (items.length === 0) {
                             productSummaryHTML = `<p class="text-slate-400 italic text-xs">Tidak ada item</p>`;
@@ -364,64 +512,62 @@
                             const pName = firstItem.product?.nama || firstItem.Product?.Nama || firstItem.product_search || 'Produk';
                             const pCode = firstItem.product?.kode || firstItem.Product?.Kode || '-';
                             productSummaryHTML = `
-                                <p class="text-slate-800 font-bold">${escapeHTML(pName)}</p>
-                                <p class="text-[10px] text-slate-400 uppercase font-black">${escapeHTML(pCode)} • ${firstItem.qty || firstItem.Qty || 1} pcs</p>
-                            `;
+                        <p class="text-slate-800 font-bold">${escapeHTML(pName)}</p>
+                        <p class="text-[10px] text-slate-400 uppercase font-black">${escapeHTML(pCode)} • ${firstItem.qty || firstItem.Qty || 1} pcs</p>
+                    `;
                         } else {
                             const firstItem = items[0];
                             const pName = firstItem.product?.nama || firstItem.Product?.Nama || firstItem.product_search || 'Produk';
                             productSummaryHTML = `
-                                <p class="text-slate-800 font-bold">${escapeHTML(pName)}</p>
-                                <div class="flex items-center gap-1.5 mt-0.5">
-                                    <span class="bg-blue-50 text-blue-600 border border-blue-100 px-1.5 py-0.5 rounded text-[10px] font-bold">+${items.length - 1} item lainnya</span>
-                                    <button onclick="toggleDetailRow(${idx})" class="text-[10px] text-slate-400 hover:text-blue-600 font-semibold underline">Lihat Detail</button>
-                                </div>
-                            `;
+                        <p class="text-slate-800 font-bold">${escapeHTML(pName)}</p>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="bg-blue-50 text-blue-600 border border-blue-100 px-1.5 py-0.5 rounded text-[10px] font-bold">+${items.length - 1} item lainnya</span>
+                            <button onclick="toggleDetailRow(${idx})" class="text-[10px] text-slate-400 hover:text-blue-600 font-semibold underline">Lihat Detail</button>
+                        </div>
+                    `;
                         }
 
-                        // Render Baris Utama Transaksi
                         const row = document.createElement('tr');
                         row.className = "hover:bg-slate-50/60 transition-all";
                         row.id = `group-row-${idx}`;
                         row.innerHTML = `
-                            <td class="p-6">
-                                <div class="flex items-center gap-1.5 flex-wrap mb-1">
-                                    <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold border border-blue-100 inline-block">
-                                        #${escapeHTML(invoice)}
-                                    </span>
-                                    <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200">
-                                        <i class="fas fa-store mr-1 text-blue-500"></i>${escapeHTML(storeLocation)}
-                                    </span>
-                                </div>
-                                <p class="text-[11px] text-slate-400 font-bold"><i class="fas fa-user-circle mr-1"></i>${escapeHTML(cashierName)}</p>
-                                ${customerName ? `
-                                    <p class="text-[10px] text-emerald-600 font-bold mt-0.5">
-                                        <i class="fas fa-user mr-1"></i>${escapeHTML(customerName)} ${customerPhone ? `(${escapeHTML(customerPhone)})` : ''}
-                                    </p>
-                                ` : ''}
-                            </td>
-                            <td class="p-6 text-xs text-slate-400 font-bold">
-                                ${escapeHTML(formattedDate)}
-                            </td>
-                            <td class="p-6">
-                                ${productSummaryHTML}
-                            </td>
-                            <td class="p-6 text-center">${statusBadge}</td>
-                            <td class="p-6 text-xs text-slate-500 max-w-[150px] truncate" title="${escapeHTML(paymentMethod)}">
-                                ${escapeHTML(paymentMethod)}
-                            </td>
-                            <td class="p-6 text-center font-bold text-slate-700">${totalQty}</td>
-                            <td class="p-6 text-right font-extrabold text-slate-800">IDR ${totalNetto.toLocaleString('id-ID')}</td>
-                            <td class="p-6 text-right text-emerald-600 font-bold">IDR ${amountPaid.toLocaleString('id-ID')}</td>
-                            <td class="p-6 text-center">
-                                <div class="flex items-center justify-center gap-1.5 flex-wrap">
-                                    ${actionButtons}
-                                </div>
-                            </td>
-                        `;
+                    <td class="p-6">
+                        <div class="flex items-center gap-1.5 flex-wrap mb-1">
+                            <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold border border-blue-100 inline-block">
+                                #${escapeHTML(invoice)}
+                            </span>
+                            <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200">
+                                <i class="fas fa-store mr-1 text-blue-500"></i>${escapeHTML(storeLocation)}
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 font-bold"><i class="fas fa-user-circle mr-1"></i>${escapeHTML(cashierName)}</p>
+                        ${customerName ? `
+                            <p class="text-[10px] text-emerald-600 font-bold mt-0.5">
+                                <i class="fas fa-user mr-1"></i>${escapeHTML(customerName)} ${customerPhone ? `(${escapeHTML(customerPhone)})` : ''}
+                            </p>
+                        ` : ''}
+                    </td>
+                    <td class="p-6 text-xs text-slate-400 font-bold">
+                        ${escapeHTML(formattedDate)}
+                    </td>
+                    <td class="p-6">
+                        ${productSummaryHTML}
+                    </td>
+                    <td class="p-6 text-center">${statusBadge}</td>
+                    <td class="p-6 text-xs text-slate-500 max-w-[150px] truncate" title="${escapeHTML(paymentMethod)}">
+                        ${escapeHTML(paymentMethod)}
+                    </td>
+                    <td class="p-6 text-center font-bold text-slate-700">${totalQty}</td>
+                    <td class="p-6 text-right font-extrabold text-slate-800">IDR ${totalNetto.toLocaleString('id-ID')}</td>
+                    <td class="p-6 text-right text-emerald-600 font-bold">IDR ${amountPaid.toLocaleString('id-ID')}</td>
+                    <td class="p-6 text-center">
+                        <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                            ${actionButtons}
+                        </div>
+                    </td>
+                `;
                         tbody.appendChild(row);
 
-                        // Render Subrow Rincian Item (Expandable)
                         if (items.length > 0) {
                             const detailRow = document.createElement('tr');
                             detailRow.id = `detail-row-${idx}`;
@@ -437,50 +583,50 @@
                                 const itSubtotal = Number(it.total_netto || it.TotalNetto || (itQty * itPrice - itDiscount));
 
                                 return `
-                                    <tr class="border-b border-slate-100 hover:bg-white/70 text-xs">
-                                        <td class="py-2.5 px-4 font-mono font-bold text-slate-500">${escapeHTML(itCode)}</td>
-                                        <td class="py-2.5 px-4 font-bold text-slate-700">${escapeHTML(itName)}</td>
-                                        <td class="py-2.5 px-4 text-center font-bold text-slate-600">${itQty} ${escapeHTML(itSatuan)}</td>
-                                        <td class="py-2.5 px-4 text-right font-semibold text-slate-600">IDR ${itPrice.toLocaleString('id-ID')}</td>
-                                        <td class="py-2.5 px-4 text-right text-slate-400 font-semibold">${itDiscount > 0 ? `IDR ${itDiscount.toLocaleString('id-ID')}` : '-'}</td>
-                                        <td class="py-2.5 px-4 text-right font-bold text-slate-800">IDR ${itSubtotal.toLocaleString('id-ID')}</td>
-                                        <td class="py-2.5 px-4 text-center">
-                                            <button onclick="openReturModal(${idx}, ${itemIdx})" class="bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 px-2.5 py-1 rounded-md text-[10px] font-bold transition-all shadow-sm">
-                                                <i class="fas fa-undo mr-1"></i> Retur
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `;
+                            <tr class="border-b border-slate-100 hover:bg-white/70 text-xs">
+                                <td class="py-2.5 px-4 font-mono font-bold text-slate-500">${escapeHTML(itCode)}</td>
+                                <td class="py-2.5 px-4 font-bold text-slate-700">${escapeHTML(itName)}</td>
+                                <td class="py-2.5 px-4 text-center font-bold text-slate-600">${itQty} ${escapeHTML(itSatuan)}</td>
+                                <td class="py-2.5 px-4 text-right font-semibold text-slate-600">IDR ${itPrice.toLocaleString('id-ID')}</td>
+                                <td class="py-2.5 px-4 text-right text-slate-400 font-semibold">${itDiscount > 0 ? `IDR ${itDiscount.toLocaleString('id-ID')}` : '-'}</td>
+                                <td class="py-2.5 px-4 text-right font-bold text-slate-800">IDR ${itSubtotal.toLocaleString('id-ID')}</td>
+                                <td class="py-2.5 px-4 text-center">
+                                    <button onclick="openReturModal(${idx}, ${itemIdx})" class="bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 px-2.5 py-1 rounded-md text-[10px] font-bold transition-all shadow-sm">
+                                        <i class="fas fa-undo mr-1"></i> Retur
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
                             }).join('');
 
                             detailRow.innerHTML = `
-                                <td colspan="9" class="p-4 pl-12 pr-6">
-                                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-                                        <div class="bg-slate-100/60 px-4 py-2 border-b border-slate-200 flex justify-between items-center">
-                                            <span class="text-[11px] font-black uppercase text-slate-500 tracking-wider">
-                                                <i class="fas fa-boxes text-blue-500 mr-1.5"></i> Rincian Barang (#${escapeHTML(invoice)})
-                                            </span>
-                                            <span class="text-[11px] font-bold text-slate-400">${items.length} Macam Barang</span>
-                                        </div>
-                                        <table class="w-full">
-                                            <thead>
-                                                <tr class="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50 border-b border-slate-100">
-                                                    <th class="py-2 px-4 text-left">Kode</th>
-                                                    <th class="py-2 px-4 text-left">Nama Produk</th>
-                                                    <th class="py-2 px-4 text-center">Qty</th>
-                                                    <th class="py-2 px-4 text-right">Harga Satuan</th>
-                                                    <th class="py-2 px-4 text-right">Diskon</th>
-                                                    <th class="py-2 px-4 text-right">Subtotal</th>
-                                                    <th class="py-2 px-4 text-center w-28">Aksi</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                ${itemRowsHTML}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </td>
-                            `;
+                        <td colspan="9" class="p-4 pl-12 pr-6">
+                            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                                <div class="bg-slate-100/60 px-4 py-2 border-b border-slate-200 flex justify-between items-center">
+                                    <span class="text-[11px] font-black uppercase text-slate-500 tracking-wider">
+                                        <i class="fas fa-boxes text-blue-500 mr-1.5"></i> Rincian Barang (#${escapeHTML(invoice)})
+                                    </span>
+                                    <span class="text-[11px] font-bold text-slate-400">${items.length} Macam Barang</span>
+                                </div>
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50 border-b border-slate-100">
+                                            <th class="py-2 px-4 text-left">Kode</th>
+                                            <th class="py-2 px-4 text-left">Nama Produk</th>
+                                            <th class="py-2 px-4 text-center">Qty</th>
+                                            <th class="py-2 px-4 text-right">Harga Satuan</th>
+                                            <th class="py-2 px-4 text-right">Diskon</th>
+                                            <th class="py-2 px-4 text-right">Subtotal</th>
+                                            <th class="py-2 px-4 text-center w-28">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${itemRowsHTML}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    `;
                             tbody.appendChild(detailRow);
                         }
                     });
@@ -596,7 +742,6 @@
                     }
                 },
                 preConfirm: () => {
-                    // Jika belum dimasukkan ke list tapi input nominal terisi
                     const amtInput = document.getElementById('modal-pay-amount');
                     if (modalPaymentList.length === 0 && amtInput) {
                         const directVal = parseFloat(amtInput.value || 0);
@@ -619,11 +764,20 @@
                     const finalMethodsCombined = `${currentMethod}, [Pelunasan: ${stringPelunasanBaru}]`;
                     const finalTotalPaid = amountPaid + totalDiinput;
 
+                    // Format list multiple payment methods pelunasan
+                    const paymentMethodsPayload = modalPaymentList.map(p => ({
+                        type: p.label,
+                        amount: String(p.value),
+                        status: "Pelunasan"
+                    }));
+
                     return {
                         invoice: invoice,
                         payment_method: finalMethodsCombined,
                         amount_paid: finalTotalPaid,
+                        payment_methods: paymentMethodsPayload,
                         is_dp: false,
+                        is_bon: false,
                         status: "Lunas",
                         pelunasan_paid: totalDiinput,
                         group_data: group
@@ -806,14 +960,15 @@
                     body: JSON.stringify({
                         payment_method: payload.payment_method,
                         amount_paid: payload.amount_paid,
+                        payment_methods: payload.payment_methods,
                         is_dp: false,
+                        is_bon: false,
                         status: "Lunas"
                     })
                 });
 
                 if (res.ok) {
                     Swal.close();
-                    // Cetak nota pelunasan
                     if (groupData) {
                         printPelunasanReceipt(groupData, pelunasanPaid);
                     }
@@ -822,7 +977,7 @@
                         Swal.fire({
                             icon: 'success',
                             title: 'Pelunasan Berhasil!',
-                            text: 'Status transaksi telah diubah menjadi Lunas dan nota pelunasan dikirim ke printer.',
+                            text: 'Status transaksi telah diubah menjadi Lunas dan bukti pembayaran pelunasan berhasil disimpan.',
                             confirmButtonColor: '#2563EB'
                         }).then(() => fetchRiwayat());
                     }, 400);
@@ -830,7 +985,9 @@
                     const err = await res.json().catch(() => ({}));
                     Swal.fire('Gagal', err.error || err.message || 'Terjadi kesalahan sistem saat pelunasan', 'error');
                 }
-            } catch (e) { Swal.fire('Error', 'Gagal terhubung ke server', 'error'); }
+            } catch (e) {
+                Swal.fire('Error', 'Gagal terhubung ke server', 'error');
+            }
         }
 
 
@@ -887,6 +1044,315 @@
                     }
                 }
             });
+        }
+
+        function reprintSaleReceipt(idx) {
+            const group = localSalesData[idx];
+            if (!group) return;
+
+            const storeHeader = getStoreInfo();
+            const items = group.items || group.Items || [];
+            const totalBill = Number(group.total_netto ?? group.TotalNetto ?? 0);
+            const totalPaid = Number(group.amount_paid ?? group.AmountPaid ?? 0);
+            const change = Math.max(totalPaid - totalBill, 0);
+            const remaining = Math.max(totalBill - totalPaid, 0);
+
+            const isBon = group.is_bon || group.IsBon || group.status === 'Bon' || group.Status === 'Bon';
+            const isDp = group.is_dp || group.IsDp || group.status === 'DP' || group.Status === 'DP';
+
+            const invoiceNo = group.invoice || group.Invoice || '-';
+            const createdAt = group.created_at || group.CreatedAt;
+            const now = createdAt
+                ? new Date(createdAt).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' })
+                : new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
+
+            const customer = group.customer || group.Customer || {};
+            const customerName = customer.name || customer.Name || '-';
+            const customerPhone = customer.phone_number || customer.PhoneNumber || '-';
+            const cashierName = group.user?.name || group.User?.name || group.member_name || group.MemberName || 'Kasir';
+
+            let statusNota = "LUNAS";
+            if (isBon) statusNota = "BON / UTANG";
+            else if (isDp) statusNota = "DP / UANG MUKA";
+
+            const itemRows = items.map(item => {
+                const pName = item.product?.nama || item.Product?.Nama || item.product_search || 'Produk';
+                const pCode = item.product?.kode || item.Product?.Kode || '-';
+                const itPrice = Number(item.h_jual || item.HJual || item.price || 0);
+                const itQty = Number(item.qty || item.Qty || 1);
+                const itSubtotal = Number(item.total_netto || item.TotalNetto || (itQty * itPrice));
+
+                return `
+        <tr>
+            <td colspan="3" class="item-name">${escapeHTML(pName)}</td>
+        </tr>
+        <tr>
+            <td>${escapeHTML(pCode)}</td>
+            <td class="center">${itQty} x ${itPrice.toLocaleString('id-ID')}</td>
+            <td class="right">${itSubtotal.toLocaleString('id-ID')}</td>
+        </tr>
+        `;
+            }).join('');
+
+            // Rincian Metode Pembayaran
+            const pMethods = group.payment_methods || group.PaymentMethods || [];
+            let paymentRows = "";
+            if (Array.isArray(pMethods) && pMethods.length > 0) {
+                paymentRows = pMethods.map(pm => `
+            <tr>
+                <td>${escapeHTML(pm.type || pm.Type || 'Pembayaran')}</td>
+                <td class="right">${Number(pm.amount || pm.Amount || 0).toLocaleString('id-ID')}</td>
+            </tr>
+        `).join('');
+            } else {
+                const rawMethod = group.payment_method || group.PaymentMethod || (isBon ? 'Bon / Utang' : 'Tunai');
+                paymentRows = `
+            <tr>
+                <td>${escapeHTML(rawMethod)}</td>
+                <td class="right">${totalPaid.toLocaleString('id-ID')}</td>
+            </tr>
+        `;
+            }
+
+            // Jika Bon, cetak 3 rangkap
+            const copySheets = isBon
+                ? [
+                    "LEMBAR 1: KASIR / TOKO",
+                    "LEMBAR 2: PELANGGAN",
+                    "LEMBAR 3: ARSIP / FINANCE"
+                ]
+                : [""];
+
+            const generateSingleReceipt = (copyLabel) => `
+        <div class="receipt">
+            ${copyLabel ? `<div class="copy-badge">*** ${copyLabel} ***</div>` : ''}
+
+            <div class="center">
+                <div class="store-name">LANGGENG ELEKTRONIKA</div>
+                <div style="font-size: 10px; margin-top: 2px;">${escapeHTML(storeHeader.address)}</div>
+                <div style="font-size: 10px;">Telp: ${escapeHTML(storeHeader.phone)}</div>
+                <div style="font-size: 10px;">Email: langgengtemaja8888@gmail.com</div>
+                <div style="margin-top: 6px; font-weight: bold; font-size: 12px;">
+                    ${isBon ? 'NOTA BON / TAGIHAN UTANG' : 'NOTA TRANSAKSI'}
+                </div>
+            </div>
+
+            <div class="line"></div>
+
+            <table>
+                <tr><td>No Nota</td><td class="right">${escapeHTML(invoiceNo)}</td></tr>
+                <tr><td>Tanggal</td><td class="right">${escapeHTML(now)}</td></tr>
+                <tr><td>Kasir</td><td class="right">${escapeHTML(cashierName)}</td></tr>
+                <tr><td>Status</td><td class="right font-bold">${statusNota}</td></tr>
+                ${(isDp || isBon) ? `
+                    <tr><td>Pelanggan</td><td class="right font-bold">${escapeHTML(customerName)}</td></tr>
+                    <tr><td>No HP</td><td class="right">${escapeHTML(customerPhone)}</td></tr>
+                ` : ''}
+            </table>
+
+            <div class="line"></div>
+
+            <table>
+                ${itemRows}
+            </table>
+
+            <div class="line"></div>
+
+            <table>
+                <tr class="bold"><td>Total Tagihan</td><td class="right">${totalBill.toLocaleString('id-ID')}</td></tr>
+                <tr><td>Dibayar</td><td class="right">${totalPaid.toLocaleString('id-ID')}</td></tr>
+                ${(isDp || isBon) ? `
+                    <tr class="bold" style="font-size: 12px;">
+                        <td>SISA UTANG</td>
+                        <td class="right">${remaining.toLocaleString('id-ID')}</td>
+                    </tr>
+                ` : `
+                    <tr><td>Kembali</td><td class="right">${change.toLocaleString('id-ID')}</td></tr>
+                `}
+            </table>
+
+            <div class="line"></div>
+
+            <div class="bold">Metode Pembayaran:</div>
+            <table>
+                ${paymentRows}
+            </table>
+
+            ${isBon ? `
+                <div class="line"></div>
+                <div style="font-size: 9px; line-height: 1.2; text-align: justify; margin: 4px 0;">
+                    * Saya menyatakan telah menerima barang tersebut dalam keadaan baik dan berjanji akan melunasi sisa tagihan sesuai kesepakatan.
+                </div>
+                <div style="margin-top: 18px; display: flex; justify-content: space-between; text-align: center; font-size: 10px;">
+                    <div style="width: 45%;">
+                        Pelanggan,<br><br><br>
+                        ( ${escapeHTML(customerName)} )
+                    </div>
+                    <div style="width: 45%;">
+                        Kasir,<br><br><br>
+                        ( ${escapeHTML(cashierName)} )
+                    </div>
+                </div>
+            ` : `
+                <div class="line"></div>
+                <div class="thanks">TERIMA KASIH</div>
+                <div class="center" style="font-size: 9px;">Barang yang sudah dibeli tidak dapat dikembalikan.</div>
+            `}
+        </div>
+    `;
+
+            const allReceiptsHTML = copySheets.map(label => generateSingleReceipt(label)).join('');
+
+            const fullHTML = `
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+            <meta charset="UTF-8">
+            <title>Nota ${escapeHTML(invoiceNo)}</title>
+            <style>
+                ${RECEIPT_BASE_CSS}
+                .center { text-align: center; }
+                .right { text-align: right; }
+                .bold { font-weight: bold; }
+                .line { border-top: 1px dashed #000; margin: 6px 0; }
+                .item-name { font-weight: bold; padding-top: 4px; }
+                .store-name { font-size: 14px; font-weight: bold; text-transform: uppercase; }
+                .thanks { margin-top: 8px; text-align: center; font-weight: bold; }
+                .copy-badge {
+                    text-align: center; font-weight: bold; font-size: 10px;
+                    border: 1px solid #000; padding: 2px; margin-bottom: 6px; letter-spacing: 0.5px;
+                }
+                .receipt { page-break-after: always; break-after: page; margin-bottom: 20px; }
+                .receipt:last-child { page-break-after: auto; break-after: auto; margin-bottom: 0; }
+                @media print {
+                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    .receipt { page-break-after: always; break-after: page; }
+                    .receipt:last-child { page-break-after: auto; break-after: auto; }
+                }
+            </style>
+        </head>
+        <body>
+            ${allReceiptsHTML}
+        </body>
+        </html>
+    `;
+
+            printHTML(fullHTML);
+        }
+
+        function reprintPelunasanReceipt(idx) {
+            const group = localSalesData[idx];
+            if (!group) return;
+            printPelunasanReceipt(group);
+        }
+
+        function printPelunasanReceipt(group, newPaidAmount = null) {
+            const userData = getUserDataFromToken() || {};
+            const store = getStoreInfo();
+            const totalBill = Number(group.total_netto ?? group.TotalNetto ?? 0);
+            const totalPaid = Number(group.amount_paid ?? group.AmountPaid ?? 0);
+            const invoiceNo = group.invoice || group.Invoice || `INV-${Date.now()}`;
+            const now = new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
+
+            const customer = group.customer || group.Customer || {};
+            const customerName = customer.name || customer.Name || '-';
+            const customerPhone = customer.phone_number || customer.PhoneNumber || '-';
+            const cashierName = group.user?.name || group.User?.name || group.member_name || group.MemberName || (userData.name || 'Desak Kasir');
+            const items = group.items || group.Items || [];
+
+            // Jika dicetak saat transaksi pelunasan baru berlangsung
+            let detailPembayaranHTML = "";
+            if (newPaidAmount !== null && Number(newPaidAmount) > 0) {
+                const initialPaid = Math.max(totalPaid - Number(newPaidAmount), 0);
+                detailPembayaranHTML = `
+            <tr><td>Pembayaran Awal (DP/Bon)</td><td class="right">${initialPaid.toLocaleString('id-ID')}</td></tr>
+            <tr class="bold"><td>Bayar Pelunasan</td><td class="right">${Number(newPaidAmount).toLocaleString('id-ID')}</td></tr>
+        `;
+            }
+
+            const itemRows = items.map(item => {
+                const pName = item.product?.nama || item.Product?.Nama || item.product_search || 'Produk';
+                const pCode = item.product?.kode || item.Product?.Kode || '-';
+                const itPrice = Number(item.h_jual || item.HJual || item.price || 0);
+                const itQty = Number(item.qty || item.Qty || 1);
+                const itSubtotal = Number(item.total_netto || item.TotalNetto || (itQty * itPrice));
+
+                return `
+        <tr>
+            <td colspan="3" class="item-name">${escapeHTML(pName)}</td>
+        </tr>
+        <tr>
+            <td>${escapeHTML(pCode)}</td>
+            <td class="center">${itQty} x ${itPrice.toLocaleString('id-ID')}</td>
+            <td class="right">${itSubtotal.toLocaleString('id-ID')}</td>
+        </tr>
+        `;
+            }).join('');
+
+            const receiptHTML = `
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+            <meta charset="UTF-8">
+            <title>Nota Pelunasan ${escapeHTML(invoiceNo)}</title>
+            <style>
+                ${RECEIPT_BASE_CSS}
+                .receipt .center { text-align: center; }
+                .receipt .right { text-align: right; }
+                .receipt .bold { font-weight: bold; }
+                .receipt .line { border-top: 1px dashed #000; margin: 8px 0; }
+                .receipt .item-name { font-weight: bold; padding-top: 4px; }
+                .receipt .store-name { font-size: 14px; font-weight: bold; text-transform: uppercase; }
+                .receipt .thanks { margin-top: 10px; text-align: center; font-weight: bold; }
+            </style>
+        </head>
+        <body>
+            <div class="receipt">
+                <div class="center">
+                    <div class="store-name">LANGGENG ELEKTRONIKA</div>
+                    <div style="font-size: 10px; margin-top: 2px;">${escapeHTML(store.address)}</div>
+                    <div style="font-size: 10px;">${escapeHTML(store.phone)}</div>
+                    <div style="font-size: 10px;">Email: langgengtemaja8888@gmail.com</div>
+                    <div style="margin-top: 6px; font-weight: bold; font-size: 12px;">NOTA PELUNASAN (LUNAS)</div>
+                </div>
+
+                <div class="line"></div>
+
+                <table>
+                    <tr><td>No Nota</td><td class="right">${escapeHTML(invoiceNo)}</td></tr>
+                    <tr><td>Waktu Cetak</td><td class="right">${escapeHTML(now)}</td></tr>
+                    <tr><td>Kasir</td><td class="right">${escapeHTML(cashierName)}</td></tr>
+                    <tr><td>Toko</td><td class="right">${escapeHTML(group.location || 'Toko Utama')}</td></tr>
+                    <tr><td>Status</td><td class="right bold">LUNAS</td></tr>
+                    <tr><td>Customer</td><td class="right">${escapeHTML(customerName)}</td></tr>
+                    <tr><td>No HP</td><td class="right">${escapeHTML(customerPhone)}</td></tr>
+                </table>
+
+                <div class="line"></div>
+
+                <table>
+                    ${itemRows}
+                </table>
+
+                <div class="line"></div>
+
+                <table>
+                    <tr class="bold"><td>Total Tagihan</td><td class="right">${totalBill.toLocaleString('id-ID')}</td></tr>
+                    ${detailPembayaranHTML}
+                    <tr class="bold"><td>Total Terbayar</td><td class="right">${totalPaid.toLocaleString('id-ID')}</td></tr>
+                    <tr class="bold"><td>Sisa Tagihan</td><td class="right">0 (LUNAS)</td></tr>
+                </table>
+
+                <div class="line"></div>
+
+                <div class="thanks">TERIMA KASIH ATAS PELUNASAN ANDA</div>
+                <div class="center">Simpan nota ini sebagai bukti sah pembayaran lunas.</div>
+            </div>
+        </body>
+        </html>
+    `;
+
+            printHTML(receiptHTML);
         }
 
         function showReturForm(item, invoiceNo) {
