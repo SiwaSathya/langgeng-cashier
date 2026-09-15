@@ -1025,7 +1025,6 @@
                 const methods = item.payment_methods || item.PaymentMethods || [];
 
                 if (Array.isArray(methods) && methods.length > 0) {
-                    // 1. Ambil data presisi dari tabel payment_methods
                     methods.forEach(pm => {
                         const type = (pm.type || pm.Type || 'Lainnya').trim();
                         const amount = parseFloat(pm.amount || pm.Amount || 0);
@@ -1049,32 +1048,6 @@
                         paymentGroups[type].total += amount;
                         paymentGroups[type].rows.push(amount);
                     });
-                } else {
-                    // 2. Fallback untuk data nota lama
-                    let method = String(item.payment_method || item.PaymentMethod || 'Tunai').trim();
-                    method = method
-                        .replace(/\[Pelunasan:.*?\]/g, '')
-                        .replace(/,\s*$/g, '')
-                        .trim();
-
-                    const amount = Number(item.total_netto || item.TotalNetto || 0);
-
-                    if (isCash(method)) {
-                        totalTunai += amount;
-                    } else {
-                        totalNonTunai += amount;
-                        if (isCreditMethod(method)) {
-                            totalKredit += amount;
-                        } else {
-                            totalMerchant += amount;
-                        }
-                    }
-
-                    if (!paymentGroups[method]) {
-                        paymentGroups[method] = { total: 0, rows: [] };
-                    }
-                    paymentGroups[method].total += amount;
-                    paymentGroups[method].rows.push(amount);
                 }
             });
 
