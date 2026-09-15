@@ -1010,18 +1010,20 @@
             });
 
             // =====================================
-            // PENGOLAHAN DATA MULTI-PAYMENT
+            // PENGOLAHAN DATA MULTI-PAYMENT & PIUTANG
             // =====================================
             let totalTunai = 0;
             let totalKredit = 0;
             let totalMerchant = 0;
             let totalNonTunai = 0;
             let pengeluaran = 0;
+            let piutang = 0;
             const paymentGroups = {};
 
             const isCash = (str) => /^(tunai|cash)$/i.test(String(str || '').trim());
             const isCreditMethod = (str) => /^(kredit|bon|utang|leasing|fif|adira|hci)/i.test(String(str || '').trim());
 
+            // 1. Hitung metode pembayaran dari payment_methods
             (receiptData.sales || []).forEach(item => {
                 const methods = item.payment_methods || item.PaymentMethods || [];
 
@@ -1052,6 +1054,37 @@
                 }
             });
 
+            // 2. Hitung total piutang (Sisa tagihan dari transaksi berstatus DP atau Bon)
+            const invoiceMap = {};
+            (receiptData.sales || []).forEach(item => {
+                const inv = item.invoice || item.Invoice || `PJL-${item.id || Math.random()}`;
+                if (!invoiceMap[inv]) {
+                    invoiceMap[inv] = {
+                        status: item.status || item.Status || '',
+                        isDp: item.is_dp || item.IsDp || false,
+                        isBon: item.is_bon || item.IsBon || false,
+                        totalNetto: 0,
+                        amountPaid: Number(item.amount_paid ?? item.AmountPaid ?? 0),
+                        remainingAmount: item.remaining_amount ?? item.RemainingAmount
+                    };
+                }
+                invoiceMap[inv].totalNetto += Number(item.total_netto ?? item.TotalNetto ?? 0);
+            });
+
+            Object.values(invoiceMap).forEach(inv => {
+                const st = String(inv.status || '').trim().toLowerCase();
+                const isDp = inv.isDp || st === 'dp';
+                const isBon = inv.isBon || st === 'bon' || st.includes('bon') || st.includes('utang');
+
+                if (isDp || isBon) {
+                    if (inv.remainingAmount != null && Number(inv.remainingAmount) > 0) {
+                        piutang += Number(inv.remainingAmount);
+                    } else {
+                        const sisa = inv.totalNetto - inv.amountPaid;
+                        piutang += sisa > 0 ? sisa : (isBon && inv.amountPaid === 0 ? inv.totalNetto : 0);
+                    }
+                }
+            });
 
             // =====================================
             // DETAIL PEMBAYARAN
@@ -1066,7 +1099,6 @@
                     </div>
             `;
 
-                    // Selain tunai tampilkan rincian nominal ke bawah
                     if (!isCash(method)) {
                         data.rows.forEach(value => {
                             html += `
@@ -1100,7 +1132,8 @@
                 })
                 .join('');
 
-            const totalKeseluruhan = totalTunai + totalNonTunai - pengeluaran;
+            // Formula total keseluruhan disesuaikan dengan potongan piutang
+            const totalKeseluruhan = totalTunai + totalNonTunai - pengeluaran - piutang;
 
             // =====================================
             // HTML RECEIPT (LAYOUT & DESAIN ASLI)
@@ -1174,6 +1207,10 @@ ${RECEIPT_BASE_CSS}
         <span>Penjualan Kredit</span>
         <span>${formatIDR(totalKredit)}</span>
     </div>
+    <div class="flex">
+        <span>Piutang</span>
+        <span>${formatIDR(piutang)}</span>
+    </div>
 </div>
 
 <div class="border-top">
@@ -1191,6 +1228,13 @@ ${RECEIPT_BASE_CSS}
     <div class="flex font-bold">
         <span>Tot Setor</span>
         <span>${formatIDR(totalTunai)}</span>
+    </div>
+</div>
+
+<div class="border-top">
+    <div class="flex font-bold">
+        <span>Piutang</span>
+        <span>${formatIDR(piutang)}</span>
     </div>
 </div>
 
@@ -1215,6 +1259,10 @@ ${RECEIPT_BASE_CSS}
         <span>- Merchant</span>
         <span>${formatIDR(totalMerchant)}</span>
     </div>
+    <div class="flex">
+        <span>- Piutang</span>
+        <span>${formatIDR(piutang)}</span>
+    </div>
 </div>
 
 <div style="margin-top:40px">
@@ -1237,7 +1285,6 @@ ${RECEIPT_BASE_CSS}
 
             return printHTML(shiftReceiptHTML);
         }
-
         async function confirmLogout() {
             if (paymentPending) return;
 
