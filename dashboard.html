@@ -1054,7 +1054,25 @@
                 }
             });
 
-            // 2. Hitung total piutang (Sisa tagihan dari transaksi berstatus DP atau Bon)
+            // 2. Hitung Pengeluaran lebih awal agar bisa memotong kas Tunai
+            const expenseRows = (receiptData.expenses || [])
+                .map(item => {
+                    const desc = item.deskripsi ?? item.Deskripsi ?? "-";
+                    const total = item.total ?? item.Total ?? 0;
+                    pengeluaran += total;
+                    return `
+                <div class="flex">
+                    <span>${escapeHTML(desc)}</span>
+                    <span>${formatIDR(total)}</span>
+                </div>
+            `;
+                })
+                .join('');
+
+            // Nilai Tunai setelah dipotong pengeluaran kas
+            const tunaiBersih = totalTunai - pengeluaran;
+
+            // 3. Hitung total piutang (Sisa tagihan transaksi berstatus DP atau Bon)
             const invoiceMap = {};
             (receiptData.sales || []).forEach(item => {
                 const inv = item.invoice || item.Invoice || `PJL-${item.id || Math.random()}`;
@@ -1087,15 +1105,18 @@
             });
 
             // =====================================
-            // DETAIL PEMBAYARAN
+            // DETAIL PEMBAYARAN (Tunai dipotong pengeluaran)
             // =====================================
             const paymentDetailRows = Object.entries(paymentGroups)
                 .map(([method, data]) => {
+                    // Jika metode adalah Tunai, gunakan tunaiBersih
+                    const displayTotal = isCash(method) ? tunaiBersih : data.total;
+
                     let html = `
                 <div style="margin-top:8px">
                     <div class="flex font-bold">
                         <span>${escapeHTML(method)}</span>
-                        <span>${formatIDR(data.total)}</span>
+                        <span>${formatIDR(displayTotal)}</span>
                     </div>
             `;
 
@@ -1115,25 +1136,7 @@
                 })
                 .join('');
 
-            // =====================================
-            // PENGELUARAN
-            // =====================================
-            const expenseRows = (receiptData.expenses || [])
-                .map(item => {
-                    const desc = item.deskripsi ?? item.Deskripsi ?? "-";
-                    const total = item.total ?? item.Total ?? 0;
-                    pengeluaran += total;
-                    return `
-                <div class="flex">
-                    <span>${escapeHTML(desc)}</span>
-                    <span>${formatIDR(total)}</span>
-                </div>
-            `;
-                })
-                .join('');
-
-            // Formula total keseluruhan disesuaikan dengan potongan piutang
-            const totalKeseluruhan = totalTunai + totalNonTunai - pengeluaran - piutang;
+            const totalKeseluruhan = tunaiBersih + totalNonTunai - piutang;
 
             // =====================================
             // HTML RECEIPT (LAYOUT & DESAIN ASLI)
@@ -1197,7 +1200,7 @@ ${RECEIPT_BASE_CSS}
 <div class="border-top">
     <div class="flex font-bold">
         <span>Total Tunai</span>
-        <span>${formatIDR(totalTunai)}</span>
+        <span>${formatIDR(tunaiBersih)}</span>
     </div>
     <div class="flex">
         <span>Penjualan Voucher</span>
@@ -1227,7 +1230,7 @@ ${RECEIPT_BASE_CSS}
 <div class="border-top">
     <div class="flex font-bold">
         <span>Tot Setor</span>
-        <span>${formatIDR(totalTunai)}</span>
+        <span>${formatIDR(tunaiBersih)}</span>
     </div>
 </div>
 
@@ -1249,7 +1252,7 @@ ${RECEIPT_BASE_CSS}
     <div class="font-bold">Rekap Setoran</div>
     <div class="flex">
         <span>- Tunai</span>
-        <span>${formatIDR(totalTunai)}</span>
+        <span>${formatIDR(tunaiBersih)}</span>
     </div>
     <div class="flex">
         <span>- Kredit</span>
