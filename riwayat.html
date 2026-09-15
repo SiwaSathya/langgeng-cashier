@@ -504,6 +504,15 @@
     `;
                         }
 
+                        const userRole = (userData.role || '').toLowerCase().trim();
+                        if (userRole === 'admin' || userRole === 'superadmin') {
+                            actionButtons += `
+                                <button onclick="deleteTransaction('${escapeHTML(invoice)}')" class="bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 border border-rose-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Hapus & Batalkan Transaksi (Rollback Stok)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            `;
+                        }
+
                         let productSummaryHTML = "";
                         if (items.length === 0) {
                             productSummaryHTML = `<p class="text-slate-400 italic text-xs">Tidak ada item</p>`;
