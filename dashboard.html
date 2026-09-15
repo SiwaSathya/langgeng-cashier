@@ -1016,6 +1016,7 @@
             let totalKredit = 0;
             let totalMerchant = 0;
             let totalNonTunai = 0;
+            let pengeluaran = 0;
             const paymentGroups = {};
 
             const isCash = (str) => /^(tunai|cash)$/i.test(String(str || '').trim());
@@ -1051,7 +1052,6 @@
                 }
             });
 
-            const totalKeseluruhan = totalTunai + totalNonTunai;
 
             // =====================================
             // DETAIL PEMBAYARAN
@@ -1090,7 +1090,7 @@
                 .map(item => {
                     const desc = item.deskripsi ?? item.Deskripsi ?? "-";
                     const total = item.total ?? item.Total ?? 0;
-
+                    pengeluaran += total;
                     return `
                 <div class="flex">
                     <span>${escapeHTML(desc)}</span>
@@ -1099,6 +1099,8 @@
             `;
                 })
                 .join('');
+
+            const totalKeseluruhan = totalTunai + totalNonTunai - pengeluaran;
 
             // =====================================
             // HTML RECEIPT (LAYOUT & DESAIN ASLI)
