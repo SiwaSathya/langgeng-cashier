@@ -1020,7 +1020,7 @@
             let piutang = 0;
             const paymentGroups = {};
 
-            const isCash = (str) => /^(tunai|cash)$/i.test(String(str || '').trim());
+            const isCash = (str) => /^(tunai|cash|Tunai)$/i.test(String(str || '').trim());
             const isCreditMethod = (str) => /^(kredit|bon|utang|leasing|fif|adira|hci)/i.test(String(str || '').trim());
 
             // 1. Hitung metode pembayaran dari payment_methods
