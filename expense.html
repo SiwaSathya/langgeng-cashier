@@ -438,6 +438,59 @@
             }
         }
 
+        async function deleteExpense(id) {
+            if (!id || id === 'undefined') {
+                Swal.fire('Error', 'ID pengeluaran tidak ditemukan atau tidak valid!', 'error');
+                return;
+            }
+
+            const confirm = await Swal.fire({
+                title: 'Hapus Pengeluaran?',
+                text: 'Data pengeluaran yang dihapus tidak dapat dipulihkan!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus Data',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#EF4444',
+                cancelButtonColor: '#64748B'
+            });
+
+            if (confirm.isConfirmed) {
+                Swal.fire({
+                    title: 'Menghapus data...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                try {
+                    const token = localStorage.getItem('token');
+                    const headers = {};
+                    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                    const res = await fetch(`${BASE_URL}/api/expenses/${encodeURIComponent(id)}`, {
+                        method: 'DELETE',
+                        headers: headers
+                    });
+
+                    if (res.ok) {
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil Dihapus',
+                            text: 'Data pengeluaran telah berhasil dihapus dari sistem.',
+                            confirmButtonColor: '#2563EB'
+                        });
+                        fetchExpenses();
+                    } else {
+                        const err = await res.json().catch(() => ({}));
+                        Swal.fire('Gagal', err.error || err.message || 'Gagal menghapus pengeluaran', 'error');
+                    }
+                } catch (error) {
+                    console.error('Delete Error:', error);
+                    Swal.fire('Error', 'Gagal terhubung ke server', 'error');
+                }
+            }
+        }
+
         function escapeHTML(value) {
             return String(value ?? '')
                 .replace(/&/g, '&amp;')
