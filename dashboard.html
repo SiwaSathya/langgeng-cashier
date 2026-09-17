@@ -1072,7 +1072,7 @@
             // Nilai Tunai setelah dipotong pengeluaran kas
             const tunaiBersih = totalTunai - pengeluaran;
 
-            // 3. Hitung total piutang (Sisa tagihan transaksi berstatus DP atau Bon)
+            // 3. Hitung total piutang (Sisa Pembayaran transaksi berstatus DP atau Bon)
             const invoiceMap = {};
             (receiptData.sales || []).forEach(item => {
                 const inv = item.invoice || item.Invoice || `PJL-${item.id || Math.random()}`;
@@ -1501,7 +1501,7 @@ ${RECEIPT_BASE_CSS}
             ${isBon ? `
                 <div class="line"></div>
                 <div style="font-size: 9px; line-height: 1.2; text-align: justify; margin: 4px 0;">
-                    * Saya menyatakan telah menerima barang tersebut dalam keadaan baik dan berjanji akan melunasi sisa tagihan sesuai kesepakatan.
+                    * Saya menyatakan telah menerima barang tersebut dalam keadaan baik dan berjanji akan melunasi sisa pembayaran sesuai kesepakatan.
                 </div>
                 <div style="margin-top: 18px; display: flex; justify-content: space-between; text-align: center; font-size: 10px;">
                     <div style="width: 45%;">

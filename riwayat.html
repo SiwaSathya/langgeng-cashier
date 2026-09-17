@@ -945,7 +945,7 @@
                             <tr><td>Pembayaran Awal (DP)</td><td class="right">${initialPaid.toLocaleString('id-ID')}</td></tr>
                             <tr class="bold"><td>Bayar Pelunasan</td><td class="right">${Number(newPaidAmount || 0).toLocaleString('id-ID')}</td></tr>
                             <tr class="bold"><td>Total Terbayar</td><td class="right">${totalPaid.toLocaleString('id-ID')}</td></tr>
-                            <tr class="bold"><td>Sisa Tagihan</td><td class="right">0 (LUNAS)</td></tr>
+                            <tr class="bold"><td>Sisa Pembayaran</td><td class="right">0 (LUNAS)</td></tr>
                         </table>
 
                         <div class="line"></div>
@@ -1190,7 +1190,7 @@
             ${isBon ? `
                 <div class="line"></div>
                 <div style="font-size: 9px; line-height: 1.2; text-align: justify; margin: 4px 0;">
-                    * Saya menyatakan telah menerima barang tersebut dalam keadaan baik dan berjanji akan melunasi sisa tagihan sesuai kesepakatan.
+                    * Saya menyatakan telah menerima barang tersebut dalam keadaan baik dan berjanji akan melunasi sisa pembayaran sesuai kesepakatan.
                 </div>
                 <div style="margin-top: 18px; display: flex; justify-content: space-between; text-align: center; font-size: 10px;">
                     <div style="width: 45%;">
@@ -1349,7 +1349,7 @@
                     <tr class="bold"><td>Total Tagihan</td><td class="right">${totalBill.toLocaleString('id-ID')}</td></tr>
                     ${detailPembayaranHTML}
                     <tr class="bold"><td>Total Terbayar</td><td class="right">${totalPaid.toLocaleString('id-ID')}</td></tr>
-                    <tr class="bold"><td>Sisa Tagihan</td><td class="right">0 (LUNAS)</td></tr>
+                    <tr class="bold"><td>Sisa Pembayaran</td><td class="right">0 (LUNAS)</td></tr>
                 </table>
 
                 <div class="line"></div>
