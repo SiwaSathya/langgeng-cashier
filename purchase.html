@@ -1,605 +1,780 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Purchase Order - SmartPOS</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        />
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap");
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Purchase Order - SmartPOS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f8fafc;
-        }
-
-        .modal-active {
-            overflow: hidden;
-        }
-
-        /* Perbaikan scrollbar agar lebih clean */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
+            body {
+                font-family: "Plus Jakarta Sans", sans-serif;
+                background-color: #f8fafc;
             }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .modal-active {
+                overflow: hidden;
             }
-        }
-    </style>
-</head>
 
-<body class="flex min-h-screen">
+            /* Perbaikan scrollbar agar lebih clean */
+            ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
 
-    <!-- SIDEBAR -->
-    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 fixed h-screen z-20">
-        <div class="flex items-center gap-3 mb-8 shrink-0">
+            ::-webkit-scrollbar-thumb {
+                background: #cbd5e1;
+                border-radius: 10px;
+            }
+
+            .animate-fade-in {
+                animation: fadeIn 0.3s ease-out;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        </style>
+    </head>
+
+    <body class="flex min-h-screen">
+        <!-- SIDEBAR -->
+        <aside
+            class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 fixed h-screen z-20"
+        >
+            <div class="flex items-center gap-3 mb-8 shrink-0">
+                <div
+                    class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
+                >
+                    <i class="fas fa-store"></i>
+                </div>
+                <h1
+                    class="text-xl font-extrabold text-slate-800 tracking-tight text-nowrap"
+                >
+                    SMARTPOS
+                </h1>
+            </div>
+
+            <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
+                <a
+                    href="dashboard.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-th-large"></i> <span>Dashboard</span>
+                </a>
+                <a
+                    href="riwayat.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-history"></i>
+                    <span>Riwayat Transaksi</span>
+                </a>
+                <a
+                    href="product.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-box"></i> <span>Master Produk</span>
+                </a>
+                <a
+                    href="purchase.html"
+                    class="flex items-center gap-4 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100"
+                >
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Riwayat Purchase</span>
+                </a>
+                <a
+                    href="expense.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-wallet"></i> <span>Pengeluaran</span>
+                </a>
+                <a
+                    href="retur.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-undo"></i> <span>Manajemen Retur</span>
+                </a>
+                <a
+                    href="akuntansi.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-book-open"></i>
+                    <span>Jurnal & Keuangan</span>
+                </a>
+                <a
+                    href="absensi.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Absensi Karyawan</span>
+                </a>
+                <a
+                    href="report.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Laporan Analitik</span>
+                </a>
+            </nav>
+
+            <div class="pt-6 border-t border-slate-100 shrink-0">
+                <div class="bg-slate-50 p-4 rounded-2xl mb-4">
+                    <p
+                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"
+                    >
+                        User Aktif
+                    </p>
+                    <p class="font-bold text-slate-700 user-name-display">
+                        Desak Kasir
+                    </p>
+                </div>
+                <a
+                    href="#"
+                    onclick="confirmLogout()"
+                    class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all"
+                >
+                    <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 ml-72 p-12 min-w-0">
+            <div class="flex justify-between items-center mb-10">
+                <div>
+                    <h1 class="text-3xl font-800 text-slate-800 tracking-tight">
+                        Purchase Order
+                    </h1>
+                    <p class="text-slate-400 mt-1 font-medium">
+                        Catat dan pantau transaksi pembelian stok barang.
+                    </p>
+                </div>
+                <button
+                    onclick="openModal()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-blue-100"
+                >
+                    <i class="fas fa-plus text-sm"></i> Tambah Purchase
+                </button>
+            </div>
+
+            <!-- TABLE CARD -->
             <div
-                class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
-                <i class="fas fa-store"></i>
-            </div>
-            <h1 class="text-xl font-extrabold text-slate-800 tracking-tight text-nowrap">SMARTPOS</h1>
-        </div>
+                class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 animate-fade-in flex flex-col overflow-hidden"
+            >
+                <!-- Search Bar -->
+                <div class="p-8 border-b border-slate-50 flex gap-4 bg-white">
+                    <div class="relative flex-1">
+                        <i
+                            class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"
+                        ></i>
+                        <input
+                            type="text"
+                            id="searchInput"
+                            onkeyup="debounceSearch()"
+                            placeholder="Cari nomor nota..."
+                            class="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-[1.25rem] outline-none focus:border-blue-400 transition-all text-sm font-medium text-slate-600"
+                        />
+                    </div>
+                </div>
 
-        <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
-            <a href="dashboard.html"
-                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-th-large"></i> <span>Dashboard</span>
-            </a>
-            <a href="riwayat.html"
-                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
-            </a>
-            <a href="product.html"
-                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-box"></i> <span>Master Produk</span>
-            </a>
-            <a href="purchase.html"
-                class="flex items-center gap-4 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
-                <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
-            </a>
-            <a href="expense.html"
-                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-wallet"></i> <span>Pengeluaran</span>
-            </a>
-            <a href="retur.html"
-                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-undo"></i> <span>Manajemen Retur</span>
-            </a>
-            <a href="akuntansi.html"
-                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-book-open"></i> <span>Jurnal & Keuangan</span>
-            </a>
-            <a href="absensi.html"
-                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-calendar-check"></i> <span>Absensi Karyawan</span>
-            </a>
-            <a href="report.html"
-                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
-            </a>
-        </nav>
+                <!-- Table Wrapper - Fix terpotong -->
+                <div class="overflow-x-auto overflow-y-hidden">
+                    <table
+                        class="w-full text-left border-collapse table-auto min-w-[1000px]"
+                    >
+                        <thead
+                            class="bg-slate-50/50 text-[11px] uppercase tracking-widest text-slate-400 font-bold"
+                        >
+                            <tr>
+                                <th class="px-8 py-5">Informasi Nota</th>
+                                <th class="px-6 py-5">Barang & Supplier</th>
+                                <th class="px-6 py-5">Qty</th>
+                                <th class="px-6 py-5">Total Harga</th>
+                                <th class="px-8 py-5 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody
+                            id="purchaseTableBody"
+                            class="divide-y divide-slate-50 text-slate-700"
+                        >
+                            <!-- Data loaded via JS -->
+                        </tbody>
+                    </table>
+                </div>
 
-        <div class="pt-6 border-t border-slate-100 shrink-0">
-            <div class="bg-slate-50 p-4 rounded-2xl mb-4">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">User Aktif</p>
-                <p class="font-bold text-slate-700 user-name-display">Desak Kasir</p>
-            </div>
-            <a href="#" onclick="confirmLogout()"
-                class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all">
-                <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
-            </a>
-        </div>
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 ml-72 p-12 min-w-0">
-        <div class="flex justify-between items-center mb-10">
-            <div>
-                <h1 class="text-3xl font-800 text-slate-800 tracking-tight">Purchase Order</h1>
-                <p class="text-slate-400 mt-1 font-medium">Catat dan pantau transaksi pembelian stok barang.</p>
-            </div>
-            <button onclick="openModal()"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-blue-100">
-                <i class="fas fa-plus text-sm"></i> Tambah Purchase
-            </button>
-        </div>
-
-        <!-- TABLE CARD -->
-        <div
-            class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 animate-fade-in flex flex-col overflow-hidden">
-            <!-- Search Bar -->
-            <div class="p-8 border-b border-slate-50 flex gap-4 bg-white">
-                <div class="relative flex-1">
-                    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
-                    <input type="text" id="searchInput" onkeyup="debounceSearch()" placeholder="Cari nomor nota..."
-                        class="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-[1.25rem] outline-none focus:border-blue-400 transition-all text-sm font-medium text-slate-600">
+                <!-- PAGINATION SECTION - Fix Overflow & Logic -->
+                <div
+                    class="p-8 bg-slate-50/30 border-t border-slate-50 flex flex-col sm:flex-row justify-between items-center gap-6"
+                >
+                    <p class="text-slate-500 text-sm font-medium">
+                        Menampilkan
+                        <span id="countInfo" class="font-bold text-slate-800"
+                            >0</span
+                        >
+                        transaksi
+                    </p>
+                    <div
+                        id="paginationControls"
+                        class="flex flex-wrap justify-end gap-2 max-w-full"
+                    >
+                        <!-- Tombol pagination akan di-generate di sini -->
+                    </div>
                 </div>
             </div>
+        </main>
 
-            <!-- Table Wrapper - Fix terpotong -->
-            <div class="overflow-x-auto overflow-y-hidden">
-                <table class="w-full text-left border-collapse table-auto min-w-[1000px]">
-                    <thead class="bg-slate-50/50 text-[11px] uppercase tracking-widest text-slate-400 font-bold">
-                        <tr>
-                            <th class="px-8 py-5">Informasi Nota</th>
-                            <th class="px-6 py-5">Barang & Supplier</th>
-                            <th class="px-6 py-5">Qty</th>
-                            <th class="px-6 py-5">Total Harga</th>
-                            <th class="px-8 py-5 text-right">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="purchaseTableBody" class="divide-y divide-slate-50 text-slate-700">
-                        <!-- Data loaded via JS -->
-                    </tbody>
-                </table>
-            </div>
+        <!-- JS LOGIC -->
+        <script>
+            const BASE_URL =
+                "https://langgeng-cashier-backend-production.up.railway.app";
+            let currentPage = 1;
+            const limit = 10;
+            let searchTimer;
+            let purchaseItems = [];
 
-            <!-- PAGINATION SECTION - Fix Overflow & Logic -->
-            <div
-                class="p-8 bg-slate-50/30 border-t border-slate-50 flex flex-col sm:flex-row justify-between items-center gap-6">
-                <p class="text-slate-500 text-sm font-medium">
-                    Menampilkan <span id="countInfo" class="font-bold text-slate-800">0</span> transaksi
-                </p>
-                <div id="paginationControls" class="flex flex-wrap justify-end gap-2 max-w-full">
-                    <!-- Tombol pagination akan di-generate di sini -->
-                </div>
-            </div>
-        </div>
-    </main>
+            async function fetchPurchases() {
+                const search = document.getElementById("searchInput").value;
+                const tbody = document.getElementById("purchaseTableBody");
 
-    <!-- JS LOGIC -->
-    <script>
-        const BASE_URL = "https://langgeng-cashier-backend-production.up.railway.app";
-        let currentPage = 1;
-        const limit = 10;
-        let searchTimer;
+                try {
+                    const res = await fetch(
+                        `${BASE_URL}/api/purchases?page=${currentPage}&search=${search}&limit=${limit}`,
+                    );
+                    const result = await res.json();
+                    const purchases = result.data || [];
+                    const total = result.meta?.total || 0;
 
-        async function fetchPurchases() {
-            const search = document.getElementById('searchInput').value;
-            const tbody = document.getElementById('purchaseTableBody');
+                    if (purchases.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="5" class="py-20 text-center text-slate-400 font-medium">Belum ada data pembelian</td></tr>`;
+                    } else {
+                        const grouped = purchases.reduce((acc, p) => {
+                            const key = p.nota || "TANPA NOTA";
+                            if (!acc[key]) {
+                                acc[key] = {
+                                    nota: key,
+                                    tanggal: p.tanggal,
+                                    user: p.user,
+                                    items: [],
+                                };
+                            }
+                            acc[key].items.push(p);
+                            return acc;
+                        }, {});
 
-            try {
-                const res = await fetch(`${BASE_URL}/api/purchases?page=${currentPage}&search=${search}&limit=${limit}`);
-                const result = await res.json();
-                const purchases = result.data || [];
-                const total = result.meta?.total || 0;
-
-                if (purchases.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="py-20 text-center text-slate-400 font-medium">Belum ada data pembelian</td></tr>`;
-                } else {
-                    tbody.innerHTML = purchases.map(p => `
-                        <tr class="hover:bg-slate-50/50 transition-colors">
+                        tbody.innerHTML = Object.values(grouped)
+                            .map(
+                                (g) => `
+                        <tr class="hover:bg-slate-50 cursor-pointer" onclick="togglePurchaseNota('${g.nota}')">
                             <td class="px-8 py-6">
-                                <div class="font-extrabold text-blue-600 tracking-tight">#${p.nota}</div>
+                                <div class="font-extrabold text-blue-600 tracking-tight">
+                                    <i class="fas fa-chevron-down mr-2 text-xs"></i>#${g.nota}
+                                </div>
                                 <div class="text-[10px] text-slate-400 font-bold uppercase mt-1">
-                                    ${new Date(p.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                    ${new Date(g.tanggal).toLocaleDateString("id-ID")}
                                 </div>
-                                <p class="text-[11px] text-slate-400 font-bold"><i class="fas fa-user-circle mr-1"></i>${escapeHTML(p.user?.name || p.user?.Name || 'Kasir')}</p>
+                                <p class="text-[11px] text-slate-400 font-bold">
+                                    <i class="fas fa-user-circle mr-1"></i>${escapeHTML(g.user?.name || g.user?.Name || "Kasir")}
+                                </p>
+                            </td>
+                            <td class="px-6 py-6 font-bold text-slate-700">
+                                ${g.items.length} Produk
                             </td>
                             <td class="px-6 py-6">
-                                <div class="font-bold text-slate-700 leading-tight">${p.product?.nama || p.product?.Nama || 'Produk'}</div>
-                                <div class="flex items-center gap-1.5 mt-1.5 text-slate-400 font-bold uppercase text-[9px] tracking-wider">
-                                    <i class="fas fa-truck text-[8px]"></i>
-                                    <span>${p.supplier?.nama || p.supplier?.Nama || 'Supplier Umum'}</span>
-                                </div>
+                                <span class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold">
+                                    ${g.items.reduce((a, b) => a + b.qty, 0)} Unit
+                                </span>
                             </td>
-                            <td class="px-6 py-6">
-                                <span class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-800 border border-blue-100">${p.qty} Unit</span>
-                            </td>
-                            <td class="px-6 py-6 font-extrabold text-slate-800">
-                                Rp ${(p.total || 0).toLocaleString('id-ID')}
+                            <td class="px-6 py-6 font-extrabold">
+                                Rp ${g.items.reduce((a, b) => a + b.total, 0).toLocaleString("id-ID")}
                             </td>
                             <td class="px-8 py-6 text-right">
-                                <button onclick="deletePurchase('${p.id || p.ID}')" class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-300 hover:bg-red-50 hover:text-red-500 transition-all">
-                                    <i class="fas fa-trash-alt text-sm"></i>
+                                <button onclick="event.stopPropagation(); deletePurchase('${g.items[0].id || g.items[0].ID}')"
+                                class="w-10 h-10 rounded-xl text-slate-300 hover:bg-red-50 hover:text-red-500">
+                                    <i class="fas fa-trash-alt"></i>
                                 </button>
                             </td>
                         </tr>
-                    `).join('');
-                }
 
-                document.getElementById('countInfo').innerText = total;
-                renderPagination(total);
-            } catch (err) {
-                console.error("Fetch error", err);
-                tbody.innerHTML = `<tr><td colspan="5" class="py-10 text-center text-red-400 font-medium">Gagal mengambil data dari server.</td></tr>`;
-            }
-        }
-
-        function renderPagination(total) {
-            const totalPages = Math.ceil(total / limit);
-            const container = document.getElementById('paginationControls');
-            let html = '';
-
-            if (totalPages <= 1) {
-                container.innerHTML = '';
-                return;
-            }
-
-            const delta = 2; // Jumlah angka di sekitar halaman aktif
-            const range = [];
-            for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
-                range.push(i);
-            }
-
-            if (currentPage > delta + 2) range.unshift('...');
-            range.unshift(1);
-            if (currentPage < totalPages - (delta + 1)) range.push('...');
-            range.push(totalPages);
-
-            // --- TOMBOL PREVIOUS (KIRI) ---
-            const prevDisabled = currentPage === 1;
-            html += `
-                <button onclick="${prevDisabled ? '' : `changePage(${currentPage - 1})`}" 
-                    class="w-10 h-10 rounded-xl flex items-center justify-center transition-all border border-slate-100 
-                    ${prevDisabled ? 'text-slate-200 bg-slate-50 cursor-not-allowed' : 'text-slate-400 bg-white hover:border-blue-200 hover:text-blue-500'}">
-                    <i class="fas fa-chevron-left text-xs"></i>
-                </button>`;
-
-            // --- TOMBOL ANGKA ---
-            range.forEach(page => {
-                if (page === '...') {
-                    html += `<span class="w-10 h-10 flex items-center justify-center text-slate-400 font-bold">...</span>`;
-                } else {
-                    const isActive = currentPage === page;
-                    html += `
-                        <button onclick="changePage(${page})" 
-                            class="w-10 h-10 rounded-xl font-bold transition-all text-xs 
-                            ${isActive
-                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
-                            : 'bg-white text-slate-400 border border-slate-100 hover:border-blue-200 hover:text-blue-500'}">
-                            ${page}
-                        </button>`;
-                }
-            });
-
-            // --- TOMBOL NEXT (KANAN) ---
-            const nextDisabled = currentPage === totalPages;
-            html += `
-                <button onclick="${nextDisabled ? '' : `changePage(${currentPage + 1})`}" 
-                    class="w-10 h-10 rounded-xl flex items-center justify-center transition-all border border-slate-100 
-                    ${nextDisabled ? 'text-slate-200 bg-slate-50 cursor-not-allowed' : 'text-slate-400 bg-white hover:border-blue-200 hover:text-blue-500'}">
-                    <i class="fas fa-chevron-right text-xs"></i>
-                </button>`;
-
-            container.innerHTML = html;
-        }
-
-        function changePage(p) {
-            currentPage = p;
-            fetchPurchases();
-            // Scroll ke atas tabel saat ganti halaman
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function debounceSearch() {
-            clearTimeout(searchTimer);
-            searchTimer = setTimeout(() => {
-                currentPage = 1;
-                fetchPurchases();
-            }, 500);
-        }
-
-        const ROLE_PERMISSIONS = {
-            'admin': ['riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'absensi.html', 'report.html'],
-            'kasir': ['dashboard.html', 'riwayat.html'],
-            'super-kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
-            'super_kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
-            'superkasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
-            'akuntan': ['akuntansi.html', 'purchase.html', 'expense.html', 'retur.html'],
-            'superadmin': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'akuntansi.html', 'absensi.html', 'report.html']
-        };
-
-        async function confirmLogout() {
-            const result = await Swal.fire({
-                title: 'Konfirmasi Keluar',
-                text: 'Pilih tindakan logout yang ingin Anda lakukan:',
-                icon: 'question',
-                showCancelButton: true,
-                showDenyButton: true,
-                confirmButtonText: '<i class="fas fa-check-circle mr-1"></i> Logout & Selesaikan Shift',
-                denyButtonText: '<i class="fas fa-sign-out-alt mr-1"></i> Logout Saja',
-                cancelButtonText: '<i class="fas fa-times mr-1"></i> Batal',
-                confirmButtonColor: '#2563EB',
-                denyButtonColor: '#F59E0B',
-                cancelButtonColor: '#64748B',
-                reverseButtons: true
-            });
-
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Menutup Shift...',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
-
-                try {
-                    const shiftResponse = await fetch(`${BASE_URL}/api/shift/current`);
-                    const shiftData = await shiftResponse.json();
-                    const shift = shiftData.shift || 1;
-
-                    const updateResponse = await fetch(`${BASE_URL}/api/sales/update/shift`, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            shift: shift
-                        })
-                    });
-
-                    if (updateResponse.ok) {
-                        await Swal.fire({
-                            icon: "success",
-                            title: "Shift Berhasil Ditutup",
-                            text: `Transaksi berhasil dimasukkan ke Shift ${shift}. Anda telah keluar.`,
-                            confirmButtonColor: '#2563EB'
-                        });
-                        localStorage.removeItem("token");
-                        window.location.href = "index.html";
-                    } else {
-                        Swal.fire("Gagal", "Gagal memperbarui shift transaksi", "error");
+                        <tr id="detail-${g.nota}" class="hidden bg-slate-50">
+                            <td colspan="5" class="px-8 py-5">
+                                ${g.items
+                                    .map(
+                                        (item) => `
+                                    <div class="flex justify-between border-b py-3">
+                                        <div>
+                                            <b>${escapeHTML(item.product?.nama || item.product?.Nama || "Produk")}</b>
+                                            <div class="text-xs text-slate-400">
+                                                ${item.supplier?.nama || item.supplier?.Nama || "Supplier"}
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            ${item.qty} Unit<br>
+                                            Rp ${(item.total || 0).toLocaleString("id-ID")}
+                                        </div>
+                                    </div>
+                                `,
+                                    )
+                                    .join("")}
+                            </td>
+                        </tr>
+                    `,
+                            )
+                            .join("");
                     }
-                } catch (error) {
-                    console.error(error);
-                    Swal.fire("Error", "Server tidak dapat dihubungi", "error");
+
+                    document.getElementById("countInfo").innerText = total;
+                    renderPagination(total);
+                } catch (err) {
+                    console.error("Fetch error", err);
+                    tbody.innerHTML = `<tr><td colspan="5" class="py-10 text-center text-red-400 font-medium">Gagal mengambil data dari server.</td></tr>`;
                 }
-            } else if (result.isDenied) {
-                localStorage.removeItem("token");
-                window.location.href = "index.html";
-            }
-        }
-
-        function escapeHTML(value) {
-            return String(value ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
-        function getUserDataFromToken() {
-            const token = localStorage.getItem('token');
-            if (!token) return null;
-            try {
-                const base64Url = token.split('.')[1];
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-                return JSON.parse(jsonPayload);
-            } catch (err) {
-                return null;
-            }
-        }
-
-        function checkRoleAccess(currentPage) {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = 'index.html';
-                return;
-            }
-            const userData = getUserDataFromToken();
-            if (!userData) {
-                window.location.href = 'index.html';
-                return;
-            }
-            const userRole = (userData.role || 'kasir').toLowerCase().trim();
-            const allowedPages = ROLE_PERMISSIONS[userRole] || ['dashboard.html'];
-
-            if (!allowedPages.includes(currentPage)) {
-                if (userRole === 'akuntan') window.location.href = 'akuntansi.html';
-                else if (userRole === 'admin') window.location.href = 'riwayat.html';
-                else window.location.href = 'dashboard.html';
-                return;
             }
 
-            const navLinks = document.querySelectorAll('aside nav a');
-            navLinks.forEach(link => {
-                const href = link.getAttribute('href');
-                if (href && href !== '#' && href !== 'index.html') {
-                    if (!allowedPages.includes(href)) {
-                        link.style.display = 'none';
-                    } else {
-                        link.style.display = 'flex';
-                    }
-                }
-            });
+            function renderPagination(total) {
+                const totalPages = Math.ceil(total / limit);
+                const container = document.getElementById("paginationControls");
+                let html = "";
 
-            const userEls = document.querySelectorAll('.user-name-display');
-            userEls.forEach(el => {
-                el.innerText = `${userData.name || 'User'} (${userRole.toUpperCase()})`;
-            });
-        }
-
-        // Global Enter Handler: Prioritize SweetAlert confirm & Active modal submit buttons
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                if (typeof Swal !== 'undefined' && Swal.isVisible()) {
-                    const activeEl = document.activeElement;
-                    if (activeEl && activeEl.tagName === 'TEXTAREA' && !e.ctrlKey) {
-                        return;
-                    }
-                    e.preventDefault();
-                    const confirmBtn = Swal.getConfirmButton();
-                    if (confirmBtn && !confirmBtn.disabled) {
-                        confirmBtn.click();
-                    }
+                if (totalPages <= 1) {
+                    container.innerHTML = "";
                     return;
                 }
 
-                const activeModalForm = document.querySelector('.fixed:not(.hidden) form, [id$="Modal"]:not(.hidden) form');
-                if (activeModalForm) {
-                    const activeEl = document.activeElement;
-                    if (activeEl && activeEl.tagName === 'TEXTAREA' && !e.ctrlKey) {
-                        return;
+                const delta = 2; // Jumlah angka di sekitar halaman aktif
+                const range = [];
+                for (
+                    let i = Math.max(2, currentPage - delta);
+                    i <= Math.min(totalPages - 1, currentPage + delta);
+                    i++
+                ) {
+                    range.push(i);
+                }
+
+                if (currentPage > delta + 2) range.unshift("...");
+                range.unshift(1);
+                if (currentPage < totalPages - (delta + 1)) range.push("...");
+                range.push(totalPages);
+
+                // --- TOMBOL PREVIOUS (KIRI) ---
+                const prevDisabled = currentPage === 1;
+                html += `
+                <button onclick="${prevDisabled ? "" : `changePage(${currentPage - 1})`}"
+                    class="w-10 h-10 rounded-xl flex items-center justify-center transition-all border border-slate-100
+                    ${prevDisabled ? "text-slate-200 bg-slate-50 cursor-not-allowed" : "text-slate-400 bg-white hover:border-blue-200 hover:text-blue-500"}">
+                    <i class="fas fa-chevron-left text-xs"></i>
+                </button>`;
+
+                // --- TOMBOL ANGKA ---
+                range.forEach((page) => {
+                    if (page === "...") {
+                        html += `<span class="w-10 h-10 flex items-center justify-center text-slate-400 font-bold">...</span>`;
+                    } else {
+                        const isActive = currentPage === page;
+                        html += `
+                        <button onclick="changePage(${page})"
+                            class="w-10 h-10 rounded-xl font-bold transition-all text-xs
+                            ${
+                                isActive
+                                    ? "bg-blue-600 text-white shadow-lg shadow-blue-200"
+                                    : "bg-white text-slate-400 border border-slate-100 hover:border-blue-200 hover:text-blue-500"
+                            }">
+                            ${page}
+                        </button>`;
                     }
-                    e.preventDefault();
-                    const submitBtn = activeModalForm.querySelector('button[type="submit"], button.bg-blue-600, button.bg-emerald-600');
-                    if (submitBtn && !submitBtn.disabled) {
-                        submitBtn.click();
-                    } else if (typeof activeModalForm.requestSubmit === 'function') {
-                        activeModalForm.requestSubmit();
+                });
+
+                // --- TOMBOL NEXT (KANAN) ---
+                const nextDisabled = currentPage === totalPages;
+                html += `
+                <button onclick="${nextDisabled ? "" : `changePage(${currentPage + 1})`}"
+                    class="w-10 h-10 rounded-xl flex items-center justify-center transition-all border border-slate-100
+                    ${nextDisabled ? "text-slate-200 bg-slate-50 cursor-not-allowed" : "text-slate-400 bg-white hover:border-blue-200 hover:text-blue-500"}">
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </button>`;
+
+                container.innerHTML = html;
+            }
+
+            function changePage(p) {
+                currentPage = p;
+                fetchPurchases();
+                // Scroll ke atas tabel saat ganti halaman
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+
+            function debounceSearch() {
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(() => {
+                    currentPage = 1;
+                    fetchPurchases();
+                }, 500);
+            }
+
+            const ROLE_PERMISSIONS = {
+                admin: [
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "absensi.html",
+                    "report.html",
+                ],
+                kasir: ["dashboard.html", "riwayat.html"],
+                "super-kasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                ],
+                super_kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                ],
+                superkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                ],
+                supersubkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                ],
+                akuntan: [
+                    "akuntansi.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                ],
+                superadmin: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "akuntansi.html",
+                    "absensi.html",
+                    "report.html",
+                ],
+            };
+
+            async function confirmLogout() {
+                const result = await Swal.fire({
+                    title: "Konfirmasi Keluar",
+                    text: "Pilih tindakan logout yang ingin Anda lakukan:",
+                    icon: "question",
+                    showCancelButton: true,
+                    showDenyButton: true,
+                    confirmButtonText:
+                        '<i class="fas fa-check-circle mr-1"></i> Logout & Selesaikan Shift',
+                    denyButtonText:
+                        '<i class="fas fa-sign-out-alt mr-1"></i> Logout Saja',
+                    cancelButtonText: '<i class="fas fa-times mr-1"></i> Batal',
+                    confirmButtonColor: "#2563EB",
+                    denyButtonColor: "#F59E0B",
+                    cancelButtonColor: "#64748B",
+                    reverseButtons: true,
+                });
+
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: "Menutup Shift...",
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading(),
+                    });
+
+                    try {
+                        const shiftResponse = await fetch(
+                            `${BASE_URL}/api/shift/current`,
+                        );
+                        const shiftData = await shiftResponse.json();
+                        const shift = shiftData.shift || 1;
+
+                        const updateResponse = await fetch(
+                            `${BASE_URL}/api/sales/update/shift`,
+                            {
+                                method: "PUT",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    shift: shift,
+                                }),
+                            },
+                        );
+
+                        if (updateResponse.ok) {
+                            await Swal.fire({
+                                icon: "success",
+                                title: "Shift Berhasil Ditutup",
+                                text: `Transaksi berhasil dimasukkan ke Shift ${shift}. Anda telah keluar.`,
+                                confirmButtonColor: "#2563EB",
+                            });
+                            localStorage.removeItem("token");
+                            window.location.href = "index.html";
+                        } else {
+                            Swal.fire(
+                                "Gagal",
+                                "Gagal memperbarui shift transaksi",
+                                "error",
+                            );
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        Swal.fire(
+                            "Error",
+                            "Server tidak dapat dihubungi",
+                            "error",
+                        );
                     }
+                } else if (result.isDenied) {
+                    localStorage.removeItem("token");
+                    window.location.href = "index.html";
                 }
             }
-        });
 
-        // Init data
-        window.onload = () => {
-            checkRoleAccess('purchase.html');
-            fetchPurchases();
-        };
-
-
-        function openModal() {
-            const modal = document.getElementById('purchaseModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('purchaseModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-
-            document.getElementById('purchaseForm').reset();
-            document.getElementById('supplier_id').value = '';
-            document.getElementById('product_id').value = '';
-        }
-
-
-
-        let supplierCache = [];
-
-        let productTimer;
-
-
-        // Load semua produk saat klik pertama
-        async function loadProductDropdown() {
-
-            await fetchProduct("");
-
-        }
-
-
-
-        // Search produk langsung ke API
-        function searchProduct() {
-
-            clearTimeout(productTimer);
-
-
-            productTimer = setTimeout(() => {
-
-                const keyword =
-                    document.getElementById('productSearch')
-                        .value
-                        .trim();
-
-
-                fetchProduct(keyword);
-
-
-            }, 300);
-
-        }
-
-
-
-        async function fetchProduct(keyword) {
-
-            try {
-
-
-                const res = await fetch(
-                    `${BASE_URL}/api/products/?search=${encodeURIComponent(keyword)}&page=1&limit=50`
-                );
-
-
-                const result = await res.json();
-
-
-                renderProduct(result.data || []);
-
-
-
-            } catch (err) {
-
-                console.error("Product search error:", err);
-
+            function escapeHTML(value) {
+                return String(value ?? "")
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
             }
 
-        }
+            function getUserDataFromToken() {
+                const token = localStorage.getItem("token");
+                if (!token) return null;
+                try {
+                    const base64Url = token.split(".")[1];
+                    const base64 = base64Url
+                        .replace(/-/g, "+")
+                        .replace(/_/g, "/");
+                    const jsonPayload = decodeURIComponent(
+                        window
+                            .atob(base64)
+                            .split("")
+                            .map(function (c) {
+                                return (
+                                    "%" +
+                                    ("00" + c.charCodeAt(0).toString(16)).slice(
+                                        -2,
+                                    )
+                                );
+                            })
+                            .join(""),
+                    );
+                    return JSON.parse(jsonPayload);
+                } catch (err) {
+                    return null;
+                }
+            }
 
+            function checkRoleAccess(currentPage) {
+                const token = localStorage.getItem("token");
+                if (!token) {
+                    window.location.href = "index.html";
+                    return;
+                }
+                const userData = getUserDataFromToken();
+                if (!userData) {
+                    window.location.href = "index.html";
+                    return;
+                }
+                const userRole = (userData.role || "kasir")
+                    .toLowerCase()
+                    .trim();
+                const allowedPages = ROLE_PERMISSIONS[userRole] || [
+                    "dashboard.html",
+                ];
 
+                if (!allowedPages.includes(currentPage)) {
+                    if (userRole === "akuntan")
+                        window.location.href = "akuntansi.html";
+                    else if (userRole === "admin")
+                        window.location.href = "riwayat.html";
+                    else window.location.href = "dashboard.html";
+                    return;
+                }
 
+                const navLinks = document.querySelectorAll("aside nav a");
+                navLinks.forEach((link) => {
+                    const href = link.getAttribute("href");
+                    if (href && href !== "#" && href !== "index.html") {
+                        if (!allowedPages.includes(href)) {
+                            link.style.display = "none";
+                        } else {
+                            link.style.display = "flex";
+                        }
+                    }
+                });
 
-        function renderProduct(data) {
+                const userEls = document.querySelectorAll(".user-name-display");
+                userEls.forEach((el) => {
+                    el.innerText = `${userData.name || "User"} (${userRole.toUpperCase()})`;
+                });
+            }
 
-            const box =
-                document.getElementById('productDropdown');
+            // Global Enter Handler: Prioritize SweetAlert confirm & Active modal submit buttons
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    if (typeof Swal !== "undefined" && Swal.isVisible()) {
+                        const activeEl = document.activeElement;
+                        if (
+                            activeEl &&
+                            activeEl.tagName === "TEXTAREA" &&
+                            !e.ctrlKey
+                        ) {
+                            return;
+                        }
+                        e.preventDefault();
+                        const confirmBtn = Swal.getConfirmButton();
+                        if (confirmBtn && !confirmBtn.disabled) {
+                            confirmBtn.click();
+                        }
+                        return;
+                    }
 
+                    const activeModalForm = document.querySelector(
+                        '.fixed:not(.hidden) form, [id$="Modal"]:not(.hidden) form',
+                    );
+                    if (activeModalForm) {
+                        const activeEl = document.activeElement;
+                        if (
+                            activeEl &&
+                            activeEl.tagName === "TEXTAREA" &&
+                            !e.ctrlKey
+                        ) {
+                            return;
+                        }
+                        e.preventDefault();
+                        const submitBtn = activeModalForm.querySelector(
+                            'button[type="submit"], button.bg-blue-600, button.bg-emerald-600',
+                        );
+                        if (submitBtn && !submitBtn.disabled) {
+                            submitBtn.click();
+                        } else if (
+                            typeof activeModalForm.requestSubmit === "function"
+                        ) {
+                            activeModalForm.requestSubmit();
+                        }
+                    }
+                }
+            });
 
-            if (data.length === 0) {
+            // Init data
+            window.onload = () => {
+                checkRoleAccess("purchase.html");
+                fetchPurchases();
+            };
 
-                box.innerHTML = `
+            function openModal() {
+                const modal = document.getElementById("purchaseModal");
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+            }
+
+            function closeModal() {
+                const modal = document.getElementById("purchaseModal");
+                modal.classList.add("hidden");
+                modal.classList.remove("flex");
+
+                document.getElementById("purchaseForm").reset();
+                document.getElementById("supplier_id").value = "";
+                document.getElementById("product_id").value = "";
+                purchaseItems = [];
+                renderPurchaseItems();
+            }
+
+            let supplierCache = [];
+
+            let productTimer;
+
+            // Load semua produk saat klik pertama
+            async function loadProductDropdown() {
+                await fetchProduct("");
+            }
+
+            // Search produk langsung ke API
+            function searchProduct() {
+                clearTimeout(productTimer);
+
+                productTimer = setTimeout(() => {
+                    const keyword = document
+                        .getElementById("productSearch")
+                        .value.trim();
+
+                    fetchProduct(keyword);
+                }, 300);
+            }
+
+            async function fetchProduct(keyword) {
+                try {
+                    const res = await fetch(
+                        `${BASE_URL}/api/products/?search=${encodeURIComponent(keyword)}&page=1&limit=50`,
+                    );
+
+                    const result = await res.json();
+
+                    renderProduct(result.data || []);
+                } catch (err) {
+                    console.error("Product search error:", err);
+                }
+            }
+
+            function renderProduct(data) {
+                const box = document.getElementById("productDropdown");
+
+                if (data.length === 0) {
+                    box.innerHTML = `
         <div class="p-3 text-slate-400">
             Produk tidak ditemukan
         </div>`;
 
-                box.classList.remove('hidden');
+                    box.classList.remove("hidden");
 
-                return;
+                    return;
+                }
 
-            }
+                box.innerHTML = data
+                    .map((p) => {
+                        const id = p.ID || p.id || "";
 
+                        const nama = p.Nama || p.nama || "-";
 
+                        const kode = p.Kode || p.kode || "-";
 
-            box.innerHTML =
-                data.map(p => {
+                        const harga = p.HBeli || p.hbeli || 0;
 
-
-                    const id =
-                        p.ID || p.id || "";
-
-
-                    const nama =
-                        p.Nama || p.nama || "-";
-
-
-                    const kode =
-                        p.Kode || p.kode || "-";
-
-
-                    const harga =
-                        p.HBeli || p.hbeli || 0;
-
-
-
-                    return `
+                        return `
 
         <div onclick="selectProduct('${id}','${String(nama).replace(/'/g, "\\'")}',${harga})"
              class="p-3 hover:bg-blue-50 cursor-pointer border-b">
@@ -612,372 +787,508 @@
 
              <div class="text-xs text-slate-400">
                 ${kode} -
-                Rp ${Number(harga).toLocaleString('id-ID')}
+                Rp ${Number(harga).toLocaleString("id-ID")}
              </div>
 
 
         </div>
 
         `;
+                    })
+                    .join("");
 
-
-                }).join('');
-
-
-
-            box.classList.remove('hidden');
-
-        }
-
-
-        function selectProduct(id, name, harga) {
-
-            document.getElementById('product_id').value = id;
-            document.getElementById('productSearch').value = name;
-            document.getElementById('h_beli').value = harga;
-            document.getElementById('productDropdown').classList.add('hidden');
-
-        }
-
-
-        document.addEventListener('DOMContentLoaded', function () {
-
-            const purchaseForm = document.getElementById('purchaseForm');
-
-            if (!purchaseForm) {
-                console.error('purchaseForm tidak ditemukan');
-                return;
+                box.classList.remove("hidden");
             }
 
-            purchaseForm.addEventListener('submit', async function (e) {
+            function selectProduct(id, name, harga) {
+                document.getElementById("product_id").value = id;
+                document.getElementById("productSearch").value = name;
+                document.getElementById("h_beli").value = harga;
+                document
+                    .getElementById("productDropdown")
+                    .classList.add("hidden");
+            }
 
-                e.preventDefault();
+            function addPurchaseItem() {
+                const id = document.getElementById("product_id").value;
+                const name = document.getElementById("productSearch").value;
+                const qty = Number(document.getElementById("qty").value);
+                const harga = Number(document.getElementById("h_beli").value);
 
-
-                const qty =
-                    Number(document.getElementById('qty').value);
-
-
-                const hBeli =
-                    Number(document.getElementById('h_beli').value);
-
-
-
-                console.log("USER LOGIN:", getUserDataFromToken());
-
-                const body = {
-
-                    nota:
-                        document.getElementById('nota').value,
-
-                    tanggal:
-                        new Date(document.getElementById('tanggal').value).toISOString(),
-
-                    product_id:
-                        Number(document.getElementById('product_id').value),
-
-                    supplier_id:
-                        document.getElementById('supplier_id').value,
-
-                    qty: qty,
-
-                    h_beli: hBeli,
-
-                    total:
-                        qty * hBeli,
-
-                    user_id:
-                        (() => {
-                            const user = getUserDataFromToken() || {};
-                            return user.id ||
-                                user.ID ||
-                                user.user_id ||
-                                user.userID ||
-                                "";
-                        })(),
-
-                    location:
-                        (() => {
-                            const user = getUserDataFromToken() || {};
-                            return user.location ||
-                                document.getElementById('location').value ||
-                                "Toko Utama";
-                        })()
-                };
-
-
-                console.log("PURCHASE PAYLOAD:", body);
-
-                const res = await fetch(
-                    `${BASE_URL}/api/purchases`,
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(body)
-                    }
-                );
-
-
-                const result = await res.json();
-
-
-                if (!res.ok) {
-
-                    Swal.fire("Error", result.message || "Gagal", "error");
+                if (!id || !qty || !harga) {
+                    Swal.fire(
+                        "Error",
+                        "Produk, qty dan harga wajib diisi",
+                        "error",
+                    );
                     return;
                 }
 
+                purchaseItems.push({
+                    product_id: Number(id),
+                    nama: name,
+                    qty: qty,
+                    h_beli: harga,
+                    total: qty * harga,
+                });
 
-                Swal.fire(
-                    "Berhasil",
-                    "Purchase berhasil disimpan",
-                    "success"
-                );
-
-
-                closeModal();
-                fetchPurchases();
-
-            });
-        });
-
-
-        // DELETE PURCHASE
-        async function deletePurchase(id) {
-
-            if (!id) {
-                Swal.fire(
-                    "Error",
-                    "ID purchase tidak ditemukan",
-                    "error"
-                );
-                return;
+                renderPurchaseItems();
+                document.getElementById("productSearch").value = "";
+                document.getElementById("product_id").value = "";
+                document.getElementById("qty").value = "";
+                document.getElementById("h_beli").value = "";
             }
 
-            const confirmDelete = await Swal.fire({
-                title: "Hapus Purchase?",
-                text: "Data pembelian akan dihapus dan stok akan dikembalikan.",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Ya, Hapus",
-                cancelButtonText: "Batal",
-                confirmButtonColor: "#dc2626",
-                cancelButtonColor: "#64748b"
-            });
+            function renderPurchaseItems() {
+                const box = document.getElementById("purchaseItems");
+                if (!box) return;
 
-            if (!confirmDelete.isConfirmed) {
-                return;
+                box.innerHTML = purchaseItems
+                    .map(
+                        (x, i) => `
+                <div class="flex justify-between border p-3 rounded-xl">
+                    <div>
+                        <b>${x.nama}</b><br>
+                        ${x.qty} x Rp ${x.h_beli.toLocaleString("id-ID")}
+                    </div>
+                    <button type="button" onclick="removePurchaseItem(${i})" class="text-red-500">
+                        Hapus
+                    </button>
+                </div>
+            `,
+                    )
+                    .join("");
             }
 
-            try {
+            function removePurchaseItem(i) {
+                purchaseItems.splice(i, 1);
+                renderPurchaseItems();
+            }
 
-                const response = await fetch(
-                    `${BASE_URL}/api/purchases/${id}`,
-                    {
-                        method: "DELETE",
-                        headers: {
-                            "Content-Type": "application/json"
-                        }
-                    }
-                );
+            document.addEventListener("DOMContentLoaded", function () {
+                const purchaseForm = document.getElementById("purchaseForm");
 
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(
-                        result.message || "Gagal menghapus purchase"
-                    );
+                if (!purchaseForm) {
+                    console.error("purchaseForm tidak ditemukan");
+                    return;
                 }
 
-                await Swal.fire(
-                    "Berhasil",
-                    "Data purchase berhasil dihapus",
-                    "success"
-                );
+                purchaseForm.addEventListener("submit", async function (e) {
+                    e.preventDefault();
 
-                fetchPurchases();
+                    const user = getUserDataFromToken() || {};
 
-            } catch (error) {
+                    if (purchaseItems.length === 0) {
+                        Swal.fire(
+                            "Error",
+                            "Tambahkan minimal 1 barang",
+                            "error",
+                        );
+                        return;
+                    }
 
-                console.error(
-                    "Delete purchase error:",
-                    error
-                );
+                    const nota = document.getElementById("nota").value.trim();
 
-                Swal.fire(
-                    "Error",
-                    error.message,
-                    "error"
-                );
+                    if (!nota) {
+                        Swal.fire("Error", "Nomor nota wajib diisi", "error");
+                        return;
+                    }
+
+                    if (!document.getElementById("supplier_id").value) {
+                        Swal.fire("Error", "Supplier wajib dipilih", "error");
+                        return;
+                    }
+
+                    const tanggalInput =
+                        document.getElementById("tanggal").value;
+
+                    if (!tanggalInput) {
+                        Swal.fire("Error", "Tanggal wajib diisi", "error");
+                        return;
+                    }
+
+                    const userId =
+                        user.id || user.ID || user.user_id || user.userID || "";
+
+                    const userLocation =
+                        user.location ||
+                        document.getElementById("location").value ||
+                        "Toko Utama";
+
+                    if (!userId) {
+                        Swal.fire(
+                            "Error",
+                            "User login tidak ditemukan",
+                            "error",
+                        );
+                        return;
+                    }
+
+                    const totalData = purchaseItems.length;
+
+                    Swal.fire({
+                        title: "Menyimpan Purchase",
+                        html: `
+                        <div id="purchaseProgress">
+                            Menyiapkan data...
+                        </div>
+                    `,
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                    });
+
+                    let failed = false;
+
+                    for (let i = 0; i < totalData; i++) {
+                        const item = purchaseItems[i];
+
+                        // PAYLOAD TETAP SESUAI BACKEND
+                        const payload = {
+                            nota: nota,
+
+                            tanggal: (() => {
+                                const dateValue =
+                                    document.getElementById("tanggal").value;
+
+                                if (!dateValue) {
+                                    return new Date().toISOString();
+                                }
+
+                                return new Date(
+                                    dateValue + "T00:00:00",
+                                ).toISOString();
+                            })(),
+
+                            product_id: Number(item.product_id),
+
+                            supplier_id: String(
+                                document.getElementById("supplier_id").value,
+                            ),
+
+                            qty: Number(item.qty),
+
+                            h_beli: Number(item.h_beli),
+
+                            total: Number(item.total),
+
+                            user_id: userId,
+
+                            location: userLocation,
+                        };
+
+                        document.getElementById("purchaseProgress").innerHTML =
+                            `
+                        Menyimpan produk...
+                        <br>
+                        ${i + 1}/${totalData}
+                    `;
+
+                        console.log("PURCHASE PAYLOAD:", payload);
+
+                        const res = await fetch(`${BASE_URL}/api/purchases`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(payload),
+                        });
+
+                        if (!res.ok) {
+                            const error = await res
+                                .json()
+                                .catch(() => ({ message: "Unknown error" }));
+
+                            console.error("PURCHASE ERROR:", error);
+
+                            failed = true;
+                            break;
+                        }
+                    }
+
+                    Swal.close();
+
+                    if (failed) {
+                        Swal.fire(
+                            "Error",
+                            "Ada data purchase yang gagal disimpan",
+                            "error",
+                        );
+
+                        return;
+                    }
+
+                    Swal.fire(
+                        "Berhasil",
+                        `${totalData} produk berhasil disimpan`,
+                        "success",
+                    );
+
+                    closeModal();
+
+                    fetchPurchases();
+                });
+            });
+
+            function togglePurchaseNota(nota) {
+                const row = document.getElementById("detail-" + nota);
+                if (row) row.classList.toggle("hidden");
             }
-        }
 
-    </script>
+            // DELETE PURCHASE
+            async function deletePurchase(id) {
+                if (!id) {
+                    Swal.fire("Error", "ID purchase tidak ditemukan", "error");
+                    return;
+                }
 
-    <!-- TAMBAH PURCHASE MODAL -->
-    <div id="purchaseModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-[2rem] p-8 w-full max-w-2xl shadow-2xl">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-extrabold text-slate-800">Tambah Purchase</h2>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-red-500">
-                    <i class="fas fa-times"></i>
-                </button>
+                const confirmDelete = await Swal.fire({
+                    title: "Hapus Purchase?",
+                    text: "Data pembelian akan dihapus dan stok akan dikembalikan.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, Hapus",
+                    cancelButtonText: "Batal",
+                    confirmButtonColor: "#dc2626",
+                    cancelButtonColor: "#64748b",
+                });
+
+                if (!confirmDelete.isConfirmed) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(
+                        `${BASE_URL}/api/purchases/${id}`,
+                        {
+                            method: "DELETE",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                        },
+                    );
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(
+                            result.message || "Gagal menghapus purchase",
+                        );
+                    }
+
+                    await Swal.fire(
+                        "Berhasil",
+                        "Data purchase berhasil dihapus",
+                        "success",
+                    );
+
+                    fetchPurchases();
+                } catch (error) {
+                    console.error("Delete purchase error:", error);
+
+                    Swal.fire("Error", error.message, "error");
+                }
+            }
+        </script>
+
+        <!-- TAMBAH PURCHASE MODAL -->
+        <div
+            id="purchaseModal"
+            class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50"
+        >
+            <div
+                class="bg-white rounded-[2rem] p-8 w-full max-w-2xl shadow-2xl"
+            >
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-extrabold text-slate-800">
+                        Tambah Purchase
+                    </h2>
+                    <button
+                        onclick="closeModal()"
+                        class="text-slate-400 hover:text-red-500"
+                    >
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="purchaseForm" novalidate class="space-y-4">
+                    <input
+                        id="nota"
+                        required
+                        placeholder="Nomor Nota"
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3"
+                    />
+
+                    <input
+                        id="tanggal"
+                        type="date"
+                        required
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3"
+                    />
+
+                    <div class="relative">
+                        <label class="text-sm font-bold text-slate-600"
+                            >Supplier</label
+                        >
+                        <input
+                            id="supplierSearch"
+                            onfocus="loadSupplierDropdown()"
+                            oninput="searchSupplier()"
+                            autocomplete="off"
+                            placeholder="Cari supplier..."
+                            class="w-full border rounded-xl px-4 py-3 mt-2"
+                        />
+
+                        <input type="hidden" id="supplier_id" />
+
+                        <div
+                            id="supplierDropdown"
+                            class="absolute bg-white border rounded-xl shadow-lg w-full mt-1 hidden max-h-60 overflow-y-auto z-50"
+                        ></div>
+                    </div>
+
+                    <div class="relative">
+                        <label class="text-sm font-bold text-slate-600"
+                            >Produk</label
+                        >
+                        <input
+                            id="productSearch"
+                            onfocus="loadProductDropdown()"
+                            oninput="searchProduct()"
+                            autocomplete="off"
+                            placeholder="Cari produk..."
+                            class="w-full border rounded-xl px-4 py-3 mt-2"
+                        />
+
+                        <input type="hidden" id="product_id" />
+
+                        <div
+                            id="productDropdown"
+                            class="absolute bg-white border rounded-xl shadow-lg w-full mt-1 hidden max-h-72 overflow-y-auto z-50"
+                        ></div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <input
+                            id="qty"
+                            type="number"
+                            step="0.01"
+                            placeholder="Qty"
+                            class="border rounded-xl px-4 py-3"
+                        />
+
+                        <input
+                            id="h_beli"
+                            type="number"
+                            step="0.01"
+                            placeholder="Harga Beli"
+                            class="border rounded-xl px-4 py-3"
+                        />
+                    </div>
+
+                    <button
+                        type="button"
+                        onclick="addPurchaseItem()"
+                        class="w-full py-3 rounded-xl bg-emerald-600 text-white font-bold"
+                    >
+                        + Tambahkan Produk ke Nota
+                    </button>
+
+                    <div id="purchaseItems" class="space-y-2"></div>
+
+                    <select
+                        id="location"
+                        class="w-full border rounded-xl px-4 py-3"
+                    >
+                        <option value="Toko Utama">Toko Utama</option>
+                        <option value="Toko Sudirman">Toko Sudirman</option>
+                        <option value="Toko Paye">Toko Paye</option>
+                    </select>
+
+                    <div class="flex justify-end gap-3 pt-4">
+                        <button
+                            type="button"
+                            onclick="closeModal()"
+                            class="px-6 py-3 rounded-xl bg-slate-200 font-bold"
+                        >
+                            Batal
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="px-6 py-3 rounded-xl bg-blue-600 text-white font-bold"
+                        >
+                            Simpan
+                        </button>
+                    </div>
+                </form>
             </div>
-
-            <form id="purchaseForm" class="space-y-4">
-
-                <input id="nota" required placeholder="Nomor Nota"
-                    class="w-full border border-slate-200 rounded-xl px-4 py-3">
-
-                <input id="tanggal" type="date" required class="w-full border border-slate-200 rounded-xl px-4 py-3">
-
-
-                <div class="relative">
-                    <label class="text-sm font-bold text-slate-600">Supplier</label>
-                    <input id="supplierSearch" onfocus="loadSupplierDropdown()" oninput="searchSupplier()"
-                        autocomplete="off" placeholder="Cari supplier..."
-                        class="w-full border rounded-xl px-4 py-3 mt-2">
-
-                    <input type="hidden" id="supplier_id">
-
-                    <div id="supplierDropdown"
-                        class="absolute bg-white border rounded-xl shadow-lg w-full mt-1 hidden max-h-60 overflow-y-auto z-50">
-                    </div>
-                </div>
-
-
-                <div class="relative">
-                    <label class="text-sm font-bold text-slate-600">Produk</label>
-                    <input id="productSearch" onfocus="loadProductDropdown()" oninput="searchProduct()"
-                        autocomplete="off" placeholder="Cari produk..." class="w-full border rounded-xl px-4 py-3 mt-2">
-
-                    <input type="hidden" id="product_id">
-
-                    <div id="productDropdown"
-                        class="absolute bg-white border rounded-xl shadow-lg w-full mt-1 hidden max-h-72 overflow-y-auto z-50">
-                    </div>
-                </div>
-
-
-                <div class="grid grid-cols-2 gap-4">
-
-                    <input id="qty" type="number" step="0.01" required placeholder="Qty"
-                        class="border rounded-xl px-4 py-3">
-
-                    <input id="h_beli" type="number" step="0.01" required placeholder="Harga Beli"
-                        class="border rounded-xl px-4 py-3">
-
-                </div>
-
-
-                <select id="location" class="w-full border rounded-xl px-4 py-3">
-
-                    <option value="Toko Utama">Toko Utama</option>
-                    <option value="Toko Sudirman">Toko Sudirman</option>
-                    <option value="Toko Paye">Toko Paye</option>
-
-                </select>
-
-
-                <div class="flex justify-end gap-3 pt-4">
-
-                    <button type="button" onclick="closeModal()" class="px-6 py-3 rounded-xl bg-slate-200 font-bold">
-                        Batal
-                    </button>
-
-                    <button type="submit" class="px-6 py-3 rounded-xl bg-blue-600 text-white font-bold">
-                        Simpan
-                    </button>
-
-                </div>
-
-            </form>
         </div>
-    </div>
 
+        <script>
+            // FINAL PRODUCT SEARCH PATCH
+            // Override function lama agar tidak terjadi konflik
 
-    <script>
-        // FINAL PRODUCT SEARCH PATCH
-        // Override function lama agar tidak terjadi konflik
+            window.productTimerFinal = null;
 
-        window.productTimerFinal = null;
+            window.loadProductDropdown = async function () {
+                await window.fetchProductFinal("");
+            };
 
-        window.loadProductDropdown = async function () {
-            await window.fetchProductFinal("");
-        };
+            window.searchProduct = function () {
+                clearTimeout(window.productTimerFinal);
 
-        window.searchProduct = function () {
+                window.productTimerFinal = setTimeout(() => {
+                    const keyword =
+                        document
+                            .getElementById("productSearch")
+                            ?.value?.trim() || "";
 
-            clearTimeout(window.productTimerFinal);
+                    window.fetchProductFinal(keyword);
+                }, 300);
+            };
 
-            window.productTimerFinal = setTimeout(() => {
+            window.fetchProductFinal = async function (keyword) {
+                try {
+                    const response = await fetch(
+                        `${BASE_URL}/api/products/?search=${encodeURIComponent(keyword)}&page=1&limit=50`,
+                    );
 
-                const keyword =
-                    document.getElementById("productSearch")
-                        ?.value
-                        ?.trim() || "";
+                    const result = await response.json();
 
-                window.fetchProductFinal(keyword);
+                    console.log("PRODUCT SEARCH:", keyword);
 
-            }, 300);
-        };
+                    window.renderProductFinal(result.data || []);
+                } catch (error) {
+                    console.error("Product fetch error:", error);
+                }
+            };
 
+            window.renderProductFinal = function (products) {
+                const dropdown = document.getElementById("productDropdown");
 
-        window.fetchProductFinal = async function (keyword) {
+                if (!dropdown) return;
 
-            try {
-
-                const response = await fetch(
-                    `${BASE_URL}/api/products/?search=${encodeURIComponent(keyword)}&page=1&limit=50`
-                );
-
-                const result = await response.json();
-
-                console.log("PRODUCT SEARCH:", keyword);
-
-                window.renderProductFinal(result.data || []);
-
-            } catch (error) {
-
-                console.error("Product fetch error:", error);
-
-            }
-
-        };
-
-
-        window.renderProductFinal = function (products) {
-
-            const dropdown =
-                document.getElementById("productDropdown");
-
-            if (!dropdown) return;
-
-
-            if (products.length === 0) {
-
-                dropdown.innerHTML = `
+                if (products.length === 0) {
+                    dropdown.innerHTML = `
             <div class="p-3 text-slate-400">
                 Produk tidak ditemukan
             </div>
         `;
 
-                dropdown.classList.remove("hidden");
-                return;
-            }
+                    dropdown.classList.remove("hidden");
+                    return;
+                }
 
+                dropdown.innerHTML = products
+                    .map((p) => {
+                        const id = p.ID ?? p.id ?? "";
+                        const nama = p.Nama ?? p.nama ?? "";
+                        const kode = p.Kode ?? p.kode ?? "";
+                        const harga = p.HBeli ?? p.hBeli ?? p.hbeli ?? 0;
 
-            dropdown.innerHTML = products.map(p => {
-
-                const id = p.ID ?? p.id ?? "";
-                const nama = p.Nama ?? p.nama ?? "";
-                const kode = p.Kode ?? p.kode ?? "";
-                const harga = p.HBeli ?? p.hBeli ?? p.hbeli ?? 0;
-
-
-                return `
+                        return `
         <div onclick="selectProductFinal('${id}','${String(nama).replaceAll("'", "\\'")}',${harga})"
              class="p-3 cursor-pointer hover:bg-blue-50 border-b">
 
@@ -990,184 +1301,103 @@
 
         </div>
         `;
+                    })
+                    .join("");
 
-            }).join("");
+                dropdown.classList.remove("hidden");
+            };
 
+            window.selectProductFinal = function (id, name, harga) {
+                const productId = document.getElementById("product_id");
+                const productSearch = document.getElementById("productSearch");
+                const hBeli = document.getElementById("h_beli");
+                const dropdown = document.getElementById("productDropdown");
 
-            dropdown.classList.remove("hidden");
+                if (productId) productId.value = id;
+                if (productSearch) productSearch.value = name;
+                if (hBeli) hBeli.value = harga;
+                if (dropdown) dropdown.classList.add("hidden");
+            };
 
-        };
+            // Alihkan select onclick lama jika dipanggil
+            window.selectProduct = window.selectProductFinal;
+        </script>
 
+        <script>
+            // ===== FINAL DROPDOWN FIX : SUPPLIER + PRODUCT =====
 
-        window.selectProductFinal = function (id, name, harga) {
+            let supplierDataCache = [];
+            let supplierSearchTimer = null;
+            let productSearchTimerFinal = null;
 
-            const productId = document.getElementById("product_id");
-            const productSearch = document.getElementById("productSearch");
-            const hBeli = document.getElementById("h_beli");
-            const dropdown = document.getElementById("productDropdown");
+            // ================= SUPPLIER =================
 
+            // klik input supplier
+            async function loadSupplierDropdown() {
+                try {
+                    if (supplierDataCache.length === 0) {
+                        const response = await fetch(
+                            `${BASE_URL}/api/suppliers`,
+                        );
 
-            if (productId) productId.value = id;
-            if (productSearch) productSearch.value = name;
-            if (hBeli) hBeli.value = harga;
-            if (dropdown) dropdown.classList.add("hidden");
+                        const result = await response.json();
 
-        };
+                        console.log("SUPPLIER RESPONSE:", result);
 
+                        supplierDataCache = result.data || [];
+                    }
 
-        // Alihkan select onclick lama jika dipanggil
-        window.selectProduct = window.selectProductFinal;
-
-    </script>
-
-
-    <script>
-        // ===== FINAL DROPDOWN FIX : SUPPLIER + PRODUCT =====
-
-        let supplierDataCache = [];
-        let supplierSearchTimer = null;
-        let productSearchTimerFinal = null;
-
-
-        // ================= SUPPLIER =================
-
-        // klik input supplier
-        async function loadSupplierDropdown() {
-
-            try {
-
-                if (supplierDataCache.length === 0) {
-
-                    const response = await fetch(
-                        `${BASE_URL}/api/suppliers`
-                    );
-
-                    const result = await response.json();
-
-                    console.log("SUPPLIER RESPONSE:", result);
-
-                    supplierDataCache = result.data || [];
-
+                    renderSupplierDropdown(supplierDataCache);
+                } catch (error) {
+                    console.error("Supplier error:", error);
                 }
-
-
-                renderSupplierDropdown(
-                    supplierDataCache
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    "Supplier error:",
-                    error
-                );
-
             }
 
-        }
+            function searchSupplier() {
+                clearTimeout(supplierSearchTimer);
 
+                supplierSearchTimer = setTimeout(() => {
+                    const keyword = document
+                        .getElementById("supplierSearch")
+                        .value.toLowerCase()
+                        .trim();
 
+                    const filtered = supplierDataCache.filter((item) => {
+                        const name = String(
+                            item.Name ?? item.name ?? "",
+                        ).toLowerCase();
 
-        function searchSupplier() {
+                        return name.includes(keyword);
+                    });
 
-            clearTimeout(
-                supplierSearchTimer
-            );
-
-
-            supplierSearchTimer =
-                setTimeout(() => {
-
-
-                    const keyword =
-                        document
-                            .getElementById("supplierSearch")
-                            .value
-                            .toLowerCase()
-                            .trim();
-
-
-
-                    const filtered =
-                        supplierDataCache.filter(item => {
-
-
-                            const name =
-                                String(
-                                    item.Name ??
-                                    item.name ??
-                                    ""
-                                )
-                                    .toLowerCase();
-
-
-                            return name.includes(keyword);
-
-
-                        });
-
-
-
-                    renderSupplierDropdown(
-                        filtered
-                    );
-
-
+                    renderSupplierDropdown(filtered);
                 }, 300);
+            }
 
-        }
+            function renderSupplierDropdown(data) {
+                const dropdown = document.getElementById("supplierDropdown");
 
+                if (!dropdown) return;
 
-
-
-        function renderSupplierDropdown(data) {
-
-            const dropdown =
-                document.getElementById(
-                    "supplierDropdown"
-                );
-
-
-            if (!dropdown) return;
-
-
-
-            if (data.length === 0) {
-
-                dropdown.innerHTML =
-                    `
+                if (data.length === 0) {
+                    dropdown.innerHTML = `
         <div class="p-3 text-slate-400">
             Supplier tidak ditemukan
         </div>
         `;
 
-                dropdown.classList.remove("hidden");
+                    dropdown.classList.remove("hidden");
 
-                return;
+                    return;
+                }
 
-            }
+                dropdown.innerHTML = data
+                    .map((item) => {
+                        const id = item.ID ?? item.id ?? "";
 
+                        const name = item.Name ?? item.name ?? "";
 
-
-            dropdown.innerHTML =
-                data.map(item => {
-
-
-                    const id =
-                        item.ID ??
-                        item.id ??
-                        "";
-
-
-                    const name =
-                        item.Name ??
-                        item.name ??
-                        "";
-
-
-
-                    return `
+                        return `
 
         <div
         onclick="selectSupplierFixed('${id}','${name.replaceAll("'", "\\'")}')"
@@ -1178,187 +1408,85 @@
         </div>
 
         `;
+                    })
+                    .join("");
 
+                dropdown.classList.remove("hidden");
+            }
 
-                }).join("");
+            function selectSupplierFixed(id, name) {
+                document.getElementById("supplier_id").value = id;
 
+                document.getElementById("supplierSearch").value = name;
 
+                document
+                    .getElementById("supplierDropdown")
+                    .classList.add("hidden");
+            }
 
-            dropdown.classList.remove(
-                "hidden"
-            );
+            // ================= PRODUCT =================
 
-        }
+            function searchProduct() {
+                clearTimeout(productSearchTimerFinal);
 
+                productSearchTimerFinal = setTimeout(() => {
+                    const keyword = document
+                        .getElementById("productSearch")
+                        .value.trim();
 
-
-        function selectSupplierFixed(id, name) {
-
-            document.getElementById(
-                "supplier_id"
-            ).value = id;
-
-
-            document.getElementById(
-                "supplierSearch"
-            ).value = name;
-
-
-            document.getElementById(
-                "supplierDropdown"
-            )
-                .classList.add("hidden");
-
-        }
-
-
-
-        // ================= PRODUCT =================
-
-
-        function searchProduct() {
-
-            clearTimeout(
-                productSearchTimerFinal
-            );
-
-
-            productSearchTimerFinal =
-                setTimeout(() => {
-
-
-                    const keyword =
-                        document
-                            .getElementById(
-                                "productSearch"
-                            )
-                            .value
-                            .trim();
-
-
-
-                    fetchProductFixed(
-                        keyword
-                    );
-
-
+                    fetchProductFixed(keyword);
                 }, 300);
+            }
 
-        }
+            async function loadProductDropdown() {
+                fetchProductFixed("");
+            }
 
-
-
-        async function loadProductDropdown() {
-
-            fetchProductFixed("");
-
-        }
-
-
-
-        async function fetchProductFixed(keyword) {
-
-
-            try {
-
-
-                const response =
-                    await fetch(
-
-                        `${BASE_URL}/api/products/?search=${encodeURIComponent(keyword)}&page=1&limit=50`
-
+            async function fetchProductFixed(keyword) {
+                try {
+                    const response = await fetch(
+                        `${BASE_URL}/api/products/?search=${encodeURIComponent(keyword)}&page=1&limit=50`,
                     );
 
+                    const result = await response.json();
 
-                const result =
-                    await response.json();
+                    console.log("PRODUCT RESPONSE:", result);
 
-
-                console.log(
-                    "PRODUCT RESPONSE:",
-                    result
-                );
-
-
-                renderProductFixed(
-                    result.data || []
-                );
-
-
-            }
-            catch (error) {
-
-                console.error(
-                    "Product error:",
-                    error
-                );
-
+                    renderProductFixed(result.data || []);
+                } catch (error) {
+                    console.error("Product error:", error);
+                }
             }
 
-        }
+            function renderProductFixed(data) {
+                const dropdown = document.getElementById("productDropdown");
 
+                if (!dropdown) return;
 
-
-
-        function renderProductFixed(data) {
-
-            const dropdown =
-                document.getElementById(
-                    "productDropdown"
-                );
-
-
-            if (!dropdown) return;
-
-
-
-            if (data.length === 0) {
-
-                dropdown.innerHTML =
-                    `
+                if (data.length === 0) {
+                    dropdown.innerHTML = `
         <div class="p-3 text-slate-400">
         Produk tidak ditemukan
         </div>
         `;
 
-                dropdown.classList.remove("hidden");
+                    dropdown.classList.remove("hidden");
 
-                return;
+                    return;
+                }
 
-            }
+                dropdown.innerHTML = data
+                    .map((item) => {
+                        const id = item.ID ?? item.id;
 
+                        const nama = item.Nama ?? item.nama ?? "";
 
+                        const kode = item.Kode ?? item.kode ?? "";
 
-            dropdown.innerHTML =
-                data.map(item => {
+                        const harga =
+                            item.HBeli ?? item.hBeli ?? item.hbeli ?? 0;
 
-
-                    const id =
-                        item.ID ??
-                        item.id;
-
-
-                    const nama =
-                        item.Nama ??
-                        item.nama ??
-                        "";
-
-
-                    const kode =
-                        item.Kode ??
-                        item.kode ??
-                        "";
-
-
-                    const harga =
-                        item.HBeli ??
-                        item.hBeli ??
-                        item.hbeli ??
-                        0;
-
-
-
-                    return `
+                        return `
 
         <div
         onclick="selectProductFixed('${id}','${nama.replaceAll("'", "\\'")}',${harga})"
@@ -1379,46 +1507,23 @@
         </div>
 
         `;
+                    })
+                    .join("");
 
+                dropdown.classList.remove("hidden");
+            }
 
-                }).join("");
+            function selectProductFixed(id, name, harga) {
+                document.getElementById("product_id").value = id;
 
+                document.getElementById("productSearch").value = name;
 
+                document.getElementById("h_beli").value = harga;
 
-            dropdown.classList.remove(
-                "hidden"
-            );
-
-        }
-
-
-
-        function selectProductFixed(id, name, harga) {
-
-            document.getElementById(
-                "product_id"
-            ).value = id;
-
-
-            document.getElementById(
-                "productSearch"
-            ).value = name;
-
-
-            document.getElementById(
-                "h_beli"
-            ).value = harga;
-
-
-            document.getElementById(
-                "productDropdown"
-            )
-                .classList.add("hidden");
-
-        }
-
-    </script>
-
-</body>
-
+                document
+                    .getElementById("productDropdown")
+                    .classList.add("hidden");
+            }
+        </script>
+    </body>
 </html>

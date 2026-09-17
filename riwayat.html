@@ -1,238 +1,359 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Riwayat Transaksi - SMARTPOS</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        />
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap");
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riwayat Transaksi - SMARTPOS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+            body {
+                font-family: "Plus Jakarta Sans", sans-serif;
+            }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+            .custom-scroll::-webkit-scrollbar {
+                width: 6px;
+            }
 
-        .custom-scroll::-webkit-scrollbar {
-            width: 6px;
-        }
+            .custom-scroll::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
 
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
+            .custom-scroll::-webkit-scrollbar-thumb {
+                background: #cbd5e1;
+                border-radius: 10px;
+            }
+        </style>
+    </head>
 
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-    </style>
-</head>
-
-<body class="bg-[#F8FAFC] flex h-screen overflow-hidden">
-
-    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 z-20 shrink-0">
-        <div class="flex items-center gap-3 mb-8 shrink-0">
-            <div
-                class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
-                <i class="fas fa-store"></i>
-            </div>
-            <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">SMARTPOS</h1>
-        </div>
-
-        <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
-            <a href="dashboard.html"
-                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-th-large"></i> <span>Dashboard</span>
-            </a>
-            <a href="riwayat.html"
-                class="flex items-center gap-4 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100">
-                <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
-            </a>
-            <a href="product.html"
-                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-box"></i> <span>Master Produk</span>
-            </a>
-            <a href="purchase.html"
-                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
-            </a>
-            <a href="expense.html"
-                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-wallet"></i> <span>Pengeluaran</span>
-            </a>
-            <a href="retur.html"
-                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-undo"></i> <span>Manajemen Retur</span>
-            </a>
-            <a href="akuntansi.html"
-                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-book-open"></i> <span>Jurnal & Keuangan</span>
-            </a>
-            <a href="absensi.html"
-                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-calendar-check"></i> <span>Absensi Karyawan</span>
-            </a>
-            <a href="report.html"
-                class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all">
-                <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
-            </a>
-        </nav>
-
-        <div class="pt-6 border-t border-slate-100 shrink-0">
-            <div class="bg-slate-50 p-4 rounded-2xl mb-4">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">User Aktif</p>
-                <p class="font-bold text-slate-700 user-name-display">Desak Kasir</p>
-            </div>
-            <a href="#" onclick="confirmLogout()"
-                class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all">
-                <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
-            </a>
-        </div>
-    </aside>
-
-    <main class="flex-1 flex flex-col overflow-hidden">
-        <header class="h-20 bg-white border-b border-slate-200 px-10 flex justify-between items-center shrink-0">
-            <div class="flex flex-col">
-                <h2 class="text-lg font-bold text-slate-800">Riwayat Penjualan</h2>
-                <p id="clock" class="text-xs text-slate-400 font-medium"></p>
-            </div>
-            <div class="flex items-center gap-3">
-                <div id="storeFilterContainer">
-                    <select id="filterStore" onchange="fetchRiwayat()"
-                        class="bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer">
-                        <option value="Semua Toko">Semua Toko (Ketiganya)</option>
-                        <option value="Toko Utama">Toko Utama</option>
-                        <option value="Toko Sudirman">Toko Sudirman</option>
-                        <option value="Toko Paye">Toko Paye</option>
-                    </select>
+    <body class="bg-[#F8FAFC] flex h-screen overflow-hidden">
+        <aside
+            class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 z-20 shrink-0"
+        >
+            <div class="flex items-center gap-3 mb-8 shrink-0">
+                <div
+                    class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
+                >
+                    <i class="fas fa-store"></i>
                 </div>
-                <div id="storeStaticBadge"
-                    class="hidden bg-blue-50 text-blue-700 border border-blue-200 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
-                    <i class="fas fa-store"></i> <span id="storeNameText">Toko Sudirman</span>
-                </div>
-                <button onclick="fetchRiwayat()"
-                    class="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-600 px-5 py-2.5 rounded-xl font-bold border border-slate-200 transition-all">
-                    <i class="fas fa-sync-alt"></i> Refresh Data
-                </button>
+                <h1
+                    class="text-xl font-extrabold text-slate-800 tracking-tight"
+                >
+                    SMARTPOS
+                </h1>
             </div>
-        </header>
 
-        <div class="flex-1 p-10 overflow-y-auto custom-scroll">
-            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-8 border-b border-slate-50 flex justify-between items-center">
-                    <div>
-                        <h3 class="font-bold text-slate-800">Semua Transaksi (Per Nota)</h3>
-                        <p class="text-xs text-slate-400 mt-1">Data penjualan dikelompokkan berdasarkan nomor invoice.
+            <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
+                <a
+                    href="dashboard.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-th-large"></i> <span>Dashboard</span>
+                </a>
+                <a
+                    href="riwayat.html"
+                    class="flex items-center gap-4 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100"
+                >
+                    <i class="fas fa-history"></i>
+                    <span>Riwayat Transaksi</span>
+                </a>
+                <a
+                    href="product.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-box"></i> <span>Master Produk</span>
+                </a>
+                <a
+                    href="purchase.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Riwayat Purchase</span>
+                </a>
+                <a
+                    href="expense.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-wallet"></i> <span>Pengeluaran</span>
+                </a>
+                <a
+                    href="retur.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-undo"></i> <span>Manajemen Retur</span>
+                </a>
+                <a
+                    href="akuntansi.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-book-open"></i>
+                    <span>Jurnal & Keuangan</span>
+                </a>
+                <a
+                    href="absensi.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Absensi Karyawan</span>
+                </a>
+                <a
+                    href="report.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Laporan Analitik</span>
+                </a>
+            </nav>
+
+            <div class="pt-6 border-t border-slate-100 shrink-0">
+                <div class="bg-slate-50 p-4 rounded-2xl mb-4">
+                    <p
+                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"
+                    >
+                        User Aktif
+                    </p>
+                    <p class="font-bold text-slate-700 user-name-display">
+                        Desak Kasir
+                    </p>
+                </div>
+                <a
+                    href="#"
+                    onclick="confirmLogout()"
+                    class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all"
+                >
+                    <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <header
+                class="h-20 bg-white border-b border-slate-200 px-10 flex justify-between items-center shrink-0"
+            >
+                <div class="flex flex-col">
+                    <h2 class="text-lg font-bold text-slate-800">
+                        Riwayat Penjualan
+                    </h2>
+                    <p
+                        id="clock"
+                        class="text-xs text-slate-400 font-medium"
+                    ></p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div id="storeFilterContainer">
+                        <select
+                            id="filterStore"
+                            onchange="fetchRiwayat()"
+                            class="bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer"
+                        >
+                            <option value="Semua Toko">
+                                Semua Toko (Ketiganya)
+                            </option>
+                            <option value="Toko Utama">Toko Utama</option>
+                            <option value="Toko Sudirman">Toko Sudirman</option>
+                            <option value="Toko Paye">Toko Paye</option>
+                        </select>
+                    </div>
+                    <div
+                        id="storeStaticBadge"
+                        class="hidden bg-blue-50 text-blue-700 border border-blue-200 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5"
+                    >
+                        <i class="fas fa-store"></i>
+                        <span id="storeNameText">Toko Sudirman</span>
+                    </div>
+                    <button
+                        onclick="fetchRiwayat()"
+                        class="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-600 px-5 py-2.5 rounded-xl font-bold border border-slate-200 transition-all"
+                    >
+                        <i class="fas fa-sync-alt"></i> Refresh Data
+                    </button>
+                </div>
+            </header>
+
+            <div class="flex-1 p-10 overflow-y-auto custom-scroll">
+                <div
+                    class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden"
+                >
+                    <div
+                        class="p-8 border-b border-slate-50 flex justify-between items-center"
+                    >
+                        <div>
+                            <h3 class="font-bold text-slate-800">
+                                Semua Transaksi (Per Nota)
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-1">
+                                Data penjualan dikelompokkan berdasarkan nomor
+                                invoice.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- FILTER TOOLBAR -->
+                    <div
+                        class="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-slate-200"
+                    >
+                        <div
+                            class="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-100"
+                        >
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-filter text-blue-600"></i>
+                                <h4
+                                    class="font-bold text-slate-800 text-sm uppercase tracking-wider"
+                                >
+                                    Filter Transaksi
+                                </h4>
+                            </div>
+                            <button
+                                type="button"
+                                onclick="resetFilters()"
+                                class="text-xs font-bold text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1.5"
+                            >
+                                <i class="fas fa-redo-alt"></i> Reset Filter
+                            </button>
+                        </div>
+
+                        <div
+                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3"
+                        >
+                            <!-- 1. Tanggal Mulai -->
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    >Dari Tanggal</label
+                                >
+                                <input
+                                    type="date"
+                                    id="filterStartDate"
+                                    onchange="fetchRiwayat()"
+                                    class="w-full bg-slate-50 border border-slate-200 px-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500"
+                                />
+                            </div>
+
+                            <!-- 2. Tanggal Selesai -->
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    >Sampai Tanggal</label
+                                >
+                                <input
+                                    type="date"
+                                    id="filterEndDate"
+                                    onchange="fetchRiwayat()"
+                                    class="w-full bg-slate-50 border border-slate-200 px-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500"
+                                />
+                            </div>
+
+                            <!-- 3. Pencarian Member / Pelanggan -->
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    >Nama Member / Kasir</label
+                                >
+                                <div class="relative">
+                                    <i
+                                        class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"
+                                    ></i>
+                                    <input
+                                        type="text"
+                                        id="filterMember"
+                                        placeholder="Cari nama..."
+                                        onkeyup="handleMemberKeyup(event)"
+                                        class="w-full bg-slate-50 border border-slate-200 pl-8 pr-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- 4. Metode Pembayaran -->
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    >Metode Bayar</label
+                                >
+                                <select
+                                    id="filterMethod"
+                                    onchange="fetchRiwayat()"
+                                    class="w-full bg-slate-50 border border-slate-200 px-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500"
+                                >
+                                    <option value="">Semua Metode</option>
+                                    <option value="Tunai">💵 Tunai</option>
+                                    <option value="Bayar Tunai">
+                                        💵 Bayar Tunai
+                                    </option>
+                                    <option value="EDC">💳 EDC</option>
+                                    <option value="Transfer">
+                                        🏦 Transfer
+                                    </option>
+                                    <option value="Bon / Utang">
+                                        📄 Bon / Utang
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- 5. Tombol Cari -->
+                            <div class="flex items-end">
+                                <button
+                                    onclick="fetchRiwayat()"
+                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2"
+                                >
+                                    <i class="fas fa-search"></i> Terapkan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr
+                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50 bg-slate-50/30"
+                                >
+                                    <th class="p-6 text-left">
+                                        Invoice & Kasir
+                                    </th>
+                                    <th class="p-6 text-left">Tanggal</th>
+                                    <th class="p-6 text-left">Item Belanja</th>
+                                    <th class="p-6 text-center">Status</th>
+                                    <th class="p-6 text-left">Metode</th>
+                                    <th class="p-6 text-center">Total Qty</th>
+                                    <th class="p-6 text-right">Total Netto</th>
+                                    <th class="p-6 text-right">Bayar</th>
+                                    <th class="p-6 text-center w-52">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody
+                                id="riwayat-body"
+                                class="divide-y divide-slate-50 font-semibold text-slate-600"
+                            ></tbody>
+                        </table>
+                    </div>
+
+                    <div
+                        id="empty-state"
+                        class="hidden py-32 flex flex-col items-center justify-center text-slate-300"
+                    >
+                        <i
+                            class="fas fa-folder-open text-6xl mb-4 opacity-20"
+                        ></i>
+                        <p class="font-semibold italic">
+                            Belum ada data transaksi tersimpan
                         </p>
                     </div>
                 </div>
-
-                <!-- FILTER TOOLBAR -->
-                <div class="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-slate-200">
-                    <div class="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-100">
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-filter text-blue-600"></i>
-                            <h4 class="font-bold text-slate-800 text-sm uppercase tracking-wider">Filter Transaksi</h4>
-                        </div>
-                        <button type="button" onclick="resetFilters()"
-                            class="text-xs font-bold text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1.5">
-                            <i class="fas fa-redo-alt"></i> Reset Filter
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-                        <!-- 1. Tanggal Mulai -->
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Dari
-                                Tanggal</label>
-                            <input type="date" id="filterStartDate" onchange="fetchRiwayat()"
-                                class="w-full bg-slate-50 border border-slate-200 px-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500">
-                        </div>
-
-                        <!-- 2. Tanggal Selesai -->
-                        <div>
-                            <label
-                                class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Sampai
-                                Tanggal</label>
-                            <input type="date" id="filterEndDate" onchange="fetchRiwayat()"
-                                class="w-full bg-slate-50 border border-slate-200 px-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500">
-                        </div>
-
-                        <!-- 3. Pencarian Member / Pelanggan -->
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nama
-                                Member / Kasir</label>
-                            <div class="relative">
-                                <i
-                                    class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                                <input type="text" id="filterMember" placeholder="Cari nama..."
-                                    onkeyup="handleMemberKeyup(event)"
-                                    class="w-full bg-slate-50 border border-slate-200 pl-8 pr-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500">
-                            </div>
-                        </div>
-
-                        <!-- 4. Metode Pembayaran -->
-                        <div>
-                            <label
-                                class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Metode
-                                Bayar</label>
-                            <select id="filterMethod" onchange="fetchRiwayat()"
-                                class="w-full bg-slate-50 border border-slate-200 px-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500">
-                                <option value="">Semua Metode</option>
-                                <option value="Tunai">💵 Tunai</option>
-                                <option value="Bayar Tunai">💵 Bayar Tunai</option>
-                                <option value="EDC">💳 EDC</option>
-                                <option value="Transfer">🏦 Transfer</option>
-                                <option value="Bon / Utang">📄 Bon / Utang</option>
-                            </select>
-                        </div>
-
-                        <!-- 5. Tombol Cari -->
-                        <div class="flex items-end">
-                            <button onclick="fetchRiwayat()"
-                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2">
-                                <i class="fas fa-search"></i> Terapkan
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr
-                                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50 bg-slate-50/30">
-                                <th class="p-6 text-left">Invoice & Kasir</th>
-                                <th class="p-6 text-left">Tanggal</th>
-                                <th class="p-6 text-left">Item Belanja</th>
-                                <th class="p-6 text-center">Status</th>
-                                <th class="p-6 text-left">Metode</th>
-                                <th class="p-6 text-center">Total Qty</th>
-                                <th class="p-6 text-right">Total Netto</th>
-                                <th class="p-6 text-right">Bayar</th>
-                                <th class="p-6 text-center w-52">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="riwayat-body" class="divide-y divide-slate-50 font-semibold text-slate-600">
-                        </tbody>
-                    </table>
-                </div>
-
-                <div id="empty-state" class="hidden py-32 flex flex-col items-center justify-center text-slate-300">
-                    <i class="fas fa-folder-open text-6xl mb-4 opacity-20"></i>
-                    <p class="font-semibold italic">Belum ada data transaksi tersimpan</p>
-                </div>
             </div>
-        </div>
-    </main>
+        </main>
 
-    <script>
-        const API_URL = "https://langgeng-cashier-backend-production.up.railway.app/api";
-        let localSalesData = [];
+        <script>
+            const API_URL =
+                "https://langgeng-cashier-backend-production.up.railway.app/api";
+            let localSalesData = [];
 
-        const RECEIPT_BASE_CSS = `
+            const RECEIPT_BASE_CSS = `
             @page { size: 80mm auto; margin: 0; }
             body {
                 margin: 0; padding: 0; background: #fff; color: #000;
@@ -246,300 +367,413 @@
             @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
         `;
 
-        function printHTML(html) {
-            return new Promise((resolve, reject) => {
-                const frame = document.createElement('iframe');
-                frame.title = 'Pratinjau cetak nota';
-                frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
-                frame.onload = async () => {
-                    try {
-                        const target = frame.contentWindow;
-                        if (target.document.fonts) await target.document.fonts.ready;
-                        target.addEventListener('afterprint', () => frame.remove(), { once: true });
-                        target.focus();
-                        target.print();
-                        resolve();
-                    } catch (error) { frame.remove(); reject(error); }
+            function printHTML(html) {
+                return new Promise((resolve, reject) => {
+                    const frame = document.createElement("iframe");
+                    frame.title = "Pratinjau cetak nota";
+                    frame.style.cssText =
+                        "position:fixed;right:0;bottom:0;width:0;height:0;border:0;";
+                    frame.onload = async () => {
+                        try {
+                            const target = frame.contentWindow;
+                            if (target.document.fonts)
+                                await target.document.fonts.ready;
+                            target.addEventListener(
+                                "afterprint",
+                                () => frame.remove(),
+                                { once: true },
+                            );
+                            target.focus();
+                            target.print();
+                            resolve();
+                        } catch (error) {
+                            frame.remove();
+                            reject(error);
+                        }
+                    };
+                    frame.srcdoc = html;
+                    document.body.appendChild(frame);
+                });
+            }
+
+            function escapeHTML(value) {
+                return String(value ?? "")
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            function getUserDataFromToken() {
+                const token = localStorage.getItem("token");
+                if (!token) return null;
+                try {
+                    const base64Url = token.split(".")[1];
+                    const base64 = base64Url
+                        .replace(/-/g, "+")
+                        .replace(/_/g, "/");
+                    const jsonPayload = decodeURIComponent(
+                        window
+                            .atob(base64)
+                            .split("")
+                            .map(function (c) {
+                                return (
+                                    "%" +
+                                    ("00" + c.charCodeAt(0).toString(16)).slice(
+                                        -2,
+                                    )
+                                );
+                            })
+                            .join(""),
+                    );
+                    return JSON.parse(jsonPayload);
+                } catch (err) {
+                    return null;
+                }
+            }
+
+            // Master data header toko berdasarkan lokasi user login
+            function getStoreInfo() {
+                const userData = getUserDataFromToken() || {};
+                const location = (userData.location || "Toko Utama").trim();
+
+                const stores = {
+                    "Toko Utama": {
+                        address:
+                            "Jl. Gajah Mada No. 7 Amlapura, Karangasem Bali",
+                        phone: "Telp. (0363)22577 Hp. 08124611382",
+                    },
+                    "Toko Paye": {
+                        address: "Jl. Untung Surapati No. 8, Karangasem Bali",
+                        phone: "Hp. 082314723344",
+                    },
+                    "Toko Sudirman": {
+                        address: "Jl. Jendral Sudirman No. 9, Karangasem Bali",
+                        phone: "Hp. 082314723345",
+                    },
                 };
-                frame.srcdoc = html;
-                document.body.appendChild(frame);
-            });
-        }
 
-        function escapeHTML(value) {
-            return String(value ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
-        function getUserDataFromToken() {
-            const token = localStorage.getItem('token');
-            if (!token) return null;
-            try {
-                const base64Url = token.split('.')[1];
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-                return JSON.parse(jsonPayload);
-            } catch (err) {
-                return null;
+                return stores[location] || stores["Toko Utama"];
             }
-        }
 
-        // Master data header toko berdasarkan lokasi user login
-        function getStoreInfo() {
-            const userData = getUserDataFromToken() || {};
-            const location = (userData.location || "Toko Utama").trim();
+            let memberSearchTimer = null;
 
-            const stores = {
-                "Toko Utama": {
-                    address: "Jl. Gajah Mada No. 7 Amlapura, Karangasem Bali",
-                    phone: "Telp. (0363)22577 Hp. 08124611382"
-                },
-                "Toko Paye": {
-                    address: "Jl. Untung Surapati No. 8, Karangasem Bali",
-                    phone: "Hp. 082314723344"
-                },
-                "Toko Sudirman": {
-                    address: "Jl. Jendral Sudirman No. 9, Karangasem Bali",
-                    phone: "Hp. 082314723345"
+            function handleMemberKeyup(event) {
+                if (event.key === "Enter") {
+                    clearTimeout(memberSearchTimer);
+                    fetchRiwayat();
+                    return;
                 }
-            };
-
-            return stores[location] || stores["Toko Utama"];
-        }
-
-        let memberSearchTimer = null;
-
-        function handleMemberKeyup(event) {
-            if (event.key === 'Enter') {
                 clearTimeout(memberSearchTimer);
-                fetchRiwayat();
-                return;
-            }
-            clearTimeout(memberSearchTimer);
-            memberSearchTimer = setTimeout(() => {
-                fetchRiwayat();
-            }, 400);
-        }
-
-        function resetFilters() {
-            const startEl = document.getElementById('filterStartDate');
-            const endEl = document.getElementById('filterEndDate');
-            const memberEl = document.getElementById('filterMember');
-            const methodEl = document.getElementById('filterMethod');
-            const storeEl = document.getElementById('filterStore');
-
-            if (startEl) startEl.value = '';
-            if (endEl) endEl.value = '';
-            if (memberEl) memberEl.value = '';
-            if (methodEl) methodEl.value = '';
-            if (storeEl) storeEl.value = 'Semua Toko';
-
-            fetchRiwayat();
-        }
-
-        async function fetchRiwayat() {
-            const tbody = document.getElementById('riwayat-body');
-            const emptyState = document.getElementById('empty-state');
-
-            tbody.innerHTML = `<tr><td colspan="9" class="py-20 text-center text-slate-400 font-medium">Memproses data...</td></tr>`;
-
-            const userData = getUserDataFromToken() || {};
-            const userLoc = (userData.location || 'Toko Utama').trim();
-            const isPusat = userLoc === 'Toko Utama' || userLoc === 'Pusat' || userData.role === 'superadmin';
-
-            // Kelola visibilitas filter toko berdasarkan peran
-            const storeFilterContainer = document.getElementById('storeFilterContainer');
-            const storeStaticBadge = document.getElementById('storeStaticBadge');
-            const storeNameText = document.getElementById('storeNameText');
-
-            let selectedStore = "Semua Toko";
-            if (isPusat) {
-                if (storeFilterContainer) storeFilterContainer.classList.remove('hidden');
-                if (storeStaticBadge) storeStaticBadge.classList.add('hidden');
-                const filterStoreEl = document.getElementById('filterStore');
-                selectedStore = filterStoreEl ? filterStoreEl.value : "Semua Toko";
-            } else {
-                if (storeFilterContainer) storeFilterContainer.classList.add('hidden');
-                if (storeStaticBadge) {
-                    storeStaticBadge.classList.remove('hidden');
-                    if (storeNameText) storeNameText.innerText = userLoc;
-                }
-                selectedStore = userLoc;
+                memberSearchTimer = setTimeout(() => {
+                    fetchRiwayat();
+                }, 400);
             }
 
-            try {
-                const params = new URLSearchParams();
+            function resetFilters() {
+                const startEl = document.getElementById("filterStartDate");
+                const endEl = document.getElementById("filterEndDate");
+                const memberEl = document.getElementById("filterMember");
+                const methodEl = document.getElementById("filterMethod");
+                const storeEl = document.getElementById("filterStore");
 
-                // 1. Lokasi User login
-                if (userData.role !== 'superadmin') {
-                    params.append('user_location', userLoc);
+                if (startEl) startEl.value = "";
+                if (endEl) endEl.value = "";
+                if (memberEl) memberEl.value = "";
+                if (methodEl) methodEl.value = "";
+                if (storeEl) storeEl.value = "Semua Toko";
+
+                fetchRiwayat();
+            }
+
+            async function fetchRiwayat() {
+                const tbody = document.getElementById("riwayat-body");
+                const emptyState = document.getElementById("empty-state");
+
+                tbody.innerHTML = `<tr><td colspan="9" class="py-20 text-center text-slate-400 font-medium">Memproses data...</td></tr>`;
+
+                const userData = getUserDataFromToken() || {};
+                const userLoc = (userData.location || "Toko Utama").trim();
+                const isPusat =
+                    userLoc === "Toko Utama" ||
+                    userLoc === "Pusat" ||
+                    userData.role === "superadmin";
+
+                // Kelola visibilitas filter toko berdasarkan peran
+                const storeFilterContainer = document.getElementById(
+                    "storeFilterContainer",
+                );
+                const storeStaticBadge =
+                    document.getElementById("storeStaticBadge");
+                const storeNameText = document.getElementById("storeNameText");
+
+                let selectedStore = "Semua Toko";
+                if (isPusat) {
+                    if (storeFilterContainer)
+                        storeFilterContainer.classList.remove("hidden");
+                    if (storeStaticBadge)
+                        storeStaticBadge.classList.add("hidden");
+                    const filterStoreEl =
+                        document.getElementById("filterStore");
+                    selectedStore = filterStoreEl
+                        ? filterStoreEl.value
+                        : "Semua Toko";
+                } else {
+                    if (storeFilterContainer)
+                        storeFilterContainer.classList.add("hidden");
+                    if (storeStaticBadge) {
+                        storeStaticBadge.classList.remove("hidden");
+                        if (storeNameText) storeNameText.innerText = userLoc;
+                    }
+                    selectedStore = userLoc;
                 }
 
-                // 2. Filter Lokasi Toko
-                if (selectedStore && selectedStore !== "Semua Toko" && selectedStore !== "All") {
-                    params.append('location', selectedStore);
-                }
+                try {
+                    const params = new URLSearchParams();
 
-                // 3. Filter Tanggal (Backend membutuhkan start_date & end_date terisi bersamaan)
-                let startDate = document.getElementById('filterStartDate')?.value || '';
-                let endDate = document.getElementById('filterEndDate')?.value || '';
+                    // 1. Lokasi User login
+                    if (userData.role !== "superadmin") {
+                        params.append("user_location", userLoc);
+                    }
 
-                if (startDate && !endDate) {
-                    endDate = startDate; // Jika hanya memilih satu tanggal, set rentang hari tersebut
-                } else if (!startDate && endDate) {
-                    startDate = endDate;
-                }
+                    // 2. Filter Lokasi Toko
+                    if (
+                        selectedStore &&
+                        selectedStore !== "Semua Toko" &&
+                        selectedStore !== "All"
+                    ) {
+                        params.append("location", selectedStore);
+                    }
 
-                if (startDate && endDate) {
-                    params.append('start_date', startDate);
-                    params.append('end_date', endDate);
-                }
+                    // 3. Filter Tanggal (Backend membutuhkan start_date & end_date terisi bersamaan)
+                    let startDate =
+                        document.getElementById("filterStartDate")?.value || "";
+                    let endDate =
+                        document.getElementById("filterEndDate")?.value || "";
 
-                // 4. Filter Member / Kasir
-                const member = document.getElementById('filterMember')?.value.trim();
-                if (member) {
-                    params.append('member', member);
-                }
+                    if (startDate && !endDate) {
+                        endDate = startDate; // Jika hanya memilih satu tanggal, set rentang hari tersebut
+                    } else if (!startDate && endDate) {
+                        startDate = endDate;
+                    }
 
-                // 5. Filter Metode Pembayaran
-                const method = document.getElementById('filterMethod')?.value;
-                if (method) {
-                    params.append('method', method);
-                }
+                    if (startDate && endDate) {
+                        params.append("start_date", startDate);
+                        params.append("end_date", endDate);
+                    }
 
-                const queryString = params.toString();
-                const url = `${API_URL}/sales${queryString ? '?' + queryString : ''}`;
+                    // 4. Filter Member / Kasir
+                    const member = document
+                        .getElementById("filterMember")
+                        ?.value.trim();
+                    if (member) {
+                        params.append("member", member);
+                    }
 
-                const response = await fetch(url);
-                const data = await response.json();
-                tbody.innerHTML = "";
+                    // 5. Filter Metode Pembayaran
+                    const method =
+                        document.getElementById("filterMethod")?.value;
+                    if (method) {
+                        params.append("method", method);
+                    }
 
-                if (data && data.length > 0) {
-                    localSalesData = data;
-                    emptyState.classList.add('hidden');
+                    const queryString = params.toString();
+                    const url = `${API_URL}/sales${queryString ? "?" + queryString : ""}`;
 
-                    data.forEach((s, idx) => {
-                        const invoice = s.invoice || s.Invoice || '-';
-                        const createdAt = s.created_at || s.CreatedAt;
-                        const formattedDate = createdAt ? new Date(createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
-                        const cashierName = s.user?.name || s.User?.name || s.member_name || s.MemberName || '-';
-                        const storeLocation = s.location || s.user?.location || 'Toko Utama';
-                        const customer = s.customer || s.Customer;
-                        const customerName = customer?.name || customer?.Name || '';
-                        const customerPhone = customer?.phone_number || customer?.PhoneNumber || '';
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    tbody.innerHTML = "";
 
-                        const isBon = s.is_bon || s.IsBon || s.status === 'Bon' || s.Status === 'Bon';
-                        const isDp = s.is_dp || s.IsDp || s.status === 'DP' || s.Status === 'DP';
-                        const status = s.status || s.Status || (isBon ? 'Bon' : (isDp ? 'DP' : 'Lunas'));
-                        const paymentMethod = s.payment_method || s.PaymentMethod || 'Tunai';
-                        const totalNetto = Number(s.total_netto ?? s.TotalNetto ?? 0);
-                        const amountPaid = Number(s.amount_paid ?? s.AmountPaid ?? 0);
-                        const remainingAmount = Number(s.remaining_amount ?? (totalNetto - amountPaid > 0 ? totalNetto - amountPaid : 0));
-                        const items = s.items || s.Items || [];
-                        const totalQty = Number(s.total_qty ?? s.TotalQty ?? items.reduce((acc, it) => acc + Number(it.qty || it.Qty || 0), 0));
-                        const hasPelunasan = paymentMethod.includes('[Pelunasan:') || (status === 'Lunas' && (isBon || isDp || customerName));
+                    if (data && data.length > 0) {
+                        localSalesData = data;
+                        emptyState.classList.add("hidden");
 
-                        let statusBadge = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Lunas</span>`;
-                        if (isBon || status === "Bon") {
-                            statusBadge = `
+                        data.forEach((s, idx) => {
+                            const invoice = s.invoice || s.Invoice || "-";
+                            const createdAt = s.created_at || s.CreatedAt;
+                            const formattedDate = createdAt
+                                ? new Date(createdAt).toLocaleString("id-ID", {
+                                      dateStyle: "medium",
+                                      timeStyle: "short",
+                                  })
+                                : "-";
+                            const cashierName =
+                                s.user?.name ||
+                                s.User?.name ||
+                                s.member_name ||
+                                s.MemberName ||
+                                "-";
+                            const storeLocation =
+                                s.location || s.user?.location || "Toko Utama";
+                            const customer = s.customer || s.Customer;
+                            const customerName =
+                                customer?.name || customer?.Name || "";
+                            const customerPhone =
+                                customer?.phone_number ||
+                                customer?.PhoneNumber ||
+                                "";
+
+                            const isBon =
+                                s.is_bon ||
+                                s.IsBon ||
+                                s.status === "Bon" ||
+                                s.Status === "Bon";
+                            const isDp =
+                                s.is_dp ||
+                                s.IsDp ||
+                                s.status === "DP" ||
+                                s.Status === "DP";
+                            const status =
+                                s.status ||
+                                s.Status ||
+                                (isBon ? "Bon" : isDp ? "DP" : "Lunas");
+                            const paymentMethod =
+                                s.payment_method || s.PaymentMethod || "Tunai";
+                            const totalNetto = Number(
+                                s.total_netto ?? s.TotalNetto ?? 0,
+                            );
+                            const amountPaid = Number(
+                                s.amount_paid ?? s.AmountPaid ?? 0,
+                            );
+                            const remainingAmount = Number(
+                                s.remaining_amount ??
+                                    (totalNetto - amountPaid > 0
+                                        ? totalNetto - amountPaid
+                                        : 0),
+                            );
+                            const items = s.items || s.Items || [];
+                            const totalQty = Number(
+                                s.total_qty ??
+                                    s.TotalQty ??
+                                    items.reduce(
+                                        (acc, it) =>
+                                            acc + Number(it.qty || it.Qty || 0),
+                                        0,
+                                    ),
+                            );
+                            const hasPelunasan =
+                                paymentMethod.includes("[Pelunasan:") ||
+                                (status === "Lunas" &&
+                                    (isBon || isDp || customerName));
+
+                            let statusBadge = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Lunas</span>`;
+                            if (isBon || status === "Bon") {
+                                statusBadge = `
                         <div class="inline-flex flex-col items-center">
                             <span class="bg-rose-50 text-rose-600 border border-rose-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">BON / UTANG</span>
-                            <span class="text-[10px] text-rose-500 font-bold mt-1">Sisa: IDR ${remainingAmount.toLocaleString('id-ID')}</span>
+                            <span class="text-[10px] text-rose-500 font-bold mt-1">Sisa: IDR ${remainingAmount.toLocaleString("id-ID")}</span>
                         </div>
                     `;
-                        } else if (isDp || status === "DP") {
-                            statusBadge = `
+                            } else if (isDp || status === "DP") {
+                                statusBadge = `
                         <div class="inline-flex flex-col items-center">
                             <span class="bg-amber-50 text-amber-600 border border-amber-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">DP / Belum Lunas</span>
-                            ${remainingAmount > 0 ? `<span class="text-[10px] text-rose-500 font-bold mt-1">Sisa: IDR ${remainingAmount.toLocaleString('id-ID')}</span>` : ''}
+                            ${remainingAmount > 0 ? `<span class="text-[10px] text-rose-500 font-bold mt-1">Sisa: IDR ${remainingAmount.toLocaleString("id-ID")}</span>` : ""}
                         </div>
                     `;
-                        }
+                            }
 
-                        let actionButtons = "";
-                        // 1. Tombol Pelunasan (Hanya muncul jika belum lunas)
-                        if (isDp || isBon || status === "DP" || status === "Bon") {
-                            actionButtons += `
+                            let actionButtons = "";
+                            // 1. Tombol Pelunasan (Hanya muncul jika belum lunas)
+                            if (
+                                isDp ||
+                                isBon ||
+                                status === "DP" ||
+                                status === "Bon"
+                            ) {
+                                actionButtons += `
         <button onclick="openPelunasanModal(${idx})" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Pelunasan Nota">
             <i class="fas fa-money-bill-wave mr-1"></i> Pelunasan
         </button>
     `;
-                        }
+                            }
 
-                        // 2. Tombol Cetak Ulang Nota Pelunasan (Muncul jika transaksi telah dilunasi)
-                        if (hasPelunasan) {
-                            actionButtons += `
+                            // 2. Tombol Cetak Ulang Nota Pelunasan (Muncul jika transaksi telah dilunasi)
+                            if (hasPelunasan) {
+                                actionButtons += `
         <button onclick="reprintPelunasanReceipt(${idx})" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Cetak Ulang Bukti Pelunasan">
             <i class="fas fa-file-invoice-dollar mr-1"></i> Nota Lunas
         </button>
     `;
-                        }
+                            }
 
-                        // 3. Tombol Cetak Ulang Nota Transaksi Utama (Selalu ada untuk semua transaksi)
-                        actionButtons += `
+                            // 3. Tombol Cetak Ulang Nota Transaksi Utama (Selalu ada untuk semua transaksi)
+                            actionButtons += `
     <button onclick="reprintSaleReceipt(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Cetak Ulang Nota Transaksi">
         <i class="fas fa-print"></i>
     </button>
 `;
 
-                        // 4. Tombol Retur Barang
-                        actionButtons += `
+                            // 4. Tombol Retur Barang
+                            actionButtons += `
     <button onclick="openReturModal(${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Retur Barang">
         <i class="fas fa-undo"></i>
     </button>
 `;
 
-                        // 5. Tombol Expand Rincian Item
-                        if (items.length > 0) {
-                            actionButtons += `
+                            // 5. Tombol Expand Rincian Item
+                            if (items.length > 0) {
+                                actionButtons += `
         <button onclick="toggleDetailRow(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1.5 rounded-lg text-xs font-bold transition-all" title="Lihat Rincian Item">
             <i id="toggle-icon-${idx}" class="fas fa-chevron-down transition-transform duration-200"></i>
         </button>
     `;
-                        }
+                            }
 
-                        const userRole = (userData.role || '').toLowerCase().trim();
-                        if (userRole === 'admin' || userRole === 'superadmin') {
-                            actionButtons += `
+                            const userRole = (userData.role || "")
+                                .toLowerCase()
+                                .trim();
+                            if (
+                                userRole === "admin" ||
+                                userRole === "superadmin"
+                            ) {
+                                actionButtons += `
                                 <button onclick="deleteTransaction('${escapeHTML(invoice)}')" class="bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 border border-rose-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Hapus & Batalkan Transaksi (Rollback Stok)">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             `;
-                        }
+                            }
 
-                        let productSummaryHTML = "";
-                        if (items.length === 0) {
-                            productSummaryHTML = `<p class="text-slate-400 italic text-xs">Tidak ada item</p>`;
-                        } else if (items.length === 1) {
-                            const firstItem = items[0];
-                            const pName = firstItem.product?.nama || firstItem.Product?.Nama || firstItem.product_search || 'Produk';
-                            const pCode = firstItem.product?.kode || firstItem.Product?.Kode || '-';
-                            productSummaryHTML = `
+                            let productSummaryHTML = "";
+                            if (items.length === 0) {
+                                productSummaryHTML = `<p class="text-slate-400 italic text-xs">Tidak ada item</p>`;
+                            } else if (items.length === 1) {
+                                const firstItem = items[0];
+                                const pName =
+                                    firstItem.product?.nama ||
+                                    firstItem.Product?.Nama ||
+                                    firstItem.product_search ||
+                                    "Produk";
+                                const pCode =
+                                    firstItem.product?.kode ||
+                                    firstItem.Product?.Kode ||
+                                    "-";
+                                productSummaryHTML = `
                         <p class="text-slate-800 font-bold">${escapeHTML(pName)}</p>
                         <p class="text-[10px] text-slate-400 uppercase font-black">${escapeHTML(pCode)} • ${firstItem.qty || firstItem.Qty || 1} pcs</p>
                     `;
-                        } else {
-                            const firstItem = items[0];
-                            const pName = firstItem.product?.nama || firstItem.Product?.Nama || firstItem.product_search || 'Produk';
-                            productSummaryHTML = `
+                            } else {
+                                const firstItem = items[0];
+                                const pName =
+                                    firstItem.product?.nama ||
+                                    firstItem.Product?.Nama ||
+                                    firstItem.product_search ||
+                                    "Produk";
+                                productSummaryHTML = `
                         <p class="text-slate-800 font-bold">${escapeHTML(pName)}</p>
                         <div class="flex items-center gap-1.5 mt-0.5">
                             <span class="bg-blue-50 text-blue-600 border border-blue-100 px-1.5 py-0.5 rounded text-[10px] font-bold">+${items.length - 1} item lainnya</span>
                             <button onclick="toggleDetailRow(${idx})" class="text-[10px] text-slate-400 hover:text-blue-600 font-semibold underline">Lihat Detail</button>
                         </div>
                     `;
-                        }
+                            }
 
-                        const row = document.createElement('tr');
-                        row.className = "hover:bg-slate-50/60 transition-all";
-                        row.id = `group-row-${idx}`;
-                        row.innerHTML = `
+                            const row = document.createElement("tr");
+                            row.className =
+                                "hover:bg-slate-50/60 transition-all";
+                            row.id = `group-row-${idx}`;
+                            row.innerHTML = `
                     <td class="p-6">
                         <div class="flex items-center gap-1.5 flex-wrap mb-1">
                             <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold border border-blue-100 inline-block">
@@ -550,11 +784,15 @@
                             </span>
                         </div>
                         <p class="text-[11px] text-slate-400 font-bold"><i class="fas fa-user-circle mr-1"></i>${escapeHTML(cashierName)}</p>
-                        ${customerName ? `
+                        ${
+                            customerName
+                                ? `
                             <p class="text-[10px] text-emerald-600 font-bold mt-0.5">
-                                <i class="fas fa-user mr-1"></i>${escapeHTML(customerName)} ${customerPhone ? `(${escapeHTML(customerPhone)})` : ''}
+                                <i class="fas fa-user mr-1"></i>${escapeHTML(customerName)} ${customerPhone ? `(${escapeHTML(customerPhone)})` : ""}
                             </p>
-                        ` : ''}
+                        `
+                                : ""
+                        }
                     </td>
                     <td class="p-6 text-xs text-slate-400 font-bold">
                         ${escapeHTML(formattedDate)}
@@ -567,38 +805,64 @@
                         ${escapeHTML(paymentMethod)}
                     </td>
                     <td class="p-6 text-center font-bold text-slate-700">${totalQty}</td>
-                    <td class="p-6 text-right font-extrabold text-slate-800">IDR ${totalNetto.toLocaleString('id-ID')}</td>
-                    <td class="p-6 text-right text-emerald-600 font-bold">IDR ${amountPaid.toLocaleString('id-ID')}</td>
+                    <td class="p-6 text-right font-extrabold text-slate-800">IDR ${totalNetto.toLocaleString("id-ID")}</td>
+                    <td class="p-6 text-right text-emerald-600 font-bold">IDR ${amountPaid.toLocaleString("id-ID")}</td>
                     <td class="p-6 text-center">
                         <div class="flex items-center justify-center gap-1.5 flex-wrap">
                             ${actionButtons}
                         </div>
                     </td>
                 `;
-                        tbody.appendChild(row);
+                            tbody.appendChild(row);
 
-                        if (items.length > 0) {
-                            const detailRow = document.createElement('tr');
-                            detailRow.id = `detail-row-${idx}`;
-                            detailRow.className = "hidden bg-slate-50/80 border-b border-slate-200";
+                            if (items.length > 0) {
+                                const detailRow = document.createElement("tr");
+                                detailRow.id = `detail-row-${idx}`;
+                                detailRow.className =
+                                    "hidden bg-slate-50/80 border-b border-slate-200";
 
-                            const itemRowsHTML = items.map((it, itemIdx) => {
-                                const itName = it.product?.nama || it.product?.Nama || it.Product?.Nama || it.product_search || `Item #${it.id || ''}`;
-                                const itCode = it.product?.kode || it.product?.Kode || '-';
-                                const itSatuan = it.product?.satuan || it.product?.Satuan || 'PCS';
-                                const itQty = Number(it.qty || it.Qty || 0);
-                                const itPrice = Number(it.h_jual || it.HJual || it.price || 0);
-                                const itDiscount = Number(it.discount || it.Discount || 0);
-                                const itSubtotal = Number(it.total_netto || it.TotalNetto || (itQty * itPrice - itDiscount));
+                                const itemRowsHTML = items
+                                    .map((it, itemIdx) => {
+                                        const itName =
+                                            it.product?.nama ||
+                                            it.product?.Nama ||
+                                            it.Product?.Nama ||
+                                            it.product_search ||
+                                            `Item #${it.id || ""}`;
+                                        const itCode =
+                                            it.product?.kode ||
+                                            it.product?.Kode ||
+                                            "-";
+                                        const itSatuan =
+                                            it.product?.satuan ||
+                                            it.product?.Satuan ||
+                                            "PCS";
+                                        const itQty = Number(
+                                            it.qty || it.Qty || 0,
+                                        );
+                                        const itPrice = Number(
+                                            it.h_jual ||
+                                                it.HJual ||
+                                                it.price ||
+                                                0,
+                                        );
+                                        const itDiscount = Number(
+                                            it.discount || it.Discount || 0,
+                                        );
+                                        const itSubtotal = Number(
+                                            it.total_netto ||
+                                                it.TotalNetto ||
+                                                itQty * itPrice - itDiscount,
+                                        );
 
-                                return `
+                                        return `
                             <tr class="border-b border-slate-100 hover:bg-white/70 text-xs">
                                 <td class="py-2.5 px-4 font-mono font-bold text-slate-500">${escapeHTML(itCode)}</td>
                                 <td class="py-2.5 px-4 font-bold text-slate-700">${escapeHTML(itName)}</td>
                                 <td class="py-2.5 px-4 text-center font-bold text-slate-600">${itQty} ${escapeHTML(itSatuan)}</td>
-                                <td class="py-2.5 px-4 text-right font-semibold text-slate-600">IDR ${itPrice.toLocaleString('id-ID')}</td>
-                                <td class="py-2.5 px-4 text-right text-slate-400 font-semibold">${itDiscount > 0 ? `IDR ${itDiscount.toLocaleString('id-ID')}` : '-'}</td>
-                                <td class="py-2.5 px-4 text-right font-bold text-slate-800">IDR ${itSubtotal.toLocaleString('id-ID')}</td>
+                                <td class="py-2.5 px-4 text-right font-semibold text-slate-600">IDR ${itPrice.toLocaleString("id-ID")}</td>
+                                <td class="py-2.5 px-4 text-right text-slate-400 font-semibold">${itDiscount > 0 ? `IDR ${itDiscount.toLocaleString("id-ID")}` : "-"}</td>
+                                <td class="py-2.5 px-4 text-right font-bold text-slate-800">IDR ${itSubtotal.toLocaleString("id-ID")}</td>
                                 <td class="py-2.5 px-4 text-center">
                                     <button onclick="openReturModal(${idx}, ${itemIdx})" class="bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 px-2.5 py-1 rounded-md text-[10px] font-bold transition-all shadow-sm">
                                         <i class="fas fa-undo mr-1"></i> Retur
@@ -606,9 +870,10 @@
                                 </td>
                             </tr>
                         `;
-                            }).join('');
+                                    })
+                                    .join("");
 
-                            detailRow.innerHTML = `
+                                detailRow.innerHTML = `
                         <td colspan="9" class="p-4 pl-12 pr-6">
                             <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
                                 <div class="bg-slate-100/60 px-4 py-2 border-b border-slate-200 flex justify-between items-center">
@@ -636,56 +901,68 @@
                             </div>
                         </td>
                     `;
-                            tbody.appendChild(detailRow);
-                        }
-                    });
-                } else {
-                    emptyState.classList.remove('hidden');
-                    tbody.innerHTML = "";
-                }
-            } catch (error) {
-                console.error(error);
-                tbody.innerHTML = `<tr><td colspan="9" class="py-20 text-center text-red-400 font-bold">Gagal terhubung ke API Server</td></tr>`;
-            }
-        }
-
-        function toggleDetailRow(idx) {
-            const detailRow = document.getElementById(`detail-row-${idx}`);
-            const toggleIcon = document.getElementById(`toggle-icon-${idx}`);
-            if (detailRow) {
-                detailRow.classList.toggle('hidden');
-                if (toggleIcon) {
-                    toggleIcon.classList.toggle('rotate-180');
+                                tbody.appendChild(detailRow);
+                            }
+                        });
+                    } else {
+                        emptyState.classList.remove("hidden");
+                        tbody.innerHTML = "";
+                    }
+                } catch (error) {
+                    console.error(error);
+                    tbody.innerHTML = `<tr><td colspan="9" class="py-20 text-center text-red-400 font-bold">Gagal terhubung ke API Server</td></tr>`;
                 }
             }
-        }
 
-        // --- 1. POPUP MODAL PELUNASAN MULTI-METODE (PER NOTA) ---
-        let modalPaymentList = [];
+            function toggleDetailRow(idx) {
+                const detailRow = document.getElementById(`detail-row-${idx}`);
+                const toggleIcon = document.getElementById(
+                    `toggle-icon-${idx}`,
+                );
+                if (detailRow) {
+                    detailRow.classList.toggle("hidden");
+                    if (toggleIcon) {
+                        toggleIcon.classList.toggle("rotate-180");
+                    }
+                }
+            }
 
-        function openPelunasanModal(idx) {
-            const group = localSalesData[idx];
-            if (!group) return;
+            // --- 1. POPUP MODAL PELUNASAN MULTI-METODE (PER NOTA) ---
+            let modalPaymentList = [];
 
-            const invoice = group.invoice || group.Invoice || '';
-            const totalNetto = Number(group.total_netto ?? group.TotalNetto ?? 0);
-            const amountPaid = Number(group.amount_paid ?? group.AmountPaid ?? 0);
-            const sisaHutang = Number(group.remaining_amount ?? (totalNetto - amountPaid > 0 ? totalNetto - amountPaid : 0));
-            const currentMethod = group.payment_method || group.PaymentMethod || 'Tunai';
-            const customer = group.customer || group.Customer;
-            const customerName = customer?.name || customer?.Name || '-';
+            function openPelunasanModal(idx) {
+                const group = localSalesData[idx];
+                if (!group) return;
 
-            modalPaymentList = [];
+                const invoice = group.invoice || group.Invoice || "";
+                const totalNetto = Number(
+                    group.total_netto ?? group.TotalNetto ?? 0,
+                );
+                const amountPaid = Number(
+                    group.amount_paid ?? group.AmountPaid ?? 0,
+                );
+                const sisaHutang = Number(
+                    group.remaining_amount ??
+                        (totalNetto - amountPaid > 0
+                            ? totalNetto - amountPaid
+                            : 0),
+                );
+                const currentMethod =
+                    group.payment_method || group.PaymentMethod || "Tunai";
+                const customer = group.customer || group.Customer;
+                const customerName = customer?.name || customer?.Name || "-";
 
-            Swal.fire({
-                title: `<span class="text-slate-800 font-bold text-lg">Pelunasan Transaksi (#${escapeHTML(invoice)})</span>`,
-                html: `
+                modalPaymentList = [];
+
+                Swal.fire({
+                    title: `<span class="text-slate-800 font-bold text-lg">Pelunasan Transaksi (#${escapeHTML(invoice)})</span>`,
+                    html: `
                     <div class="text-left text-sm space-y-4 p-1">
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs font-semibold text-slate-600">
                             <div class="flex justify-between mb-1"><span>Customer:</span><span class="font-bold text-slate-800">${escapeHTML(customerName)}</span></div>
-                            <div class="flex justify-between mb-1"><span>Total Belanja Nota:</span><span class="font-bold text-slate-800">IDR ${totalNetto.toLocaleString('id-ID')}</span></div>
-                            <div class="flex justify-between mb-1"><span>Sudah Dibayar (DP):</span><span class="font-bold text-emerald-600">IDR ${amountPaid.toLocaleString('id-ID')}</span></div>
-                            <div class="flex justify-between border-t pt-1 font-bold text-slate-800"><span>Kekurangan / Sisa Hutang:</span><span class="text-rose-600 text-sm">IDR ${sisaHutang.toLocaleString('id-ID')}</span></div>
+                            <div class="flex justify-between mb-1"><span>Total Belanja Nota:</span><span class="font-bold text-slate-800">IDR ${totalNetto.toLocaleString("id-ID")}</span></div>
+                            <div class="flex justify-between mb-1"><span>Sudah Dibayar (DP):</span><span class="font-bold text-emerald-600">IDR ${amountPaid.toLocaleString("id-ID")}</span></div>
+                            <div class="flex justify-between border-t pt-1 font-bold text-slate-800"><span>Kekurangan / Sisa Hutang:</span><span class="text-rose-600 text-sm">IDR ${sisaHutang.toLocaleString("id-ID")}</span></div>
                         </div>
 
                         <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100/60 space-y-3">
@@ -721,165 +998,209 @@
                         </div>
 
                         <div id="modal-list-box" class="space-y-1 bg-slate-100 p-2.5 rounded-xl hidden max-h-24 overflow-y-auto custom-scroll"></div>
-                        
+
                         <div class="flex justify-between items-center font-bold text-xs px-1 text-slate-700">
                             <span>Total Pelunasan Diinput:</span>
                             <span id="modal-text-total-paid" class="text-blue-600 font-black">IDR 0</span>
                         </div>
                     </div>
                 `,
-                showCancelButton: true,
-                confirmButtonText: '<i class="fas fa-check-circle mr-1"></i> Simpan Pelunasan (Enter)',
-                cancelButtonText: 'Batal',
-                confirmButtonColor: '#2563EB',
-                didOpen: () => {
-                    const amtInput = document.getElementById('modal-pay-amount');
-                    if (amtInput) {
-                        amtInput.focus();
-                        amtInput.select();
-                        amtInput.addEventListener('keydown', (e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                const val = parseFloat(amtInput.value || 0);
-                                if (val > 0) {
-                                    addPaymentToModalList();
-                                } else if (modalPaymentList.length > 0) {
-                                    Swal.clickConfirm();
+                    showCancelButton: true,
+                    confirmButtonText:
+                        '<i class="fas fa-check-circle mr-1"></i> Simpan Pelunasan (Enter)',
+                    cancelButtonText: "Batal",
+                    confirmButtonColor: "#2563EB",
+                    didOpen: () => {
+                        const amtInput =
+                            document.getElementById("modal-pay-amount");
+                        if (amtInput) {
+                            amtInput.focus();
+                            amtInput.select();
+                            amtInput.addEventListener("keydown", (e) => {
+                                if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    const val = parseFloat(amtInput.value || 0);
+                                    if (val > 0) {
+                                        addPaymentToModalList();
+                                    } else if (modalPaymentList.length > 0) {
+                                        Swal.clickConfirm();
+                                    }
                                 }
-                            }
-                        });
-                    }
-                },
-                preConfirm: () => {
-                    const amtInput = document.getElementById('modal-pay-amount');
-                    if (modalPaymentList.length === 0 && amtInput) {
-                        const directVal = parseFloat(amtInput.value || 0);
-                        if (directVal > 0) {
-                            addPaymentToModalList();
+                            });
                         }
+                    },
+                    preConfirm: () => {
+                        const amtInput =
+                            document.getElementById("modal-pay-amount");
+                        if (modalPaymentList.length === 0 && amtInput) {
+                            const directVal = parseFloat(amtInput.value || 0);
+                            if (directVal > 0) {
+                                addPaymentToModalList();
+                            }
+                        }
+
+                        const totalDiinput = modalPaymentList.reduce(
+                            (s, p) => s + p.value,
+                            0,
+                        );
+                        if (
+                            modalPaymentList.length === 0 ||
+                            totalDiinput <= 0
+                        ) {
+                            Swal.showValidationMessage(
+                                "Anda belum menginput nominal pelunasan!",
+                            );
+                            return false;
+                        }
+                        if (totalDiinput < sisaHutang) {
+                            Swal.showValidationMessage(
+                                `Pembayaran kurang! Kekurangan pelunasan adalah IDR ${sisaHutang.toLocaleString("id-ID")}`,
+                            );
+                            return false;
+                        }
+
+                        const stringPelunasanBaru = modalPaymentList
+                            .map((p) => p.label)
+                            .join(", ");
+                        const finalMethodsCombined = `${currentMethod}, [Pelunasan: ${stringPelunasanBaru}]`;
+                        const finalTotalPaid = amountPaid + totalDiinput;
+
+                        // Format list multiple payment methods pelunasan
+                        const paymentMethodsPayload = modalPaymentList.map(
+                            (p) => ({
+                                type: p.label,
+                                amount: String(p.value),
+                                status: "Pelunasan",
+                            }),
+                        );
+
+                        return {
+                            invoice: invoice,
+                            payment_method: finalMethodsCombined,
+                            amount_paid: finalTotalPaid,
+                            payment_methods: paymentMethodsPayload,
+                            is_dp: false,
+                            is_bon: false,
+                            status: "Lunas",
+                            pelunasan_paid: totalDiinput,
+                            group_data: group,
+                        };
+                    },
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        processPelunasanAPI(
+                            result.value.invoice,
+                            result.value,
+                            result.value.group_data,
+                            result.value.pelunasan_paid,
+                        );
                     }
-
-                    const totalDiinput = modalPaymentList.reduce((s, p) => s + p.value, 0);
-                    if (modalPaymentList.length === 0 || totalDiinput <= 0) {
-                        Swal.showValidationMessage('Anda belum menginput nominal pelunasan!');
-                        return false;
-                    }
-                    if (totalDiinput < sisaHutang) {
-                        Swal.showValidationMessage(`Pembayaran kurang! Kekurangan pelunasan adalah IDR ${sisaHutang.toLocaleString('id-ID')}`);
-                        return false;
-                    }
-
-                    const stringPelunasanBaru = modalPaymentList.map(p => p.label).join(", ");
-                    const finalMethodsCombined = `${currentMethod}, [Pelunasan: ${stringPelunasanBaru}]`;
-                    const finalTotalPaid = amountPaid + totalDiinput;
-
-                    // Format list multiple payment methods pelunasan
-                    const paymentMethodsPayload = modalPaymentList.map(p => ({
-                        type: p.label,
-                        amount: String(p.value),
-                        status: "Pelunasan"
-                    }));
-
-                    return {
-                        invoice: invoice,
-                        payment_method: finalMethodsCombined,
-                        amount_paid: finalTotalPaid,
-                        payment_methods: paymentMethodsPayload,
-                        is_dp: false,
-                        is_bon: false,
-                        status: "Lunas",
-                        pelunasan_paid: totalDiinput,
-                        group_data: group
-                    };
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    processPelunasanAPI(result.value.invoice, result.value, result.value.group_data, result.value.pelunasan_paid);
-                }
-            });
-        }
-
-        function toggleModalBankSelect() {
-            const type = document.getElementById('modal-pay-type').value;
-            document.getElementById('modal-bank-wrapper').style.display = (type === 'Tunai') ? 'none' : 'block';
-        }
-
-        function addPaymentToModalList() {
-            const type = document.getElementById('modal-pay-type').value;
-            const amtInput = document.getElementById('modal-pay-amount');
-            const amount = parseFloat(amtInput.value || 0);
-
-            if (amount <= 0) return Swal.showValidationMessage("Masukkan nominal yang valid!");
-
-            let label = type;
-            if (type !== 'Tunai') {
-                label = `${type} - ${document.getElementById('modal-pay-bank').value}`;
+                });
             }
 
-            modalPaymentList.push({ label, value: amount });
-            amtInput.value = "";
-            renderModalPaymentList();
-        }
-
-        function renderModalPaymentList() {
-            const box = document.getElementById('modal-list-box');
-            const totalText = document.getElementById('modal-text-total-paid');
-
-            if (modalPaymentList.length === 0) {
-                box.classList.add('hidden');
-                totalText.innerText = "IDR 0";
-                return;
+            function toggleModalBankSelect() {
+                const type = document.getElementById("modal-pay-type").value;
+                document.getElementById("modal-bank-wrapper").style.display =
+                    type === "Tunai" ? "none" : "block";
             }
 
-            box.classList.remove('hidden');
-            box.innerHTML = "";
-            let total = 0;
+            function addPaymentToModalList() {
+                const type = document.getElementById("modal-pay-type").value;
+                const amtInput = document.getElementById("modal-pay-amount");
+                const amount = parseFloat(amtInput.value || 0);
 
-            modalPaymentList.forEach((p) => {
-                total += p.value;
-                box.innerHTML += `
+                if (amount <= 0)
+                    return Swal.showValidationMessage(
+                        "Masukkan nominal yang valid!",
+                    );
+
+                let label = type;
+                if (type !== "Tunai") {
+                    label = `${type} - ${document.getElementById("modal-pay-bank").value}`;
+                }
+
+                modalPaymentList.push({ label, value: amount });
+                amtInput.value = "";
+                renderModalPaymentList();
+            }
+
+            function renderModalPaymentList() {
+                const box = document.getElementById("modal-list-box");
+                const totalText = document.getElementById(
+                    "modal-text-total-paid",
+                );
+
+                if (modalPaymentList.length === 0) {
+                    box.classList.add("hidden");
+                    totalText.innerText = "IDR 0";
+                    return;
+                }
+
+                box.classList.remove("hidden");
+                box.innerHTML = "";
+                let total = 0;
+
+                modalPaymentList.forEach((p) => {
+                    total += p.value;
+                    box.innerHTML += `
                     <div class="flex justify-between bg-white px-2 py-1 rounded text-[11px] font-bold text-slate-600 border">
                         <span>${escapeHTML(p.label)}</span>
-                        <span>IDR ${p.value.toLocaleString('id-ID')}</span>
+                        <span>IDR ${p.value.toLocaleString("id-ID")}</span>
                     </div>
                 `;
-            });
-            totalText.innerText = `IDR ${total.toLocaleString('id-ID')}`;
-        }
+                });
+                totalText.innerText = `IDR ${total.toLocaleString("id-ID")}`;
+            }
 
-        function printPelunasanReceipt(group, newPaidAmount) {
-            const userData = getUserDataFromToken() || {};
-            const store = getStoreInfo();
-            const totalBill = Number(group.total_netto || 0);
-            const initialPaid = Number(group.amount_paid || 0);
-            const totalPaid = initialPaid + Number(newPaidAmount || 0);
-            const invoiceNo = group.invoice || `INV-${Date.now()}`;
-            const now = new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
+            function printPelunasanReceipt(group, newPaidAmount) {
+                const userData = getUserDataFromToken() || {};
+                const store = getStoreInfo();
+                const totalBill = Number(group.total_netto || 0);
+                const initialPaid = Number(group.amount_paid || 0);
+                const totalPaid = initialPaid + Number(newPaidAmount || 0);
+                const invoiceNo = group.invoice || `INV-${Date.now()}`;
+                const now = new Date().toLocaleString("id-ID", {
+                    dateStyle: "short",
+                    timeStyle: "medium",
+                });
 
-            const customerName = group.customer?.name || '-';
-            const customerPhone = group.customer?.phone_number || '-';
-            const items = group.items || [];
+                const customerName = group.customer?.name || "-";
+                const customerPhone = group.customer?.phone_number || "-";
+                const items = group.items || [];
 
-            const itemRows = items.map(item => {
-                const pName = item.product?.nama || item.product?.Nama || item.product_search || 'Produk';
-                const pCode = item.product?.kode || item.product?.Kode || '-';
-                const itPrice = Number(item.h_jual || item.HJual || item.price || 0);
-                const itQty = Number(item.qty || item.Qty || 1);
-                const itSubtotal = Number(item.total_netto || item.TotalNetto || (itQty * itPrice));
+                const itemRows = items
+                    .map((item) => {
+                        const pName =
+                            item.product?.nama ||
+                            item.product?.Nama ||
+                            item.product_search ||
+                            "Produk";
+                        const pCode =
+                            item.product?.kode || item.product?.Kode || "-";
+                        const itPrice = Number(
+                            item.h_jual || item.HJual || item.price || 0,
+                        );
+                        const itQty = Number(item.qty || item.Qty || 1);
+                        const itSubtotal = Number(
+                            item.total_netto ||
+                                item.TotalNetto ||
+                                itQty * itPrice,
+                        );
 
-                return `
+                        return `
                 <tr>
                     <td colspan="3" class="item-name">${escapeHTML(pName)}</td>
                 </tr>
                 <tr>
                     <td>${escapeHTML(pCode)}</td>
-                    <td class="center">${itQty} x ${itPrice.toLocaleString('id-ID')}</td>
-                    <td class="right">${itSubtotal.toLocaleString('id-ID')}</td>
+                    <td class="center">${itQty} x ${itPrice.toLocaleString("id-ID")}</td>
+                    <td class="right">${itSubtotal.toLocaleString("id-ID")}</td>
                 </tr>
             `;
-            }).join('');
+                    })
+                    .join("");
 
-            const receiptHTML = `
+                const receiptHTML = `
                 <!DOCTYPE html>
                 <html lang="id">
                 <head>
@@ -925,8 +1246,8 @@
                         <table>
                             <tr><td>No Nota</td><td class="right">${escapeHTML(invoiceNo)}</td></tr>
                             <tr><td>Waktu Lunas</td><td class="right">${escapeHTML(now)}</td></tr>
-                            <tr><td>Kasir</td><td class="right">${escapeHTML(userData.name || 'Desak Kasir')}</td></tr>
-                            <tr><td>Toko</td><td class="right">${escapeHTML(group.location || userData.location || 'Toko Utama')}</td></tr>
+                            <tr><td>Kasir</td><td class="right">${escapeHTML(userData.name || "Desak Kasir")}</td></tr>
+                            <tr><td>Toko</td><td class="right">${escapeHTML(group.location || userData.location || "Toko Utama")}</td></tr>
                             <tr><td>Status</td><td class="right bold">LUNAS</td></tr>
                             <tr><td>Customer</td><td class="right">${escapeHTML(customerName)}</td></tr>
                             <tr><td>No HP</td><td class="right">${escapeHTML(customerPhone)}</td></tr>
@@ -941,10 +1262,10 @@
                         <div class="line"></div>
 
                         <table>
-                            <tr class="bold"><td>Total Tagihan</td><td class="right">${totalBill.toLocaleString('id-ID')}</td></tr>
-                            <tr><td>Pembayaran Awal (DP)</td><td class="right">${initialPaid.toLocaleString('id-ID')}</td></tr>
-                            <tr class="bold"><td>Bayar Pelunasan</td><td class="right">${Number(newPaidAmount || 0).toLocaleString('id-ID')}</td></tr>
-                            <tr class="bold"><td>Total Terbayar</td><td class="right">${totalPaid.toLocaleString('id-ID')}</td></tr>
+                            <tr class="bold"><td>Total Tagihan</td><td class="right">${totalBill.toLocaleString("id-ID")}</td></tr>
+                            <tr><td>Pembayaran Awal (DP)</td><td class="right">${initialPaid.toLocaleString("id-ID")}</td></tr>
+                            <tr class="bold"><td>Bayar Pelunasan</td><td class="right">${Number(newPaidAmount || 0).toLocaleString("id-ID")}</td></tr>
+                            <tr class="bold"><td>Total Terbayar</td><td class="right">${totalPaid.toLocaleString("id-ID")}</td></tr>
                             <tr class="bold"><td>Sisa Pembayaran</td><td class="right">0 (LUNAS)</td></tr>
                         </table>
 
@@ -957,80 +1278,113 @@
                 </html>
             `;
 
-            printHTML(receiptHTML);
-        }
+                printHTML(receiptHTML);
+            }
 
-        async function processPelunasanAPI(invoice, payload, groupData, pelunasanPaid) {
-            Swal.fire({ title: 'Menyimpan Pelunasan...', didOpen: () => Swal.showLoading() });
-            try {
-                const res = await fetch(`${API_URL}/sales/${encodeURIComponent(invoice)}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        payment_method: payload.payment_method,
-                        amount_paid: payload.amount_paid,
-                        payment_methods: payload.payment_methods,
-                        is_dp: false,
-                        is_bon: false,
-                        status: "Lunas"
-                    })
+            async function processPelunasanAPI(
+                invoice,
+                payload,
+                groupData,
+                pelunasanPaid,
+            ) {
+                Swal.fire({
+                    title: "Menyimpan Pelunasan...",
+                    didOpen: () => Swal.showLoading(),
                 });
+                try {
+                    const res = await fetch(
+                        `${API_URL}/sales/${encodeURIComponent(invoice)}`,
+                        {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                payment_method: payload.payment_method,
+                                amount_paid: payload.amount_paid,
+                                payment_methods: payload.payment_methods,
+                                is_dp: false,
+                                is_bon: false,
+                                status: "Lunas",
+                            }),
+                        },
+                    );
 
-                if (res.ok) {
-                    Swal.close();
-                    if (groupData) {
-                        printPelunasanReceipt(groupData, pelunasanPaid);
+                    if (res.ok) {
+                        Swal.close();
+                        if (groupData) {
+                            printPelunasanReceipt(groupData, pelunasanPaid);
+                        }
+
+                        setTimeout(() => {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Pelunasan Berhasil!",
+                                text: "Status transaksi telah diubah menjadi Lunas dan bukti pembayaran pelunasan berhasil disimpan.",
+                                confirmButtonColor: "#2563EB",
+                            }).then(() => fetchRiwayat());
+                        }, 400);
+                    } else {
+                        const err = await res.json().catch(() => ({}));
+                        Swal.fire(
+                            "Gagal",
+                            err.error ||
+                                err.message ||
+                                "Terjadi kesalahan sistem saat pelunasan",
+                            "error",
+                        );
                     }
-
-                    setTimeout(() => {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Pelunasan Berhasil!',
-                            text: 'Status transaksi telah diubah menjadi Lunas dan bukti pembayaran pelunasan berhasil disimpan.',
-                            confirmButtonColor: '#2563EB'
-                        }).then(() => fetchRiwayat());
-                    }, 400);
-                } else {
-                    const err = await res.json().catch(() => ({}));
-                    Swal.fire('Gagal', err.error || err.message || 'Terjadi kesalahan sistem saat pelunasan', 'error');
+                } catch (e) {
+                    Swal.fire("Error", "Gagal terhubung ke server", "error");
                 }
-            } catch (e) {
-                Swal.fire('Error', 'Gagal terhubung ke server', 'error');
-            }
-        }
-
-
-        // --- 2. POPUP MODAL RETUR BARANG (PER ITEM DALAM NOTA) ---
-        function openReturModal(groupIdx, itemIdx = null) {
-            const group = localSalesData[groupIdx];
-            if (!group) return;
-
-            const items = group.items || group.Items || [];
-            if (items.length === 0) {
-                return Swal.fire('Opps', 'Tidak ada data produk dalam nota ini.', 'warning');
             }
 
-            // Jika itemIdx ditentukan langsung
-            if (itemIdx !== null && items[itemIdx]) {
-                return showReturForm(items[itemIdx], group.invoice || group.Invoice || '');
-            }
+            // --- 2. POPUP MODAL RETUR BARANG (PER ITEM DALAM NOTA) ---
+            function openReturModal(groupIdx, itemIdx = null) {
+                const group = localSalesData[groupIdx];
+                if (!group) return;
 
-            // Jika nota hanya memiliki 1 item
-            if (items.length === 1) {
-                return showReturForm(items[0], group.invoice || group.Invoice || '');
-            }
+                const items = group.items || group.Items || [];
+                if (items.length === 0) {
+                    return Swal.fire(
+                        "Opps",
+                        "Tidak ada data produk dalam nota ini.",
+                        "warning",
+                    );
+                }
 
-            // Jika nota memiliki banyak item dan dipanggil dari baris nota utama
-            let optionsHTML = items.map((it, i) => {
-                const itName = it.product?.nama || it.Product?.Nama || it.product_search || `Item #${it.id}`;
-                const itCode = it.product?.kode || it.Product?.Kode || '-';
-                const itQty = it.qty || it.Qty || 1;
-                return `<option value="${i}">${escapeHTML(itName)} (${escapeHTML(itCode)}) - Qty: ${itQty}</option>`;
-            }).join('');
+                // Jika itemIdx ditentukan langsung
+                if (itemIdx !== null && items[itemIdx]) {
+                    return showReturForm(
+                        items[itemIdx],
+                        group.invoice || group.Invoice || "",
+                    );
+                }
 
-            Swal.fire({
-                title: `<span class="text-slate-800 font-bold text-lg">Pilih Barang yang Diretur</span>`,
-                html: `
+                // Jika nota hanya memiliki 1 item
+                if (items.length === 1) {
+                    return showReturForm(
+                        items[0],
+                        group.invoice || group.Invoice || "",
+                    );
+                }
+
+                // Jika nota memiliki banyak item dan dipanggil dari baris nota utama
+                let optionsHTML = items
+                    .map((it, i) => {
+                        const itName =
+                            it.product?.nama ||
+                            it.Product?.Nama ||
+                            it.product_search ||
+                            `Item #${it.id}`;
+                        const itCode =
+                            it.product?.kode || it.Product?.Kode || "-";
+                        const itQty = it.qty || it.Qty || 1;
+                        return `<option value="${i}">${escapeHTML(itName)} (${escapeHTML(itCode)}) - Qty: ${itQty}</option>`;
+                    })
+                    .join("");
+
+                Swal.fire({
+                    title: `<span class="text-slate-800 font-bold text-lg">Pilih Barang yang Diretur</span>`,
+                    html: `
                     <div class="text-left text-sm space-y-3 p-1">
                         <p class="text-xs text-slate-500 font-medium">Nota: <b>#${escapeHTML(group.invoice || group.Invoice)}</b> memiliki beberapa produk. Pilih produk yang ingin diproses retur:</p>
                         <div>
@@ -1041,100 +1395,150 @@
                         </div>
                     </div>
                 `,
-                showCancelButton: true,
-                confirmButtonText: 'Lanjutkan',
-                cancelButtonText: 'Batal',
-                confirmButtonColor: '#2563EB'
-            }).then((res) => {
-                if (res.isConfirmed) {
-                    const selIdx = parseInt(document.getElementById('select-retur-item').value);
-                    if (!isNaN(selIdx) && items[selIdx]) {
-                        showReturForm(items[selIdx], group.invoice || group.Invoice || '');
+                    showCancelButton: true,
+                    confirmButtonText: "Lanjutkan",
+                    cancelButtonText: "Batal",
+                    confirmButtonColor: "#2563EB",
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        const selIdx = parseInt(
+                            document.getElementById("select-retur-item").value,
+                        );
+                        if (!isNaN(selIdx) && items[selIdx]) {
+                            showReturForm(
+                                items[selIdx],
+                                group.invoice || group.Invoice || "",
+                            );
+                        }
                     }
-                }
-            });
-        }
+                });
+            }
 
-        function reprintSaleReceipt(idx) {
-            const group = localSalesData[idx];
-            if (!group) return;
+            function reprintSaleReceipt(idx) {
+                const group = localSalesData[idx];
+                if (!group) return;
 
-            const storeHeader = getStoreInfo();
-            const items = group.items || group.Items || [];
-            const totalBill = Number(group.total_netto ?? group.TotalNetto ?? 0);
-            const totalPaid = Number(group.amount_paid ?? group.AmountPaid ?? 0);
-            const change = Math.max(totalPaid - totalBill, 0);
-            const remaining = Math.max(totalBill - totalPaid, 0);
+                const storeHeader = getStoreInfo();
+                const items = group.items || group.Items || [];
+                const totalBill = Number(
+                    group.total_netto ?? group.TotalNetto ?? 0,
+                );
+                const totalPaid = Number(
+                    group.amount_paid ?? group.AmountPaid ?? 0,
+                );
+                const change = Math.max(totalPaid - totalBill, 0);
+                const remaining = Math.max(totalBill - totalPaid, 0);
 
-            const isBon = group.is_bon || group.IsBon || group.status === 'Bon' || group.Status === 'Bon';
-            const isDp = group.is_dp || group.IsDp || group.status === 'DP' || group.Status === 'DP';
+                const isBon =
+                    group.is_bon ||
+                    group.IsBon ||
+                    group.status === "Bon" ||
+                    group.Status === "Bon";
+                const isDp =
+                    group.is_dp ||
+                    group.IsDp ||
+                    group.status === "DP" ||
+                    group.Status === "DP";
 
-            const invoiceNo = group.invoice || group.Invoice || '-';
-            const createdAt = group.created_at || group.CreatedAt;
-            const now = createdAt
-                ? new Date(createdAt).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' })
-                : new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
+                const invoiceNo = group.invoice || group.Invoice || "-";
+                const createdAt = group.created_at || group.CreatedAt;
+                const now = createdAt
+                    ? new Date(createdAt).toLocaleString("id-ID", {
+                          dateStyle: "short",
+                          timeStyle: "medium",
+                      })
+                    : new Date().toLocaleString("id-ID", {
+                          dateStyle: "short",
+                          timeStyle: "medium",
+                      });
 
-            const customer = group.customer || group.Customer || {};
-            const customerName = customer.name || customer.Name || '-';
-            const customerPhone = customer.phone_number || customer.PhoneNumber || '-';
-            const cashierName = group.user?.name || group.User?.name || group.member_name || group.MemberName || 'Kasir';
+                const customer = group.customer || group.Customer || {};
+                const customerName = customer.name || customer.Name || "-";
+                const customerPhone =
+                    customer.phone_number || customer.PhoneNumber || "-";
+                const cashierName =
+                    group.user?.name ||
+                    group.User?.name ||
+                    group.member_name ||
+                    group.MemberName ||
+                    "Kasir";
 
-            let statusNota = "LUNAS";
-            if (isBon) statusNota = "BON / UTANG";
-            else if (isDp) statusNota = "DP / UANG MUKA";
+                let statusNota = "LUNAS";
+                if (isBon) statusNota = "BON / UTANG";
+                else if (isDp) statusNota = "DP / UANG MUKA";
 
-            const itemRows = items.map(item => {
-                const pName = item.product?.nama || item.product?.Nama || item.product_search || 'Produk';
-                const pCode = item.product?.kode || item.product?.Kode || '-';
-                const itPrice = Number(item.h_jual || item.HJual || item.price || 0);
-                const itQty = Number(item.qty || item.Qty || 1);
-                const itSubtotal = Number(item.total_netto || item.TotalNetto || (itQty * itPrice));
+                const itemRows = items
+                    .map((item) => {
+                        const pName =
+                            item.product?.nama ||
+                            item.product?.Nama ||
+                            item.product_search ||
+                            "Produk";
+                        const pCode =
+                            item.product?.kode || item.product?.Kode || "-";
+                        const itPrice = Number(
+                            item.h_jual || item.HJual || item.price || 0,
+                        );
+                        const itQty = Number(item.qty || item.Qty || 1);
+                        const itSubtotal = Number(
+                            item.total_netto ||
+                                item.TotalNetto ||
+                                itQty * itPrice,
+                        );
 
-                return `
+                        return `
         <tr>
             <td colspan="3" class="item-name">${escapeHTML(pName)}</td>
         </tr>
         <tr>
             <td>${escapeHTML(pCode)}</td>
-            <td class="center">${itQty} x ${itPrice.toLocaleString('id-ID')}</td>
-            <td class="right">${itSubtotal.toLocaleString('id-ID')}</td>
+            <td class="center">${itQty} x ${itPrice.toLocaleString("id-ID")}</td>
+            <td class="right">${itSubtotal.toLocaleString("id-ID")}</td>
         </tr>
         `;
-            }).join('');
+                    })
+                    .join("");
 
-            // Rincian Metode Pembayaran
-            const pMethods = group.payment_methods || group.PaymentMethods || [];
-            let paymentRows = "";
-            if (Array.isArray(pMethods) && pMethods.length > 0) {
-                paymentRows = pMethods.map(pm => `
+                // Rincian Metode Pembayaran
+                const pMethods =
+                    group.payment_methods || group.PaymentMethods || [];
+                let paymentRows = "";
+                if (Array.isArray(pMethods) && pMethods.length > 0) {
+                    paymentRows = pMethods
+                        .map(
+                            (pm) => `
             <tr>
-                <td>${escapeHTML(pm.type || pm.Type || 'Pembayaran')}</td>
-                <td class="right">${Number(pm.amount || pm.Amount || 0).toLocaleString('id-ID')}</td>
+                <td>${escapeHTML(pm.type || pm.Type || "Pembayaran")}</td>
+                <td class="right">${Number(pm.amount || pm.Amount || 0).toLocaleString("id-ID")}</td>
             </tr>
-        `).join('');
-            } else {
-                const rawMethod = group.payment_method || group.PaymentMethod || (isBon ? 'Bon / Utang' : 'Tunai');
-                paymentRows = `
+        `,
+                        )
+                        .join("");
+                } else {
+                    const rawMethod =
+                        group.payment_method ||
+                        group.PaymentMethod ||
+                        (isBon ? "Bon / Utang" : "Tunai");
+                    paymentRows = `
             <tr>
                 <td>${escapeHTML(rawMethod)}</td>
-                <td class="right">${totalPaid.toLocaleString('id-ID')}</td>
+                <td class="right">${totalPaid.toLocaleString("id-ID")}</td>
             </tr>
         `;
-            }
+                }
 
-            // Jika Bon, cetak 3 rangkap
-            const copySheets = isBon
-                ? [
-                    "LEMBAR 1: KASIR / TOKO",
-                    "LEMBAR 2: PELANGGAN",
-                    "LEMBAR 3: ARSIP / FINANCE"
-                ]
-                : [""];
+                // Jika Bon, cetak 3 rangkap
+                const copySheets = isBon
+                    ? [
+                          "LEMBAR 1: KASIR / TOKO",
+                          "LEMBAR 2: PELANGGAN",
+                          "LEMBAR 3: ARSIP / FINANCE",
+                      ]
+                    : [""];
 
-            const generateSingleReceipt = (copyLabel) => `
+                const generateSingleReceipt = (copyLabel) => `
         <div class="receipt">
-            ${copyLabel ? `<div class="copy-badge">*** ${copyLabel} ***</div>` : ''}
+            ${copyLabel ? `<div class="copy-badge">*** ${copyLabel} ***</div>` : ""}
 
             <div class="center">
                 <div class="store-name">LANGGENG ELEKTRONIKA</div>
@@ -1142,7 +1546,7 @@
                 <div style="font-size: 10px;">Telp: ${escapeHTML(storeHeader.phone)}</div>
                 <div style="font-size: 10px;">Email: langgengtemaja8888@gmail.com</div>
                 <div style="margin-top: 6px; font-weight: bold; font-size: 12px;">
-                    ${isBon ? 'NOTA BON / TAGIHAN UTANG' : 'NOTA TRANSAKSI'}
+                    ${isBon ? "NOTA BON / TAGIHAN UTANG" : "NOTA TRANSAKSI"}
                 </div>
             </div>
 
@@ -1153,10 +1557,14 @@
                 <tr><td>Tanggal</td><td class="right">${escapeHTML(now)}</td></tr>
                 <tr><td>Kasir</td><td class="right">${escapeHTML(cashierName)}</td></tr>
                 <tr><td>Status</td><td class="right font-bold">${statusNota}</td></tr>
-                ${(isDp || isBon) ? `
+                ${
+                    isDp || isBon
+                        ? `
                     <tr><td>Pelanggan</td><td class="right font-bold">${escapeHTML(customerName)}</td></tr>
                     <tr><td>No HP</td><td class="right">${escapeHTML(customerPhone)}</td></tr>
-                ` : ''}
+                `
+                        : ""
+                }
             </table>
 
             <div class="line"></div>
@@ -1168,16 +1576,20 @@
             <div class="line"></div>
 
             <table>
-                <tr class="bold"><td>Total Tagihan</td><td class="right">${totalBill.toLocaleString('id-ID')}</td></tr>
-                <tr><td>Dibayar</td><td class="right">${totalPaid.toLocaleString('id-ID')}</td></tr>
-                ${(isDp || isBon) ? `
+                <tr class="bold"><td>Total Tagihan</td><td class="right">${totalBill.toLocaleString("id-ID")}</td></tr>
+                <tr><td>Dibayar</td><td class="right">${totalPaid.toLocaleString("id-ID")}</td></tr>
+                ${
+                    isDp || isBon
+                        ? `
                     <tr class="bold" style="font-size: 12px;">
                         <td>SISA UTANG</td>
-                        <td class="right">${remaining.toLocaleString('id-ID')}</td>
+                        <td class="right">${remaining.toLocaleString("id-ID")}</td>
                     </tr>
-                ` : `
-                    <tr><td>Kembali</td><td class="right">${change.toLocaleString('id-ID')}</td></tr>
-                `}
+                `
+                        : `
+                    <tr><td>Kembali</td><td class="right">${change.toLocaleString("id-ID")}</td></tr>
+                `
+                }
             </table>
 
             <div class="line"></div>
@@ -1187,7 +1599,9 @@
                 ${paymentRows}
             </table>
 
-            ${isBon ? `
+            ${
+                isBon
+                    ? `
                 <div class="line"></div>
                 <div style="font-size: 9px; line-height: 1.2; text-align: justify; margin: 4px 0;">
                     * Saya menyatakan telah menerima barang tersebut dalam keadaan baik dan berjanji akan melunasi sisa pembayaran sesuai kesepakatan.
@@ -1202,17 +1616,21 @@
                         ( ${escapeHTML(cashierName)} )
                     </div>
                 </div>
-            ` : `
+            `
+                    : `
                 <div class="line"></div>
                 <div class="thanks">TERIMA KASIH</div>
                 <div class="center" style="font-size: 9px;">Barang yang sudah dibeli tidak dapat dikembalikan.</div>
-            `}
+            `
+            }
         </div>
     `;
 
-            const allReceiptsHTML = copySheets.map(label => generateSingleReceipt(label)).join('');
+                const allReceiptsHTML = copySheets
+                    .map((label) => generateSingleReceipt(label))
+                    .join("");
 
-            const fullHTML = `
+                const fullHTML = `
         <!DOCTYPE html>
         <html lang="id">
         <head>
@@ -1246,59 +1664,90 @@
         </html>
     `;
 
-            printHTML(fullHTML);
-        }
-
-        function reprintPelunasanReceipt(idx) {
-            const group = localSalesData[idx];
-            if (!group) return;
-            printPelunasanReceipt(group);
-        }
-
-        function printPelunasanReceipt(group, newPaidAmount = null) {
-            const userData = getUserDataFromToken() || {};
-            const store = getStoreInfo();
-            const totalBill = Number(group.total_netto ?? group.TotalNetto ?? 0);
-            const totalPaid = Number(group.amount_paid ?? group.AmountPaid ?? 0);
-            const invoiceNo = group.invoice || group.Invoice || `INV-${Date.now()}`;
-            const now = new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
-
-            const customer = group.customer || group.Customer || {};
-            const customerName = customer.name || customer.Name || '-';
-            const customerPhone = customer.phone_number || customer.PhoneNumber || '-';
-            const cashierName = group.user?.name || group.User?.name || group.member_name || group.MemberName || (userData.name || 'Desak Kasir');
-            const items = group.items || group.Items || [];
-
-            // Jika dicetak saat transaksi pelunasan baru berlangsung
-            let detailPembayaranHTML = "";
-            if (newPaidAmount !== null && Number(newPaidAmount) > 0) {
-                const initialPaid = Math.max(totalPaid - Number(newPaidAmount), 0);
-                detailPembayaranHTML = `
-            <tr><td>Pembayaran Awal (DP/Bon)</td><td class="right">${initialPaid.toLocaleString('id-ID')}</td></tr>
-            <tr class="bold"><td>Bayar Pelunasan</td><td class="right">${Number(newPaidAmount).toLocaleString('id-ID')}</td></tr>
-        `;
+                printHTML(fullHTML);
             }
 
-            const itemRows = items.map(item => {
-                const pName = item.Product?.nama || item.product?.Nama || item.product_search || 'Produk';
-                const pCode = item.Product?.kode || item.product?.Kode || '-';
-                const itPrice = Number(item.h_jual || item.HJual || item.price || 0);
-                const itQty = Number(item.qty || item.Qty || 1);
-                const itSubtotal = Number(item.total_netto || item.TotalNetto || (itQty * itPrice));
+            function reprintPelunasanReceipt(idx) {
+                const group = localSalesData[idx];
+                if (!group) return;
+                printPelunasanReceipt(group);
+            }
 
-                return `
+            function printPelunasanReceipt(group, newPaidAmount = null) {
+                const userData = getUserDataFromToken() || {};
+                const store = getStoreInfo();
+                const totalBill = Number(
+                    group.total_netto ?? group.TotalNetto ?? 0,
+                );
+                const totalPaid = Number(
+                    group.amount_paid ?? group.AmountPaid ?? 0,
+                );
+                const invoiceNo =
+                    group.invoice || group.Invoice || `INV-${Date.now()}`;
+                const now = new Date().toLocaleString("id-ID", {
+                    dateStyle: "short",
+                    timeStyle: "medium",
+                });
+
+                const customer = group.customer || group.Customer || {};
+                const customerName = customer.name || customer.Name || "-";
+                const customerPhone =
+                    customer.phone_number || customer.PhoneNumber || "-";
+                const cashierName =
+                    group.user?.name ||
+                    group.User?.name ||
+                    group.member_name ||
+                    group.MemberName ||
+                    userData.name ||
+                    "Desak Kasir";
+                const items = group.items || group.Items || [];
+
+                // Jika dicetak saat transaksi pelunasan baru berlangsung
+                let detailPembayaranHTML = "";
+                if (newPaidAmount !== null && Number(newPaidAmount) > 0) {
+                    const initialPaid = Math.max(
+                        totalPaid - Number(newPaidAmount),
+                        0,
+                    );
+                    detailPembayaranHTML = `
+            <tr><td>Pembayaran Awal (DP/Bon)</td><td class="right">${initialPaid.toLocaleString("id-ID")}</td></tr>
+            <tr class="bold"><td>Bayar Pelunasan</td><td class="right">${Number(newPaidAmount).toLocaleString("id-ID")}</td></tr>
+        `;
+                }
+
+                const itemRows = items
+                    .map((item) => {
+                        const pName =
+                            item.Product?.nama ||
+                            item.product?.Nama ||
+                            item.product_search ||
+                            "Produk";
+                        const pCode =
+                            item.Product?.kode || item.product?.Kode || "-";
+                        const itPrice = Number(
+                            item.h_jual || item.HJual || item.price || 0,
+                        );
+                        const itQty = Number(item.qty || item.Qty || 1);
+                        const itSubtotal = Number(
+                            item.total_netto ||
+                                item.TotalNetto ||
+                                itQty * itPrice,
+                        );
+
+                        return `
         <tr>
             <td colspan="3" class="item-name">${escapeHTML(pName)}</td>
         </tr>
         <tr>
             <td>${escapeHTML(pCode)}</td>
-            <td class="center">${itQty} x ${itPrice.toLocaleString('id-ID')}</td>
-            <td class="right">${itSubtotal.toLocaleString('id-ID')}</td>
+            <td class="center">${itQty} x ${itPrice.toLocaleString("id-ID")}</td>
+            <td class="right">${itSubtotal.toLocaleString("id-ID")}</td>
         </tr>
         `;
-            }).join('');
+                    })
+                    .join("");
 
-            const receiptHTML = `
+                const receiptHTML = `
         <!DOCTYPE html>
         <html lang="id">
         <head>
@@ -1331,7 +1780,7 @@
                     <tr><td>No Nota</td><td class="right">${escapeHTML(invoiceNo)}</td></tr>
                     <tr><td>Waktu Cetak</td><td class="right">${escapeHTML(now)}</td></tr>
                     <tr><td>Kasir</td><td class="right">${escapeHTML(cashierName)}</td></tr>
-                    <tr><td>Toko</td><td class="right">${escapeHTML(group.location || 'Toko Utama')}</td></tr>
+                    <tr><td>Toko</td><td class="right">${escapeHTML(group.location || "Toko Utama")}</td></tr>
                     <tr><td>Status</td><td class="right bold">LUNAS</td></tr>
                     <tr><td>Customer</td><td class="right">${escapeHTML(customerName)}</td></tr>
                     <tr><td>No HP</td><td class="right">${escapeHTML(customerPhone)}</td></tr>
@@ -1346,9 +1795,9 @@
                 <div class="line"></div>
 
                 <table>
-                    <tr class="bold"><td>Total Tagihan</td><td class="right">${totalBill.toLocaleString('id-ID')}</td></tr>
+                    <tr class="bold"><td>Total Tagihan</td><td class="right">${totalBill.toLocaleString("id-ID")}</td></tr>
                     ${detailPembayaranHTML}
-                    <tr class="bold"><td>Total Terbayar</td><td class="right">${totalPaid.toLocaleString('id-ID')}</td></tr>
+                    <tr class="bold"><td>Total Terbayar</td><td class="right">${totalPaid.toLocaleString("id-ID")}</td></tr>
                     <tr class="bold"><td>Sisa Pembayaran</td><td class="right">0 (LUNAS)</td></tr>
                 </table>
 
@@ -1361,18 +1810,23 @@
         </html>
     `;
 
-            printHTML(receiptHTML);
-        }
+                printHTML(receiptHTML);
+            }
 
-        function showReturForm(item, invoiceNo) {
-            const saleId = item.id || item.ID || 0;
-            const maxQty = Number(item.qty || item.Qty || 1);
-            const itemName = item.product?.nama || item.product?.Nama || item.product_search || 'Produk';
-            const itemCode = item.product?.kode || item.product?.Kode || '-';
+            function showReturForm(item, invoiceNo) {
+                const saleId = item.id || item.ID || 0;
+                const maxQty = Number(item.qty || item.Qty || 1);
+                const itemName =
+                    item.product?.nama ||
+                    item.product?.Nama ||
+                    item.product_search ||
+                    "Produk";
+                const itemCode =
+                    item.product?.kode || item.product?.Kode || "-";
 
-            Swal.fire({
-                title: '<span class="text-slate-800 font-bold text-lg">Retur Barang Penjualan</span>',
-                html: `
+                Swal.fire({
+                    title: '<span class="text-slate-800 font-bold text-lg">Retur Barang Penjualan</span>',
+                    html: `
                     <div class="text-left text-sm space-y-4 p-1">
                         <div class="bg-rose-50/50 p-4 rounded-xl border border-rose-100 text-xs font-semibold text-slate-600">
                             <p class="font-bold text-slate-800 mb-1">Item: ${escapeHTML(itemName)}</p>
@@ -1398,226 +1852,347 @@
                         </div>
                     </div>
                 `,
-                showCancelButton: true,
-                confirmButtonText: 'Proses Retur',
-                cancelButtonText: 'Batal',
-                confirmButtonColor: '#F43F5E',
-                preConfirm: () => {
-                    const qtyInput = parseInt(document.getElementById('retur-qty').value || 0);
-                    const reason = document.getElementById('retur-reason').value.trim();
-                    const toCompany = document.getElementById('retur-to-company').checked;
+                    showCancelButton: true,
+                    confirmButtonText: "Proses Retur",
+                    cancelButtonText: "Batal",
+                    confirmButtonColor: "#F43F5E",
+                    preConfirm: () => {
+                        const qtyInput = parseInt(
+                            document.getElementById("retur-qty").value || 0,
+                        );
+                        const reason = document
+                            .getElementById("retur-reason")
+                            .value.trim();
+                        const toCompany =
+                            document.getElementById("retur-to-company").checked;
 
-                    if (qtyInput <= 0 || qtyInput > maxQty) {
-                        Swal.showValidationMessage(`Jumlah Qty retur harus berada di antara 1 s/d ${maxQty}!`);
-                        return false;
+                        if (qtyInput <= 0 || qtyInput > maxQty) {
+                            Swal.showValidationMessage(
+                                `Jumlah Qty retur harus berada di antara 1 s/d ${maxQty}!`,
+                            );
+                            return false;
+                        }
+                        if (!reason) {
+                            Swal.showValidationMessage(
+                                "Alasan retur wajib diisi!",
+                            );
+                            return false;
+                        }
+
+                        return {
+                            sales_id: saleId,
+                            reason: reason,
+                            status: "Retur Sukses",
+                            is_retur: true,
+                            is_retur_to_company: toCompany,
+                            qty_retur: qtyInput,
+                        };
+                    },
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        processReturAPI(result.value);
                     }
-                    if (!reason) {
-                        Swal.showValidationMessage('Alasan retur wajib diisi!');
-                        return false;
-                    }
-
-                    return {
-                        sales_id: saleId,
-                        reason: reason,
-                        status: "Retur Sukses",
-                        is_retur: true,
-                        is_retur_to_company: toCompany,
-                        qty_retur: qtyInput
-                    };
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    processReturAPI(result.value);
-                }
-            });
-        }
-
-        async function processReturAPI(payload) {
-            Swal.fire({ title: 'Memproses Retur...', didOpen: () => Swal.showLoading() });
-            try {
-                const res = await fetch(`${API_URL}/retur`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
                 });
+            }
 
-                if (res.ok) {
-                    Swal.fire('Retur Sukses!', 'Barang berhasil diretur dan sistem stok disesuaikan.', 'success').then(() => fetchRiwayat());
-                } else {
-                    const err = await res.json().catch(() => ({}));
-                    Swal.fire('Gagal', err.error || err.message || 'Terjadi kesalahan sistem saat retur', 'error');
-                }
-            } catch (e) { Swal.fire('Error', 'Gagal terhubung ke server', 'error'); }
-        }
-
-        async function deleteTransaction(invoice) {
-            const confirm = await Swal.fire({
-                title: 'Hapus & Batalkan Transaksi?',
-                html: `<p class="text-xs text-slate-600">Nota: <b>#${escapeHTML(invoice)}</b> akan dihapus dari riwayat transaksi. Seluruh stok produk akan <b>dikembalikan otomatis</b> ke saldo toko.</p>`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Hapus & Rollback Stok',
-                cancelButtonText: 'Batal',
-                confirmButtonColor: '#EF4444'
-            });
-
-            if (confirm.isConfirmed) {
-                Swal.fire({ title: 'Menghapus transaksi & mengembalikan stok...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
+            async function processReturAPI(payload) {
+                Swal.fire({
+                    title: "Memproses Retur...",
+                    didOpen: () => Swal.showLoading(),
+                });
                 try {
-                    const res = await fetch(`${API_URL}/sales/${encodeURIComponent(invoice)}`, {
-                        method: 'DELETE'
+                    const res = await fetch(`${API_URL}/retur`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload),
                     });
 
                     if (res.ok) {
-                        Swal.fire('Berhasil!', 'Transaksi telah dihapus dan seluruh stok produk berhasil dikembalikan.', 'success').then(() => fetchRiwayat());
+                        Swal.fire(
+                            "Retur Sukses!",
+                            "Barang berhasil diretur dan sistem stok disesuaikan.",
+                            "success",
+                        ).then(() => fetchRiwayat());
                     } else {
                         const err = await res.json().catch(() => ({}));
-                        Swal.fire('Gagal', err.error || err.message || 'Gagal membatalkan transaksi', 'error');
+                        Swal.fire(
+                            "Gagal",
+                            err.error ||
+                                err.message ||
+                                "Terjadi kesalahan sistem saat retur",
+                            "error",
+                        );
                     }
                 } catch (e) {
-                    Swal.fire('Error', 'Gagal terhubung ke server', 'error');
+                    Swal.fire("Error", "Gagal terhubung ke server", "error");
                 }
             }
-        }
 
-        const ROLE_PERMISSIONS = {
-            'admin': ['riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'absensi.html', 'report.html'],
-            'kasir': ['dashboard.html', 'riwayat.html'],
-            'super-kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
-            'super_kasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
-            'superkasir': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html'],
-            'supersubkasir': ['dashboard.html', 'riwayat.html', 'product.html'],
-            'akuntan': ['akuntansi.html', 'purchase.html', 'expense.html', 'retur.html'],
-            'superadmin': ['dashboard.html', 'riwayat.html', 'product.html', 'purchase.html', 'expense.html', 'retur.html', 'akuntansi.html', 'absensi.html', 'report.html']
-        };
-
-        async function confirmLogout() {
-            const result = await Swal.fire({
-                title: 'Konfirmasi Keluar',
-                text: 'Pilih tindakan logout yang ingin Anda lakukan:',
-                icon: 'question',
-                showCancelButton: true,
-                showDenyButton: true,
-                confirmButtonText: '<i class="fas fa-check-circle mr-1"></i> Logout & Selesaikan Shift',
-                denyButtonText: '<i class="fas fa-sign-out-alt mr-1"></i> Logout Saja',
-                cancelButtonText: '<i class="fas fa-times mr-1"></i> Batal',
-                confirmButtonColor: '#2563EB',
-                denyButtonColor: '#F59E0B',
-                cancelButtonColor: '#64748B',
-                reverseButtons: true
-            });
-
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Menutup Shift...',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
+            async function deleteTransaction(invoice) {
+                const confirm = await Swal.fire({
+                    title: "Hapus & Batalkan Transaksi?",
+                    html: `<p class="text-xs text-slate-600">Nota: <b>#${escapeHTML(invoice)}</b> akan dihapus dari riwayat transaksi. Seluruh stok produk akan <b>dikembalikan otomatis</b> ke saldo toko.</p>`,
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, Hapus & Rollback Stok",
+                    cancelButtonText: "Batal",
+                    confirmButtonColor: "#EF4444",
                 });
 
-                try {
-                    const shiftResponse = await fetch(`${API_URL}/shift/current`);
-                    const shiftData = await shiftResponse.json();
-                    const shift = shiftData.shift || 1;
-
-                    const updateResponse = await fetch(`${API_URL}/sales/update/shift`, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            shift: shift
-                        })
+                if (confirm.isConfirmed) {
+                    Swal.fire({
+                        title: "Menghapus transaksi & mengembalikan stok...",
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading(),
                     });
 
-                    if (updateResponse.ok) {
-                        await Swal.fire({
-                            icon: "success",
-                            title: "Shift Berhasil Ditutup",
-                            text: `Transaksi berhasil dimasukkan ke Shift ${shift}. Anda telah keluar.`,
-                            confirmButtonColor: '#2563EB'
-                        });
-                        localStorage.removeItem("token");
-                        window.location.href = "index.html";
-                    } else {
-                        Swal.fire("Gagal", "Gagal memperbarui shift transaksi", "error");
+                    try {
+                        const res = await fetch(
+                            `${API_URL}/sales/${encodeURIComponent(invoice)}`,
+                            {
+                                method: "DELETE",
+                            },
+                        );
+
+                        if (res.ok) {
+                            Swal.fire(
+                                "Berhasil!",
+                                "Transaksi telah dihapus dan seluruh stok produk berhasil dikembalikan.",
+                                "success",
+                            ).then(() => fetchRiwayat());
+                        } else {
+                            const err = await res.json().catch(() => ({}));
+                            Swal.fire(
+                                "Gagal",
+                                err.error ||
+                                    err.message ||
+                                    "Gagal membatalkan transaksi",
+                                "error",
+                            );
+                        }
+                    } catch (e) {
+                        Swal.fire(
+                            "Error",
+                            "Gagal terhubung ke server",
+                            "error",
+                        );
                     }
-                } catch (error) {
-                    console.error(error);
-                    Swal.fire("Error", "Server tidak dapat dihubungi", "error");
                 }
-            } else if (result.isDenied) {
-                localStorage.removeItem("token");
-                window.location.href = "index.html";
-            }
-        }
-
-        function checkRoleAccess(currentPage) {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = 'index.html';
-                return;
-            }
-            const userData = getUserDataFromToken();
-            if (!userData) {
-                window.location.href = 'index.html';
-                return;
-            }
-            const userRole = (userData.role || 'kasir').toLowerCase().trim();
-            const allowedPages = ROLE_PERMISSIONS[userRole] || ['dashboard.html'];
-
-            if (!allowedPages.includes(currentPage)) {
-                if (userRole === 'akuntan') window.location.href = 'akuntansi.html';
-                else if (userRole === 'admin') window.location.href = 'riwayat.html';
-                else window.location.href = 'dashboard.html';
-                return;
             }
 
-            const navLinks = document.querySelectorAll('aside nav a');
-            navLinks.forEach(link => {
-                const href = link.getAttribute('href');
-                if (href && href !== '#' && href !== 'index.html') {
-                    if (!allowedPages.includes(href)) {
-                        link.style.display = 'none';
-                    } else {
-                        link.style.display = 'flex';
+            const ROLE_PERMISSIONS = {
+                admin: [
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "absensi.html",
+                    "report.html",
+                ],
+                kasir: ["dashboard.html", "riwayat.html"],
+                "super-kasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                ],
+                super_kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                ],
+                superkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                ],
+                supersubkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                ],
+                akuntan: [
+                    "akuntansi.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                ],
+                superadmin: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "akuntansi.html",
+                    "absensi.html",
+                    "report.html",
+                ],
+            };
+
+            async function confirmLogout() {
+                const result = await Swal.fire({
+                    title: "Konfirmasi Keluar",
+                    text: "Pilih tindakan logout yang ingin Anda lakukan:",
+                    icon: "question",
+                    showCancelButton: true,
+                    showDenyButton: true,
+                    confirmButtonText:
+                        '<i class="fas fa-check-circle mr-1"></i> Logout & Selesaikan Shift',
+                    denyButtonText:
+                        '<i class="fas fa-sign-out-alt mr-1"></i> Logout Saja',
+                    cancelButtonText: '<i class="fas fa-times mr-1"></i> Batal',
+                    confirmButtonColor: "#2563EB",
+                    denyButtonColor: "#F59E0B",
+                    cancelButtonColor: "#64748B",
+                    reverseButtons: true,
+                });
+
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: "Menutup Shift...",
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading(),
+                    });
+
+                    try {
+                        const shiftResponse = await fetch(
+                            `${API_URL}/shift/current`,
+                        );
+                        const shiftData = await shiftResponse.json();
+                        const shift = shiftData.shift || 1;
+
+                        const updateResponse = await fetch(
+                            `${API_URL}/sales/update/shift`,
+                            {
+                                method: "PUT",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    shift: shift,
+                                }),
+                            },
+                        );
+
+                        if (updateResponse.ok) {
+                            await Swal.fire({
+                                icon: "success",
+                                title: "Shift Berhasil Ditutup",
+                                text: `Transaksi berhasil dimasukkan ke Shift ${shift}. Anda telah keluar.`,
+                                confirmButtonColor: "#2563EB",
+                            });
+                            localStorage.removeItem("token");
+                            window.location.href = "index.html";
+                        } else {
+                            Swal.fire(
+                                "Gagal",
+                                "Gagal memperbarui shift transaksi",
+                                "error",
+                            );
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        Swal.fire(
+                            "Error",
+                            "Server tidak dapat dihubungi",
+                            "error",
+                        );
+                    }
+                } else if (result.isDenied) {
+                    localStorage.removeItem("token");
+                    window.location.href = "index.html";
+                }
+            }
+
+            function checkRoleAccess(currentPage) {
+                const token = localStorage.getItem("token");
+                if (!token) {
+                    window.location.href = "index.html";
+                    return;
+                }
+                const userData = getUserDataFromToken();
+                if (!userData) {
+                    window.location.href = "index.html";
+                    return;
+                }
+                const userRole = (userData.role || "kasir")
+                    .toLowerCase()
+                    .trim();
+                const allowedPages = ROLE_PERMISSIONS[userRole] || [
+                    "dashboard.html",
+                ];
+
+                if (!allowedPages.includes(currentPage)) {
+                    if (userRole === "akuntan")
+                        window.location.href = "akuntansi.html";
+                    else if (userRole === "admin")
+                        window.location.href = "riwayat.html";
+                    else window.location.href = "dashboard.html";
+                    return;
+                }
+
+                const navLinks = document.querySelectorAll("aside nav a");
+                navLinks.forEach((link) => {
+                    const href = link.getAttribute("href");
+                    if (href && href !== "#" && href !== "index.html") {
+                        if (!allowedPages.includes(href)) {
+                            link.style.display = "none";
+                        } else {
+                            link.style.display = "flex";
+                        }
+                    }
+                });
+
+                const userEls = document.querySelectorAll(".user-name-display");
+                userEls.forEach((el) => {
+                    el.innerText = `${userData.name || "User"} (${userRole.toUpperCase()})`;
+                });
+            }
+
+            // Global Enter Handler: Prioritize SweetAlert confirm & Active modal buttons
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    if (typeof Swal !== "undefined" && Swal.isVisible()) {
+                        const activeEl = document.activeElement;
+                        if (
+                            activeEl &&
+                            activeEl.tagName === "TEXTAREA" &&
+                            !e.ctrlKey
+                        ) {
+                            return;
+                        }
+                        e.preventDefault();
+                        const confirmBtn = Swal.getConfirmButton();
+                        if (confirmBtn && !confirmBtn.disabled) {
+                            confirmBtn.click();
+                        }
                     }
                 }
             });
 
-            const userEls = document.querySelectorAll('.user-name-display');
-            userEls.forEach(el => {
-                el.innerText = `${userData.name || 'User'} (${userRole.toUpperCase()})`;
-            });
-        }
+            // Jalankan saat pertama load
+            checkRoleAccess("riwayat.html");
+            fetchRiwayat();
 
-        // Global Enter Handler: Prioritize SweetAlert confirm & Active modal buttons
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                if (typeof Swal !== 'undefined' && Swal.isVisible()) {
-                    const activeEl = document.activeElement;
-                    if (activeEl && activeEl.tagName === 'TEXTAREA' && !e.ctrlKey) {
-                        return;
-                    }
-                    e.preventDefault();
-                    const confirmBtn = Swal.getConfirmButton();
-                    if (confirmBtn && !confirmBtn.disabled) {
-                        confirmBtn.click();
-                    }
-                }
-            }
-        });
-
-        // Jalankan saat pertama load
-        checkRoleAccess('riwayat.html');
-        fetchRiwayat();
-
-        // Clock Update
-        setInterval(() => {
-            const clockEl = document.getElementById('clock');
-            if (clockEl) clockEl.innerText = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
-        }, 1000);
-    </script>
-</body>
-
+            // Clock Update
+            setInterval(() => {
+                const clockEl = document.getElementById("clock");
+                if (clockEl)
+                    clockEl.innerText = new Date().toLocaleString("id-ID", {
+                        dateStyle: "full",
+                        timeStyle: "medium",
+                    });
+            }, 1000);
+        </script>
+    </body>
 </html>
