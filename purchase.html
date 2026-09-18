@@ -244,7 +244,6 @@
             let currentPage = 1;
             const limit = 10;
             let searchTimer;
-            let purchaseItems = [];
 
             async function fetchPurchases() {
                 const search = document.getElementById("searchInput").value;
@@ -261,74 +260,34 @@
                     if (purchases.length === 0) {
                         tbody.innerHTML = `<tr><td colspan="5" class="py-20 text-center text-slate-400 font-medium">Belum ada data pembelian</td></tr>`;
                     } else {
-                        const grouped = purchases.reduce((acc, p) => {
-                            const key = p.nota || "TANPA NOTA";
-                            if (!acc[key]) {
-                                acc[key] = {
-                                    nota: key,
-                                    tanggal: p.tanggal,
-                                    user: p.user,
-                                    items: [],
-                                };
-                            }
-                            acc[key].items.push(p);
-                            return acc;
-                        }, {});
-
-                        tbody.innerHTML = Object.values(grouped)
+                        tbody.innerHTML = purchases
                             .map(
-                                (g) => `
-                        <tr class="hover:bg-slate-50 cursor-pointer" onclick="togglePurchaseNota('${g.nota}')">
+                                (p) => `
+                        <tr class="hover:bg-slate-50/50 transition-colors">
                             <td class="px-8 py-6">
-                                <div class="font-extrabold text-blue-600 tracking-tight">
-                                    <i class="fas fa-chevron-down mr-2 text-xs"></i>#${g.nota}
-                                </div>
+                                <div class="font-extrabold text-blue-600 tracking-tight">#${p.nota}</div>
                                 <div class="text-[10px] text-slate-400 font-bold uppercase mt-1">
-                                    ${new Date(g.tanggal).toLocaleDateString("id-ID")}
+                                    ${new Date(p.tanggal).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}
                                 </div>
-                                <p class="text-[11px] text-slate-400 font-bold">
-                                    <i class="fas fa-user-circle mr-1"></i>${escapeHTML(g.user?.name || g.user?.Name || "Kasir")}
-                                </p>
-                            </td>
-                            <td class="px-6 py-6 font-bold text-slate-700">
-                                ${g.items.length} Produk
+                                <p class="text-[11px] text-slate-400 font-bold"><i class="fas fa-user-circle mr-1"></i>${escapeHTML(p.user?.name || p.user?.Name || "Kasir")}</p>
                             </td>
                             <td class="px-6 py-6">
-                                <span class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold">
-                                    ${g.items.reduce((a, b) => a + b.qty, 0)} Unit
-                                </span>
+                                <div class="font-bold text-slate-700 leading-tight">${p.product?.nama || p.product?.Nama || "Produk"}</div>
+                                <div class="flex items-center gap-1.5 mt-1.5 text-slate-400 font-bold uppercase text-[9px] tracking-wider">
+                                    <i class="fas fa-truck text-[8px]"></i>
+                                    <span>${p.supplier?.nama || p.supplier?.Nama || "Supplier Umum"}</span>
+                                </div>
                             </td>
-                            <td class="px-6 py-6 font-extrabold">
-                                Rp ${g.items.reduce((a, b) => a + b.total, 0).toLocaleString("id-ID")}
+                            <td class="px-6 py-6">
+                                <span class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-800 border border-blue-100">${p.qty} Unit</span>
+                            </td>
+                            <td class="px-6 py-6 font-extrabold text-slate-800">
+                                Rp ${(p.total || 0).toLocaleString("id-ID")}
                             </td>
                             <td class="px-8 py-6 text-right">
-                                <button onclick="event.stopPropagation(); deletePurchase('${g.items[0].id || g.items[0].ID}')"
-                                class="w-10 h-10 rounded-xl text-slate-300 hover:bg-red-50 hover:text-red-500">
-                                    <i class="fas fa-trash-alt"></i>
+                                <button onclick="deletePurchase('${p.id || p.ID}')" class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-300 hover:bg-red-50 hover:text-red-500 transition-all">
+                                    <i class="fas fa-trash-alt text-sm"></i>
                                 </button>
-                            </td>
-                        </tr>
-
-                        <tr id="detail-${g.nota}" class="hidden bg-slate-50">
-                            <td colspan="5" class="px-8 py-5">
-                                ${g.items
-                                    .map(
-                                        (item) => `
-                                    <div class="flex justify-between border-b py-3">
-                                        <div>
-                                            <b>${escapeHTML(item.product?.nama || item.product?.Nama || "Produk")}</b>
-                                            <div class="text-xs text-slate-400">
-                                                ${item.supplier?.nama || item.supplier?.Nama || "Supplier"}
-                                            </div>
-                                        </div>
-                                        <div class="text-right">
-                                            ${item.qty} Unit<br>
-                                            Rp ${(item.total || 0).toLocaleString("id-ID")}
-                                        </div>
-                                    </div>
-                                `,
-                                    )
-                                    .join("")}
                             </td>
                         </tr>
                     `,
@@ -452,14 +411,6 @@
                     "retur.html",
                 ],
                 superkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                ],
-                supersubkasir: [
                     "dashboard.html",
                     "riwayat.html",
                     "product.html",
@@ -710,8 +661,6 @@
                 document.getElementById("purchaseForm").reset();
                 document.getElementById("supplier_id").value = "";
                 document.getElementById("product_id").value = "";
-                purchaseItems = [];
-                renderPurchaseItems();
             }
 
             let supplierCache = [];
@@ -809,62 +758,6 @@
                     .classList.add("hidden");
             }
 
-            function addPurchaseItem() {
-                const id = document.getElementById("product_id").value;
-                const name = document.getElementById("productSearch").value;
-                const qty = Number(document.getElementById("qty").value);
-                const harga = Number(document.getElementById("h_beli").value);
-
-                if (!id || !qty || !harga) {
-                    Swal.fire(
-                        "Error",
-                        "Produk, qty dan harga wajib diisi",
-                        "error",
-                    );
-                    return;
-                }
-
-                purchaseItems.push({
-                    product_id: Number(id),
-                    nama: name,
-                    qty: qty,
-                    h_beli: harga,
-                    total: qty * harga,
-                });
-
-                renderPurchaseItems();
-                document.getElementById("productSearch").value = "";
-                document.getElementById("product_id").value = "";
-                document.getElementById("qty").value = "";
-                document.getElementById("h_beli").value = "";
-            }
-
-            function renderPurchaseItems() {
-                const box = document.getElementById("purchaseItems");
-                if (!box) return;
-
-                box.innerHTML = purchaseItems
-                    .map(
-                        (x, i) => `
-                <div class="flex justify-between border p-3 rounded-xl">
-                    <div>
-                        <b>${x.nama}</b><br>
-                        ${x.qty} x Rp ${x.h_beli.toLocaleString("id-ID")}
-                    </div>
-                    <button type="button" onclick="removePurchaseItem(${i})" class="text-red-500">
-                        Hapus
-                    </button>
-                </div>
-            `,
-                    )
-                    .join("");
-            }
-
-            function removePurchaseItem(i) {
-                purchaseItems.splice(i, 1);
-                renderPurchaseItems();
-            }
-
             document.addEventListener("DOMContentLoaded", function () {
                 const purchaseForm = document.getElementById("purchaseForm");
 
@@ -876,165 +769,82 @@
                 purchaseForm.addEventListener("submit", async function (e) {
                     e.preventDefault();
 
-                    const user = getUserDataFromToken() || {};
+                    const qty = Number(document.getElementById("qty").value);
 
-                    if (purchaseItems.length === 0) {
-                        Swal.fire(
-                            "Error",
-                            "Tambahkan minimal 1 barang",
-                            "error",
-                        );
-                        return;
-                    }
+                    const hBeli = Number(
+                        document.getElementById("h_beli").value,
+                    );
 
-                    const nota = document.getElementById("nota").value.trim();
+                    console.log("USER LOGIN:", getUserDataFromToken());
 
-                    if (!nota) {
-                        Swal.fire("Error", "Nomor nota wajib diisi", "error");
-                        return;
-                    }
+                    const body = {
+                        nota: document.getElementById("nota").value,
 
-                    if (!document.getElementById("supplier_id").value) {
-                        Swal.fire("Error", "Supplier wajib dipilih", "error");
-                        return;
-                    }
+                        tanggal: new Date(
+                            document.getElementById("tanggal").value,
+                        ).toISOString(),
 
-                    const tanggalInput =
-                        document.getElementById("tanggal").value;
+                        product_id: Number(
+                            document.getElementById("product_id").value,
+                        ),
 
-                    if (!tanggalInput) {
-                        Swal.fire("Error", "Tanggal wajib diisi", "error");
-                        return;
-                    }
+                        supplier_id:
+                            document.getElementById("supplier_id").value,
 
-                    const userId =
-                        user.id || user.ID || user.user_id || user.userID || "";
+                        qty: qty,
 
-                    const userLocation =
-                        user.location ||
-                        document.getElementById("location").value ||
-                        "Toko Utama";
+                        h_beli: hBeli,
 
-                    if (!userId) {
-                        Swal.fire(
-                            "Error",
-                            "User login tidak ditemukan",
-                            "error",
-                        );
-                        return;
-                    }
+                        total: qty * hBeli,
 
-                    const totalData = purchaseItems.length;
+                        user_id: (() => {
+                            const user = getUserDataFromToken() || {};
+                            return (
+                                user.id ||
+                                user.ID ||
+                                user.user_id ||
+                                user.userID ||
+                                ""
+                            );
+                        })(),
 
-                    Swal.fire({
-                        title: "Menyimpan Purchase",
-                        html: `
-                        <div id="purchaseProgress">
-                            Menyiapkan data...
-                        </div>
-                    `,
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
+                        location: (() => {
+                            const user = getUserDataFromToken() || {};
+                            return (
+                                user.location ||
+                                document.getElementById("location").value ||
+                                "Toko Utama"
+                            );
+                        })(),
+                    };
+
+                    console.log("PURCHASE PAYLOAD:", body);
+
+                    const res = await fetch(`${BASE_URL}/api/purchases`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
                         },
+                        body: JSON.stringify(body),
                     });
 
-                    let failed = false;
+                    const result = await res.json();
 
-                    for (let i = 0; i < totalData; i++) {
-                        const item = purchaseItems[i];
-
-                        // PAYLOAD TETAP SESUAI BACKEND
-                        const payload = {
-                            nota: nota,
-
-                            tanggal: (() => {
-                                const dateValue =
-                                    document.getElementById("tanggal").value;
-
-                                if (!dateValue) {
-                                    return new Date().toISOString();
-                                }
-
-                                return new Date(
-                                    dateValue + "T00:00:00",
-                                ).toISOString();
-                            })(),
-
-                            product_id: Number(item.product_id),
-
-                            supplier_id: String(
-                                document.getElementById("supplier_id").value,
-                            ),
-
-                            qty: Number(item.qty),
-
-                            h_beli: Number(item.h_beli),
-
-                            total: Number(item.total),
-
-                            user_id: userId,
-
-                            location: userLocation,
-                        };
-
-                        document.getElementById("purchaseProgress").innerHTML =
-                            `
-                        Menyimpan produk...
-                        <br>
-                        ${i + 1}/${totalData}
-                    `;
-
-                        console.log("PURCHASE PAYLOAD:", payload);
-
-                        const res = await fetch(`${BASE_URL}/api/purchases`, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(payload),
-                        });
-
-                        if (!res.ok) {
-                            const error = await res
-                                .json()
-                                .catch(() => ({ message: "Unknown error" }));
-
-                            console.error("PURCHASE ERROR:", error);
-
-                            failed = true;
-                            break;
-                        }
-                    }
-
-                    Swal.close();
-
-                    if (failed) {
-                        Swal.fire(
-                            "Error",
-                            "Ada data purchase yang gagal disimpan",
-                            "error",
-                        );
-
+                    if (!res.ok) {
+                        Swal.fire("Error", result.message || "Gagal", "error");
                         return;
                     }
 
                     Swal.fire(
                         "Berhasil",
-                        `${totalData} produk berhasil disimpan`,
+                        "Purchase berhasil disimpan",
                         "success",
                     );
 
                     closeModal();
-
                     fetchPurchases();
                 });
             });
-
-            function togglePurchaseNota(nota) {
-                const row = document.getElementById("detail-" + nota);
-                if (row) row.classList.toggle("hidden");
-            }
 
             // DELETE PURCHASE
             async function deletePurchase(id) {
@@ -1112,7 +922,7 @@
                     </button>
                 </div>
 
-                <form id="purchaseForm" novalidate class="space-y-4">
+                <form id="purchaseForm" class="space-y-4">
                     <input
                         id="nota"
                         required
@@ -1174,6 +984,7 @@
                             id="qty"
                             type="number"
                             step="0.01"
+                            required
                             placeholder="Qty"
                             class="border rounded-xl px-4 py-3"
                         />
@@ -1182,20 +993,11 @@
                             id="h_beli"
                             type="number"
                             step="0.01"
+                            required
                             placeholder="Harga Beli"
                             class="border rounded-xl px-4 py-3"
                         />
                     </div>
-
-                    <button
-                        type="button"
-                        onclick="addPurchaseItem()"
-                        class="w-full py-3 rounded-xl bg-emerald-600 text-white font-bold"
-                    >
-                        + Tambahkan Produk ke Nota
-                    </button>
-
-                    <div id="purchaseItems" class="space-y-2"></div>
 
                     <select
                         id="location"
