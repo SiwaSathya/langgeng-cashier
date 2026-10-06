@@ -1419,26 +1419,68 @@
                 if (!group) return;
 
                 const storeHeader = getStoreInfo();
-                const items = group.items || group.Items || [];
-                const totalBill = Number(
-                    group.total_netto ?? group.TotalNetto ?? 0,
-                );
+                const rawItems = group.items || group.Items || [];
+
+                // 1. FILTER: Kecualikan barang yang sudah diretur
+                const activeItems = rawItems.filter((item) => {
+                    const isItemRetur = Boolean(
+                        item.is_returs ||
+                        item.IsReturs ||
+                        item.is_retur ||
+                        item.IsRetur ||
+                        String(item.status || item.Status || "")
+                            .toLowerCase()
+                            .includes("retur"),
+                    );
+                    return !isItemRetur;
+                });
+
+                // Jika seluruh barang dalam nota sudah diretur
+                if (activeItems.length === 0) {
+                    return Swal.fire({
+                        icon: "info",
+                        title: "Tidak Dapat Dicetak",
+                        text: "Seluruh barang pada nota ini telah diretur.",
+                        confirmButtonColor: "#2563EB",
+                    });
+                }
+
+                // 2. HITUNG ULANG TOTAL DARI ITEM AKTIF SAJA
+                const totalBill = activeItems.reduce((sum, item) => {
+                    const itPrice = Number(
+                        item.h_jual || item.HJual || item.price || 0,
+                    );
+                    const itQty = Number(item.qty || item.Qty || 1);
+                    const itDiscount = Number(
+                        item.discount || item.Discount || 0,
+                    );
+                    const itSubtotal = Number(
+                        item.total_netto ||
+                            item.TotalNetto ||
+                            itQty * itPrice - itDiscount,
+                    );
+                    return sum + itSubtotal;
+                }, 0);
+
                 const totalPaid = Number(
                     group.amount_paid ?? group.AmountPaid ?? 0,
                 );
                 const change = Math.max(totalPaid - totalBill, 0);
                 const remaining = Math.max(totalBill - totalPaid, 0);
 
+                // Status Bon / DP hanya aktif jika masih memiliki sisa tagihan
                 const isBon =
-                    group.is_bon ||
-                    group.IsBon ||
-                    group.status === "Bon" ||
-                    group.Status === "Bon";
+                    (group.is_bon ||
+                        group.IsBon ||
+                        group.status === "Bon" ||
+                        group.Status === "Bon") &&
+                    remaining > 0;
                 const isDp =
-                    group.is_dp ||
-                    group.IsDp ||
-                    group.status === "DP" ||
-                    group.Status === "DP";
+                    (group.is_dp ||
+                        group.IsDp ||
+                        group.status === "DP" ||
+                        group.Status === "DP") &&
+                    remaining > 0;
 
                 const invoiceNo = group.invoice || group.Invoice || "-";
                 const createdAt = group.created_at || group.CreatedAt;
@@ -1467,35 +1509,43 @@
                 if (isBon) statusNota = "BON / UTANG";
                 else if (isDp) statusNota = "DP / UANG MUKA";
 
-                const itemRows = items
+                // 3. RENDER HANYA ITEM YANG BELUM DIRETUR
+                const itemRows = activeItems
                     .map((item) => {
                         const pName =
                             item.product?.nama ||
                             item.product?.Nama ||
+                            item.Product?.Nama ||
                             item.product_search ||
                             "Produk";
                         const pCode =
-                            item.product?.kode || item.product?.Kode || "-";
+                            item.product?.kode ||
+                            item.product?.Kode ||
+                            item.Product?.Kode ||
+                            "-";
                         const itPrice = Number(
                             item.h_jual || item.HJual || item.price || 0,
                         );
                         const itQty = Number(item.qty || item.Qty || 1);
+                        const itDiscount = Number(
+                            item.discount || item.Discount || 0,
+                        );
                         const itSubtotal = Number(
                             item.total_netto ||
                                 item.TotalNetto ||
-                                itQty * itPrice,
+                                itQty * itPrice - itDiscount,
                         );
 
                         return `
-        <tr>
-            <td colspan="3" class="item-name">${escapeHTML(pName)}</td>
-        </tr>
-        <tr>
-            <td>${escapeHTML(pCode)}</td>
-            <td class="center">${itQty} x ${itPrice.toLocaleString("id-ID")}</td>
-            <td class="right">${itSubtotal.toLocaleString("id-ID")}</td>
-        </tr>
-        `;
+                    <tr>
+                        <td colspan="3" class="item-name">${escapeHTML(pName)}</td>
+                    </tr>
+                    <tr>
+                        <td>${escapeHTML(pCode)}</td>
+                        <td class="center">${itQty} x ${itPrice.toLocaleString("id-ID")}</td>
+                        <td class="right">${itSubtotal.toLocaleString("id-ID")}</td>
+                    </tr>
+                    `;
                     })
                     .join("");
 
@@ -1507,11 +1557,11 @@
                     paymentRows = pMethods
                         .map(
                             (pm) => `
-            <tr>
-                <td>${escapeHTML(pm.type || pm.Type || "Pembayaran")}</td>
-                <td class="right">${Number(pm.amount || pm.Amount || 0).toLocaleString("id-ID")}</td>
-            </tr>
-        `,
+                        <tr>
+                            <td>${escapeHTML(pm.type || pm.Type || "Pembayaran")}</td>
+                            <td class="right">${Number(pm.amount || pm.Amount || 0).toLocaleString("id-ID")}</td>
+                        </tr>
+                    `,
                         )
                         .join("");
                 } else {
@@ -1520,11 +1570,11 @@
                         group.PaymentMethod ||
                         (isBon ? "Bon / Utang" : "Tunai");
                     paymentRows = `
-            <tr>
-                <td>${escapeHTML(rawMethod)}</td>
-                <td class="right">${totalPaid.toLocaleString("id-ID")}</td>
-            </tr>
-        `;
+                        <tr>
+                            <td>${escapeHTML(rawMethod)}</td>
+                            <td class="right">${totalPaid.toLocaleString("id-ID")}</td>
+                        </tr>
+                    `;
                 }
 
                 // Jika Bon, cetak 3 rangkap
@@ -1537,132 +1587,132 @@
                     : [""];
 
                 const generateSingleReceipt = (copyLabel) => `
-        <div class="receipt">
-            ${copyLabel ? `<div class="copy-badge">*** ${copyLabel} ***</div>` : ""}
+                    <div class="receipt">
+                        ${copyLabel ? `<div class="copy-badge">*** ${copyLabel} ***</div>` : ""}
 
-            <div class="center">
-                <div class="store-name">LANGGENG ELEKTRONIKA</div>
-                <div style="font-size: 10px; margin-top: 2px;">${escapeHTML(storeHeader.address)}</div>
-                <div style="font-size: 10px;">Telp: ${escapeHTML(storeHeader.phone)}</div>
-                <div style="font-size: 10px;">Email: langgengtemaja8888@gmail.com</div>
-                <div style="margin-top: 6px; font-weight: bold; font-size: 12px;">
-                    ${isBon ? "NOTA BON / TAGIHAN UTANG" : "NOTA TRANSAKSI"}
-                </div>
-            </div>
+                        <div class="center">
+                            <div class="store-name">LANGGENG ELEKTRONIKA</div>
+                            <div style="font-size: 10px; margin-top: 2px;">${escapeHTML(storeHeader.address)}</div>
+                            <div style="font-size: 10px;">Telp: ${escapeHTML(storeHeader.phone)}</div>
+                            <div style="font-size: 10px;">Email: langgengtemaja8888@gmail.com</div>
+                            <div style="margin-top: 6px; font-weight: bold; font-size: 12px;">
+                                ${isBon ? "NOTA BON / TAGIHAN UTANG" : "NOTA TRANSAKSI"}
+                            </div>
+                        </div>
 
-            <div class="line"></div>
+                        <div class="line"></div>
 
-            <table>
-                <tr><td>No Nota</td><td class="right">${escapeHTML(invoiceNo)}</td></tr>
-                <tr><td>Tanggal</td><td class="right">${escapeHTML(now)}</td></tr>
-                <tr><td>Kasir</td><td class="right">${escapeHTML(cashierName)}</td></tr>
-                <tr><td>Status</td><td class="right font-bold">${statusNota}</td></tr>
-                ${
-                    isDp || isBon
-                        ? `
-                    <tr><td>Pelanggan</td><td class="right font-bold">${escapeHTML(customerName)}</td></tr>
-                    <tr><td>No HP</td><td class="right">${escapeHTML(customerPhone)}</td></tr>
-                `
-                        : ""
-                }
-            </table>
+                        <table>
+                            <tr><td>No Nota</td><td class="right">${escapeHTML(invoiceNo)}</td></tr>
+                            <tr><td>Tanggal</td><td class="right">${escapeHTML(now)}</td></tr>
+                            <tr><td>Kasir</td><td class="right">${escapeHTML(cashierName)}</td></tr>
+                            <tr><td>Status</td><td class="right font-bold">${statusNota}</td></tr>
+                            ${
+                                isDp || isBon
+                                    ? `
+                                <tr><td>Pelanggan</td><td class="right font-bold">${escapeHTML(customerName)}</td></tr>
+                                <tr><td>No HP</td><td class="right">${escapeHTML(customerPhone)}</td></tr>
+                            `
+                                    : ""
+                            }
+                        </table>
 
-            <div class="line"></div>
+                        <div class="line"></div>
 
-            <table>
-                ${itemRows}
-            </table>
+                        <table>
+                            ${itemRows}
+                        </table>
 
-            <div class="line"></div>
+                        <div class="line"></div>
 
-            <table>
-                <tr class="bold"><td>Total Tagihan</td><td class="right">${totalBill.toLocaleString("id-ID")}</td></tr>
-                <tr><td>Dibayar</td><td class="right">${totalPaid.toLocaleString("id-ID")}</td></tr>
-                ${
-                    isDp || isBon
-                        ? `
-                    <tr class="bold" style="font-size: 12px;">
-                        <td>SISA UTANG</td>
-                        <td class="right">${remaining.toLocaleString("id-ID")}</td>
-                    </tr>
-                `
-                        : `
-                    <tr><td>Kembali</td><td class="right">${change.toLocaleString("id-ID")}</td></tr>
-                `
-                }
-            </table>
+                        <table>
+                            <tr class="bold"><td>Total Tagihan</td><td class="right">${totalBill.toLocaleString("id-ID")}</td></tr>
+                            <tr><td>Dibayar</td><td class="right">${totalPaid.toLocaleString("id-ID")}</td></tr>
+                            ${
+                                isDp || isBon
+                                    ? `
+                                <tr class="bold" style="font-size: 12px;">
+                                    <td>SISA UTANG</td>
+                                    <td class="right">${remaining.toLocaleString("id-ID")}</td>
+                                </tr>
+                            `
+                                    : `
+                                <tr><td>Kembali</td><td class="right">${change.toLocaleString("id-ID")}</td></tr>
+                            `
+                            }
+                        </table>
 
-            <div class="line"></div>
+                        <div class="line"></div>
 
-            <div class="bold">Metode Pembayaran:</div>
-            <table>
-                ${paymentRows}
-            </table>
+                        <div class="bold">Metode Pembayaran:</div>
+                        <table>
+                            ${paymentRows}
+                        </table>
 
-            ${
-                isBon
-                    ? `
-                <div class="line"></div>
-                <div style="font-size: 9px; line-height: 1.2; text-align: justify; margin: 4px 0;">
-                    * Saya menyatakan telah menerima barang tersebut dalam keadaan baik dan berjanji akan melunasi sisa pembayaran sesuai kesepakatan.
-                </div>
-                <div style="margin-top: 18px; display: flex; justify-content: space-between; text-align: center; font-size: 10px;">
-                    <div style="width: 45%;">
-                        Pelanggan,<br><br><br>
-                        ( ${escapeHTML(customerName)} )
+                        ${
+                            isBon
+                                ? `
+                            <div class="line"></div>
+                            <div style="font-size: 9px; line-height: 1.2; text-align: justify; margin: 4px 0;">
+                                * Saya menyatakan telah menerima barang tersebut dalam keadaan baik dan berjanji akan melunasi sisa pembayaran sesuai kesepakatan.
+                            </div>
+                            <div style="margin-top: 18px; display: flex; justify-content: space-between; text-align: center; font-size: 10px;">
+                                <div style="width: 45%;">
+                                    Pelanggan,<br><br><br>
+                                    ( ${escapeHTML(customerName)} )
+                                </div>
+                                <div style="width: 45%;">
+                                    Kasir,<br><br><br>
+                                    ( ${escapeHTML(cashierName)} )
+                                </div>
+                            </div>
+                        `
+                                : `
+                            <div class="line"></div>
+                            <div class="thanks">TERIMA KASIH</div>
+                            <div class="center" style="font-size: 9px;">Barang yang sudah dibeli tidak dapat dikembalikan.</div>
+                        `
+                        }
                     </div>
-                    <div style="width: 45%;">
-                        Kasir,<br><br><br>
-                        ( ${escapeHTML(cashierName)} )
-                    </div>
-                </div>
-            `
-                    : `
-                <div class="line"></div>
-                <div class="thanks">TERIMA KASIH</div>
-                <div class="center" style="font-size: 9px;">Barang yang sudah dibeli tidak dapat dikembalikan.</div>
-            `
-            }
-        </div>
-    `;
+                `;
 
                 const allReceiptsHTML = copySheets
                     .map((label) => generateSingleReceipt(label))
                     .join("");
 
                 const fullHTML = `
-        <!DOCTYPE html>
-        <html lang="id">
-        <head>
-            <meta charset="UTF-8">
-            <title>Nota ${escapeHTML(invoiceNo)}</title>
-            <style>
-                ${RECEIPT_BASE_CSS}
-                .center { text-align: center; }
-                .right { text-align: right; }
-                .bold { font-weight: bold; }
-                .line { border-top: 1px dashed #000; margin: 6px 0; }
-                .item-name { font-weight: bold; padding-top: 4px; }
-                .store-name { font-size: 14px; font-weight: bold; text-transform: uppercase; }
-                .thanks { margin-top: 8px; text-align: center; font-weight: bold; }
-                .copy-badge {
-                    text-align: center; font-weight: bold; font-size: 10px;
-                    border: 1px solid #000; padding: 2px; margin-bottom: 6px; letter-spacing: 0.5px;
-                }
-                .receipt { page-break-after: always; break-after: page; margin-bottom: 20px; }
-                .receipt:last-child { page-break-after: auto; break-after: auto; margin-bottom: 0; }
-                @media print {
-                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                    .receipt { page-break-after: always; break-after: page; }
-                    .receipt:last-child { page-break-after: auto; break-after: auto; }
-                }
-            </style>
-        </head>
-        <body>
-            ${allReceiptsHTML}
-        </body>
-        </html>
-    `;
+                    <!DOCTYPE html>
+                    <html lang="id">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Nota ${escapeHTML(invoiceNo)}</title>
+                        <style>
+                            ${RECEIPT_BASE_CSS}
+                            .center { text-align: center; }
+                            .right { text-align: right; }
+                            .bold { font-weight: bold; }
+                            .line { border-top: 1px dashed #000; margin: 6px 0; }
+                            .item-name { font-weight: bold; padding-top: 4px; }
+                            .store-name { font-size: 14px; font-weight: bold; text-transform: uppercase; }
+                            .thanks { margin-top: 8px; text-align: center; font-weight: bold; }
+                            .copy-badge {
+                                text-align: center; font-weight: bold; font-size: 10px;
+                                border: 1px solid #000; padding: 2px; margin-bottom: 6px; letter-spacing: 0.5px;
+                            }
+                            .receipt { page-break-after: always; break-after: page; margin-bottom: 20px; }
+                            .receipt:last-child { page-break-after: auto; break-after: auto; margin-bottom: 0; }
+                            @media print {
+                                body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                                .receipt { page-break-after: always; break-after: page; }
+                                .receipt:last-child { page-break-after: auto; break-after: auto; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${allReceiptsHTML}
+                    </body>
+                    </html>
+                `;
 
                 printHTML(fullHTML);
             }
