@@ -1262,7 +1262,7 @@
                         <div class="line"></div>
 
                         <table>
-                            <tr class="bold"><td>Total Tagihan</td><td class="right">${totalBill.toLocaleString("id-ID")}</td></tr>
+                            <tr class="bold"><td>Total Pembayaran</td><td class="right">${totalBill.toLocaleString("id-ID")}</td></tr>
                             <tr><td>Pembayaran Awal (DP)</td><td class="right">${initialPaid.toLocaleString("id-ID")}</td></tr>
                             <tr class="bold"><td>Bayar Pelunasan</td><td class="right">${Number(newPaidAmount || 0).toLocaleString("id-ID")}</td></tr>
                             <tr class="bold"><td>Total Terbayar</td><td class="right">${totalPaid.toLocaleString("id-ID")}</td></tr>
@@ -1626,7 +1626,7 @@
                         <div class="line"></div>
 
                         <table>
-                            <tr class="bold"><td>Total Tagihan</td><td class="right">${totalBill.toLocaleString("id-ID")}</td></tr>
+                            <tr class="bold"><td>Total Pembayaran</td><td class="right">${totalBill.toLocaleString("id-ID")}</td></tr>
                             <tr><td>Dibayar</td><td class="right">${totalPaid.toLocaleString("id-ID")}</td></tr>
                             ${
                                 isDp || isBon
@@ -1845,7 +1845,7 @@
                 <div class="line"></div>
 
                 <table>
-                    <tr class="bold"><td>Total Tagihan</td><td class="right">${totalBill.toLocaleString("id-ID")}</td></tr>
+                    <tr class="bold"><td>Total Pembayaran</td><td class="right">${totalBill.toLocaleString("id-ID")}</td></tr>
                     ${detailPembayaranHTML}
                     <tr class="bold"><td>Total Terbayar</td><td class="right">${totalPaid.toLocaleString("id-ID")}</td></tr>
                     <tr class="bold"><td>Sisa Pembayaran</td><td class="right">0 (LUNAS)</td></tr>
@@ -1873,7 +1873,6 @@
                     "Produk";
                 const itemCode =
                     item.product?.kode || item.product?.Kode || "-";
-
                 Swal.fire({
                     title: '<span class="text-slate-800 font-bold text-lg">Retur Barang Penjualan</span>',
                     html: `
