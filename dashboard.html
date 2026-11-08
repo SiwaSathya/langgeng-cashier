@@ -60,45 +60,7 @@
                 cursor: wait;
             }
 
-            @media (max-width: 900px) {
-                body {
-                    display: block !important;
-                    height: auto !important;
-                    overflow: auto !important;
-                }
-
-                body > aside {
-                    width: 100%;
-                    padding: 1rem;
-                }
-
-                aside nav {
-                    display: flex;
-                    overflow-x: auto;
-                    gap: 0.5rem;
-                }
-
-                aside nav a {
-                    flex-shrink: 0;
-                }
-
-                main > header {
-                    height: auto;
-                    padding: 1rem;
-                    flex-wrap: wrap;
-                    gap: 1rem;
-                }
-
-                main > header > div:first-child {
-                    flex-wrap: wrap;
-                    gap: 0.5rem;
-                }
-
-                main > div {
-                    padding: 1rem !important;
-                    gap: 1rem !important;
-                }
-            }
+            /* Clean Tailwind responsive shell */
 
             @media (prefers-reduced-motion: reduce) {
                 * {
@@ -109,21 +71,44 @@
         </style>
     </head>
 
-    <body class="bg-[#F8FAFC] flex h-screen overflow-hidden">
+    <body
+        class="bg-[#F8FAFC] flex flex-col lg:flex-row min-h-screen lg:h-screen lg:overflow-hidden w-full overflow-x-hidden"
+    >
+        <!-- Mobile Backdrop -->
+        <div
+            id="sidebar-backdrop"
+            onclick="toggleSidebar()"
+            class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity duration-300"
+        ></div>
+
+        <!-- SIDEBAR (Off-canvas on mobile, static flex item on desktop) -->
         <aside
-            class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 z-20 shrink-0"
+            id="app-sidebar"
+            class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 sm:p-8 fixed inset-y-0 left-0 z-50 h-full lg:static lg:h-full lg:shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out"
         >
-            <div class="flex items-center gap-3 mb-8 shrink-0">
-                <div
-                    class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
-                >
-                    <i class="fas fa-store"></i>
+            <div class="flex items-center justify-between mb-8 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
+                    >
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h1
+                        class="text-xl font-extrabold text-slate-800 tracking-tight"
+                    >
+                        SMARTPOS
+                    </h1>
                 </div>
-                <h1
-                    class="text-xl font-extrabold text-slate-800 tracking-tight"
+                <button
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    title="Tutup / Collapse Sidebar"
+                    aria-label="Toggle Sidebar"
                 >
-                    SMARTPOS
-                </h1>
+                    <i class="fas fa-times text-lg lg:hidden"></i>
+                    <i class="fas fa-angles-left text-lg hidden lg:block"></i>
+                </button>
             </div>
             <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
                 <a
@@ -207,11 +192,54 @@
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col overflow-hidden">
+        <!-- Mobile Top Bar -->
+        <div
+            class="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full"
+        >
+            <div class="flex items-center gap-3">
+                <button
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-xl focus:outline-none"
+                    aria-label="Buka Menu"
+                >
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+                <span
+                    class="font-extrabold text-slate-800 tracking-tight flex items-center gap-2"
+                >
+                    <span
+                        class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs shadow"
+                        ><i class="fas fa-store"></i
+                    ></span>
+                    SMARTPOS
+                </span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span
+                    class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg user-name-display"
+                    >Kasir</span
+                >
+            </div>
+        </div>
+
+        <main
+            id="main-content"
+            class="flex-1 flex flex-col min-w-0 w-full overflow-hidden"
+        >
             <header
-                class="h-20 bg-white border-b border-slate-200 px-10 flex justify-between items-center shrink-0"
+                class="min-h-20 bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-10 py-3 sm:py-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shrink-0"
             >
-                <div class="flex items-center gap-6">
+                <div class="flex items-center gap-4 sm:gap-6">
+                    <button
+                        type="button"
+                        onclick="toggleSidebar()"
+                        class="hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-blue-600 shadow-sm transition-all cursor-pointer shrink-0"
+                        title="Buka / Tutup Sidebar"
+                        aria-label="Toggle Sidebar"
+                    >
+                        <i class="fas fa-bars text-sm"></i>
+                    </button>
                     <div class="flex flex-col">
                         <h2 class="text-lg font-bold text-slate-800">
                             Kasir Utama
@@ -244,7 +272,7 @@
             </header>
 
             <div
-                class="flex-1 p-10 grid grid-cols-12 gap-8 overflow-y-auto custom-scroll"
+                class="flex-1 p-4 sm:p-6 lg:p-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 overflow-y-auto custom-scroll"
             >
                 <div class="col-span-12 lg:col-span-5 space-y-6">
                     <div
@@ -560,7 +588,7 @@
                 </div>
 
                 <div
-                    class="col-span-12 lg:col-span-7 bg-white rounded-[2rem] border border-slate-200 flex flex-col overflow-hidden custom-shadow"
+                    class="col-span-12 lg:col-span-7 bg-white rounded-2xl sm:rounded-[2rem] border border-slate-200 flex flex-col overflow-hidden custom-shadow"
                 >
                     <div
                         class="p-8 border-b border-slate-50 flex justify-between items-center"
@@ -583,21 +611,54 @@
                         >
                     </div>
 
-                    <div class="flex-1 overflow-y-auto custom-scroll">
-                        <table class="w-full">
-                            <thead class="sticky top-0 bg-white shadow-sm z-10">
+                    <div
+                        class="flex-1 overflow-x-auto overflow-y-auto custom-scroll"
+                    >
+                        <!-- Mobile Scroll Indicator Hint -->
+                        <div
+                            class="sm:hidden flex items-center justify-between text-[11px] text-slate-500 font-medium px-4 py-2 bg-slate-50 border-b border-slate-100 shrink-0"
+                        >
+                            <span class="flex items-center gap-1.5"
+                                ><i
+                                    class="fas fa-arrows-left-right text-blue-500"
+                                ></i>
+                                Geser keranjang</span
+                            >
+                            <span
+                                class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold"
+                                >↔ Geser</span
+                            >
+                        </div>
+                        <table class="w-full min-w-[420px]">
+                            <thead
+                                class="sticky top-0 bg-white shadow-sm z-10 border-b border-slate-100"
+                            >
                                 <tr
                                     class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
                                 >
-                                    <th class="p-6 text-left">Item Name</th>
-                                    <th class="p-6 text-center w-28">Qty</th>
-                                    <th class="p-6 text-right w-44">
+                                    <th
+                                        class="px-3.5 py-3 sm:px-5 sm:py-3.5 text-left whitespace-nowrap"
+                                    >
+                                        Item
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3 sm:px-5 sm:py-3.5 text-center whitespace-nowrap w-20 sm:w-24"
+                                    >
+                                        Qty
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3 sm:px-5 sm:py-3.5 text-right whitespace-nowrap w-28 sm:w-36"
+                                    >
                                         Harga Satuan
                                     </th>
-                                    <th class="p-6 text-right w-36">
+                                    <th
+                                        class="px-3.5 py-3 sm:px-5 sm:py-3.5 text-right whitespace-nowrap w-24 sm:w-32"
+                                    >
                                         Subtotal
                                     </th>
-                                    <th class="p-6 w-16"></th>
+                                    <th
+                                        class="px-3.5 py-3 sm:px-5 sm:py-3.5 w-12 text-center"
+                                    ></th>
                                 </tr>
                             </thead>
                             <tbody
@@ -1089,19 +1150,19 @@
                     if (fullRender) {
                         tbody.innerHTML += `
                         <tr class="group hover:bg-slate-50/50 transition-all">
-                            <td class="p-4">
-                                <p class="font-bold text-slate-700">${escapeHTML(item.Nama)}</p>
+                            <td class="px-3.5 py-2.5 sm:px-5 sm:py-3.5">
+                                <p class="font-bold text-slate-800 text-xs sm:text-sm">${escapeHTML(item.Nama)}</p>
                                 <p class="text-[10px] text-slate-400 font-bold uppercase">${escapeHTML(item.Kode)}</p>
                             </td>
-                            <td class="p-4 text-center">
-                                <input type="number" min="1" value="${item.qty}" onchange="updateCartItem(${i}, 'qty', this.value)" class="w-20 text-center bg-slate-50 border border-slate-200 rounded-lg p-1.5 font-bold">
+                            <td class="px-3.5 py-2.5 sm:px-5 sm:py-3.5 text-center whitespace-nowrap">
+                                <input type="number" min="1" value="${item.qty}" onchange="updateCartItem(${i}, 'qty', this.value)" class="w-16 sm:w-20 text-center bg-slate-50 border border-slate-200 rounded-lg p-1 sm:p-1.5 font-bold text-xs sm:text-sm">
                             </td>
-                            <td class="p-4 text-right">
-                                <input type="text" value="Rp ${item.price.toLocaleString("id-ID")}" onchange="formatInputRupiah(this); updateCartItem(${i}, 'price', this.value)" class="w-36 text-right bg-slate-50 border border-slate-200 rounded-lg p-1.5 font-bold text-blue-600">
+                            <td class="px-3.5 py-2.5 sm:px-5 sm:py-3.5 text-right whitespace-nowrap">
+                                <input type="text" value="Rp ${item.price.toLocaleString("id-ID")}" onchange="formatInputRupiah(this); updateCartItem(${i}, 'price', this.value)" class="w-28 sm:w-36 text-right bg-slate-50 border border-slate-200 rounded-lg p-1 sm:p-1.5 font-bold text-blue-600 text-xs sm:text-sm font-mono">
                             </td>
-                            <td class="p-4 text-right font-bold text-slate-800" id="subtotal-text-${i}">IDR ${item.subtotal.toLocaleString("id-ID")}</td>
-                            <td class="p-4 text-center">
-                                <button aria-label="Hapus item" onclick="removeItem(${i})" class="text-slate-300 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+                            <td class="px-3.5 py-2.5 sm:px-5 sm:py-3.5 text-right font-bold text-slate-800 font-mono text-xs sm:text-sm whitespace-nowrap" id="subtotal-text-${i}">IDR ${item.subtotal.toLocaleString("id-ID")}</td>
+                            <td class="px-3.5 py-2.5 sm:px-5 sm:py-3.5 text-center whitespace-nowrap">
+                                <button aria-label="Hapus item" onclick="removeItem(${i})" class="text-slate-300 hover:text-red-500 p-1"><i class="fas fa-trash-alt text-xs sm:text-sm"></i></button>
                             </td>
                         </tr>
                     `;
@@ -1488,6 +1549,7 @@
 <meta charset="UTF-8">
 <title>Rekap Setoran Shift</title>
 <style>
+
 ${RECEIPT_BASE_CSS}
 
 .shift-receipt {
@@ -1513,7 +1575,7 @@ ${RECEIPT_BASE_CSS}
     padding-top: 8px;
     margin-top: 8px;
 }
-</style>
+        </style>
 </head>
 <body>
 <div class="shift-receipt">
@@ -1930,6 +1992,7 @@ ${RECEIPT_BASE_CSS}
             <meta charset="UTF-8">
             <title>Nota ${escapeHTML(invoiceNo)}</title>
             <style>
+
                 ${RECEIPT_BASE_CSS}
 
                 .center { text-align: center; }
@@ -1986,7 +2049,8 @@ ${RECEIPT_BASE_CSS}
                         break-after: auto;
                     }
                 }
-            </style>
+
+        </style>
         </head>
         <body>
             ${allReceiptsHTML}
@@ -2247,6 +2311,7 @@ ${RECEIPT_BASE_CSS}
 
             const ROLE_PERMISSIONS = {
                 admin: [
+                    "dashboard.html",
                     "riwayat.html",
                     "product.html",
                     "purchase.html",
@@ -2255,7 +2320,7 @@ ${RECEIPT_BASE_CSS}
                     "absensi.html",
                     "report.html",
                 ],
-                kasir: ["dashboard.html", "riwayat.html"],
+                kasir: ["dashboard.html", "riwayat.html", "absensi.html"],
                 "super-kasir": [
                     "dashboard.html",
                     "riwayat.html",
@@ -2263,6 +2328,7 @@ ${RECEIPT_BASE_CSS}
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 super_kasir: [
                     "dashboard.html",
@@ -2271,6 +2337,7 @@ ${RECEIPT_BASE_CSS}
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 superkasir: [
                     "dashboard.html",
@@ -2279,17 +2346,16 @@ ${RECEIPT_BASE_CSS}
                     "purchase.html",
                     "expense.html",
                     "retur.html",
-                ],
-                supersubkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
+                    "absensi.html",
                 ],
                 akuntan: [
                     "akuntansi.html",
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "riwayat.html",
+                    "report.html",
+                    "absensi.html",
                 ],
                 superadmin: [
                     "dashboard.html",
@@ -2461,6 +2527,63 @@ ${RECEIPT_BASE_CSS}
             renderCart();
             renderPaymentList();
             checkRoleAccess("dashboard.html");
+        </script>
+
+        <!-- UNIFIED SIDEBAR CONTROLLER -->
+        <script>
+            function toggleSidebar() {
+                const isMobile = window.innerWidth < 1024;
+                const sidebar = document.getElementById("app-sidebar");
+                const backdrop = document.getElementById("sidebar-backdrop");
+                if (!sidebar) return;
+
+                if (isMobile) {
+                    const isClosed =
+                        sidebar.classList.contains("-translate-x-full");
+                    if (isClosed) {
+                        sidebar.classList.remove("-translate-x-full");
+                        if (backdrop) backdrop.classList.remove("hidden");
+                        document.body.classList.add("overflow-hidden");
+                    } else {
+                        sidebar.classList.add("-translate-x-full");
+                        if (backdrop) backdrop.classList.add("hidden");
+                        document.body.classList.remove("overflow-hidden");
+                    }
+                } else {
+                    const isCollapsed =
+                        sidebar.classList.contains("desktop-collapsed") ||
+                        sidebar.classList.contains("lg:hidden");
+                    if (isCollapsed) {
+                        sidebar.classList.remove(
+                            "desktop-collapsed",
+                            "lg:hidden",
+                        );
+                    } else {
+                        sidebar.classList.add("desktop-collapsed", "lg:hidden");
+                    }
+                }
+            }
+            window.toggleSidebar = toggleSidebar;
+            window.toggleMobileSidebar = toggleSidebar;
+
+            window.addEventListener("resize", () => {
+                const sidebar = document.getElementById("app-sidebar");
+                const backdrop = document.getElementById("sidebar-backdrop");
+                if (window.innerWidth >= 1024) {
+                    if (!sidebar?.classList.contains("desktop-collapsed")) {
+                        sidebar?.classList.remove(
+                            "-translate-x-full",
+                            "lg:hidden",
+                        );
+                    }
+                    backdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
+                } else {
+                    sidebar?.classList.add("-translate-x-full");
+                    backdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
+                }
+            });
         </script>
     </body>
 </html>

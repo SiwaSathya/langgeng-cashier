@@ -50,25 +50,67 @@
                     transform: translateY(0);
                 }
             }
+
+            /* Highlighted Table Row on Click (Identifikasi Data Cepat) */
+            tr.row-selected,
+            tr.row-selected > td {
+                background-color: #eff6ff !important;
+            }
+
+            tr.row-selected {
+                box-shadow:
+                    inset 4px 0 0 0 #2563eb,
+                    inset 0 1px 0 0 #bfdbfe,
+                    inset 0 -1px 0 0 #bfdbfe !important;
+                position: relative;
+                z-index: 5;
+            }
+
+            tbody tr {
+                cursor: pointer;
+            }
         </style>
     </head>
 
-    <body class="flex min-h-screen">
+    <body
+        class="bg-[#F8FAFC] flex flex-col lg:flex-row min-h-screen lg:h-screen lg:overflow-hidden w-full overflow-x-hidden"
+    >
         <!-- SIDEBAR (Fixed Position) -->
+        <!-- Mobile Backdrop -->
+        <div
+            id="sidebar-backdrop"
+            onclick="toggleSidebar()"
+            class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity duration-300"
+        ></div>
+
+        <!-- SIDEBAR (Fixed / Off-Canvas) -->
         <aside
-            class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 fixed h-screen z-20"
+            id="app-sidebar"
+            class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 sm:p-8 fixed inset-y-0 left-0 z-50 h-full lg:static lg:h-full lg:shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out"
         >
-            <div class="flex items-center gap-3 mb-8 shrink-0">
-                <div
-                    class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
-                >
-                    <i class="fas fa-store"></i>
+            <div class="flex items-center justify-between mb-8 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
+                    >
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h1
+                        class="text-xl font-extrabold text-slate-800 tracking-tight"
+                    >
+                        SMARTPOS
+                    </h1>
                 </div>
-                <h1
-                    class="text-xl font-extrabold text-slate-800 tracking-tight"
+                <button
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    title="Tutup / Collapse Sidebar"
+                    aria-label="Toggle Sidebar"
                 >
-                    SMARTPOS
-                </h1>
+                    <i class="fas fa-times text-lg lg:hidden"></i>
+                    <i class="fas fa-angles-left text-lg hidden lg:block"></i>
+                </button>
             </div>
 
             <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
@@ -154,18 +196,67 @@
             </div>
         </aside>
 
+        <!-- Mobile Top Bar -->
+        <div
+            class="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full"
+        >
+            <div class="flex items-center gap-3">
+                <button
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-xl focus:outline-none"
+                    aria-label="Buka Menu"
+                >
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+                <span
+                    class="font-extrabold text-slate-800 tracking-tight flex items-center gap-2"
+                >
+                    <span
+                        class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs shadow"
+                        ><i class="fas fa-store"></i
+                    ></span>
+                    SMARTPOS
+                </span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span
+                    class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg user-name-display"
+                    >Kasir</span
+                >
+            </div>
+        </div>
+
         <!-- MAIN CONTENT -->
-        <main class="flex-1 ml-72 p-12 min-w-0">
+        <main
+            id="main-content"
+            class="flex-1 p-4 sm:p-6 lg:p-10 min-w-0 w-full overflow-y-auto custom-scroll"
+        >
             <!-- HEADER SECTION -->
-            <div class="flex justify-between items-center mb-8">
-                <div>
-                    <h1 class="text-3xl font-800 text-slate-800 tracking-tight">
-                        Absensi & Pengguna
-                    </h1>
-                    <p class="text-slate-400 mt-1">
-                        Kelola kehadiran shift kerja dan manajemen akun pengguna
-                        role-based.
-                    </p>
+            <div
+                class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8"
+            >
+                <div class="flex items-center gap-3">
+                    <button
+                        type="button"
+                        onclick="toggleSidebar()"
+                        class="hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-blue-600 shadow-sm transition-all cursor-pointer shrink-0"
+                        title="Buka / Tutup Sidebar"
+                        aria-label="Toggle Sidebar"
+                    >
+                        <i class="fas fa-bars text-sm"></i>
+                    </button>
+                    <div>
+                        <h1
+                            class="text-3xl font-800 text-slate-800 tracking-tight"
+                        >
+                            Absensi & Pengguna
+                        </h1>
+                        <p class="text-slate-400 mt-1">
+                            Kelola kehadiran shift kerja dan manajemen akun
+                            pengguna role-based.
+                        </p>
+                    </div>
                 </div>
                 <div class="flex gap-3">
                     <button
@@ -187,7 +278,9 @@
             </div>
 
             <!-- TAB NAVIGATION -->
-            <div class="mb-8 border-b border-slate-200 flex gap-2 pb-2">
+            <div
+                class="mb-8 border-b border-slate-200 flex gap-2 pb-2 overflow-x-auto custom-scroll"
+            >
                 <button
                     onclick="switchTab('tab-absensi')"
                     id="btn-tab-absensi"
@@ -206,6 +299,99 @@
 
             <!-- TAB 1: LOG ABSENSI KARYAWAN -->
             <div id="tab-absensi" class="tab-panel space-y-8 animate-fade-in">
+                <!-- LIVE CLOCK-IN / ATTENDANCE CARD -->
+                <div
+                    class="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 rounded-[2rem] p-8 text-white shadow-xl shadow-slate-200 relative overflow-hidden"
+                >
+                    <div
+                        class="absolute -right-10 -bottom-10 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"
+                    ></div>
+                    <div
+                        class="relative z-10 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6"
+                    >
+                        <!-- SISI KIRI: JAM & IDENTITAS -->
+                        <div class="flex items-start sm:items-center gap-5">
+                            <div
+                                class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center text-2xl text-blue-400 shrink-0 shadow-inner"
+                            >
+                                <i class="fas fa-fingerprint"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                    >
+                                        <span
+                                            class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"
+                                        ></span>
+                                        Live Presensi WITA
+                                    </span>
+                                    <span
+                                        id="live-date-display"
+                                        class="text-xs text-slate-300 font-semibold"
+                                    ></span>
+                                </div>
+                                <h2
+                                    id="live-clock-display"
+                                    class="text-3xl sm:text-4xl font-extrabold tracking-tight font-mono text-white mb-2"
+                                >
+                                    --:--:--
+                                </h2>
+                                <p class="text-xs text-slate-300">
+                                    Pegawai Aktif:
+                                    <strong
+                                        id="live-user-name"
+                                        class="text-white font-bold"
+                                        >-</strong
+                                    >
+                                    <span
+                                        id="live-user-role-badge"
+                                        class="ml-1.5 bg-blue-500/30 text-blue-200 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider"
+                                        >-</span
+                                    >
+                                    <span class="text-slate-400 ml-1.5"
+                                        ><i
+                                            class="fas fa-store text-blue-400 mr-1"
+                                        ></i
+                                        ><span id="live-user-location"
+                                            >-</span
+                                        ></span
+                                    >
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- SISI KANAN: STATUS KEHADIRAN & TOMBOL AKSI -->
+                        <div
+                            id="live-attendance-action-container"
+                            class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5 flex flex-col sm:flex-row items-center gap-4 min-w-[320px] justify-between"
+                        >
+                            <div class="text-left w-full sm:w-auto">
+                                <p
+                                    class="text-[11px] uppercase tracking-wider text-slate-400 font-bold mb-1"
+                                >
+                                    Status Kehadiran Hari Ini
+                                </p>
+                                <div id="live-attendance-status-badge">
+                                    <span
+                                        class="inline-block px-3 py-1 rounded-xl text-xs font-bold bg-slate-700 text-slate-300"
+                                        >Memeriksa status...</span
+                                    >
+                                </div>
+                                <p
+                                    id="live-attendance-info"
+                                    class="text-xs text-slate-300 mt-1.5 font-medium"
+                                ></p>
+                            </div>
+                            <div
+                                id="live-attendance-button-wrapper"
+                                class="w-full sm:w-auto flex items-center gap-2"
+                            >
+                                <!-- Tombol akan dirender secara dinamis oleh JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- SUMMARY CARDS -->
                 <div
                     class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3"
@@ -368,7 +554,7 @@
 
                 <!-- TABLE CARD ABSENSI -->
                 <div
-                    class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden"
+                    class="bg-white rounded-2xl sm:rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden"
                 >
                     <div
                         class="p-8 border-b border-slate-50 flex gap-4 items-center"
@@ -403,20 +589,58 @@
                         </select>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
+                    <!-- Mobile Scroll Indicator Hint -->
+                    <div
+                        class="sm:hidden flex items-center justify-between text-[11px] text-slate-500 font-medium px-4 py-2.5 bg-slate-50/90 border-b border-slate-100 shrink-0"
+                    >
+                        <span class="flex items-center gap-1.5"
+                            ><i
+                                class="fas fa-arrows-left-right text-blue-500"
+                            ></i>
+                            Geser tabel log kehadiran</span
+                        >
+                        <span
+                            class="text-[10px] bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full font-bold"
+                            >↔ Geser</span
+                        >
+                    </div>
+
+                    <div class="overflow-x-auto custom-scroll">
+                        <table
+                            class="w-full text-left border-collapse min-w-[650px]"
+                        >
                             <thead
-                                class="bg-slate-50/50 text-[11px] uppercase tracking-widest text-slate-400 font-bold"
+                                class="bg-slate-50/50 text-[10px] sm:text-[11px] uppercase tracking-widest text-slate-400 font-bold border-b border-slate-100"
                             >
                                 <tr>
-                                    <th class="px-8 py-5">Karyawan</th>
-                                    <th class="px-6 py-5">Tanggal & Shift</th>
-                                    <th class="px-6 py-5">Status</th>
-                                    <th class="px-6 py-5">
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                    >
+                                        Karyawan
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                    >
+                                        Tanggal & Shift
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                    >
+                                        Status
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                    >
                                         Jam Masuk / Pulang
                                     </th>
-                                    <th class="px-6 py-5">Keterangan</th>
-                                    <th class="px-8 py-5 text-right">Aksi</th>
+                                    <th class="px-3.5 py-3.5 sm:px-6 sm:py-4">
+                                        Keterangan
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-right whitespace-nowrap"
+                                    >
+                                        Aksi
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody
@@ -449,7 +673,7 @@
                 class="tab-panel space-y-8 hidden animate-fade-in"
             >
                 <div
-                    class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden"
+                    class="bg-white rounded-2xl sm:rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden"
                 >
                     <div
                         class="p-8 border-b border-slate-50 flex justify-between items-center"
@@ -465,18 +689,60 @@
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
+                    <!-- Mobile Scroll Indicator Hint -->
+                    <div
+                        class="sm:hidden flex items-center justify-between text-[11px] text-slate-500 font-medium px-4 py-2.5 bg-slate-50/90 border-b border-slate-100 shrink-0"
+                    >
+                        <span class="flex items-center gap-1.5"
+                            ><i
+                                class="fas fa-arrows-left-right text-blue-500"
+                            ></i>
+                            Geser tabel user</span
+                        >
+                        <span
+                            class="text-[10px] bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full font-bold"
+                            >↔ Geser</span
+                        >
+                    </div>
+
+                    <div class="overflow-x-auto custom-scroll">
+                        <table
+                            class="w-full text-left border-collapse min-w-[620px]"
+                        >
                             <thead
-                                class="bg-slate-50/50 text-[11px] uppercase tracking-widest text-slate-400 font-bold"
+                                class="bg-slate-50/50 text-[10px] sm:text-[11px] uppercase tracking-widest text-slate-400 font-bold border-b border-slate-100"
                             >
                                 <tr>
-                                    <th class="px-8 py-5">ID Pengguna</th>
-                                    <th class="px-6 py-5">Nama Lengkap</th>
-                                    <th class="px-6 py-5">Username</th>
-                                    <th class="px-6 py-5">Role Akses</th>
-                                    <th class="px-6 py-5">Lokasi / Cabang</th>
-                                    <th class="px-8 py-5 text-right">Aksi</th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                    >
+                                        ID Pengguna
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                    >
+                                        Nama Lengkap
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                    >
+                                        Username
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                    >
+                                        Role Akses
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                    >
+                                        Lokasi / Cabang
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-right whitespace-nowrap"
+                                    >
+                                        Aksi
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody
@@ -495,7 +761,7 @@
             class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
         >
             <div
-                class="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden"
+                class="bg-white w-full max-w-xl rounded-2xl sm:rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden"
             >
                 <div
                     class="p-8 border-b border-slate-50 flex justify-between items-center"
@@ -642,7 +908,7 @@
             class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
         >
             <div
-                class="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden"
+                class="bg-white w-full max-w-xl rounded-2xl sm:rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden"
             >
                 <div
                     class="p-8 border-b border-slate-50 flex justify-between items-center"
@@ -778,6 +1044,7 @@
 
             const ROLE_PERMISSIONS = {
                 admin: [
+                    "dashboard.html",
                     "riwayat.html",
                     "product.html",
                     "purchase.html",
@@ -786,7 +1053,7 @@
                     "absensi.html",
                     "report.html",
                 ],
-                kasir: ["dashboard.html", "riwayat.html"],
+                kasir: ["dashboard.html", "riwayat.html", "absensi.html"],
                 "super-kasir": [
                     "dashboard.html",
                     "riwayat.html",
@@ -794,6 +1061,7 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 super_kasir: [
                     "dashboard.html",
@@ -802,6 +1070,7 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 superkasir: [
                     "dashboard.html",
@@ -810,12 +1079,16 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 akuntan: [
                     "akuntansi.html",
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "riwayat.html",
+                    "report.html",
+                    "absensi.html",
                 ],
                 superadmin: [
                     "dashboard.html",
@@ -985,6 +1258,18 @@
                 userEls.forEach((el) => {
                     el.innerText = `${userData.name || "User"} (${userRole.toUpperCase()})`;
                 });
+
+                // Role kasir hanya fokus ke live absensi mandiri, sembunyikan manajemen user & input manual
+                if (userRole === "kasir") {
+                    const btnUser = document.getElementById("btn-tab-user");
+                    const btnAddUser =
+                        document.getElementById("btn-tambah-user");
+                    const btnManualAtt =
+                        document.getElementById("btn-input-absensi");
+                    if (btnUser) btnUser.style.display = "none";
+                    if (btnAddUser) btnAddUser.style.display = "none";
+                    if (btnManualAtt) btnManualAtt.style.display = "none";
+                }
             }
 
             window.onload = () => {
@@ -992,10 +1277,292 @@
                 document.getElementById("att_date").value = new Date()
                     .toISOString()
                     .split("T")[0];
+                initLiveClock();
+                checkTodayAttendance();
                 fetchAttendance();
                 loadEmployees();
                 fetchUsers();
             };
+            // ==========================================
+            // LIVE ATTENDANCE (CLOCK IN / CLOCK OUT)
+            // ==========================================
+            let liveClockInterval = null;
+
+            function initLiveClock() {
+                const dateEl = document.getElementById("live-date-display");
+                const clockEl = document.getElementById("live-clock-display");
+
+                function tick() {
+                    const now = new Date();
+                    if (dateEl) {
+                        dateEl.innerText = now.toLocaleDateString("id-ID", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                            timeZone: "Asia/Makassar",
+                        });
+                    }
+                    if (clockEl) {
+                        const timeStr = now
+                            .toLocaleTimeString("id-ID", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit",
+                                timeZone: "Asia/Makassar",
+                            })
+                            .replace(/\./g, ":");
+                        clockEl.innerText = `${timeStr} WITA`;
+                    }
+                }
+                tick();
+                if (liveClockInterval) clearInterval(liveClockInterval);
+                liveClockInterval = setInterval(tick, 1000);
+            }
+
+            async function checkTodayAttendance() {
+                const userData = getUserDataFromToken();
+                if (!userData || !userData.user_id) return;
+
+                const nameEl = document.getElementById("live-user-name");
+                const roleEl = document.getElementById("live-user-role-badge");
+                const locEl = document.getElementById("live-user-location");
+                const badgeEl = document.getElementById(
+                    "live-attendance-status-badge",
+                );
+                const infoEl = document.getElementById("live-attendance-info");
+                const btnWrapper = document.getElementById(
+                    "live-attendance-button-wrapper",
+                );
+
+                if (nameEl)
+                    nameEl.innerText =
+                        userData.name || userData.username || "Karyawan";
+                if (roleEl)
+                    roleEl.innerText = (userData.role || "KASIR").toUpperCase();
+                if (locEl) locEl.innerText = userData.location || "Toko Pusat";
+
+                try {
+                    const token = localStorage.getItem("token");
+                    const res = await fetch(
+                        `${BASE_URL}/api/attendance/today/${userData.user_id}`,
+                        {
+                            headers: token
+                                ? { Authorization: `Bearer ${token}` }
+                                : {},
+                        },
+                    );
+                    if (!res.ok)
+                        throw new Error("Gagal mengambil status presensi");
+                    const status = await res.json();
+
+                    if (!status.has_attended) {
+                        // Belum clock-in
+                        badgeEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30"><i class="fas fa-clock"></i> Belum Absen Masuk</span>`;
+                        infoEl.innerText =
+                            "Shift Anda belum dimulai. Silakan lakukan absen masuk sekarang.";
+                        btnWrapper.innerHTML = `
+                            <button onclick="handleLiveClockIn('${userData.user_id}')" class="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-5 py-3 rounded-xl font-extrabold text-xs shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2 transition-all transform active:scale-95">
+                                <i class="fas fa-sign-in-alt text-sm"></i> Absen Masuk (Clock In)
+                            </button>
+                        `;
+                    } else if (!status.has_clocked_out) {
+                        // Sedang bertugas (Clock-in sudah, clock-out belum)
+                        const inTime =
+                            status.attendance && status.attendance.check_in
+                                ? new Date(status.attendance.check_in)
+                                      .toLocaleTimeString("id-ID", {
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                          timeZone: "Asia/Makassar",
+                                      })
+                                      .replace(/\./g, ":")
+                                : "--:--";
+                        const shiftNum = status.attendance?.shift || 1;
+                        badgeEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Sedang Bertugas (Shift ${shiftNum})</span>`;
+                        infoEl.innerText = `Masuk pukul ${inTime} WITA. Jangan lupa absen pulang saat shift Anda berakhir.`;
+                        btnWrapper.innerHTML = `
+                            <button onclick="handleLiveClockOut('${userData.user_id}')" class="w-full sm:w-auto bg-gradient-to-r from-rose-500 to-amber-600 hover:from-rose-600 hover:to-amber-700 text-white px-5 py-3 rounded-xl font-extrabold text-xs shadow-lg shadow-rose-900/30 flex items-center justify-center gap-2 transition-all transform active:scale-95">
+                                <i class="fas fa-sign-out-alt text-sm"></i> Absen Pulang (Clock Out)
+                            </button>
+                        `;
+                    } else {
+                        // Sudah selesai shift
+                        const inTime =
+                            status.attendance && status.attendance.check_in
+                                ? new Date(status.attendance.check_in)
+                                      .toLocaleTimeString("id-ID", {
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                          timeZone: "Asia/Makassar",
+                                      })
+                                      .replace(/\./g, ":")
+                                : "--:--";
+                        const outTime =
+                            status.attendance && status.attendance.check_out
+                                ? new Date(status.attendance.check_out)
+                                      .toLocaleTimeString("id-ID", {
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                          timeZone: "Asia/Makassar",
+                                      })
+                                      .replace(/\./g, ":")
+                                : "--:--";
+                        badgeEl.innerHTML = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30"><i class="fas fa-check-circle"></i> Shift Hari Ini Selesai</span>`;
+                        infoEl.innerText = `Masuk: ${inTime} WITA • Pulang: ${outTime} WITA. Terima kasih atas dedikasi Anda!`;
+                        btnWrapper.innerHTML = `
+                            <button disabled class="w-full sm:w-auto bg-slate-700/60 text-slate-400 px-5 py-3 rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 cursor-not-allowed">
+                                <i class="fas fa-calendar-check text-emerald-400"></i> Sudah Selesai
+                            </button>
+                        `;
+                    }
+                } catch (err) {
+                    console.error("Live attendance error:", err);
+                    badgeEl.innerHTML = `<span class="inline-block px-3 py-1 rounded-xl text-xs font-bold bg-slate-700 text-slate-300">Siap Absen</span>`;
+                }
+            }
+
+            async function handleLiveClockIn(userId) {
+                const nowHour = new Date().getHours();
+                const defaultShift = nowHour >= 13 ? 2 : 1;
+
+                const { value: formValues } = await Swal.fire({
+                    title: "Konfirmasi Absen Masuk",
+                    html: `
+                        <div class="text-left space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Shift Kerja</label>
+                                <select id="swal-shift" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 outline-none">
+                                    <option value="1" ${defaultShift === 1 ? "selected" : ""}>Shift 1 (Pagi: 08:00 - 16:00)</option>
+                                    <option value="2" ${defaultShift === 2 ? "selected" : ""}>Shift 2 (Siang: 13:00 - 21:00)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Catatan / Keterangan (Opsional)</label>
+                                <input id="swal-notes" placeholder="Contoh: Shift regular / On time" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm outline-none text-slate-800" />
+                            </div>
+                        </div>
+                    `,
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: "#10B981",
+                    cancelButtonColor: "#94A3B8",
+                    confirmButtonText:
+                        '<i class="fas fa-fingerprint mr-1"></i> Absen Masuk Sekarang',
+                    cancelButtonText: "Batal",
+                    preConfirm: () => {
+                        return {
+                            shift: parseInt(
+                                document.getElementById("swal-shift").value,
+                            ),
+                            notes: document.getElementById("swal-notes").value,
+                        };
+                    },
+                });
+
+                if (!formValues) return;
+
+                try {
+                    Swal.showLoading();
+                    const token = localStorage.getItem("token");
+                    const res = await fetch(
+                        `${BASE_URL}/api/attendance/clock-in`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                ...(token
+                                    ? { Authorization: `Bearer ${token}` }
+                                    : {}),
+                            },
+                            body: JSON.stringify({
+                                user_id: userId,
+                                shift: formValues.shift,
+                                notes: formValues.notes,
+                            }),
+                        },
+                    );
+                    const json = await res.json();
+                    if (!res.ok)
+                        throw new Error(json.error || "Gagal absen masuk");
+
+                    Swal.fire({
+                        title: "Presensi Berhasil!",
+                        text: json.message || "Selamat bertugas!",
+                        icon: "success",
+                        timer: 2000,
+                        showConfirmButton: false,
+                    });
+
+                    checkTodayAttendance();
+                    fetchAttendance();
+                } catch (err) {
+                    Swal.fire({
+                        title: "Gagal Absen",
+                        text: err.message,
+                        icon: "error",
+                    });
+                }
+            }
+
+            async function handleLiveClockOut(userId) {
+                const { value: notes } = await Swal.fire({
+                    title: "Konfirmasi Absen Pulang",
+                    text: "Apakah Anda yakin ingin menyelesaikan shift dan mencatat absen pulang sekarang?",
+                    input: "text",
+                    inputPlaceholder: "Catatan penutupan shift (opsional)...",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#F59E0B",
+                    cancelButtonColor: "#94A3B8",
+                    confirmButtonText:
+                        '<i class="fas fa-sign-out-alt mr-1"></i> Ya, Absen Pulang',
+                    cancelButtonText: "Batal",
+                });
+
+                if (notes === undefined) return;
+
+                try {
+                    Swal.showLoading();
+                    const token = localStorage.getItem("token");
+                    const res = await fetch(
+                        `${BASE_URL}/api/attendance/clock-out`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                ...(token
+                                    ? { Authorization: `Bearer ${token}` }
+                                    : {}),
+                            },
+                            body: JSON.stringify({
+                                user_id: userId,
+                                notes: notes || "",
+                            }),
+                        },
+                    );
+                    const json = await res.json();
+                    if (!res.ok)
+                        throw new Error(json.error || "Gagal absen pulang");
+
+                    Swal.fire({
+                        title: "Terima Kasih!",
+                        text: json.message || "Absen pulang berhasil dicatat.",
+                        icon: "success",
+                        timer: 2500,
+                        showConfirmButton: false,
+                    });
+
+                    checkTodayAttendance();
+                    fetchAttendance();
+                } catch (err) {
+                    Swal.fire({
+                        title: "Gagal Absen Pulang",
+                        text: err.message,
+                        icon: "error",
+                    });
+                }
+            }
 
             function switchTab(tabId) {
                 document
@@ -1123,22 +1690,22 @@
 
                             return `
                         <tr class="hover:bg-slate-50/50 transition-colors">
-                            <td class="px-8 py-5">
-                                <div class="font-bold text-slate-700">${escapeHTML(item.user?.name || item.user_id)}</div>
+                            <td class="px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                                <div class="font-bold text-slate-800 text-xs sm:text-sm">${escapeHTML(item.user?.name || item.user_id)}</div>
                                 <div class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">${escapeHTML(item.user?.role || "Karyawan")} • ${escapeHTML(item.user?.location || "Pusat")}</div>
                             </td>
-                            <td class="px-6 py-5">
-                                <div class="font-semibold text-slate-600">${dateFormatted}</div>
+                            <td class="px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                                <div class="font-semibold text-slate-600 text-xs sm:text-sm">${dateFormatted}</div>
                                 <div class="text-[11px] text-blue-600 font-bold">Shift ${item.shift}</div>
                             </td>
-                            <td class="px-6 py-5">
-                                <span class="px-3 py-1 ${badgeClass} rounded-lg text-xs font-bold">${escapeHTML(item.status)}</span>
+                            <td class="px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                                <span class="px-2.5 py-0.5 sm:px-3 sm:py-1 ${badgeClass} rounded-lg text-xs font-bold">${escapeHTML(item.status)}</span>
                             </td>
-                            <td class="px-6 py-5 text-sm text-slate-600 font-mono font-semibold">
+                            <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm text-slate-600 font-mono font-semibold whitespace-nowrap">
                                 <i class="fas fa-sign-in-alt text-emerald-500 mr-1"></i>${checkIn} &nbsp;—&nbsp; <i class="fas fa-sign-out-alt text-rose-400 mr-1"></i>${checkOut}
                             </td>
-                            <td class="px-6 py-5 text-sm text-slate-400 font-medium max-w-xs truncate">${escapeHTML(item.notes || "-")}</td>
-                            <td class="px-8 py-5 text-right">
+                            <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm text-slate-400 font-medium max-w-xs truncate">${escapeHTML(item.notes || "-")}</td>
+                            <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right whitespace-nowrap">
                                 <button onclick="editAttendance(${item.ID})" class="text-blue-500 hover:text-blue-700 mx-2 transition-colors" title="Edit"><i class="fas fa-edit"></i></button>
                                 <button onclick="deleteAttendance(${item.ID})" class="text-red-400 hover:text-red-600 mx-2 transition-colors" title="Hapus"><i class="fas fa-trash"></i></button>
                             </td>
@@ -1445,14 +2012,14 @@
 
                             return `
                         <tr class="hover:bg-slate-50/50 transition-colors">
-                            <td class="px-8 py-5 font-mono text-xs font-bold text-slate-500">${u.id}</td>
-                            <td class="px-6 py-5 font-bold text-slate-800">${u.name}</td>
-                            <td class="px-6 py-5 font-medium text-slate-600 font-mono">${u.username}</td>
-                            <td class="px-6 py-5">
-                                <span class="px-3 py-1 ${roleBadge} rounded-lg text-xs uppercase">${u.role || "kasir"}</span>
+                            <td class="px-3.5 py-3 sm:px-6 sm:py-4 font-mono text-xs font-bold text-slate-500 whitespace-nowrap">${u.id}</td>
+                            <td class="px-3.5 py-3 sm:px-6 sm:py-4 font-bold text-slate-800 text-xs sm:text-sm whitespace-nowrap">${u.name}</td>
+                            <td class="px-3.5 py-3 sm:px-6 sm:py-4 font-medium text-slate-600 font-mono text-xs sm:text-sm whitespace-nowrap">${u.username}</td>
+                            <td class="px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                                <span class="px-2.5 py-0.5 sm:px-3 sm:py-1 ${roleBadge} rounded-lg text-xs uppercase">${u.role || "kasir"}</span>
                             </td>
-                            <td class="px-6 py-5 text-slate-500 font-medium">${u.location || "Pusat"}</td>
-                            <td class="px-8 py-5 text-right">
+                            <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-slate-500 font-medium text-xs sm:text-sm whitespace-nowrap">${u.location || "Pusat"}</td>
+                            <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right whitespace-nowrap">
                                 <button onclick="editUser('${u.id}')" class="text-blue-500 hover:text-blue-700 mx-2 transition-colors" title="Edit"><i class="fas fa-edit"></i></button>
                                 <button onclick="deleteUser('${u.id}')" class="text-red-400 hover:text-red-600 mx-2 transition-colors" title="Hapus"><i class="fas fa-trash"></i></button>
                             </td>
@@ -1659,6 +2226,98 @@
                             activeModalForm.requestSubmit();
                         }
                     }
+                }
+            });
+            // --- GLOBAL TABLE ROW CLICK-TO-HIGHLIGHT (IDENTIFIKASI DATA CEPAT) ---
+            document.addEventListener("click", (e) => {
+                const tr = e.target.closest("tbody tr");
+                if (!tr) return;
+
+                // Jangan highlight baris loading / empty state yang memiliki colspan
+                if (tr.querySelector("td[colspan]")) return;
+
+                const tbody = tr.closest("tbody");
+                if (!tbody) return;
+
+                const isInteractive = e.target.closest(
+                    "button, a, input, select",
+                );
+                const wasSelected = tr.classList.contains("row-selected");
+
+                if (isInteractive) {
+                    // Jika menekan tombol aksi (Edit, Hapus, Detail, Cetak, Retur, dll.),
+                    // pastikan baris ditandai (highlight) agar pengguna yakin baris mana yang sedang diproses!
+                    tbody.querySelectorAll("tr").forEach((r) => {
+                        if (r !== tr) r.classList.remove("row-selected");
+                    });
+                    tr.classList.add("row-selected");
+                } else {
+                    // Klik biasa pada baris data: toggle highlight
+                    tbody.querySelectorAll("tr").forEach((r) => {
+                        if (r !== tr) r.classList.remove("row-selected");
+                    });
+                    if (wasSelected) {
+                        tr.classList.remove("row-selected");
+                    } else {
+                        tr.classList.add("row-selected");
+                    }
+                }
+            });
+        </script>
+
+        <!-- UNIFIED SIDEBAR CONTROLLER -->
+        <script>
+            function toggleSidebar() {
+                const isMobile = window.innerWidth < 1024;
+                const sidebar = document.getElementById("app-sidebar");
+                const backdrop = document.getElementById("sidebar-backdrop");
+                if (!sidebar) return;
+
+                if (isMobile) {
+                    const isClosed =
+                        sidebar.classList.contains("-translate-x-full");
+                    if (isClosed) {
+                        sidebar.classList.remove("-translate-x-full");
+                        if (backdrop) backdrop.classList.remove("hidden");
+                        document.body.classList.add("overflow-hidden");
+                    } else {
+                        sidebar.classList.add("-translate-x-full");
+                        if (backdrop) backdrop.classList.add("hidden");
+                        document.body.classList.remove("overflow-hidden");
+                    }
+                } else {
+                    const isCollapsed =
+                        sidebar.classList.contains("desktop-collapsed") ||
+                        sidebar.classList.contains("lg:hidden");
+                    if (isCollapsed) {
+                        sidebar.classList.remove(
+                            "desktop-collapsed",
+                            "lg:hidden",
+                        );
+                    } else {
+                        sidebar.classList.add("desktop-collapsed", "lg:hidden");
+                    }
+                }
+            }
+            window.toggleSidebar = toggleSidebar;
+            window.toggleMobileSidebar = toggleSidebar;
+
+            window.addEventListener("resize", () => {
+                const sidebar = document.getElementById("app-sidebar");
+                const backdrop = document.getElementById("sidebar-backdrop");
+                if (window.innerWidth >= 1024) {
+                    if (!sidebar?.classList.contains("desktop-collapsed")) {
+                        sidebar?.classList.remove(
+                            "-translate-x-full",
+                            "lg:hidden",
+                        );
+                    }
+                    backdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
+                } else {
+                    sidebar?.classList.add("-translate-x-full");
+                    backdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
                 }
             });
         </script>

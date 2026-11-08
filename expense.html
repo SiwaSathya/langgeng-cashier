@@ -26,6 +26,10 @@
                 width: 6px;
             }
 
+            ::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+
             ::-webkit-scrollbar-thumb {
                 background: #cbd5e1;
                 border-radius: 10px;
@@ -46,25 +50,67 @@
                     transform: translateY(0);
                 }
             }
+
+            /* Highlighted Table Row on Click (Identifikasi Data Cepat) */
+            tr.row-selected,
+            tr.row-selected > td {
+                background-color: #eff6ff !important;
+            }
+
+            tr.row-selected {
+                box-shadow:
+                    inset 4px 0 0 0 #2563eb,
+                    inset 0 1px 0 0 #bfdbfe,
+                    inset 0 -1px 0 0 #bfdbfe !important;
+                position: relative;
+                z-index: 5;
+            }
+
+            tbody tr {
+                cursor: pointer;
+            }
         </style>
     </head>
 
-    <body class="flex min-h-screen">
+    <body
+        class="bg-[#F8FAFC] flex flex-col lg:flex-row min-h-screen lg:h-screen lg:overflow-hidden w-full overflow-x-hidden"
+    >
         <!-- SIDEBAR (Fixed) -->
+        <!-- Mobile Backdrop -->
+        <div
+            id="sidebar-backdrop"
+            onclick="toggleSidebar()"
+            class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity duration-300"
+        ></div>
+
+        <!-- SIDEBAR (Fixed / Off-Canvas) -->
         <aside
-            class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 fixed h-screen z-20"
+            id="app-sidebar"
+            class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 sm:p-8 fixed inset-y-0 left-0 z-50 h-full lg:static lg:h-full lg:shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out"
         >
-            <div class="flex items-center gap-3 mb-8 shrink-0">
-                <div
-                    class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
-                >
-                    <i class="fas fa-store"></i>
+            <div class="flex items-center justify-between mb-8 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
+                    >
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h1
+                        class="text-xl font-extrabold text-slate-800 tracking-tight"
+                    >
+                        SMARTPOS
+                    </h1>
                 </div>
-                <h1
-                    class="text-xl font-extrabold text-slate-800 tracking-tight"
+                <button
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    title="Tutup / Collapse Sidebar"
+                    aria-label="Toggle Sidebar"
                 >
-                    SMARTPOS
-                </h1>
+                    <i class="fas fa-times text-lg lg:hidden"></i>
+                    <i class="fas fa-angles-left text-lg hidden lg:block"></i>
+                </button>
             </div>
 
             <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
@@ -150,29 +196,84 @@
             </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
-        <main class="flex-1 ml-72 p-12">
-            <div class="flex justify-between items-center mb-10">
-                <div>
-                    <h1 class="text-3xl font-800 text-slate-800 tracking-tight">
-                        Expenses
-                    </h1>
-                    <p class="text-slate-400 mt-1">
-                        Pantau biaya operasional dan pengeluaran kas lainnya.
-                    </p>
-                </div>
+        <!-- Mobile Top Bar -->
+        <div
+            class="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full"
+        >
+            <div class="flex items-center gap-3">
                 <button
-                    onclick="openModal()"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-blue-100"
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-xl focus:outline-none"
+                    aria-label="Buka Menu"
                 >
-                    <i class="fas fa-plus text-sm"></i> Tambah Pengeluaran
+                    <i class="fas fa-bars text-lg"></i>
                 </button>
+                <span
+                    class="font-extrabold text-slate-800 tracking-tight flex items-center gap-2"
+                >
+                    <span
+                        class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs shadow"
+                        ><i class="fas fa-store"></i
+                    ></span>
+                    SMARTPOS
+                </span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span
+                    class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg user-name-display"
+                    >Kasir</span
+                >
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <main
+            id="main-content"
+            class="flex-1 p-4 sm:p-6 lg:p-10 min-w-0 w-full overflow-y-auto custom-scroll"
+        >
+            <!-- HEADER SECTION -->
+            <div
+                class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8"
+            >
+                <div class="flex items-center gap-3">
+                    <button
+                        type="button"
+                        onclick="toggleSidebar()"
+                        class="hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-blue-600 shadow-sm transition-all cursor-pointer shrink-0"
+                        title="Buka / Tutup Sidebar"
+                        aria-label="Toggle Sidebar"
+                    >
+                        <i class="fas fa-bars text-sm"></i>
+                    </button>
+                    <div>
+                        <h1
+                            class="text-3xl font-800 text-slate-800 tracking-tight"
+                        >
+                            Expenses
+                        </h1>
+                        <p class="text-slate-400 mt-1">
+                            Pantau biaya operasional dan pengeluaran kas
+                            lainnya.
+                        </p>
+                    </div>
+                </div>
+                <div>
+                    <button
+                        onclick="openModal()"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-blue-100"
+                    >
+                        <i class="fas fa-plus text-sm"></i> Tambah Pengeluaran
+                    </button>
+                </div>
             </div>
 
             <div
-                class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-fade-in"
+                class="bg-white rounded-2xl sm:rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-fade-in"
             >
-                <div class="p-8 border-b border-slate-50 flex gap-4">
+                <div
+                    class="p-4 sm:p-8 border-b border-slate-50 flex flex-col sm:flex-row gap-4"
+                >
                     <div class="relative flex-1">
                         <i
                             class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"
@@ -187,19 +288,51 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                <!-- Mobile Scroll Indicator Hint -->
+                <div
+                    class="sm:hidden flex items-center justify-between text-[11px] text-slate-500 font-medium px-4 py-2.5 bg-slate-50/90 border-b border-slate-100 shrink-0"
+                >
+                    <span class="flex items-center gap-1.5"
+                        ><i class="fas fa-arrows-left-right text-blue-500"></i>
+                        Geser tabel untuk info biaya</span
+                    >
+                    <span
+                        class="text-[10px] bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full font-bold"
+                        >↔ Geser</span
+                    >
+                </div>
+
+                <div class="overflow-x-auto custom-scroll">
+                    <table
+                        class="w-full text-left border-collapse min-w-[620px]"
+                    >
                         <thead
-                            class="bg-slate-50/50 text-[11px] uppercase tracking-widest text-slate-400 font-bold"
+                            class="bg-slate-50/50 text-[10px] sm:text-[11px] uppercase tracking-widest text-slate-400 font-bold border-b border-slate-100"
                         >
                             <tr>
-                                <th class="px-8 py-5">Tanggal</th>
-                                <th class="px-6 py-5">Keterangan</th>
-                                <th class="px-6 py-5">Kategori</th>
-                                <th class="px-6 py-5 text-right">
+                                <th
+                                    class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                >
+                                    Tanggal
+                                </th>
+                                <th class="px-3.5 py-3.5 sm:px-6 sm:py-4">
+                                    Keterangan
+                                </th>
+                                <th
+                                    class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                >
+                                    Kategori
+                                </th>
+                                <th
+                                    class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-right whitespace-nowrap"
+                                >
                                     Jumlah (Rp)
                                 </th>
-                                <th class="px-8 py-5 text-right">Aksi</th>
+                                <th
+                                    class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-right whitespace-nowrap"
+                                >
+                                    Aksi
+                                </th>
                             </tr>
                         </thead>
                         <tbody
@@ -210,7 +343,7 @@
                 </div>
 
                 <div
-                    class="p-8 bg-slate-50/30 flex justify-between items-center"
+                    class="p-4 sm:p-8 bg-slate-50/30 flex flex-col sm:flex-row justify-between items-center gap-4"
                 >
                     <p class="text-slate-500 text-sm">
                         Menampilkan
@@ -232,7 +365,7 @@
             class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
         >
             <div
-                class="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden"
+                class="bg-white w-full max-w-xl rounded-2xl sm:rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden max-h-[92vh] flex flex-col"
             >
                 <div
                     class="p-8 border-b border-slate-50 flex justify-between items-center"
@@ -429,25 +562,25 @@
                                 const expId = e.ID || e.id;
                                 return `
                             <tr class="hover:bg-slate-50/50 transition-colors">
-                                <td class="px-8 py-5">
-                                    <div class="font-bold text-slate-400 text-[11px] uppercase tracking-wider">
+                                <td class="px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                                    <div class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">
                                         ${new Date(e.tanggal || e.CreatedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                                     </div>
                                     <p class="text-[11px] text-slate-400 font-bold"><i class="fas fa-user-circle mr-1"></i>${escapeHTML(e.user?.name || e.user?.Name || "Kasir")}</p>
                                 </td>
-                                <td class="px-6 py-5">
-                                    <div class="font-bold text-slate-700">${escapeHTML(e.deskripsi || "-")}</div>
+                                <td class="px-3.5 py-3 sm:px-6 sm:py-4 min-w-[160px]">
+                                    <div class="font-bold text-slate-800 text-xs sm:text-sm">${escapeHTML(e.deskripsi || "-")}</div>
                                     <div class="text-[10px] text-slate-400 font-mono">Nota: #${escapeHTML(e.nota || "-")}</div>
                                 </td>
-                                <td class="px-6 py-5">
+                                <td class="px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                                     <span class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg text-xs font-semibold">
                                         ${escapeHTML(e.kategori || "Umum")}
                                     </span>
                                 </td>
-                                <td class="px-6 py-5 text-right font-extrabold text-red-500">
+                                <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right font-extrabold text-red-500 font-mono whitespace-nowrap text-xs sm:text-sm">
                                     Rp ${(e.total || 0).toLocaleString("id-ID")}
                                 </td>
-                                <td class="px-8 py-5 text-right">
+                                <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right whitespace-nowrap">
                                     <button onclick="printExpenseReceipt('${expId}')" class="text-slate-500 hover:text-blue-600 mx-1.5 p-1.5 rounded-lg hover:bg-blue-50 transition-all" title="Cetak Bukti Pengeluaran">
                                         <i class="fas fa-print text-sm"></i>
                                     </button>
@@ -679,7 +812,9 @@
             <head>
                 <meta charset="UTF-8">
                 <title>Nota Pengeluaran ${escapeHTML(notaNo)}</title>
-                <style>${RECEIPT_BASE_CSS}</style>
+                <style>
+${RECEIPT_BASE_CSS}
+        </style>
             </head>
             <body>
                 <div class="receipt">
@@ -777,6 +912,7 @@
 
             const ROLE_PERMISSIONS = {
                 admin: [
+                    "dashboard.html",
                     "riwayat.html",
                     "product.html",
                     "purchase.html",
@@ -785,7 +921,7 @@
                     "absensi.html",
                     "report.html",
                 ],
-                kasir: ["dashboard.html", "riwayat.html"],
+                kasir: ["dashboard.html", "riwayat.html", "absensi.html"],
                 "super-kasir": [
                     "dashboard.html",
                     "riwayat.html",
@@ -793,6 +929,7 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 super_kasir: [
                     "dashboard.html",
@@ -801,6 +938,7 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 superkasir: [
                     "dashboard.html",
@@ -809,12 +947,16 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 akuntan: [
                     "akuntansi.html",
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "riwayat.html",
+                    "report.html",
+                    "absensi.html",
                 ],
                 superadmin: [
                     "dashboard.html",
@@ -1104,6 +1246,98 @@
             });
 
             checkRoleAccess("expense.html");
+            // --- GLOBAL TABLE ROW CLICK-TO-HIGHLIGHT (IDENTIFIKASI DATA CEPAT) ---
+            document.addEventListener("click", (e) => {
+                const tr = e.target.closest("tbody tr");
+                if (!tr) return;
+
+                // Jangan highlight baris loading / empty state yang memiliki colspan
+                if (tr.querySelector("td[colspan]")) return;
+
+                const tbody = tr.closest("tbody");
+                if (!tbody) return;
+
+                const isInteractive = e.target.closest(
+                    "button, a, input, select",
+                );
+                const wasSelected = tr.classList.contains("row-selected");
+
+                if (isInteractive) {
+                    // Jika menekan tombol aksi (Edit, Hapus, Detail, Cetak, Retur, dll.),
+                    // pastikan baris ditandai (highlight) agar pengguna yakin baris mana yang sedang diproses!
+                    tbody.querySelectorAll("tr").forEach((r) => {
+                        if (r !== tr) r.classList.remove("row-selected");
+                    });
+                    tr.classList.add("row-selected");
+                } else {
+                    // Klik biasa pada baris data: toggle highlight
+                    tbody.querySelectorAll("tr").forEach((r) => {
+                        if (r !== tr) r.classList.remove("row-selected");
+                    });
+                    if (wasSelected) {
+                        tr.classList.remove("row-selected");
+                    } else {
+                        tr.classList.add("row-selected");
+                    }
+                }
+            });
+        </script>
+
+        <!-- UNIFIED SIDEBAR CONTROLLER -->
+        <script>
+            function toggleSidebar() {
+                const isMobile = window.innerWidth < 1024;
+                const sidebar = document.getElementById("app-sidebar");
+                const backdrop = document.getElementById("sidebar-backdrop");
+                if (!sidebar) return;
+
+                if (isMobile) {
+                    const isClosed =
+                        sidebar.classList.contains("-translate-x-full");
+                    if (isClosed) {
+                        sidebar.classList.remove("-translate-x-full");
+                        if (backdrop) backdrop.classList.remove("hidden");
+                        document.body.classList.add("overflow-hidden");
+                    } else {
+                        sidebar.classList.add("-translate-x-full");
+                        if (backdrop) backdrop.classList.add("hidden");
+                        document.body.classList.remove("overflow-hidden");
+                    }
+                } else {
+                    const isCollapsed =
+                        sidebar.classList.contains("desktop-collapsed") ||
+                        sidebar.classList.contains("lg:hidden");
+                    if (isCollapsed) {
+                        sidebar.classList.remove(
+                            "desktop-collapsed",
+                            "lg:hidden",
+                        );
+                    } else {
+                        sidebar.classList.add("desktop-collapsed", "lg:hidden");
+                    }
+                }
+            }
+            window.toggleSidebar = toggleSidebar;
+            window.toggleMobileSidebar = toggleSidebar;
+
+            window.addEventListener("resize", () => {
+                const sidebar = document.getElementById("app-sidebar");
+                const backdrop = document.getElementById("sidebar-backdrop");
+                if (window.innerWidth >= 1024) {
+                    if (!sidebar?.classList.contains("desktop-collapsed")) {
+                        sidebar?.classList.remove(
+                            "-translate-x-full",
+                            "lg:hidden",
+                        );
+                    }
+                    backdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
+                } else {
+                    sidebar?.classList.add("-translate-x-full");
+                    backdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
+                }
+            });
         </script>
     </body>
 </html>

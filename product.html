@@ -52,25 +52,67 @@
                     transform: translateY(0);
                 }
             }
+
+            /* Highlighted Table Row on Click (Identifikasi Data Cepat) */
+            tr.row-selected,
+            tr.row-selected > td {
+                background-color: #eff6ff !important;
+            }
+
+            tr.row-selected {
+                box-shadow:
+                    inset 4px 0 0 0 #2563eb,
+                    inset 0 1px 0 0 #bfdbfe,
+                    inset 0 -1px 0 0 #bfdbfe !important;
+                position: relative;
+                z-index: 5;
+            }
+
+            tbody tr {
+                cursor: pointer;
+            }
         </style>
     </head>
 
-    <body class="flex min-h-screen">
+    <body
+        class="bg-[#F8FAFC] flex flex-col lg:flex-row min-h-screen lg:h-screen lg:overflow-hidden w-full overflow-x-hidden"
+    >
         <!-- SIDEBAR (Fixed Position) -->
+        <!-- Mobile Backdrop -->
+        <div
+            id="sidebar-backdrop"
+            onclick="toggleSidebar()"
+            class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity duration-300"
+        ></div>
+
+        <!-- SIDEBAR (Fixed / Off-Canvas) -->
         <aside
-            class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 fixed h-screen z-20"
+            id="app-sidebar"
+            class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 sm:p-8 fixed inset-y-0 left-0 z-50 h-full lg:static lg:h-full lg:shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out"
         >
-            <div class="flex items-center gap-3 mb-8 shrink-0">
-                <div
-                    class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
-                >
-                    <i class="fas fa-store"></i>
+            <div class="flex items-center justify-between mb-8 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
+                    >
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h1
+                        class="text-xl font-extrabold text-slate-800 tracking-tight"
+                    >
+                        SMARTPOS
+                    </h1>
                 </div>
-                <h1
-                    class="text-xl font-extrabold text-slate-800 tracking-tight"
+                <button
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    title="Tutup / Collapse Sidebar"
+                    aria-label="Toggle Sidebar"
                 >
-                    SMARTPOS
-                </h1>
+                    <i class="fas fa-times text-lg lg:hidden"></i>
+                    <i class="fas fa-angles-left text-lg hidden lg:block"></i>
+                </button>
             </div>
 
             <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
@@ -156,34 +198,96 @@
             </div>
         </aside>
 
-        <!-- MAIN CONTENT (Margin Left to account for fixed sidebar) -->
-        <main class="flex-1 ml-72 p-12">
-            <!-- HEADER SECTION -->
-            <div class="flex justify-between items-center mb-10">
-                <div>
-                    <h1 class="text-3xl font-800 text-slate-800 tracking-tight">
-                        Master Product
-                    </h1>
-                    <p class="text-slate-400 mt-1">
-                        Kelola data barang dan stok inventaris Anda secara
-                        real-time.
-                    </p>
-                </div>
+        <!-- MAIN CONTENT -->
+        <!-- Mobile Top Bar -->
+        <div
+            class="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full"
+        >
+            <div class="flex items-center gap-3">
                 <button
-                    id="addProductButton"
-                    onclick="openModal()"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-blue-100"
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-xl focus:outline-none"
+                    aria-label="Buka Menu"
                 >
-                    <i class="fas fa-plus text-sm"></i> Tambah Produk
+                    <i class="fas fa-bars text-lg"></i>
                 </button>
+                <span
+                    class="font-extrabold text-slate-800 tracking-tight flex items-center gap-2"
+                >
+                    <span
+                        class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs shadow"
+                        ><i class="fas fa-store"></i
+                    ></span>
+                    SMARTPOS
+                </span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span
+                    class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg user-name-display"
+                    >Kasir</span
+                >
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <main
+            id="main-content"
+            class="flex-1 p-4 sm:p-6 lg:p-10 min-w-0 w-full overflow-y-auto custom-scroll"
+        >
+            <!-- HEADER SECTION -->
+            <div
+                class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8"
+            >
+                <div class="flex items-center gap-3">
+                    <button
+                        type="button"
+                        onclick="toggleSidebar()"
+                        class="hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-blue-600 shadow-sm transition-all cursor-pointer shrink-0"
+                        title="Buka / Tutup Sidebar"
+                        aria-label="Toggle Sidebar"
+                    >
+                        <i class="fas fa-bars text-sm"></i>
+                    </button>
+                    <div>
+                        <h1
+                            class="text-3xl font-800 text-slate-800 tracking-tight"
+                        >
+                            Master Product
+                        </h1>
+                        <p class="text-slate-400 mt-1">
+                            Kelola data barang dan stok inventaris Anda secara
+                            real-time.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button
+                        id="btn-cek-nilai-stok"
+                        onclick="openStockValuationModal()"
+                        class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-4 rounded-2xl font-bold flex items-center gap-2.5 transition-all shadow-xl shadow-emerald-100 text-sm"
+                    >
+                        <i class="fas fa-chart-line text-sm"></i> Cek Nilai Stok
+                        (Kembar)
+                    </button>
+                    <button
+                        id="addProductButton"
+                        onclick="openModal()"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-blue-100 text-sm"
+                    >
+                        <i class="fas fa-plus text-sm"></i> Tambah Produk
+                    </button>
+                </div>
             </div>
 
             <!-- MAIN TABLE CARD -->
             <div
-                class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-fade-in"
+                class="bg-white rounded-2xl sm:rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-fade-in"
             >
                 <!-- Toolbar Table -->
-                <div class="p-8 border-b border-slate-50 flex gap-4">
+                <div
+                    class="p-4 sm:p-8 border-b border-slate-50 flex flex-col sm:flex-row gap-4"
+                >
                     <div class="relative flex-1">
                         <i
                             class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"
@@ -199,17 +303,51 @@
                 </div>
 
                 <!-- Table Container -->
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                <!-- Mobile Scroll Indicator Hint -->
+                <div
+                    class="sm:hidden flex items-center justify-between text-[11px] text-slate-500 font-medium px-4 py-2.5 bg-slate-50/90 border-b border-slate-100 shrink-0"
+                >
+                    <span class="flex items-center gap-1.5"
+                        ><i class="fas fa-arrows-left-right text-blue-500"></i>
+                        Geser tabel untuk detail produk</span
+                    >
+                    <span
+                        class="text-[10px] bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full font-bold"
+                        >↔ Geser</span
+                    >
+                </div>
+
+                <div class="overflow-x-auto custom-scroll">
+                    <table
+                        class="w-full text-left border-collapse min-w-[620px]"
+                    >
                         <thead
-                            class="bg-slate-50/50 text-[11px] uppercase tracking-widest text-slate-400 font-bold"
+                            class="bg-slate-50/50 text-[10px] sm:text-[11px] uppercase tracking-widest text-slate-400 font-bold border-b border-slate-100"
                         >
                             <tr>
-                                <th class="px-8 py-5">Produk</th>
-                                <th class="px-6 py-5">Kategori</th>
-                                <th class="px-6 py-5">Harga Jual</th>
-                                <th class="px-6 py-5">Stok</th>
-                                <th class="px-8 py-5 text-right">Aksi</th>
+                                <th class="px-3.5 py-3.5 sm:px-6 sm:py-4">
+                                    Produk
+                                </th>
+                                <th
+                                    class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                >
+                                    Kategori
+                                </th>
+                                <th
+                                    class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                >
+                                    Harga Jual
+                                </th>
+                                <th
+                                    class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                >
+                                    Stok
+                                </th>
+                                <th
+                                    class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-right whitespace-nowrap"
+                                >
+                                    Aksi
+                                </th>
                             </tr>
                         </thead>
                         <tbody
@@ -223,7 +361,7 @@
 
                 <!-- Pagination & Info -->
                 <div
-                    class="p-8 bg-slate-50/30 flex justify-between items-center"
+                    class="p-4 sm:p-8 bg-slate-50/30 flex flex-col sm:flex-row justify-between items-center gap-4"
                 >
                     <p class="text-slate-500 text-sm">
                         Menampilkan
@@ -247,10 +385,10 @@
             class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
         >
             <div
-                class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden"
+                class="bg-white w-full max-w-2xl rounded-2xl sm:rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden max-h-[92vh] flex flex-col"
             >
                 <div
-                    class="p-8 border-b border-slate-50 flex justify-between items-center"
+                    class="p-5 sm:p-8 border-b border-slate-50 flex justify-between items-center shrink-0"
                 >
                     <h3
                         id="modalTitle"
@@ -266,7 +404,10 @@
                     </button>
                 </div>
 
-                <form id="productForm" class="p-8 grid grid-cols-2 gap-6">
+                <form
+                    id="productForm"
+                    class="p-5 sm:p-8 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 overflow-y-auto custom-scroll"
+                >
                     <input type="hidden" id="productId" />
 
                     <div class="col-span-1">
@@ -407,6 +548,189 @@
             </div>
         </div>
 
+        <!-- MODAL VALUASI STOK PER TANGGAL (PERMINTAAN KEMBAR) -->
+        <div
+            id="stockValuationModal"
+            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+        >
+            <div
+                class="bg-white w-full max-w-5xl rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden flex flex-col max-h-[90vh]"
+            >
+                <div
+                    class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 shrink-0"
+                >
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="p-3 bg-emerald-100 text-emerald-700 rounded-2xl"
+                                ><i class="fas fa-boxes text-lg"></i
+                            ></span>
+                            <div>
+                                <h3 class="text-xl font-800 text-slate-800">
+                                    Laporan Nominal & Valuasi Stok Akhir
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-0.5">
+                                    Lihat kuantitas (QTY) dan nilai aset
+                                    persediaan (Rp) per tanggal tertentu
+                                    (Historical Cutoff) untuk Laba Rugi.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <button
+                        onclick="closeStockValuationModal()"
+                        class="w-10 h-10 rounded-2xl bg-white border border-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center shadow-sm"
+                    >
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+
+                <!-- Toolbar Filter Valuasi -->
+                <div
+                    class="p-6 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4 bg-white shrink-0"
+                >
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <div>
+                            <label
+                                class="block text-[10px] font-bold text-slate-400 uppercase mb-1"
+                                >Tanggal Cutoff Stok *</label
+                            >
+                            <input
+                                type="date"
+                                id="stockCutoffDate"
+                                class="bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-emerald-500 cursor-pointer"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                class="block text-[10px] font-bold text-slate-400 uppercase mb-1"
+                                >Lokasi Toko</label
+                            >
+                            <select
+                                id="stockLocationFilter"
+                                class="bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-emerald-500 cursor-pointer"
+                            >
+                                <option value="Semua Toko">
+                                    🌐 Semua Toko
+                                </option>
+                                <option value="Toko Utama">
+                                    🏬 Toko Utama
+                                </option>
+                                <option value="Toko Sudirman">
+                                    🏬 Toko Sudirman
+                                </option>
+                                <option value="Toko Paye">🏬 Toko Paye</option>
+                            </select>
+                        </div>
+                        <div class="pt-5">
+                            <button
+                                onclick="fetchHistoricalStock()"
+                                class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md shadow-emerald-100 flex items-center gap-2 transition-all"
+                            >
+                                <i class="fas fa-search"></i> Hitung Stok
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="pt-5 flex items-center gap-2">
+                        <button
+                            onclick="exportStockExcel()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md shadow-blue-100 flex items-center gap-2 transition-all"
+                        >
+                            <i class="fas fa-file-excel"></i> Export Excel
+                            (.xlsx)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Ringkasan Valuasi -->
+                <div
+                    class="grid grid-cols-3 gap-4 p-6 bg-slate-50/70 border-b border-slate-100 shrink-0"
+                >
+                    <div
+                        class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm"
+                    >
+                        <p
+                            class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                        >
+                            Total Macam Produk
+                        </p>
+                        <h4
+                            id="stockSummaryItems"
+                            class="text-xl font-black text-slate-800"
+                        >
+                            0 Item
+                        </h4>
+                    </div>
+                    <div
+                        class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm"
+                    >
+                        <p
+                            class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                        >
+                            Total QTY Fisik Stok
+                        </p>
+                        <h4
+                            id="stockSummaryQty"
+                            class="text-xl font-black text-emerald-600"
+                        >
+                            0 Unit
+                        </h4>
+                    </div>
+                    <div
+                        class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm"
+                    >
+                        <p
+                            class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                        >
+                            Total Nilai Persediaan (Aset)
+                        </p>
+                        <h4
+                            id="stockSummaryNominal"
+                            class="text-xl font-black text-blue-700"
+                        >
+                            Rp 0
+                        </h4>
+                    </div>
+                </div>
+
+                <!-- Tabel Data Valuasi Stok -->
+                <div class="overflow-y-auto flex-1 custom-scroll p-6">
+                    <table class="w-full text-left border-collapse">
+                        <thead
+                            class="bg-slate-100 text-[10px] uppercase tracking-wider text-slate-500 font-bold sticky top-0 border-b border-slate-200"
+                        >
+                            <tr>
+                                <th class="p-3 pl-4">Produk</th>
+                                <th class="p-3">Kategori</th>
+                                <th class="p-3 text-right">
+                                    Harga Beli Satuan
+                                </th>
+                                <th class="p-3 text-center">Qty Stok Cutoff</th>
+                                <th class="p-3 text-right pr-4">
+                                    Nominal Persediaan
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody
+                            id="stockValuationTableBody"
+                            class="divide-y divide-slate-100 text-xs text-slate-700 font-semibold"
+                        >
+                            <tr>
+                                <td
+                                    colspan="5"
+                                    class="py-16 text-center text-slate-400"
+                                >
+                                    Pilih tanggal cutoff dan klik "Hitung Stok"
+                                    untuk menampilkan nilai persediaan.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- JAVASCRIPT LOGIC -->
         <script>
             const BASE_URL =
@@ -476,20 +800,20 @@
                         .map(
                             (p) => `
             <tr class="hover:bg-slate-50/50 transition-colors">
-                <td class="px-8 py-5">
-                    <div class="font-bold text-slate-700">${p.Nama || p.nama || "-"}</div>
+                <td class="px-3.5 py-3 sm:px-6 sm:py-4 min-w-[160px]">
+                    <div class="font-bold text-slate-800 text-xs sm:text-sm">${p.Nama || p.nama || "-"}</div>
                     <div class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">${p.Kode || p.kode || "-"}</div>
                 </td>
-                <td class="px-6 py-5 text-sm text-slate-500 font-semibold">
+                <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm text-slate-500 font-semibold whitespace-nowrap">
                     ${p.Category ? p.Category.Nama || p.Category.Name || p.Category.name : p.CategoryID || "-"}
                 </td>
-                <td class="px-6 py-5 font-bold text-slate-700">
+                <td class="px-3.5 py-3 sm:px-6 sm:py-4 font-bold text-slate-700 text-xs sm:text-sm font-mono whitespace-nowrap">
                     Rp ${parseFloat(p.HJual || p.Hjual || p.hjual || 0).toLocaleString("id-ID")}
                 </td>
-                <td class="px-6 py-5">
-                    <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold">${p.Saldo || p.saldo || 0} Unit</span>
+                <td class="px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                    <span class="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold">${p.Saldo || p.saldo || 0} Unit</span>
                 </td>
-                <td class="px-8 py-5 text-right">
+                <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right whitespace-nowrap">
                     ${
                         isSuperSubKasir
                             ? "-"
@@ -736,6 +1060,7 @@
 
             const ROLE_PERMISSIONS = {
                 admin: [
+                    "dashboard.html",
                     "riwayat.html",
                     "product.html",
                     "purchase.html",
@@ -744,7 +1069,7 @@
                     "absensi.html",
                     "report.html",
                 ],
-                kasir: ["dashboard.html", "riwayat.html"],
+                kasir: ["dashboard.html", "riwayat.html", "absensi.html"],
                 "super-kasir": [
                     "dashboard.html",
                     "riwayat.html",
@@ -752,6 +1077,7 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 super_kasir: [
                     "dashboard.html",
@@ -760,6 +1086,7 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 superkasir: [
                     "dashboard.html",
@@ -768,17 +1095,16 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
-                ],
-                supersubkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
+                    "absensi.html",
                 ],
                 akuntan: [
                     "akuntansi.html",
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "riwayat.html",
+                    "report.html",
+                    "absensi.html",
                 ],
                 superadmin: [
                     "dashboard.html",
@@ -952,6 +1278,17 @@
                     el.innerText = `${userData.name || "User"} (${userRole.toUpperCase()})`;
                 });
 
+                // Batasi akses Cek Nilai Stok (Kembar): Tidak bisa diakses oleh kasir dan super-kasir
+                const isKasirRole =
+                    userRole === "kasir" || userRole.includes("kasir");
+                const btnCekNilaiStok =
+                    document.getElementById("btn-cek-nilai-stok");
+                if (btnCekNilaiStok) {
+                    btnCekNilaiStok.style.display = isKasirRole
+                        ? "none"
+                        : "inline-flex";
+                }
+
                 // Apply restrictions for supersubkasir
                 if (isSuperSubKasir) {
                     const addProductBtn =
@@ -1009,7 +1346,264 @@
                 }
             });
 
+            // ==========================================
+            // FITUR HISTORICAL STOCK VALUATION (KEMBAR)
+            // ==========================================
+            function openStockValuationModal() {
+                const userData = getUserDataFromToken();
+                const userRole = (
+                    userData && userData.role ? userData.role : ""
+                )
+                    .toLowerCase()
+                    .trim();
+                if (userRole === "kasir" || userRole.includes("kasir")) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Akses Ditolak",
+                        text: "Fitur Cek Nilai Stok hanya dapat diakses oleh Manajemen / Akuntansi",
+                        confirmButtonColor: "#2563EB",
+                    });
+                    return;
+                }
+
+                const modal = document.getElementById("stockValuationModal");
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+                document.body.classList.add("modal-active");
+
+                const dateInput = document.getElementById("stockCutoffDate");
+                if (!dateInput.value) {
+                    dateInput.value = new Date().toISOString().split("T")[0];
+                }
+                fetchHistoricalStock();
+            }
+
+            function closeStockValuationModal() {
+                const modal = document.getElementById("stockValuationModal");
+                modal.classList.add("hidden");
+                modal.classList.remove("flex");
+                document.body.classList.remove("modal-active");
+            }
+
+            async function fetchHistoricalStock() {
+                const userData = getUserDataFromToken();
+                const userRole = (
+                    userData && userData.role ? userData.role : ""
+                )
+                    .toLowerCase()
+                    .trim();
+                if (userRole === "kasir" || userRole.includes("kasir")) {
+                    return Swal.fire(
+                        "Akses Ditolak",
+                        "Fitur Cek Nilai Stok hanya untuk Manajemen / Akuntansi",
+                        "warning",
+                    );
+                }
+
+                const cutoff = document.getElementById("stockCutoffDate").value;
+                const location = document.getElementById(
+                    "stockLocationFilter",
+                ).value;
+                const tbody = document.getElementById(
+                    "stockValuationTableBody",
+                );
+
+                if (!cutoff) {
+                    return Swal.fire(
+                        "Perhatian",
+                        "Pilih tanggal cutoff stok terlebih dahulu!",
+                        "warning",
+                    );
+                }
+
+                tbody.innerHTML = `<tr><td colspan="5" class="py-16 text-center text-slate-400 font-mono">Menghitung seluruh mutasi stok sampai dengan ${cutoff}...</td></tr>`;
+
+                try {
+                    let url = `${BASE_URL}/api/products/historical-stock?cutoff_date=${cutoff}`;
+                    if (location && location !== "Semua Toko") {
+                        url += `&location=${encodeURIComponent(location)}`;
+                    }
+
+                    const token = localStorage.getItem("token");
+                    const headers = {};
+                    if (token) {
+                        headers["Authorization"] = `Bearer ${token}`;
+                    }
+
+                    const res = await fetch(url, { headers });
+                    if (!res.ok) {
+                        const err = await res.json().catch(() => ({}));
+                        tbody.innerHTML = `<tr><td colspan="5" class="py-16 text-center text-rose-500 font-bold">Gagal memuat valuasi stok: ${escapeHTML(err.error || "Server error")}</td></tr>`;
+                        return;
+                    }
+
+                    const data = await res.json();
+                    const items = data.items || [];
+
+                    document.getElementById("stockSummaryItems").innerText =
+                        `${data.total_items || items.length} Item`;
+                    document.getElementById("stockSummaryQty").innerText =
+                        `${(data.total_qty || 0).toLocaleString("id-ID")} Unit`;
+                    document.getElementById("stockSummaryNominal").innerText =
+                        `Rp ${(data.total_nominal || 0).toLocaleString("id-ID")}`;
+
+                    if (items.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="5" class="py-16 text-center text-slate-400">Tidak ada produk ditemukan</td></tr>`;
+                        return;
+                    }
+
+                    tbody.innerHTML = items
+                        .map(
+                            (it) => `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-3 pl-4">
+                                <div class="font-bold text-slate-800">${escapeHTML(it.nama)}</div>
+                                <div class="text-[10px] text-slate-400 font-mono font-bold">${escapeHTML(it.kode)}</div>
+                            </td>
+                            <td class="p-3 text-slate-500 font-medium">${escapeHTML(it.category_name || "-")}</td>
+                            <td class="p-3 text-right font-mono font-semibold text-slate-600">Rp ${Number(it.h_beli || 0).toLocaleString("id-ID")}</td>
+                            <td class="p-3 text-center font-extrabold text-slate-800 bg-slate-50/50">${Number(it.qty_stok || 0).toLocaleString("id-ID")} ${escapeHTML(it.satuan || "Unit")}</td>
+                            <td class="p-3 text-right pr-4 font-mono font-black text-blue-700">Rp ${Number(it.nominal_stok || 0).toLocaleString("id-ID")}</td>
+                        </tr>
+                    `,
+                        )
+                        .join("");
+                } catch (err) {
+                    console.error("fetchHistoricalStock error:", err);
+                    tbody.innerHTML = `<tr><td colspan="5" class="py-16 text-center text-rose-500 font-bold">Koneksi Error: ${err.message}</td></tr>`;
+                }
+            }
+
+            function exportStockExcel() {
+                const userData = getUserDataFromToken();
+                const userRole = (
+                    userData && userData.role ? userData.role : ""
+                )
+                    .toLowerCase()
+                    .trim();
+                if (userRole === "kasir" || userRole.includes("kasir")) {
+                    return Swal.fire(
+                        "Akses Ditolak",
+                        "Fitur ekspor nilai stok hanya untuk Manajemen / Akuntansi",
+                        "warning",
+                    );
+                }
+
+                const cutoff = document.getElementById("stockCutoffDate").value;
+                const location = document.getElementById(
+                    "stockLocationFilter",
+                ).value;
+                if (!cutoff) {
+                    return Swal.fire(
+                        "Perhatian",
+                        "Pilih tanggal cutoff terlebih dahulu!",
+                        "warning",
+                    );
+                }
+                let url = `${BASE_URL}/api/products/export-stock?cutoff_date=${cutoff}`;
+                if (location && location !== "Semua Toko") {
+                    url += `&location=${encodeURIComponent(location)}`;
+                }
+                if (userRole) {
+                    url += `&role=${encodeURIComponent(userRole)}`;
+                }
+                window.open(url, "_blank");
+            }
+
             checkRoleAccess("product.html");
+
+            // --- GLOBAL TABLE ROW CLICK-TO-HIGHLIGHT (IDENTIFIKASI DATA CEPAT) ---
+            document.addEventListener("click", (e) => {
+                const tr = e.target.closest("tbody tr");
+                if (!tr) return;
+
+                // Jangan highlight baris loading / empty state yang memiliki colspan
+                if (tr.querySelector("td[colspan]")) return;
+
+                const tbody = tr.closest("tbody");
+                if (!tbody) return;
+
+                const isInteractive = e.target.closest(
+                    "button, a, input, select",
+                );
+                const wasSelected = tr.classList.contains("row-selected");
+
+                if (isInteractive) {
+                    // Jika menekan tombol aksi (Edit, Hapus, Detail, Cetak, Retur, dll.),
+                    // pastikan baris ditandai (highlight) agar pengguna yakin baris mana yang sedang diproses!
+                    tbody.querySelectorAll("tr").forEach((r) => {
+                        if (r !== tr) r.classList.remove("row-selected");
+                    });
+                    tr.classList.add("row-selected");
+                } else {
+                    // Klik biasa pada baris data: toggle highlight
+                    tbody.querySelectorAll("tr").forEach((r) => {
+                        if (r !== tr) r.classList.remove("row-selected");
+                    });
+                    if (wasSelected) {
+                        tr.classList.remove("row-selected");
+                    } else {
+                        tr.classList.add("row-selected");
+                    }
+                }
+            });
+        </script>
+
+        <!-- UNIFIED SIDEBAR CONTROLLER -->
+        <script>
+            function toggleSidebar() {
+                const isMobile = window.innerWidth < 1024;
+                const sidebar = document.getElementById("app-sidebar");
+                const backdrop = document.getElementById("sidebar-backdrop");
+                if (!sidebar) return;
+
+                if (isMobile) {
+                    const isClosed =
+                        sidebar.classList.contains("-translate-x-full");
+                    if (isClosed) {
+                        sidebar.classList.remove("-translate-x-full");
+                        if (backdrop) backdrop.classList.remove("hidden");
+                        document.body.classList.add("overflow-hidden");
+                    } else {
+                        sidebar.classList.add("-translate-x-full");
+                        if (backdrop) backdrop.classList.add("hidden");
+                        document.body.classList.remove("overflow-hidden");
+                    }
+                } else {
+                    const isCollapsed =
+                        sidebar.classList.contains("desktop-collapsed") ||
+                        sidebar.classList.contains("lg:hidden");
+                    if (isCollapsed) {
+                        sidebar.classList.remove(
+                            "desktop-collapsed",
+                            "lg:hidden",
+                        );
+                    } else {
+                        sidebar.classList.add("desktop-collapsed", "lg:hidden");
+                    }
+                }
+            }
+            window.toggleSidebar = toggleSidebar;
+            window.toggleMobileSidebar = toggleSidebar;
+
+            window.addEventListener("resize", () => {
+                const sidebar = document.getElementById("app-sidebar");
+                const backdrop = document.getElementById("sidebar-backdrop");
+                if (window.innerWidth >= 1024) {
+                    if (!sidebar?.classList.contains("desktop-collapsed")) {
+                        sidebar?.classList.remove(
+                            "-translate-x-full",
+                            "lg:hidden",
+                        );
+                    }
+                    backdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
+                } else {
+                    sidebar?.classList.add("-translate-x-full");
+                    backdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
+                }
+            });
         </script>
     </body>
 </html>

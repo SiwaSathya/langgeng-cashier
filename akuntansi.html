@@ -13,6 +13,10 @@
         <style>
             @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap");
 
+
+
+
+
             body {
                 font-family: "Plus Jakarta Sans", sans-serif;
                 background-color: #f8fafc;
@@ -46,25 +50,62 @@
                     transform: translateY(0);
                 }
             }
+
+            /* Highlighted Table Row on Click (Identifikasi Data Cepat) */
+            tr.row-selected,
+            tr.row-selected > td {
+                background-color: #eff6ff !important;
+            }
+
+            tr.row-selected {
+                box-shadow: inset 4px 0 0 0 #2563eb, inset 0 1px 0 0 #bfdbfe, inset 0 -1px 0 0 #bfdbfe !important;
+                position: relative;
+                z-index: 5;
+            }
+
+            tbody tr {
+                cursor: pointer;
+            }
         </style>
     </head>
 
-    <body class="flex min-h-screen">
+    <body class="bg-[#F8FAFC] flex flex-col lg:flex-row min-h-screen lg:h-screen lg:overflow-hidden w-full overflow-x-hidden">
         <!-- SIDEBAR (Fixed Position) -->
+        <!-- Mobile Backdrop -->
+        <div
+            id="sidebar-backdrop"
+            onclick="toggleSidebar()"
+            class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity duration-300"
+        ></div>
+
+        <!-- SIDEBAR (Fixed / Off-Canvas) -->
         <aside
-            class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 fixed h-screen z-20"
+            id="app-sidebar"
+            class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 sm:p-8 fixed inset-y-0 left-0 z-50 h-full lg:static lg:h-full lg:shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out"
         >
-            <div class="flex items-center gap-3 mb-8 shrink-0">
-                <div
-                    class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
-                >
-                    <i class="fas fa-store"></i>
+            <div class="flex items-center justify-between mb-8 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
+                    >
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h1
+                        class="text-xl font-extrabold text-slate-800 tracking-tight"
+                    >
+                        SMARTPOS
+                    </h1>
                 </div>
-                <h1
-                    class="text-xl font-extrabold text-slate-800 tracking-tight"
+                <button
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    title="Tutup / Collapse Sidebar"
+                    aria-label="Toggle Sidebar"
                 >
-                    SMARTPOS
-                </h1>
+                    <i class="fas fa-times text-lg lg:hidden"></i>
+                    <i class="fas fa-angles-left text-lg hidden lg:block"></i>
+                </button>
             </div>
 
             <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
@@ -150,11 +191,44 @@
             </div>
         </aside>
 
+        <!-- Mobile Top Bar -->
+        <div
+            class="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full"
+        >
+            <div class="flex items-center gap-3">
+                <button
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-xl focus:outline-none"
+                    aria-label="Buka Menu"
+                >
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+                <span class="font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
+                    <span class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs shadow"><i class="fas fa-store"></i></span>
+                    SMARTPOS
+                </span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg user-name-display">Kasir</span>
+            </div>
+        </div>
+
         <!-- MAIN CONTENT -->
-        <main class="flex-1 ml-72 p-12 min-w-0">
+        <main id="main-content" class="flex-1 p-4 sm:p-6 lg:p-10 min-w-0 w-full overflow-y-auto custom-scroll">
             <!-- HEADER SECTION -->
-            <div class="flex justify-between items-center mb-6">
-                <div>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <button
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-blue-600 shadow-sm transition-all cursor-pointer shrink-0"
+                    title="Buka / Tutup Sidebar"
+                    aria-label="Toggle Sidebar"
+                >
+                    <i class="fas fa-bars text-sm"></i>
+                </button>
+                    <div>
                     <h1 class="text-3xl font-800 text-slate-800 tracking-tight">
                         Siklus Akuntansi Keuangan
                     </h1>
@@ -162,8 +236,24 @@
                         Buku Harian, Rekapitulasi, Buku Besar, Bagan Akun, &
                         Piutang Dagang.
                     </p>
-                </div>
-                <div class="flex gap-3 items-center">
+                </div></div>
+                <div class="flex gap-3 items-center flex-wrap">
+                    <!-- Filter Toko Global (Semua / Satu Persatu) -->
+                    <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-2xl shadow-sm">
+                        <i class="fas fa-store text-blue-600 text-xs"></i>
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Lokasi:</span>
+                        <select
+                            id="globalStoreFilter"
+                            onchange="onStoreFilterChanged()"
+                            class="bg-transparent font-extrabold text-xs text-slate-800 outline-none cursor-pointer pr-2"
+                        >
+                            <option value="Semua Toko">🌐 Semua Toko</option>
+                            <option value="Toko Utama">🏬 Toko Utama</option>
+                            <option value="Toko Sudirman">🏬 Toko Sudirman</option>
+                            <option value="Toko Paye">🏬 Toko Paye</option>
+                        </select>
+                    </div>
+
                     <button
                         onclick="openJournalModal()"
                         class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3.5 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-100 text-sm"
@@ -218,7 +308,7 @@
             <!-- TAB 1: BUKU HARIAN -->
             <div id="tab-jurnal" class="tab-panel space-y-6 animate-fade-in">
                 <div
-                    class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden"
+                    class="bg-white rounded-2xl sm:rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden"
                 >
                     <div
                         class="p-8 border-b border-slate-50 flex justify-between items-center gap-4 flex-wrap"
@@ -239,11 +329,30 @@
                                 />
                             </div>
                         </div>
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <select
+                                id="journalStatusFilter"
+                                onchange="fetchJournals()"
+                                class="bg-slate-50 border border-slate-100 px-4 py-3 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer"
+                            >
+                                <option value="">Semua Status</option>
+                                <option value="checked">Sudah Dicek (Checked)</option>
+                                <option value="unchecked">Belum Dicek (Unchecked)</option>
+                            </select>
+                            <select
+                                id="journalPeriodPreset"
+                                onchange="applyPeriodPreset(this.value)"
+                                class="bg-slate-50 border border-slate-100 px-4 py-3 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer"
+                            >
+                                <option value="custom">Periode Kustom</option>
+                                <option value="today">Hari Ini</option>
+                                <option value="this_month" selected>Bulan Ini</option>
+                                <option value="this_year">Tahun Ini</option>
+                            </select>
                             <input
                                 type="date"
                                 id="journalStartDate"
-                                onchange="fetchJournals()"
+                                onchange="document.getElementById('journalPeriodPreset').value='custom'; fetchJournals()"
                                 class="bg-slate-50 border border-slate-100 px-4 py-3 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer"
                             />
                             <span class="text-xs text-slate-400 font-bold"
@@ -252,34 +361,49 @@
                             <input
                                 type="date"
                                 id="journalEndDate"
-                                onchange="fetchJournals()"
+                                onchange="document.getElementById('journalPeriodPreset').value='custom'; fetchJournals()"
                                 class="bg-slate-50 border border-slate-100 px-4 py-3 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer"
                             />
                             <button
                                 onclick="fetchJournals()"
                                 class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-3 rounded-xl font-bold text-xs"
+                                title="Segarkan Data"
                             >
                                 <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button
+                                onclick="exportJournalsExcel()"
+                                class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-xl font-bold text-xs flex items-center gap-2 shadow-sm shadow-emerald-200 transition-all"
+                                title="Download Laporan Jurnal ke File Excel (.xlsx)"
+                            >
+                                <i class="fas fa-file-excel text-sm"></i> Export Excel
                             </button>
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
+                    <!-- Mobile Scroll Indicator Hint -->
+                    <div class="sm:hidden flex items-center justify-between text-[11px] text-slate-500 font-medium px-4 py-2.5 bg-slate-50/90 border-b border-slate-100 shrink-0">
+                        <span class="flex items-center gap-1.5"><i class="fas fa-arrows-left-right text-blue-500"></i> Geser tabel jurnal umum</span>
+                        <span class="text-[10px] bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full font-bold">↔ Geser</span>
+                    </div>
+
+                    <div class="overflow-x-auto custom-scroll">
+                        <table class="w-full text-left border-collapse min-w-[680px]">
                             <thead
-                                class="bg-slate-50/50 text-[11px] uppercase tracking-widest text-slate-400 font-bold"
+                                class="bg-slate-50/50 text-[10px] sm:text-[11px] uppercase tracking-widest text-slate-400 font-bold border-b border-slate-100"
                             >
                                 <tr>
-                                    <th class="px-8 py-5">
+                                    <th class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap">
                                         Tanggal & No. Bukti
                                     </th>
-                                    <th class="px-6 py-5">
+                                    <th class="px-3.5 py-3.5 sm:px-6 sm:py-4">
                                         Akun & Uraian Transaksi
                                     </th>
-                                    <th class="px-6 py-5">Ref / Bukti</th>
-                                    <th class="px-6 py-5 text-right">Debet</th>
-                                    <th class="px-6 py-5 text-right">Kredit</th>
-                                    <th class="px-6 py-5 text-center w-28">
+                                    <th class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap">Ref / Bukti</th>
+                                    <th class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-right whitespace-nowrap">Debet</th>
+                                    <th class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-right whitespace-nowrap">Kredit</th>
+                                    <th class="px-3.5 py-3.5 sm:px-4 sm:py-4 text-center whitespace-nowrap w-24 sm:w-28">Status</th>
+                                    <th class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-center whitespace-nowrap w-24 sm:w-28">
                                         Aksi
                                     </th>
                                 </tr>
@@ -314,7 +438,7 @@
                 class="tab-panel space-y-6 hidden animate-fade-in"
             >
                 <div
-                    class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8"
+                    class="bg-white rounded-2xl sm:rounded-[2.5rem] shadow-sm border border-slate-100 p-8"
                 >
                     <div
                         class="flex justify-between items-center mb-6 pb-4 border-b border-slate-50 flex-wrap gap-4"
@@ -327,7 +451,7 @@
                                 Akumulasi saldo per akun dan verifikasi
                                 keseimbangan (Debet = Kredit).
                             </p>
-                        </div>
+                        </div></div>
                         <div class="flex items-center gap-3">
                             <input
                                 type="date"
@@ -354,9 +478,7 @@
                     </div>
 
                     <div class="overflow-x-auto mb-6">
-                        <table
-                            class="w-full text-left border-collapse border border-slate-200"
-                        >
+                        <table class="w-full text-left border-collapse border border-slate-200 min-w-[720px]">
                             <thead
                                 class="bg-slate-100 text-[11px] uppercase tracking-widest text-slate-600 font-bold border-b border-slate-200"
                             >
@@ -410,7 +532,7 @@
                 class="tab-panel space-y-6 hidden animate-fade-in"
             >
                 <div
-                    class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8"
+                    class="bg-white rounded-2xl sm:rounded-[2.5rem] shadow-sm border border-slate-100 p-8"
                 >
                     <div
                         class="flex justify-between items-center mb-6 pb-4 border-b border-slate-50 flex-wrap gap-4"
@@ -423,7 +545,7 @@
                                 Format T-Account kartu buku besar sesuai
                                 template excel standar.
                             </p>
-                        </div>
+                        </div></div>
                         <div class="flex items-center gap-3 flex-wrap">
                             <select
                                 id="ledgerAccountSelect"
@@ -466,7 +588,7 @@
                 class="tab-panel space-y-6 hidden animate-fade-in"
             >
                 <div
-                    class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8"
+                    class="bg-white rounded-2xl sm:rounded-[2.5rem] shadow-sm border border-slate-100 p-8"
                 >
                     <div
                         class="flex justify-between items-center mb-6 pb-4 border-b border-slate-50"
@@ -489,7 +611,7 @@
                     </div>
 
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
+                        <table class="w-full text-left border-collapse min-w-[720px]">
                             <thead
                                 class="bg-slate-50 text-[11px] uppercase tracking-widest text-slate-400 font-bold"
                             >
@@ -523,7 +645,7 @@
                 class="tab-panel space-y-6 hidden animate-fade-in"
             >
                 <div
-                    class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8"
+                    class="bg-white rounded-2xl sm:rounded-[2.5rem] shadow-sm border border-slate-100 p-8"
                 >
                     <div
                         class="flex justify-between items-center mb-6 pb-4 border-b border-slate-50 flex-wrap gap-4"
@@ -536,7 +658,7 @@
                                 Daftar tagihan piutang pelanggan, saldo awal,
                                 mutasi pembayaran, dan saldo akhir.
                             </p>
-                        </div>
+                        </div></div>
                         <div class="flex items-center gap-3 flex-wrap">
                             <div class="relative">
                                 <i
@@ -575,9 +697,7 @@
                     </div>
 
                     <div class="overflow-x-auto mb-4">
-                        <table
-                            class="w-full text-left border-collapse border border-slate-200"
-                        >
+                        <table class="w-full text-left border-collapse border border-slate-200 min-w-[720px]">
                             <thead
                                 class="bg-slate-100 text-[11px] uppercase tracking-widest text-slate-600 font-bold border-b border-slate-200"
                             >
@@ -662,7 +782,7 @@
             class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
         >
             <div
-                class="bg-white w-full max-w-3xl rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden max-h-[90vh] flex flex-col"
+                class="bg-white w-full max-w-3xl rounded-2xl sm:rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden max-h-[90vh] flex flex-col"
             >
                 <div
                     class="p-8 border-b border-slate-50 flex justify-between items-center shrink-0"
@@ -813,7 +933,7 @@
             class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
         >
             <div
-                class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden"
+                class="bg-white w-full max-w-md rounded-2xl sm:rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden"
             >
                 <div
                     class="p-8 border-b border-slate-50 flex justify-between items-center"
@@ -938,7 +1058,7 @@
             class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
         >
             <div
-                class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden"
+                class="bg-white w-full max-w-lg rounded-2xl sm:rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden"
             >
                 <div
                     class="p-8 border-b border-slate-50 flex justify-between items-center"
@@ -1117,8 +1237,7 @@
 
         <!-- JAVASCRIPT LOGIC -->
         <script>
-            const BASE_URL =
-                "https://langgeng-cashier-backend-production.up.railway.app";
+            const BASE_URL = "https://langgeng-cashier-backend-production.up.railway.app";
             let accountsList = [];
             let journalPage = 1;
             const journalLimit = 20;
@@ -1129,6 +1248,7 @@
 
             const ROLE_PERMISSIONS = {
                 admin: [
+                    "dashboard.html",
                     "riwayat.html",
                     "product.html",
                     "purchase.html",
@@ -1137,7 +1257,11 @@
                     "absensi.html",
                     "report.html",
                 ],
-                kasir: ["dashboard.html", "riwayat.html"],
+                kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "absensi.html",
+                ],
                 "super-kasir": [
                     "dashboard.html",
                     "riwayat.html",
@@ -1145,6 +1269,7 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 super_kasir: [
                     "dashboard.html",
@@ -1153,6 +1278,7 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 superkasir: [
                     "dashboard.html",
@@ -1161,12 +1287,16 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 akuntan: [
                     "akuntansi.html",
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "riwayat.html",
+                    "report.html",
+                    "absensi.html",
                 ],
                 superadmin: [
                     "dashboard.html",
@@ -1188,6 +1318,16 @@
                     .replace(/>/g, "&gt;")
                     .replace(/"/g, "&quot;")
                     .replace(/'/g, "&#039;");
+            }
+
+            function formatRupiah(num) {
+                if (num === null || num === undefined || isNaN(num)) return "Rp 0";
+                return new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                }).format(num);
             }
 
             function getUserDataFromToken() {
@@ -1289,7 +1429,17 @@
                 document.getElementById("piutangEndDate").value = today;
             }
 
+            let currentActiveTab = "tab-jurnal";
+
+            function onStoreFilterChanged() {
+                if (currentActiveTab === "tab-jurnal") fetchJournals();
+                else if (currentActiveTab === "tab-rekap") fetchRecap();
+                else if (currentActiveTab === "tab-ledger") fetchLedger();
+                else if (currentActiveTab === "tab-piutang") fetchPiutang();
+            }
+
             function switchTab(tabId) {
+                currentActiveTab = tabId;
                 document
                     .querySelectorAll(".tab-panel")
                     .forEach((el) => el.classList.add("hidden"));
@@ -1339,7 +1489,7 @@
                             <td class="px-6 py-4 font-bold text-slate-800">${a.name}</td>
                             <td class="px-6 py-4"><span class="bg-slate-100 px-2.5 py-1 rounded text-xs font-bold text-slate-600">${a.type}</span></td>
                             <td class="px-6 py-4 text-center font-bold text-xs ${a.normal_position === "DEBET" ? "text-blue-600" : "text-emerald-600"}">${a.normal_position}</td>
-                            <td class="px-6 py-4 text-right font-extrabold text-slate-800">Rp ${Number(a.current_balance || 0).toLocaleString("id-ID")}</td>
+                            <td class="px-6 py-4 text-right font-extrabold text-slate-800">${formatRupiah(a.current_balance)}</td>
                             <td class="px-6 py-4 text-center">
                                 <button onclick="editAccount(${a.ID})" class="text-blue-500 hover:text-blue-700 mx-1" title="Edit Akun"><i class="fas fa-edit"></i></button>
                                 <button onclick="deleteAccount(${a.ID})" class="text-red-400 hover:text-red-600 mx-1" title="Hapus Akun"><i class="fas fa-trash"></i></button>
@@ -1492,28 +1642,31 @@
                 const search = document.getElementById("journalSearch").value;
                 const start = document.getElementById("journalStartDate").value;
                 const end = document.getElementById("journalEndDate").value;
+                const status = document.getElementById("journalStatusFilter")?.value || "";
                 const tbody = document.getElementById("journalTableBody");
 
+                const location = document.getElementById("globalStoreFilter")?.value || "";
                 let url = `${BASE_URL}/api/accounting/journals?page=${journalPage}&limit=${journalLimit}`;
                 if (search) url += `&search=${encodeURIComponent(search)}`;
                 if (start && end) url += `&start_date=${start}&end_date=${end}`;
+                if (status) url += `&status=${encodeURIComponent(status)}`;
+                if (location && location !== "Semua Toko") url += `&location=${encodeURIComponent(location)}`;
 
                 try {
                     const res = await fetch(url);
                     if (!res.ok) {
                         const err = await res.json().catch(() => ({}));
-                        tbody.innerHTML = `<tr><td colspan="6" class="px-8 py-20 text-center text-rose-500 font-bold">Gagal memuat jurnal: ${escapeHTML(err.error || "Server error")}</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="7" class="px-8 py-20 text-center text-rose-500 font-bold">Gagal memuat jurnal: ${escapeHTML(err.error || "Server error")}</td></tr>`;
                         return;
                     }
                     const result = await res.json();
                     const entries = result.data || [];
                     const total = result.total || 0;
 
-                    document.getElementById("journalCountInfo").innerText =
-                        total;
+                    document.getElementById("journalCountInfo").innerText = total;
 
                     if (entries.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="6" class="px-8 py-20 text-center text-slate-400 font-medium">Belum ada catatan jurnal pada periode ini</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="7" class="px-8 py-20 text-center text-slate-400 font-medium">Belum ada catatan jurnal pada periode ini</td></tr>`;
                         return;
                     }
 
@@ -1529,18 +1682,30 @@
                             const isCredit = it.kredit > 0;
                             html += `
                             <tr class="hover:bg-slate-50/50 ${isFirst ? "border-t-2 border-slate-200" : ""}">
-                                <td class="px-8 py-3 align-top">
-                                    ${isFirst ? `<span class="font-bold text-slate-800">${dateFormatted}</span><p class="font-mono text-[11px] text-blue-600 font-bold">${entry.entry_number}</p>` : ""}
+                                <td class="px-3.5 py-2.5 sm:px-6 sm:py-3.5 align-top whitespace-nowrap">
+                                    ${isFirst ? `<span class="font-bold text-slate-800 text-xs sm:text-sm">${dateFormatted}</span><p class="font-mono text-[11px] text-blue-600 font-bold">${entry.entry_number}</p>` : ""}
                                 </td>
-                                <td class="px-6 py-3">
-                                    <div class="${isCredit ? "pl-8" : ""}">
-                                        <span class="font-bold ${isCredit ? "text-slate-700" : "text-slate-900"}">${it.account?.name || "Akun"}</span>
-                                        ${isFirst && entry.description ? `<p class="text-xs text-slate-400 font-medium italic mt-0.5">${entry.description}</p>` : ""}
+                                <td class="px-3.5 py-2.5 sm:px-6 sm:py-3.5 min-w-[160px]">
+                                    <div class="${isCredit ? "pl-4 sm:pl-8" : ""}">
+                                        <span class="font-bold text-xs sm:text-sm ${isCredit ? "text-slate-700" : "text-slate-900"}">${it.account?.name || "Akun"}</span>
+                                        ${isFirst && entry.description ? `<p class="text-xs text-slate-400 font-medium italic mt-0.5">${escapeHTML(entry.description)}</p>` : ""}
                                     </div>
                                 </td>
-                                <td class="px-6 py-3 text-xs font-mono font-bold text-slate-400">${entry.reference || it.account?.code || "-"}</td>
-                                <td class="px-6 py-3 text-right font-bold text-slate-800 font-mono">${it.debet > 0 ? `Rp ${Number(it.debet).toLocaleString("id-ID")}` : "-"}</td>
-                                <td class="px-6 py-3 text-right font-bold text-slate-800 font-mono">${it.kredit > 0 ? `Rp ${Number(it.kredit).toLocaleString("id-ID")}` : "-"}</td>
+                                <td class="px-3.5 py-2.5 sm:px-6 sm:py-3.5 text-xs font-mono font-bold text-slate-400 whitespace-nowrap">${entry.reference || it.account?.code || "-"}</td>
+                                <td class="px-3.5 py-2.5 sm:px-6 sm:py-3.5 text-right font-bold text-slate-800 font-mono whitespace-nowrap text-xs sm:text-sm">${it.debet > 0 ? formatRupiah(it.debet) : "-"}</td>
+                                <td class="px-3.5 py-2.5 sm:px-6 sm:py-3.5 text-right font-bold text-slate-800 font-mono whitespace-nowrap text-xs sm:text-sm">${it.kredit > 0 ? formatRupiah(it.kredit) : "-"}</td>
+                                <td class="px-3.5 py-2.5 sm:px-4 sm:py-3.5 text-center align-top whitespace-nowrap">
+                                    ${
+                                        isFirst
+                                            ? `
+                                        <button onclick="toggleCheckJournal(${entry.ID})" title="${entry.is_checked ? 'Sudah Diperiksa (Klik untuk batalkan verifikasi)' : 'Belum Dicek (Klik untuk tandai sudah diperiksa)'}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm ${entry.is_checked ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-emerald-100' : 'bg-slate-100 text-slate-400 border border-slate-200 hover:bg-slate-200 hover:text-slate-600'}">
+                                            <i class="fas ${entry.is_checked ? 'fa-check-circle text-emerald-600' : 'fa-circle text-slate-300'}"></i>
+                                            <span>${entry.is_checked ? 'Checked' : 'Check'}</span>
+                                        </button>
+                                    `
+                                            : ""
+                                    }
+                                </td>
                                 <td class="px-6 py-3 text-center align-top">
                                     ${
                                         isFirst
@@ -1560,6 +1725,64 @@
                 } catch (e) {
                     console.error(e);
                 }
+            }
+
+            async function toggleCheckJournal(id) {
+                try {
+                    const res = await fetch(`${BASE_URL}/api/accounting/journals/${id}/toggle-check`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                    });
+                    if (res.ok) {
+                        fetchJournals();
+                    } else {
+                        const err = await res.json().catch(() => ({}));
+                        Swal.fire("Gagal", err.error || "Gagal mengubah status checklist", "error");
+                    }
+                } catch (e) {
+                    Swal.fire("Error", "Gagal menghubungi server", "error");
+                }
+            }
+
+            function applyPeriodPreset(preset) {
+                const now = new Date();
+                const y = now.getFullYear();
+                const m = String(now.getMonth() + 1).padStart(2, 0);
+                const d = String(now.getDate()).padStart(2, 0);
+
+                const startInput = document.getElementById("journalStartDate");
+                const endInput = document.getElementById("journalEndDate");
+
+                if (preset === "today") {
+                    startInput.value = `${y}-${m}-${d}`;
+                    endInput.value = `${y}-${m}-${d}`;
+                } else if (preset === "this_month") {
+                    startInput.value = `${y}-${m}-01`;
+                    const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
+                    endInput.value = `${y}-${m}-${String(lastDay).padStart(2, 0)}`;
+                } else if (preset === "this_year") {
+                    startInput.value = `${y}-01-01`;
+                    endInput.value = `${y}-12-31`;
+                }
+                journalPage = 1;
+                fetchJournals();
+            }
+
+            function exportJournalsExcel() {
+                const search = document.getElementById("journalSearch")?.value || "";
+                const start = document.getElementById("journalStartDate")?.value || "";
+                const end = document.getElementById("journalEndDate")?.value || "";
+                const status = document.getElementById("journalStatusFilter")?.value || "";
+                const location = document.getElementById("globalStoreFilter")?.value || "";
+
+                const params = new URLSearchParams();
+                if (start) params.append("start_date", start);
+                if (end) params.append("end_date", end);
+                if (search) params.append("search", search);
+                if (status) params.append("status", status);
+                if (location && location !== "Semua Toko") params.append("location", location);
+
+                window.open(`${BASE_URL}/api/accounting/export-excel?${params.toString()}`, "_blank");
             }
 
             function debounceJournalSearch() {
@@ -1671,9 +1894,9 @@
                 });
 
                 document.getElementById("modalTotalDebet").innerText =
-                    `IDR ${totalDebet.toLocaleString("id-ID")}`;
+                    formatRupiah(totalDebet);
                 document.getElementById("modalTotalKredit").innerText =
-                    `IDR ${totalKredit.toLocaleString("id-ID")}`;
+                    formatRupiah(totalKredit);
 
                 const diff = totalDebet - totalKredit;
                 const statusEl = document.getElementById("modalBalanceStatus");
@@ -1689,7 +1912,7 @@
                 } else {
                     statusEl.className =
                         "text-rose-600 font-black flex items-center gap-1";
-                    statusEl.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Belum Seimbang (Selisih: IDR ${Math.abs(diff).toLocaleString("id-ID")})`;
+                    statusEl.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Belum Seimbang (Selisih: ${formatRupiah(Math.abs(diff))})`;
                 }
             }
 
@@ -1848,9 +2071,10 @@
                 tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-mono">Menghitung rekapitulasi jurnal...</td></tr>`;
 
                 try {
-                    const res = await fetch(
-                        `${BASE_URL}/api/accounting/recap?start_date=${start}&end_date=${end}`,
-                    );
+                    const location = document.getElementById("globalStoreFilter")?.value || "";
+                    let recapUrl = `${BASE_URL}/api/accounting/recap?start_date=${start}&end_date=${end}`;
+                    if (location && location !== "Semua Toko") recapUrl += `&location=${encodeURIComponent(location)}`;
+                    const res = await fetch(recapUrl);
                     if (!res.ok) {
                         const err = await res.json().catch(() => ({}));
                         tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500 font-bold">Gagal memuat rekapitulasi: ${escapeHTML(err.error || "Server error")}</td></tr>`;
@@ -1875,8 +2099,8 @@
                         <td class="px-6 py-3 font-mono font-bold text-slate-600 border-r border-slate-200">${it.account_code}</td>
                         <td class="px-6 py-3 font-bold text-slate-800 border-r border-slate-200">${it.account_name}</td>
                         <td class="px-6 py-3 border-r border-slate-200"><span class="bg-slate-100 px-2 py-0.5 rounded text-xs font-bold text-slate-500">${it.account_type}</span></td>
-                        <td class="px-6 py-3 text-right font-bold text-slate-800 border-r border-slate-200">${it.total_debet > 0 ? `Rp ${Number(it.total_debet).toLocaleString("id-ID")}` : "-"}</td>
-                        <td class="px-6 py-3 text-right font-bold text-slate-800">${it.total_kredit > 0 ? `Rp ${Number(it.total_kredit).toLocaleString("id-ID")}` : "-"}</td>
+                        <td class="px-6 py-3 text-right font-bold text-slate-800 border-r border-slate-200">${it.total_debet > 0 ? formatRupiah(it.total_debet) : "-"}</td>
+                        <td class="px-6 py-3 text-right font-bold text-slate-800">${it.total_kredit > 0 ? formatRupiah(it.total_kredit) : "-"}</td>
                     </tr>
                 `,
                         )
@@ -1885,8 +2109,8 @@
                     tfoot.innerHTML = `
                     <tr>
                         <td colspan="3" class="px-6 py-4 font-black uppercase border-r border-slate-300">JUMLAH TOTAL</td>
-                        <td class="px-6 py-4 text-right font-black text-blue-600 text-base border-r border-slate-300">Rp ${Number(data.total_debet || 0).toLocaleString("id-ID")}</td>
-                        <td class="px-6 py-4 text-right font-black text-emerald-600 text-base">Rp ${Number(data.total_kredit || 0).toLocaleString("id-ID")}</td>
+                        <td class="px-6 py-4 text-right font-black text-blue-600 text-base border-r border-slate-300">${formatRupiah(data.total_debet || 0)}</td>
+                        <td class="px-6 py-4 text-right font-black text-emerald-600 text-base">${formatRupiah(data.total_kredit || 0)}</td>
                     </tr>
                 `;
 
@@ -1911,7 +2135,7 @@
                             <i class="fas fa-exclamation-circle text-2xl text-rose-600"></i>
                             <div>
                                 <h4 class="text-base font-extrabold">STATUS REKAPITULASI: TIDAK SEIMBANG</h4>
-                                <p class="text-xs text-rose-600 font-medium">Terdapat selisih sebesar Rp ${Math.abs(data.difference || 0).toLocaleString("id-ID")}. Periksa kembali jurnal harian.</p>
+                                <p class="text-xs text-rose-600 font-medium">Terdapat selisih sebesar ${formatRupiah(Math.abs(data.difference || 0))}. Periksa kembali jurnal harian.</p>
                             </div>
                         </div>
                         <span class="bg-rose-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase">Out of Balance</span>
@@ -1937,8 +2161,10 @@
 
                 container.innerHTML = `<div class="p-12 text-center text-slate-400 font-mono">Menyusun kartu buku besar...</div>`;
 
+                const location = document.getElementById("globalStoreFilter")?.value || "";
                 let url = `${BASE_URL}/api/accounting/ledger?start_date=${start}&end_date=${end}`;
                 if (accId > 0) url += `&account_id=${accId}`;
+                if (location && location !== "Semua Toko") url += `&location=${encodeURIComponent(location)}`;
 
                 try {
                     const res = await fetch(url);
@@ -1967,9 +2193,9 @@
                             <td class="px-4 py-2.5 border-r border-slate-200 text-slate-500 font-semibold">${new Date(tx.date).toLocaleDateString("id-ID", { dateStyle: "medium" })}</td>
                             <td class="px-4 py-2.5 border-r border-slate-200 font-bold text-slate-700">${escapeHTML(tx.description)}</td>
                             <td class="px-4 py-2.5 border-r border-slate-200 text-slate-400">${escapeHTML(tx.entry_number || "-")}</td>
-                            <td class="px-4 py-2.5 border-r border-slate-200 text-right font-bold text-slate-800">${tx.debet > 0 ? `Rp ${Number(tx.debet).toLocaleString("id-ID")}` : "-"}</td>
-                            <td class="px-4 py-2.5 border-r border-slate-200 text-right font-bold text-slate-800">${tx.kredit > 0 ? `Rp ${Number(tx.kredit).toLocaleString("id-ID")}` : "-"}</td>
-                            <td class="px-4 py-2.5 text-right font-extrabold text-blue-600">Rp ${Number(tx.balance || 0).toLocaleString("id-ID")}</td>
+                            <td class="px-4 py-2.5 border-r border-slate-200 text-right font-bold text-slate-800">${tx.debet > 0 ? formatRupiah(tx.debet) : "-"}</td>
+                            <td class="px-4 py-2.5 border-r border-slate-200 text-right font-bold text-slate-800">${tx.kredit > 0 ? formatRupiah(tx.kredit) : "-"}</td>
+                            <td class="px-4 py-2.5 text-right font-extrabold text-blue-600">${formatRupiah(tx.balance || 0)}</td>
                         </tr>
                     `,
                                 )
@@ -1988,10 +2214,10 @@
                                 </div>
                                 <div class="flex justify-between items-center mt-2 px-1 text-xs font-semibold text-slate-500">
                                     <span>Tipe: <b>${card.account_type}</b> • Posisi Normal: <b>${card.normal_position}</b></span>
-                                    <span>Saldo Awal: <b class="text-slate-900 font-mono">Rp ${Number(card.initial_balance || 0).toLocaleString("id-ID")}</b></span>
+                                    <span>Saldo Awal: <b class="text-slate-900 font-mono">${formatRupiah(card.initial_balance || 0)}</b></span>
                                 </div>
                             </div>
-                            <table class="w-full text-left border-collapse">
+                            <table class="w-full text-left border-collapse min-w-[720px]">
                                 <thead class="bg-slate-50 text-[10px] uppercase text-slate-600 font-bold border-b border-slate-300">
                                     <tr>
                                         <th class="px-4 py-3 border-r border-slate-200">TANGGAL</th>
@@ -2008,9 +2234,9 @@
                                 <tfoot class="bg-slate-100 font-bold text-xs border-t-2 border-slate-300">
                                     <tr>
                                         <td colspan="3" class="px-4 py-3 text-right border-r border-slate-300">JUMLAH MUTASI & SALDO AKHIR</td>
-                                        <td class="px-4 py-3 text-right text-blue-700 font-black font-mono border-r border-slate-300">Rp ${Number(card.total_debet || 0).toLocaleString("id-ID")}</td>
-                                        <td class="px-4 py-3 text-right text-emerald-700 font-black font-mono border-r border-slate-300">Rp ${Number(card.total_kredit || 0).toLocaleString("id-ID")}</td>
-                                        <td class="px-4 py-3 text-right text-slate-900 font-black font-mono text-sm">Rp ${Number(card.ending_balance || 0).toLocaleString("id-ID")}</td>
+                                        <td class="px-4 py-3 text-right text-blue-700 font-black font-mono border-r border-slate-300">${formatRupiah(card.total_debet || 0)}</td>
+                                        <td class="px-4 py-3 text-right text-emerald-700 font-black font-mono border-r border-slate-300">${formatRupiah(card.total_kredit || 0)}</td>
+                                        <td class="px-4 py-3 text-right text-slate-900 font-black font-mono text-sm">${formatRupiah(card.ending_balance || 0)}</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -2033,7 +2259,7 @@
                 const tbody = document.getElementById("piutangTableBody");
                 const tfoot = document.getElementById("piutangTableFoot");
 
-                let url = `${BASE_URL}/api/accounting/piutang?page=${piutangPage}&limit=${piutangLimit}`;
+                let url = `${BASE_URL}/api/accounting/piutang?page=${piutangPage}&limit=100&group_by=phone`;
                 if (search) url += `&search=${encodeURIComponent(search)}`;
                 if (start && end) url += `&start_date=${start}&end_date=${end}`;
 
@@ -2051,8 +2277,7 @@
                     const records = result.data || [];
                     const total = result.total || 0;
 
-                    document.getElementById("piutangCountInfo").innerText =
-                        total;
+                    document.getElementById("piutangCountInfo").innerText = total;
 
                     if (records.length === 0) {
                         tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-slate-400 font-mono">Tidak ada catatan piutang dagang</td></tr>`;
@@ -2060,61 +2285,118 @@
                         return;
                     }
 
-                    let sumSaldoAwal = 0;
-                    let sumDebet = 0;
-                    let sumKredit = 0;
-                    let sumSaldoAkhir = 0;
+                    // Kelompokkan data piutang berdasarkan Nomor Telephone
+                    const groupedByPhone = new Map();
+                    records.forEach((p) => {
+                        const phoneKey = String(p.customer_phone || "").trim() || "Tanpa No. HP";
+                        if (!groupedByPhone.has(phoneKey)) {
+                            groupedByPhone.set(phoneKey, {
+                                phone: phoneKey,
+                                customerName: p.customer_name || "Pelanggan",
+                                items: [],
+                                subSaldoAwal: 0,
+                                subDebet: 0,
+                                subKredit: 0,
+                                subSaldoAkhir: 0,
+                            });
+                        }
+                        const group = groupedByPhone.get(phoneKey);
+                        group.items.push(p);
+                        group.subSaldoAwal += Number(p.saldo_awal || 0);
+                        group.subDebet += Number(p.debet || 0);
+                        group.subKredit += Number(p.kredit || 0);
+                        group.subSaldoAkhir += Number(p.saldo_akhir || 0);
+                    });
 
-                    tbody.innerHTML = records
-                        .map((p) => {
-                            sumSaldoAwal += Number(p.saldo_awal || 0);
-                            sumDebet += Number(p.debet || 0);
-                            sumKredit += Number(p.kredit || 0);
-                            sumSaldoAkhir += Number(p.saldo_akhir || 0);
+                    let grandSaldoAwal = 0;
+                    let grandDebet = 0;
+                    let grandKredit = 0;
+                    let grandSaldoAkhir = 0;
+                    let rowsHTML = "";
 
-                            const isLunas =
-                                p.status === "Lunas" || p.saldo_akhir <= 0;
-                            const dateFormatted = p.tanggal
-                                ? new Date(p.tanggal).toLocaleDateString(
-                                      "id-ID",
-                                      { dateStyle: "medium" },
-                                  )
-                                : "-";
+                    groupedByPhone.forEach((group) => {
+                        grandSaldoAwal += group.subSaldoAwal;
+                        grandDebet += group.subDebet;
+                        grandKredit += group.subKredit;
+                        grandSaldoAkhir += group.subSaldoAkhir;
 
-                            return `
-                        <tr class="hover:bg-slate-50">
-                            <td class="px-6 py-3 font-semibold text-slate-500 border-r border-slate-200">${dateFormatted}</td>
-                            <td class="px-6 py-3 font-bold text-slate-800 border-r border-slate-200">
-                                <div>${escapeHTML(p.customer_name || "Pelanggan")}</div>
-                                ${p.customer_phone ? `<div class="text-[10px] text-slate-400">${escapeHTML(p.customer_phone)}</div>` : ""}
-                            </td>
-                            <td class="px-6 py-3 text-xs font-mono font-bold text-blue-600 border-r border-slate-200">${escapeHTML(p.sales_invoice || "-")}</td>
-                            <td class="px-6 py-3 text-right font-bold text-slate-600 border-r border-slate-200">Rp ${Number(p.saldo_awal || 0).toLocaleString("id-ID")}</td>
-                            <td class="px-6 py-3 text-right font-bold text-rose-600 border-r border-slate-200">Rp ${Number(p.debet || 0).toLocaleString("id-ID")}</td>
-                            <td class="px-6 py-3 text-right font-bold text-emerald-600 border-r border-slate-200">Rp ${Number(p.kredit || 0).toLocaleString("id-ID")}</td>
-                            <td class="px-6 py-3 text-right font-extrabold text-slate-900 border-r border-slate-200">Rp ${Number(p.saldo_akhir || 0).toLocaleString("id-ID")}</td>
-                            <td class="px-6 py-3 text-center border-r border-slate-200">
-                                <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${isLunas ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}">${escapeHTML(p.status)}</span>
-                            </td>
-                            <td class="px-6 py-3 text-center">
-                                <button onclick="editPiutang(${p.ID})" class="text-blue-500 hover:text-blue-700 mx-1" title="Edit"><i class="fas fa-edit"></i></button>
-                                <button onclick="deletePiutang(${p.ID})" class="text-red-400 hover:text-red-600 mx-1" title="Hapus"><i class="fas fa-trash"></i></button>
+                        // Baris Header Kelompok Pelanggan / Phone
+                        rowsHTML += `
+                        <tr class="bg-blue-50/70 border-t-2 border-b border-blue-200">
+                            <td colspan="9" class="px-6 py-2.5">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-phone-alt text-blue-600 text-xs"></i>
+                                        <span class="font-extrabold text-blue-900 text-xs">${escapeHTML(group.phone)}</span>
+                                        <span class="text-slate-400 text-xs">•</span>
+                                        <span class="font-bold text-slate-800 text-xs">${escapeHTML(group.customerName)}</span>
+                                    </div>
+                                    <span class="text-[10px] font-extrabold uppercase bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full border border-blue-200">
+                                        ${group.items.length} Transaksi
+                                    </span>
+                                </div>
                             </td>
                         </tr>
-                    `;
-                        })
-                        .join("");
+                        `;
 
+                        // Baris-baris transaksi piutang untuk kontak ini
+                        group.items.forEach((p) => {
+                            const isLunas = p.status === "Lunas" || p.saldo_akhir <= 0;
+                            const dateFormatted = p.tanggal
+                                ? new Date(p.tanggal).toLocaleDateString("id-ID", { dateStyle: "medium" })
+                                : "-";
+
+                            rowsHTML += `
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-2.5 font-semibold text-slate-500 border-r border-slate-200 pl-8">${dateFormatted}</td>
+                                <td class="px-6 py-2.5 font-bold text-slate-700 border-r border-slate-200">
+                                    <div>${escapeHTML(p.customer_name || "Pelanggan")}</div>
+                                    ${p.keterangan ? `<div class="text-[10px] text-slate-400 font-normal italic">${escapeHTML(p.keterangan)}</div>` : ""}
+                                </td>
+                                <td class="px-6 py-2.5 text-xs font-mono font-bold text-blue-600 border-r border-slate-200">${escapeHTML(p.sales_invoice || "-")}</td>
+                                <td class="px-6 py-2.5 text-right font-bold text-slate-600 border-r border-slate-200">${formatRupiah(p.saldo_awal || 0)}</td>
+                                <td class="px-6 py-2.5 text-right font-bold text-rose-600 border-r border-slate-200">${formatRupiah(p.debet || 0)}</td>
+                                <td class="px-6 py-2.5 text-right font-bold text-emerald-600 border-r border-slate-200">${formatRupiah(p.kredit || 0)}</td>
+                                <td class="px-6 py-2.5 text-right font-extrabold text-slate-900 border-r border-slate-200">${formatRupiah(p.saldo_akhir || 0)}</td>
+                                <td class="px-6 py-2.5 text-center border-r border-slate-200">
+                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${isLunas ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}">${escapeHTML(p.status)}</span>
+                                </td>
+                                <td class="px-6 py-2.5 text-center">
+                                    <button onclick="editPiutang(${p.ID})" class="text-blue-500 hover:text-blue-700 mx-1" title="Edit"><i class="fas fa-edit"></i></button>
+                                    <button onclick="deletePiutang(${p.ID})" class="text-red-400 hover:text-red-600 mx-1" title="Hapus"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            `;
+                        });
+
+                        // Baris Subtotal per Nomor HP
+                        rowsHTML += `
+                        <tr class="bg-slate-100/80 font-bold text-xs border-b-2 border-slate-300">
+                            <td colspan="3" class="px-6 py-2 text-right uppercase text-slate-500 text-[11px] border-r border-slate-300">
+                                Sub Total (${escapeHTML(group.phone)}):
+                            </td>
+                            <td class="px-6 py-2 text-right font-mono font-bold text-slate-700 border-r border-slate-300">${formatRupiah(group.subSaldoAwal)}</td>
+                            <td class="px-6 py-2 text-right font-mono font-bold text-rose-600 border-r border-slate-300">${formatRupiah(group.subDebet)}</td>
+                            <td class="px-6 py-2 text-right font-mono font-bold text-emerald-600 border-r border-slate-300">${formatRupiah(group.subKredit)}</td>
+                            <td class="px-6 py-2 text-right font-mono font-extrabold text-blue-700 border-r border-slate-300">${formatRupiah(group.subSaldoAkhir)}</td>
+                            <td colspan="2"></td>
+                        </tr>
+                        `;
+                    });
+
+                    tbody.innerHTML = rowsHTML;
+
+                    // Grand Total Rekapitulasi Piutang
                     tfoot.innerHTML = `
-                    <tr>
-                        <td colspan="3" class="px-6 py-4 font-black uppercase border-r border-slate-300">TOTAL REKAP PIUTANG</td>
-                        <td class="px-6 py-4 text-right font-black border-r border-slate-300">Rp ${sumSaldoAwal.toLocaleString("id-ID")}</td>
-                        <td class="px-6 py-4 text-right font-black text-rose-600 border-r border-slate-300">Rp ${sumDebet.toLocaleString("id-ID")}</td>
-                        <td class="px-6 py-4 text-right font-black text-emerald-600 border-r border-slate-300">Rp ${sumKredit.toLocaleString("id-ID")}</td>
-                        <td class="px-6 py-4 text-right font-black text-blue-700 border-r border-slate-300">Rp ${sumSaldoAkhir.toLocaleString("id-ID")}</td>
+                    <tr class="bg-slate-200/90 text-slate-800 font-black">
+                        <td colspan="3" class="px-6 py-4 font-black uppercase border-r border-slate-300 text-xs">GRAND TOTAL PIUTANG SEMUA KONTAK</td>
+                        <td class="px-6 py-4 text-right font-black border-r border-slate-300 text-xs">${formatRupiah(grandSaldoAwal)}</td>
+                        <td class="px-6 py-4 text-right font-black text-rose-600 border-r border-slate-300 text-xs">${formatRupiah(grandDebet)}</td>
+                        <td class="px-6 py-4 text-right font-black text-emerald-600 border-r border-slate-300 text-xs">${formatRupiah(grandKredit)}</td>
+                        <td class="px-6 py-4 text-right font-black text-blue-800 border-r border-slate-300 text-sm">${formatRupiah(grandSaldoAkhir)}</td>
                         <td colspan="2"></td>
                     </tr>
-                `;
+                    `;
                 } catch (e) {
                     console.error(e);
                 }
@@ -2341,6 +2623,88 @@
                     }
                 }
             });
+                    // --- GLOBAL TABLE ROW CLICK-TO-HIGHLIGHT (IDENTIFIKASI DATA CEPAT) ---
+            document.addEventListener("click", (e) => {
+                const tr = e.target.closest("tbody tr");
+                if (!tr) return;
+
+                // Jangan highlight baris loading / empty state yang memiliki colspan
+                if (tr.querySelector("td[colspan]")) return;
+
+                const tbody = tr.closest("tbody");
+                if (!tbody) return;
+
+                const isInteractive = e.target.closest("button, a, input, select");
+                const wasSelected = tr.classList.contains("row-selected");
+
+                if (isInteractive) {
+                    // Jika menekan tombol aksi (Edit, Hapus, Detail, Cetak, Retur, dll.),
+                    // pastikan baris ditandai (highlight) agar pengguna yakin baris mana yang sedang diproses!
+                    tbody.querySelectorAll("tr").forEach((r) => {
+                        if (r !== tr) r.classList.remove("row-selected");
+                    });
+                    tr.classList.add("row-selected");
+                } else {
+                    // Klik biasa pada baris data: toggle highlight
+                    tbody.querySelectorAll("tr").forEach((r) => {
+                        if (r !== tr) r.classList.remove("row-selected");
+                    });
+                    if (wasSelected) {
+                        tr.classList.remove("row-selected");
+                    } else {
+                        tr.classList.add("row-selected");
+                    }
+                }
+            });
         </script>
+
+                <!-- UNIFIED SIDEBAR CONTROLLER -->
+        <script>
+            function toggleSidebar() {
+                const isMobile = window.innerWidth < 1024;
+                const sidebar = document.getElementById("app-sidebar");
+                const backdrop = document.getElementById("sidebar-backdrop");
+                if (!sidebar) return;
+
+                if (isMobile) {
+                    const isClosed = sidebar.classList.contains("-translate-x-full");
+                    if (isClosed) {
+                        sidebar.classList.remove("-translate-x-full");
+                        if (backdrop) backdrop.classList.remove("hidden");
+                        document.body.classList.add("overflow-hidden");
+                    } else {
+                        sidebar.classList.add("-translate-x-full");
+                        if (backdrop) backdrop.classList.add("hidden");
+                        document.body.classList.remove("overflow-hidden");
+                    }
+                } else {
+                    const isCollapsed = sidebar.classList.contains("desktop-collapsed") || sidebar.classList.contains("lg:hidden");
+                    if (isCollapsed) {
+                        sidebar.classList.remove("desktop-collapsed", "lg:hidden");
+                    } else {
+                        sidebar.classList.add("desktop-collapsed", "lg:hidden");
+                    }
+                }
+            }
+            window.toggleSidebar = toggleSidebar;
+            window.toggleMobileSidebar = toggleSidebar;
+
+            window.addEventListener("resize", () => {
+                const sidebar = document.getElementById("app-sidebar");
+                const backdrop = document.getElementById("sidebar-backdrop");
+                if (window.innerWidth >= 1024) {
+                    if (!sidebar?.classList.contains("desktop-collapsed")) {
+                        sidebar?.classList.remove("-translate-x-full", "lg:hidden");
+                    }
+                    backdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
+                } else {
+                    sidebar?.classList.add("-translate-x-full");
+                    backdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
+                }
+            });
+        </script>
+
     </body>
 </html>

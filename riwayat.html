@@ -29,24 +29,81 @@
                 background: #cbd5e1;
                 border-radius: 10px;
             }
+
+            /* Highlighted Table Row on Click */
+            tr.row-selected,
+            tr.row-selected > td {
+                background-color: #eff6ff !important;
+            }
+
+            tr.row-selected {
+                box-shadow:
+                    inset 4px 0 0 0 #2563eb,
+                    inset 0 1px 0 0 #bfdbfe,
+                    inset 0 -1px 0 0 #bfdbfe !important;
+                position: relative;
+                z-index: 5;
+            }
+
+            /* Highlighted Sub-table (Item Detail) Row on Click */
+            tr.sub-row-selected,
+            tr.sub-row-selected > td {
+                background-color: #eff6ff !important;
+            }
+
+            tr.sub-row-selected {
+                box-shadow:
+                    inset 3px 0 0 0 #3b82f6,
+                    inset 0 1px 0 0 #bfdbfe,
+                    inset 0 -1px 0 0 #bfdbfe !important;
+                position: relative;
+                z-index: 5;
+            }
+
+            #riwayat-body tr {
+                cursor: pointer;
+            }
         </style>
     </head>
 
-    <body class="bg-[#F8FAFC] flex h-screen overflow-hidden">
+    <body
+        class="bg-[#F8FAFC] flex flex-col lg:flex-row min-h-screen lg:h-screen lg:overflow-hidden w-full overflow-x-hidden"
+    >
+        <!-- Mobile Backdrop -->
+        <div
+            id="sidebar-backdrop"
+            onclick="toggleSidebar()"
+            class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity duration-300"
+        ></div>
+
+        <!-- SIDEBAR (Off-canvas on mobile, static flex item on desktop) -->
         <aside
-            class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 z-20 shrink-0"
+            id="app-sidebar"
+            class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 sm:p-8 fixed inset-y-0 left-0 z-50 h-full lg:static lg:h-full lg:shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out"
         >
-            <div class="flex items-center gap-3 mb-8 shrink-0">
-                <div
-                    class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
-                >
-                    <i class="fas fa-store"></i>
+            <div class="flex items-center justify-between mb-8 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
+                    >
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h1
+                        class="text-xl font-extrabold text-slate-800 tracking-tight"
+                    >
+                        SMARTPOS
+                    </h1>
                 </div>
-                <h1
-                    class="text-xl font-extrabold text-slate-800 tracking-tight"
+                <button
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    title="Tutup / Collapse Sidebar"
+                    aria-label="Toggle Sidebar"
                 >
-                    SMARTPOS
-                </h1>
+                    <i class="fas fa-times text-lg lg:hidden"></i>
+                    <i class="fas fa-angles-left text-lg hidden lg:block"></i>
+                </button>
             </div>
 
             <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
@@ -132,24 +189,69 @@
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col overflow-hidden">
+        <!-- Mobile Top Bar -->
+        <div
+            class="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full"
+        >
+            <div class="flex items-center gap-3">
+                <button
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-xl focus:outline-none"
+                    aria-label="Buka Menu"
+                >
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+                <span
+                    class="font-extrabold text-slate-800 tracking-tight flex items-center gap-2"
+                >
+                    <span
+                        class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs shadow"
+                        ><i class="fas fa-store"></i
+                    ></span>
+                    SMARTPOS
+                </span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span
+                    class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg user-name-display"
+                    >Kasir</span
+                >
+            </div>
+        </div>
+
+        <main
+            id="main-content"
+            class="flex-1 flex flex-col min-w-0 w-full overflow-hidden"
+        >
             <header
-                class="h-20 bg-white border-b border-slate-200 px-10 flex justify-between items-center shrink-0"
+                class="min-h-20 bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-10 py-3 sm:py-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shrink-0"
             >
-                <div class="flex flex-col">
-                    <h2 class="text-lg font-bold text-slate-800">
-                        Riwayat Penjualan
-                    </h2>
-                    <p
-                        id="clock"
-                        class="text-xs text-slate-400 font-medium"
-                    ></p>
+                <div class="flex items-center gap-3">
+                    <button
+                        type="button"
+                        onclick="toggleSidebar()"
+                        class="hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-blue-600 shadow-sm transition-all cursor-pointer shrink-0"
+                        title="Buka / Tutup Sidebar"
+                        aria-label="Toggle Sidebar"
+                    >
+                        <i class="fas fa-bars text-sm"></i>
+                    </button>
+                    <div class="flex flex-col">
+                        <h2 class="text-lg font-bold text-slate-800">
+                            Riwayat Penjualan
+                        </h2>
+                        <p
+                            id="clock"
+                            class="text-xs text-slate-400 font-medium"
+                        ></p>
+                    </div>
                 </div>
                 <div class="flex items-center gap-3">
                     <div id="storeFilterContainer">
                         <select
                             id="filterStore"
-                            onchange="fetchRiwayat()"
+                            onchange="fetchRiwayat(1)"
                             class="bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer"
                         >
                             <option value="Semua Toko">
@@ -176,9 +278,11 @@
                 </div>
             </header>
 
-            <div class="flex-1 p-10 overflow-y-auto custom-scroll">
+            <div
+                class="flex-1 p-4 sm:p-6 lg:p-10 overflow-y-auto custom-scroll"
+            >
                 <div
-                    class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden"
+                    class="bg-white rounded-2xl sm:rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden"
                 >
                     <div
                         class="p-8 border-b border-slate-50 flex justify-between items-center"
@@ -199,29 +303,132 @@
                         class="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-slate-200"
                     >
                         <div
-                            class="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-100"
+                            class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4 pb-4 border-b border-slate-100"
                         >
-                            <div class="flex items-center gap-2">
-                                <i class="fas fa-filter text-blue-600"></i>
-                                <h4
-                                    class="font-bold text-slate-800 text-sm uppercase tracking-wider"
+                            <div class="flex items-center gap-2.5">
+                                <span
+                                    class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm shadow-sm"
                                 >
-                                    Filter Transaksi
-                                </h4>
+                                    <i class="fas fa-filter"></i>
+                                </span>
+                                <div>
+                                    <h4
+                                        class="font-extrabold text-slate-800 text-sm tracking-tight"
+                                    >
+                                        Filter & Pencarian Riwayat Transaksi
+                                    </h4>
+                                    <p
+                                        class="text-[11px] text-slate-400 font-medium"
+                                    >
+                                        Cari transaksi berdasarkan invoice,
+                                        pelanggan, status, shift, atau produk.
+                                    </p>
+                                </div>
                             </div>
-                            <button
-                                type="button"
-                                onclick="resetFilters()"
-                                class="text-xs font-bold text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1.5"
-                            >
-                                <i class="fas fa-redo-alt"></i> Reset Filter
-                            </button>
+
+                            <!-- PRESET TANGGAL CEPAT -->
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <span
+                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1"
+                                    ><i
+                                        class="fas fa-bolt text-amber-500 mr-1"
+                                    ></i
+                                    >Preset:</span
+                                >
+                                <button
+                                    type="button"
+                                    onclick="setPresetDate('all')"
+                                    class="preset-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white shadow-sm"
+                                    data-preset="all"
+                                >
+                                    Semua Waktu
+                                </button>
+                                <button
+                                    type="button"
+                                    onclick="setPresetDate('today')"
+                                    class="preset-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                    data-preset="today"
+                                >
+                                    Hari Ini
+                                </button>
+                                <button
+                                    type="button"
+                                    onclick="setPresetDate('yesterday')"
+                                    class="preset-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                    data-preset="yesterday"
+                                >
+                                    Kemarin
+                                </button>
+                                <button
+                                    type="button"
+                                    onclick="setPresetDate('last7days')"
+                                    class="preset-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                    data-preset="last7days"
+                                >
+                                    7 Hari
+                                </button>
+                                <button
+                                    type="button"
+                                    onclick="setPresetDate('thismonth')"
+                                    class="preset-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                    data-preset="thismonth"
+                                >
+                                    Bulan Ini
+                                </button>
+                                <button
+                                    type="button"
+                                    onclick="setPresetDate('lastmonth')"
+                                    class="preset-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                    data-preset="lastmonth"
+                                >
+                                    Bulan Lalu
+                                </button>
+                                <button
+                                    type="button"
+                                    onclick="resetFilters()"
+                                    class="ml-2 text-xs font-bold text-rose-500 hover:text-rose-700 transition-colors flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-rose-50"
+                                    title="Bersihkan Seluruh Filter"
+                                >
+                                    <i class="fas fa-undo-alt"></i> Reset
+                                </button>
+                            </div>
                         </div>
 
+                        <!-- BARIS 1: PENCARIAN CEPAT GLOBAL -->
+                        <div class="mb-4">
+                            <label
+                                class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                            >
+                                Pencarian Cepat Multi-Kriteria
+                            </label>
+                            <div class="relative">
+                                <i
+                                    class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"
+                                ></i>
+                                <input
+                                    type="text"
+                                    id="filterSearch"
+                                    placeholder="Ketik No. Invoice (PJL-...), Nama Pelanggan / Member, Kasir, atau Nama / Kode Barang..."
+                                    onkeyup="handleSearchKeyup(event)"
+                                    class="w-full bg-slate-50 border border-slate-200 pl-11 pr-10 py-2.5 text-xs rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all placeholder:text-slate-400 font-medium"
+                                />
+                                <button
+                                    type="button"
+                                    id="clearSearchBtn"
+                                    onclick="clearSearchInput()"
+                                    class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500 p-1"
+                                    title="Hapus pencarian"
+                                >
+                                    <i class="fas fa-times-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- BARIS 2: FILTER GRID RINCI -->
                         <div
-                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3"
+                            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3"
                         >
-                            <!-- 1. Tanggal Mulai -->
+                            <!-- 1. Dari Tanggal -->
                             <div>
                                 <label
                                     class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
@@ -230,12 +437,12 @@
                                 <input
                                     type="date"
                                     id="filterStartDate"
-                                    onchange="fetchRiwayat()"
+                                    onchange="onDateInputChange()"
                                     class="w-full bg-slate-50 border border-slate-200 px-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500"
                                 />
                             </div>
 
-                            <!-- 2. Tanggal Selesai -->
+                            <!-- 2. Sampai Tanggal -->
                             <div>
                                 <label
                                     class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
@@ -244,32 +451,34 @@
                                 <input
                                     type="date"
                                     id="filterEndDate"
-                                    onchange="fetchRiwayat()"
+                                    onchange="onDateInputChange()"
                                     class="w-full bg-slate-50 border border-slate-200 px-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500"
                                 />
                             </div>
 
-                            <!-- 3. Pencarian Member / Pelanggan -->
+                            <!-- 3. Status Pembayaran -->
                             <div>
                                 <label
                                     class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
-                                    >Nama Member / Kasir</label
+                                    >Status Bayar</label
                                 >
-                                <div class="relative">
-                                    <i
-                                        class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"
-                                    ></i>
-                                    <input
-                                        type="text"
-                                        id="filterMember"
-                                        placeholder="Cari nama..."
-                                        onkeyup="handleMemberKeyup(event)"
-                                        class="w-full bg-slate-50 border border-slate-200 pl-8 pr-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500"
-                                    />
-                                </div>
+                                <select
+                                    id="filterStatus"
+                                    onchange="fetchRiwayat(1)"
+                                    class="w-full bg-slate-50 border border-slate-200 px-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500"
+                                >
+                                    <option value="">Semua Status</option>
+                                    <option value="Lunas">✅ Lunas</option>
+                                    <option value="Belum Lunas">
+                                        ⏳ Belum Lunas (Bon)
+                                    </option>
+                                    <option value="DP">
+                                        💳 Uang Muka (DP)
+                                    </option>
+                                </select>
                             </div>
 
-                            <!-- 4. Metode Pembayaran -->
+                            <!-- 4. Metode Bayar -->
                             <div>
                                 <label
                                     class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
@@ -277,17 +486,14 @@
                                 >
                                 <select
                                     id="filterMethod"
-                                    onchange="fetchRiwayat()"
+                                    onchange="fetchRiwayat(1)"
                                     class="w-full bg-slate-50 border border-slate-200 px-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500"
                                 >
                                     <option value="">Semua Metode</option>
                                     <option value="Tunai">💵 Tunai</option>
-                                    <option value="Bayar Tunai">
-                                        💵 Bayar Tunai
-                                    </option>
-                                    <option value="EDC">💳 EDC</option>
+                                    <option value="EDC">💳 EDC / Kartu</option>
                                     <option value="Transfer">
-                                        🏦 Transfer
+                                        🏦 Transfer Bank
                                     </option>
                                     <option value="Bon / Utang">
                                         📄 Bon / Utang
@@ -295,35 +501,114 @@
                                 </select>
                             </div>
 
-                            <!-- 5. Tombol Cari -->
-                            <div class="flex items-end">
-                                <button
-                                    onclick="fetchRiwayat()"
-                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2"
+                            <!-- 5. Shift Kasir -->
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    >Shift Kasir</label
                                 >
-                                    <i class="fas fa-search"></i> Terapkan
-                                </button>
+                                <select
+                                    id="filterShift"
+                                    onchange="fetchRiwayat(1)"
+                                    class="w-full bg-slate-50 border border-slate-200 px-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500"
+                                >
+                                    <option value="">Semua Shift</option>
+                                    <option value="1">☀️ Shift 1 (Pagi)</option>
+                                    <option value="2">
+                                        🌤️ Shift 2 (Siang)
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- 6. Filter Barang / Produk Spesifik -->
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    >Produk Dibeli</label
+                                >
+                                <div class="relative">
+                                    <i
+                                        class="fas fa-box absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"
+                                    ></i>
+                                    <input
+                                        type="text"
+                                        id="filterProduct"
+                                        placeholder="Nama / kode..."
+                                        onkeyup="handleSearchKeyup(event)"
+                                        class="w-full bg-slate-50 border border-slate-200 pl-8 pr-3 py-2 text-xs rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
+                    <!-- Mobile Scroll Indicator Hint -->
+                    <div
+                        class="sm:hidden flex items-center justify-between text-[11px] text-slate-500 font-medium px-4 py-2.5 bg-slate-50/90 border-b border-slate-100 shrink-0"
+                    >
+                        <span class="flex items-center gap-1.5"
+                            ><i
+                                class="fas fa-arrows-left-right text-blue-500"
+                            ></i>
+                            Geser tabel untuk info & aksi</span
+                        >
+                        <span
+                            class="text-[10px] bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full font-bold"
+                            >↔ Geser</span
+                        >
+                    </div>
+
+                    <div class="overflow-x-auto custom-scroll">
+                        <table class="w-full min-w-[780px]">
                             <thead>
                                 <tr
-                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50 bg-slate-50/30"
+                                    class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 bg-slate-50/50"
                                 >
-                                    <th class="p-6 text-left">
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-left whitespace-nowrap"
+                                    >
                                         Invoice & Kasir
                                     </th>
-                                    <th class="p-6 text-left">Tanggal</th>
-                                    <th class="p-6 text-left">Item Belanja</th>
-                                    <th class="p-6 text-center">Status</th>
-                                    <th class="p-6 text-left">Metode</th>
-                                    <th class="p-6 text-center">Total Qty</th>
-                                    <th class="p-6 text-right">Total Netto</th>
-                                    <th class="p-6 text-right">Bayar</th>
-                                    <th class="p-6 text-center w-52">Aksi</th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-left whitespace-nowrap"
+                                    >
+                                        Tanggal
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-left"
+                                    >
+                                        Item Belanja
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-center whitespace-nowrap"
+                                    >
+                                        Status
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-left whitespace-nowrap"
+                                    >
+                                        Metode
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-center whitespace-nowrap"
+                                    >
+                                        Total Qty
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-right whitespace-nowrap"
+                                    >
+                                        Total Netto
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-right whitespace-nowrap"
+                                    >
+                                        Bayar
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-center whitespace-nowrap w-44 sm:w-52"
+                                    >
+                                        Aksi
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody
@@ -344,6 +629,53 @@
                             Belum ada data transaksi tersimpan
                         </p>
                     </div>
+
+                    <!-- PAGINATION FOOTER -->
+                    <div
+                        id="paginationContainer"
+                        class="p-5 px-8 bg-slate-50/70 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4"
+                    >
+                        <div class="flex items-center gap-4 flex-wrap">
+                            <p class="text-xs text-slate-500 font-medium">
+                                Menampilkan
+                                <span
+                                    id="countInfo"
+                                    class="font-bold text-slate-800"
+                                    >0</span
+                                >
+                                transaksi (Halaman
+                                <span
+                                    id="pageInfo"
+                                    class="font-bold text-blue-600"
+                                    >1</span
+                                >
+                                dari
+                                <span
+                                    id="totalPagesInfo"
+                                    class="font-bold text-slate-800"
+                                    >1</span
+                                >)
+                            </p>
+                            <div
+                                class="flex items-center gap-2 text-xs text-slate-500"
+                            >
+                                <span class="font-medium">Data per hal:</span>
+                                <select
+                                    id="limitSelect"
+                                    onchange="changeLimit(this.value)"
+                                    class="bg-white border border-slate-200 px-2.5 py-1 rounded-xl font-bold text-slate-700 outline-none cursor-pointer focus:border-blue-500"
+                                >
+                                    <option value="20" selected>20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div
+                            id="paginationControls"
+                            class="flex items-center gap-1.5 flex-wrap"
+                        ></div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -352,6 +684,10 @@
             const API_URL =
                 "https://langgeng-cashier-backend-production.up.railway.app/api";
             let localSalesData = [];
+            let currentPage = 1;
+            let limit = 20;
+            let totalTransactions = 0;
+            let totalPages = 1;
 
             const RECEIPT_BASE_CSS = `
             @page { size: 80mm auto; margin: 0; }
@@ -457,39 +793,156 @@
                 return stores[location] || stores["Toko Utama"];
             }
 
-            let memberSearchTimer = null;
+            let searchDebounceTimer = null;
 
-            function handleMemberKeyup(event) {
+            function handleSearchKeyup(event) {
+                const searchVal =
+                    document.getElementById("filterSearch")?.value || "";
+                const clearBtn = document.getElementById("clearSearchBtn");
+                if (clearBtn) {
+                    if (searchVal.trim() !== "") {
+                        clearBtn.classList.remove("hidden");
+                    } else {
+                        clearBtn.classList.add("hidden");
+                    }
+                }
+
                 if (event.key === "Enter") {
-                    clearTimeout(memberSearchTimer);
-                    fetchRiwayat();
+                    clearTimeout(searchDebounceTimer);
+                    currentPage = 1;
+                    fetchRiwayat(1);
                     return;
                 }
-                clearTimeout(memberSearchTimer);
-                memberSearchTimer = setTimeout(() => {
-                    fetchRiwayat();
+                clearTimeout(searchDebounceTimer);
+                searchDebounceTimer = setTimeout(() => {
+                    currentPage = 1;
+                    fetchRiwayat(1);
                 }, 400);
             }
 
-            function resetFilters() {
-                const startEl = document.getElementById("filterStartDate");
-                const endEl = document.getElementById("filterEndDate");
-                const memberEl = document.getElementById("filterMember");
-                const methodEl = document.getElementById("filterMethod");
-                const storeEl = document.getElementById("filterStore");
-
-                if (startEl) startEl.value = "";
-                if (endEl) endEl.value = "";
-                if (memberEl) memberEl.value = "";
-                if (methodEl) methodEl.value = "";
-                if (storeEl) storeEl.value = "Semua Toko";
-
-                fetchRiwayat();
+            function clearSearchInput() {
+                const input = document.getElementById("filterSearch");
+                if (input) input.value = "";
+                const clearBtn = document.getElementById("clearSearchBtn");
+                if (clearBtn) clearBtn.classList.add("hidden");
+                currentPage = 1;
+                fetchRiwayat(1);
             }
 
-            async function fetchRiwayat() {
+            function onDateInputChange() {
+                updatePresetButtonActiveState("");
+                currentPage = 1;
+                fetchRiwayat(1);
+            }
+
+            function updatePresetButtonActiveState(presetName) {
+                const buttons = document.querySelectorAll(".preset-btn");
+                buttons.forEach((btn) => {
+                    if (btn.getAttribute("data-preset") === presetName) {
+                        btn.className =
+                            "preset-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white shadow-sm";
+                    } else {
+                        btn.className =
+                            "preset-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200";
+                    }
+                });
+            }
+
+            function setPresetDate(preset) {
+                const startEl = document.getElementById("filterStartDate");
+                const endEl = document.getElementById("filterEndDate");
+                const now = new Date();
+
+                const formatDate = (d) => {
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth() + 1).padStart(2, "0");
+                    const day = String(d.getDate()).padStart(2, "0");
+                    return `${y}-${m}-${day}`;
+                };
+
+                updatePresetButtonActiveState(preset);
+
+                if (preset === "all") {
+                    if (startEl) startEl.value = "";
+                    if (endEl) endEl.value = "";
+                } else if (preset === "today") {
+                    const todayStr = formatDate(now);
+                    if (startEl) startEl.value = todayStr;
+                    if (endEl) endEl.value = todayStr;
+                } else if (preset === "yesterday") {
+                    const yest = new Date(now);
+                    yest.setDate(yest.getDate() - 1);
+                    const yestStr = formatDate(yest);
+                    if (startEl) startEl.value = yestStr;
+                    if (endEl) endEl.value = yestStr;
+                } else if (preset === "last7days") {
+                    const d7 = new Date(now);
+                    d7.setDate(d7.getDate() - 6);
+                    if (startEl) startEl.value = formatDate(d7);
+                    if (endEl) endEl.value = formatDate(now);
+                } else if (preset === "thismonth") {
+                    const firstDay = new Date(
+                        now.getFullYear(),
+                        now.getMonth(),
+                        1,
+                    );
+                    if (startEl) startEl.value = formatDate(firstDay);
+                    if (endEl) endEl.value = formatDate(now);
+                } else if (preset === "lastmonth") {
+                    const firstDayLastMonth = new Date(
+                        now.getFullYear(),
+                        now.getMonth() - 1,
+                        1,
+                    );
+                    const lastDayLastMonth = new Date(
+                        now.getFullYear(),
+                        now.getMonth(),
+                        0,
+                    );
+                    if (startEl) startEl.value = formatDate(firstDayLastMonth);
+                    if (endEl) endEl.value = formatDate(lastDayLastMonth);
+                }
+
+                currentPage = 1;
+                fetchRiwayat(1);
+            }
+
+            function resetFilters() {
+                const searchEl = document.getElementById("filterSearch");
+                const startEl = document.getElementById("filterStartDate");
+                const endEl = document.getElementById("filterEndDate");
+                const statusEl = document.getElementById("filterStatus");
+                const methodEl = document.getElementById("filterMethod");
+                const shiftEl = document.getElementById("filterShift");
+                const productEl = document.getElementById("filterProduct");
+                const storeEl = document.getElementById("filterStore");
+                const clearBtn = document.getElementById("clearSearchBtn");
+
+                if (searchEl) searchEl.value = "";
+                if (startEl) startEl.value = "";
+                if (endEl) endEl.value = "";
+                if (statusEl) statusEl.value = "";
+                if (methodEl) methodEl.value = "";
+                if (shiftEl) shiftEl.value = "";
+                if (productEl) productEl.value = "";
+                if (storeEl) storeEl.value = "Semua Toko";
+                if (clearBtn) clearBtn.classList.add("hidden");
+
+                updatePresetButtonActiveState("all");
+
+                currentPage = 1;
+                fetchRiwayat(1);
+            }
+
+            async function fetchRiwayat(page = currentPage) {
+                if (typeof page === "number" && page >= 1) {
+                    currentPage = page;
+                }
                 const tbody = document.getElementById("riwayat-body");
                 const emptyState = document.getElementById("empty-state");
+                const paginationContainer = document.getElementById(
+                    "paginationContainer",
+                );
 
                 tbody.innerHTML = `<tr><td colspan="9" class="py-20 text-center text-slate-400 font-medium">Memproses data...</td></tr>`;
 
@@ -546,14 +999,14 @@
                         params.append("location", selectedStore);
                     }
 
-                    // 3. Filter Tanggal (Backend membutuhkan start_date & end_date terisi bersamaan)
+                    // 3. Filter Tanggal
                     let startDate =
                         document.getElementById("filterStartDate")?.value || "";
                     let endDate =
                         document.getElementById("filterEndDate")?.value || "";
 
                     if (startDate && !endDate) {
-                        endDate = startDate; // Jika hanya memilih satu tanggal, set rentang hari tersebut
+                        endDate = startDate;
                     } else if (!startDate && endDate) {
                         startDate = endDate;
                     }
@@ -563,33 +1016,83 @@
                         params.append("end_date", endDate);
                     }
 
-                    // 4. Filter Member / Kasir
-                    const member = document
-                        .getElementById("filterMember")
-                        ?.value.trim();
-                    if (member) {
-                        params.append("member", member);
+                    // 4. Pencarian Utama / Cepat
+                    const search =
+                        document.getElementById("filterSearch")?.value.trim() ||
+                        "";
+                    if (search) {
+                        params.append("search", search);
                     }
 
-                    // 5. Filter Metode Pembayaran
+                    // 5. Filter Status Transaksi
+                    const status =
+                        document.getElementById("filterStatus")?.value || "";
+                    if (status) {
+                        params.append("status", status);
+                    }
+
+                    // 6. Filter Metode Pembayaran
                     const method =
-                        document.getElementById("filterMethod")?.value;
+                        document.getElementById("filterMethod")?.value || "";
                     if (method) {
                         params.append("method", method);
                     }
 
+                    // 7. Filter Shift Kasir
+                    const shift =
+                        document.getElementById("filterShift")?.value || "";
+                    if (shift) {
+                        params.append("shift", shift);
+                    }
+
+                    // 8. Filter Produk Tertentu
+                    const productSearch =
+                        document
+                            .getElementById("filterProduct")
+                            ?.value.trim() || "";
+                    if (productSearch) {
+                        params.append("product_search", productSearch);
+                    }
+
+                    // 9. Pagination Params
+                    params.append("page", currentPage);
+                    params.append("limit", limit);
                     const queryString = params.toString();
                     const url = `${API_URL}/sales${queryString ? "?" + queryString : ""}`;
 
                     const response = await fetch(url);
-                    const data = await response.json();
+                    const resJson = await response.json();
                     tbody.innerHTML = "";
 
-                    if (data && data.length > 0) {
-                        localSalesData = data;
-                        emptyState.classList.add("hidden");
+                    const items = Array.isArray(resJson)
+                        ? resJson
+                        : resJson.data || [];
+                    totalTransactions = Array.isArray(resJson)
+                        ? items.length
+                        : resJson.total || 0;
+                    totalPages = Array.isArray(resJson)
+                        ? Math.max(1, Math.ceil(totalTransactions / limit))
+                        : resJson.total_pages || 1;
+                    currentPage = Array.isArray(resJson)
+                        ? 1
+                        : resJson.page || currentPage;
 
-                        data.forEach((s, idx) => {
+                    const countInfoEl = document.getElementById("countInfo");
+                    if (countInfoEl) countInfoEl.innerText = totalTransactions;
+                    const pageInfoEl = document.getElementById("pageInfo");
+                    if (pageInfoEl) pageInfoEl.innerText = currentPage;
+                    const totalPagesInfoEl =
+                        document.getElementById("totalPagesInfo");
+                    if (totalPagesInfoEl)
+                        totalPagesInfoEl.innerText = totalPages;
+
+                    if (items && items.length > 0) {
+                        localSalesData = items;
+                        emptyState.classList.add("hidden");
+                        if (paginationContainer)
+                            paginationContainer.classList.remove("hidden");
+
+                        items.forEach((s, idx) => {
                             const invoice = s.invoice || s.Invoice || "-";
                             const createdAt = s.created_at || s.CreatedAt;
                             const formattedDate = createdAt
@@ -774,9 +1277,9 @@
                                 "hover:bg-slate-50/60 transition-all";
                             row.id = `group-row-${idx}`;
                             row.innerHTML = `
-                    <td class="p-6">
+                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                         <div class="flex items-center gap-1.5 flex-wrap mb-1">
-                            <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold border border-blue-100 inline-block">
+                            <span class="bg-blue-50 text-blue-600 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-lg text-xs font-bold border border-blue-100 inline-block">
                                 #${escapeHTML(invoice)}
                             </span>
                             <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200">
@@ -794,21 +1297,21 @@
                                 : ""
                         }
                     </td>
-                    <td class="p-6 text-xs text-slate-400 font-bold">
+                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-xs text-slate-500 font-bold whitespace-nowrap">
                         ${escapeHTML(formattedDate)}
                     </td>
-                    <td class="p-6">
+                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 min-w-[180px]">
                         ${productSummaryHTML}
                     </td>
-                    <td class="p-6 text-center">${statusBadge}</td>
-                    <td class="p-6 text-xs text-slate-500 max-w-[150px] truncate" title="${escapeHTML(paymentMethod)}">
+                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-center whitespace-nowrap">${statusBadge}</td>
+                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-xs text-slate-500 max-w-[130px] truncate whitespace-nowrap" title="${escapeHTML(paymentMethod)}">
                         ${escapeHTML(paymentMethod)}
                     </td>
-                    <td class="p-6 text-center font-bold text-slate-700">${totalQty}</td>
-                    <td class="p-6 text-right font-extrabold text-slate-800">IDR ${totalNetto.toLocaleString("id-ID")}</td>
-                    <td class="p-6 text-right text-emerald-600 font-bold">IDR ${amountPaid.toLocaleString("id-ID")}</td>
-                    <td class="p-6 text-center">
-                        <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-center font-bold text-slate-700 whitespace-nowrap">${totalQty}</td>
+                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right font-extrabold text-slate-800 whitespace-nowrap font-mono text-xs sm:text-sm">IDR ${totalNetto.toLocaleString("id-ID")}</td>
+                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right text-emerald-600 font-bold whitespace-nowrap font-mono text-xs sm:text-sm">IDR ${amountPaid.toLocaleString("id-ID")}</td>
+                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-center whitespace-nowrap">
+                        <div class="flex items-center justify-center gap-1.5 flex-nowrap">
                             ${actionButtons}
                         </div>
                     </td>
@@ -856,7 +1359,7 @@
                                         );
 
                                         return `
-                            <tr class="border-b border-slate-100 hover:bg-white/70 text-xs">
+                            <tr class="border-b border-slate-100 hover:bg-slate-50 text-xs transition-all cursor-pointer">
                                 <td class="py-2.5 px-4 font-mono font-bold text-slate-500">${escapeHTML(itCode)}</td>
                                 <td class="py-2.5 px-4 font-bold text-slate-700">${escapeHTML(itName)}</td>
                                 <td class="py-2.5 px-4 text-center font-bold text-slate-600">${itQty} ${escapeHTML(itSatuan)}</td>
@@ -904,14 +1407,87 @@
                                 tbody.appendChild(detailRow);
                             }
                         });
+                        renderPagination(totalTransactions);
                     } else {
+                        localSalesData = [];
                         emptyState.classList.remove("hidden");
                         tbody.innerHTML = "";
+                        if (paginationContainer)
+                            paginationContainer.classList.add("hidden");
+                        renderPagination(0);
                     }
                 } catch (error) {
                     console.error(error);
                     tbody.innerHTML = `<tr><td colspan="9" class="py-20 text-center text-red-400 font-bold">Gagal terhubung ke API Server</td></tr>`;
                 }
+            }
+
+            function changePage(page) {
+                if (page < 1 || page > totalPages) return;
+                currentPage = page;
+                fetchRiwayat(currentPage);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+
+            function changeLimit(newLimit) {
+                limit = parseInt(newLimit, 10) || 20;
+                currentPage = 1;
+                fetchRiwayat(1);
+            }
+
+            function renderPagination(total) {
+                const container = document.getElementById("paginationControls");
+                if (!container) return;
+
+                if (totalPages <= 1) {
+                    container.innerHTML = "";
+                    return;
+                }
+
+                let html = "";
+
+                // Tombol Previous
+                html += `<button onclick="changePage(${currentPage - 1})" ${currentPage <= 1 ? "disabled" : ""}
+                    class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-500 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-1">
+                    <i class="fas fa-chevron-left text-[10px]"></i> Sebelumnya
+                </button>`;
+
+                // Sliding window
+                let start = Math.max(1, currentPage - 2);
+                let end = Math.min(totalPages, start + 4);
+                if (end - start < 4) start = Math.max(1, end - 4);
+
+                if (start > 1) {
+                    html += `<button onclick="changePage(1)" class="w-8 h-8 rounded-xl text-xs font-bold transition-all bg-white text-slate-600 hover:bg-slate-50 border border-slate-200">1</button>`;
+                    if (start > 2) {
+                        html += `<span class="px-1 text-slate-400 font-bold text-xs">...</span>`;
+                    }
+                }
+
+                for (let i = start; i <= end; i++) {
+                    if (i < 1) continue;
+                    html += `
+                        <button onclick="changePage(${i})"
+                            class="w-8 h-8 rounded-xl text-xs font-bold transition-all ${currentPage === i ? "bg-blue-600 text-white shadow-md shadow-blue-200" : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200"}">
+                            ${i}
+                        </button>
+                    `;
+                }
+
+                if (end < totalPages) {
+                    if (end < totalPages - 1) {
+                        html += `<span class="px-1 text-slate-400 font-bold text-xs">...</span>`;
+                    }
+                    html += `<button onclick="changePage(${totalPages})" class="w-8 h-8 rounded-xl text-xs font-bold transition-all bg-white text-slate-600 hover:bg-slate-50 border border-slate-200">${totalPages}</button>`;
+                }
+
+                // Tombol Next
+                html += `<button onclick="changePage(${currentPage + 1})" ${currentPage >= totalPages ? "disabled" : ""}
+                    class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-500 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-1">
+                    Berikutnya <i class="fas fa-chevron-right text-[10px]"></i>
+                </button>`;
+
+                container.innerHTML = html;
             }
 
             function toggleDetailRow(idx) {
@@ -1207,6 +1783,7 @@
                     <meta charset="UTF-8">
                     <title>Nota Pelunasan ${escapeHTML(invoiceNo)}</title>
                     <style>
+
                         ${RECEIPT_BASE_CSS}
                         .receipt .center { text-align: center; }
                         .receipt .right { text-align: right; }
@@ -1229,7 +1806,8 @@
                             text-align: center;
                             font-weight: bold;
                         }
-                    </style>
+
+        </style>
                 </head>
                 <body>
                     <div class="receipt">
@@ -1687,6 +2265,7 @@
                         <meta charset="UTF-8">
                         <title>Nota ${escapeHTML(invoiceNo)}</title>
                         <style>
+
                             ${RECEIPT_BASE_CSS}
                             .center { text-align: center; }
                             .right { text-align: right; }
@@ -1706,7 +2285,8 @@
                                 .receipt { page-break-after: always; break-after: page; }
                                 .receipt:last-child { page-break-after: auto; break-after: auto; }
                             }
-                        </style>
+
+        </style>
                     </head>
                     <body>
                         ${allReceiptsHTML}
@@ -1804,6 +2384,7 @@
             <meta charset="UTF-8">
             <title>Nota Pelunasan ${escapeHTML(invoiceNo)}</title>
             <style>
+
                 ${RECEIPT_BASE_CSS}
                 .receipt .center { text-align: center; }
                 .receipt .right { text-align: right; }
@@ -1812,7 +2393,8 @@
                 .receipt .item-name { font-weight: bold; padding-top: 4px; }
                 .receipt .store-name { font-size: 14px; font-weight: bold; text-transform: uppercase; }
                 .receipt .thanks { margin-top: 10px; text-align: center; font-weight: bold; }
-            </style>
+
+        </style>
         </head>
         <body>
             <div class="receipt">
@@ -1873,6 +2455,17 @@
                     "Produk";
                 const itemCode =
                     item.product?.kode || item.product?.Kode || "-";
+
+                const userData = getUserDataFromToken() || {};
+                const currentUserName =
+                    userData.name || userData.username || "Petugas Kasir";
+                const currentUserRole = (
+                    userData.role || "kasir"
+                ).toUpperCase();
+                const currentUserId = userData.user_id
+                    ? String(userData.user_id)
+                    : "";
+
                 Swal.fire({
                     title: '<span class="text-slate-800 font-bold text-lg">Retur Barang Penjualan</span>',
                     html: `
@@ -1881,6 +2474,20 @@
                             <p class="font-bold text-slate-800 mb-1">Item: ${escapeHTML(itemName)}</p>
                             <p class="text-[10px] text-slate-400 uppercase font-black mb-1">Kode: ${escapeHTML(itemCode)} • Nota: #${escapeHTML(invoiceNo)}</p>
                             <p>Maksimum Qty yang Bisa Diretur: <span class="font-black text-rose-600">${maxQty} Pcs</span></p>
+                        </div>
+
+                        <!-- Info Petugas Penanggung Jawab -->
+                        <div class="bg-blue-50/60 p-3 rounded-xl border border-blue-100 flex items-center justify-between text-xs">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-sm shadow-blue-200">
+                                    <i class="fas fa-user-shield"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Petugas Penanggung Jawab</span>
+                                    <span class="font-bold text-slate-800">${escapeHTML(currentUserName)}</span>
+                                </div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-blue-100 text-blue-700 border border-blue-200">${escapeHTML(currentUserRole)}</span>
                         </div>
 
                         <div>
@@ -1935,6 +2542,9 @@
                             is_retur: true,
                             is_retur_to_company: toCompany,
                             qty_retur: qtyInput,
+                            user_id: currentUserId,
+                            user_name: currentUserName,
+                            user_role: currentUserRole,
                         };
                     },
                 }).then((result) => {
@@ -1950,9 +2560,14 @@
                     didOpen: () => Swal.showLoading(),
                 });
                 try {
+                    const token = localStorage.getItem("token");
+                    const headers = { "Content-Type": "application/json" };
+                    if (token) {
+                        headers["Authorization"] = `Bearer ${token}`;
+                    }
                     const res = await fetch(`${API_URL}/retur`, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: headers,
                         body: JSON.stringify(payload),
                     });
 
@@ -2031,6 +2646,7 @@
 
             const ROLE_PERMISSIONS = {
                 admin: [
+                    "dashboard.html",
                     "riwayat.html",
                     "product.html",
                     "purchase.html",
@@ -2039,7 +2655,7 @@
                     "absensi.html",
                     "report.html",
                 ],
-                kasir: ["dashboard.html", "riwayat.html"],
+                kasir: ["dashboard.html", "riwayat.html", "absensi.html"],
                 "super-kasir": [
                     "dashboard.html",
                     "riwayat.html",
@@ -2047,6 +2663,7 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 super_kasir: [
                     "dashboard.html",
@@ -2055,6 +2672,7 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 superkasir: [
                     "dashboard.html",
@@ -2063,17 +2681,16 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
-                ],
-                supersubkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
+                    "absensi.html",
                 ],
                 akuntan: [
                     "akuntansi.html",
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "riwayat.html",
+                    "report.html",
+                    "absensi.html",
                 ],
                 superadmin: [
                     "dashboard.html",
@@ -2229,9 +2846,79 @@
                 }
             });
 
+            // --- ROW HIGHLIGHT ON CLICK (IDENTIFIKASI DATA CEPAT) ---
+            function setupTableRowHighlight() {
+                const tbody = document.getElementById("riwayat-body");
+                if (!tbody || tbody.dataset.highlightBound) return;
+                tbody.dataset.highlightBound = "true";
+
+                tbody.addEventListener("click", (e) => {
+                    // 1. Clicked inside a detail accordion row (item detail sub-table)
+                    const detailContainer = e.target.closest(
+                        "tr[id^='detail-row-']",
+                    );
+                    if (detailContainer) {
+                        const itemTr = e.target.closest("table tbody tr");
+                        if (itemTr) {
+                            const subTbody = itemTr.closest("tbody");
+                            const wasSelected =
+                                itemTr.classList.contains("sub-row-selected");
+                            if (subTbody) {
+                                subTbody
+                                    .querySelectorAll("tr")
+                                    .forEach((r) =>
+                                        r.classList.remove("sub-row-selected"),
+                                    );
+                            }
+                            if (!wasSelected) {
+                                itemTr.classList.add("sub-row-selected");
+                            }
+                        }
+                        return;
+                    }
+
+                    // 2. Clicked on main transaction row
+                    const mainTr = e.target.closest("tr[id^='group-row-']");
+                    if (mainTr) {
+                        const isInteractive = e.target.closest(
+                            "button, a, input, select",
+                        );
+                        const wasSelected =
+                            mainTr.classList.contains("row-selected");
+
+                        if (isInteractive) {
+                            // If action button was clicked (Hapus, Cetak, Retur, Pelunasan),
+                            // ensure targeted row is highlighted so user clearly sees what is being acted upon!
+                            tbody
+                                .querySelectorAll("tr[id^='group-row-']")
+                                .forEach((r) => {
+                                    if (r !== mainTr)
+                                        r.classList.remove("row-selected");
+                                });
+                            mainTr.classList.add("row-selected");
+                        } else {
+                            // Normal click on row: toggle highlight
+                            tbody
+                                .querySelectorAll("tr[id^='group-row-']")
+                                .forEach((r) => {
+                                    if (r !== mainTr)
+                                        r.classList.remove("row-selected");
+                                });
+                            if (wasSelected) {
+                                mainTr.classList.remove("row-selected");
+                            } else {
+                                mainTr.classList.add("row-selected");
+                            }
+                        }
+                    }
+                });
+            }
+
             // Jalankan saat pertama load
             checkRoleAccess("riwayat.html");
+
             fetchRiwayat();
+            setupTableRowHighlight();
 
             // Clock Update
             setInterval(() => {
@@ -2242,6 +2929,63 @@
                         timeStyle: "medium",
                     });
             }, 1000);
+        </script>
+
+        <!-- UNIFIED SIDEBAR CONTROLLER -->
+        <script>
+            function toggleSidebar() {
+                const isMobile = window.innerWidth < 1024;
+                const sidebar = document.getElementById("app-sidebar");
+                const backdrop = document.getElementById("sidebar-backdrop");
+                if (!sidebar) return;
+
+                if (isMobile) {
+                    const isClosed =
+                        sidebar.classList.contains("-translate-x-full");
+                    if (isClosed) {
+                        sidebar.classList.remove("-translate-x-full");
+                        if (backdrop) backdrop.classList.remove("hidden");
+                        document.body.classList.add("overflow-hidden");
+                    } else {
+                        sidebar.classList.add("-translate-x-full");
+                        if (backdrop) backdrop.classList.add("hidden");
+                        document.body.classList.remove("overflow-hidden");
+                    }
+                } else {
+                    const isCollapsed =
+                        sidebar.classList.contains("desktop-collapsed") ||
+                        sidebar.classList.contains("lg:hidden");
+                    if (isCollapsed) {
+                        sidebar.classList.remove(
+                            "desktop-collapsed",
+                            "lg:hidden",
+                        );
+                    } else {
+                        sidebar.classList.add("desktop-collapsed", "lg:hidden");
+                    }
+                }
+            }
+            window.toggleSidebar = toggleSidebar;
+            window.toggleMobileSidebar = toggleSidebar;
+
+            window.addEventListener("resize", () => {
+                const sidebar = document.getElementById("app-sidebar");
+                const backdrop = document.getElementById("sidebar-backdrop");
+                if (window.innerWidth >= 1024) {
+                    if (!sidebar?.classList.contains("desktop-collapsed")) {
+                        sidebar?.classList.remove(
+                            "-translate-x-full",
+                            "lg:hidden",
+                        );
+                    }
+                    backdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
+                } else {
+                    sidebar?.classList.add("-translate-x-full");
+                    backdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
+                }
+            });
         </script>
     </body>
 </html>

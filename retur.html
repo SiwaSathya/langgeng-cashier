@@ -29,24 +29,66 @@
                 background: #cbd5e1;
                 border-radius: 10px;
             }
+
+            /* Highlighted Table Row on Click (Identifikasi Data Cepat) */
+            tr.row-selected,
+            tr.row-selected > td {
+                background-color: #eff6ff !important;
+            }
+
+            tr.row-selected {
+                box-shadow:
+                    inset 4px 0 0 0 #2563eb,
+                    inset 0 1px 0 0 #bfdbfe,
+                    inset 0 -1px 0 0 #bfdbfe !important;
+                position: relative;
+                z-index: 5;
+            }
+
+            tbody tr {
+                cursor: pointer;
+            }
         </style>
     </head>
 
-    <body class="bg-[#F8FAFC] flex h-screen overflow-hidden">
+    <body
+        class="bg-[#F8FAFC] flex flex-col lg:flex-row min-h-screen lg:h-screen lg:overflow-hidden w-full overflow-x-hidden"
+    >
+        <!-- Mobile Backdrop -->
+        <div
+            id="sidebar-backdrop"
+            onclick="toggleSidebar()"
+            class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity duration-300"
+        ></div>
+
+        <!-- SIDEBAR (Off-canvas on mobile, static flex item on desktop) -->
         <aside
-            class="w-72 bg-white border-r border-slate-200 flex flex-col p-8 z-20 shrink-0"
+            id="app-sidebar"
+            class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 sm:p-8 fixed inset-y-0 left-0 z-50 h-full lg:static lg:h-full lg:shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out"
         >
-            <div class="flex items-center gap-3 mb-8 shrink-0">
-                <div
-                    class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
-                >
-                    <i class="fas fa-store"></i>
+            <div class="flex items-center justify-between mb-8 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
+                    >
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h1
+                        class="text-xl font-extrabold text-slate-800 tracking-tight"
+                    >
+                        SMARTPOS
+                    </h1>
                 </div>
-                <h1
-                    class="text-xl font-extrabold text-slate-800 tracking-tight"
+                <button
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    title="Tutup / Collapse Sidebar"
+                    aria-label="Toggle Sidebar"
                 >
-                    SMARTPOS
-                </h1>
+                    <i class="fas fa-times text-lg lg:hidden"></i>
+                    <i class="fas fa-angles-left text-lg hidden lg:block"></i>
+                </button>
             </div>
 
             <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
@@ -132,18 +174,63 @@
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col overflow-hidden">
+        <!-- Mobile Top Bar -->
+        <div
+            class="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full"
+        >
+            <div class="flex items-center gap-3">
+                <button
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-xl focus:outline-none"
+                    aria-label="Buka Menu"
+                >
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+                <span
+                    class="font-extrabold text-slate-800 tracking-tight flex items-center gap-2"
+                >
+                    <span
+                        class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs shadow"
+                        ><i class="fas fa-store"></i
+                    ></span>
+                    SMARTPOS
+                </span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span
+                    class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg user-name-display"
+                    >Kasir</span
+                >
+            </div>
+        </div>
+
+        <main
+            id="main-content"
+            class="flex-1 flex flex-col min-w-0 w-full overflow-hidden"
+        >
             <header
-                class="h-20 bg-white border-b border-slate-200 px-10 flex justify-between items-center shrink-0"
+                class="min-h-20 bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-10 py-3 sm:py-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shrink-0"
             >
-                <div class="flex flex-col">
-                    <h2 class="text-lg font-bold text-slate-800">
-                        Log & Kontrol Retur Barang
-                    </h2>
-                    <p
-                        id="clock"
-                        class="text-xs text-slate-400 font-medium"
-                    ></p>
+                <div class="flex items-center gap-3">
+                    <button
+                        type="button"
+                        onclick="toggleSidebar()"
+                        class="hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-blue-600 shadow-sm transition-all cursor-pointer shrink-0"
+                        title="Buka / Tutup Sidebar"
+                        aria-label="Toggle Sidebar"
+                    >
+                        <i class="fas fa-bars text-sm"></i>
+                    </button>
+                    <div class="flex flex-col">
+                        <h2 class="text-lg font-bold text-slate-800">
+                            Log & Kontrol Retur Barang
+                        </h2>
+                        <p
+                            id="clock"
+                            class="text-xs text-slate-400 font-medium"
+                        ></p>
+                    </div>
                 </div>
                 <div class="flex items-center gap-3">
                     <button
@@ -161,30 +248,117 @@
                 </div>
             </header>
 
-            <div class="flex-1 p-10 overflow-y-auto custom-scroll">
+            <div
+                class="flex-1 p-4 sm:p-6 lg:p-10 overflow-y-auto custom-scroll"
+            >
                 <div
-                    class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden"
+                    class="bg-white rounded-2xl sm:rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden"
                 >
-                    <div class="p-8 border-b border-slate-50">
-                        <h3 class="font-bold text-slate-800">
-                            Daftar Aktivitas Retur
-                        </h3>
+                    <div
+                        class="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white"
+                    >
+                        <div>
+                            <h3
+                                class="font-extrabold text-slate-800 text-lg flex items-center gap-2"
+                            >
+                                <i class="fas fa-boxes text-blue-600"></i>
+                                Daftar Aktivitas & Pertanggungjawaban Retur
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">
+                                Catatan audit riwayat pengembalian barang
+                                beserta petugas penanggung jawab
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <div class="relative min-w-[260px]">
+                                <i
+                                    class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"
+                                ></i>
+                                <input
+                                    id="retur-search"
+                                    type="text"
+                                    oninput="filterReturTable()"
+                                    placeholder="Cari Petugas / Invoice / Produk..."
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
+                                />
+                            </div>
+                            <select
+                                id="retur-status-filter"
+                                onchange="filterReturTable()"
+                                class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-600 outline-none focus:bg-white focus:border-blue-500 cursor-pointer transition-all"
+                            >
+                                <option value="all">Semua Status</option>
+                                <option value="Retur Sukses">
+                                    Di Toko (Retur Sukses)
+                                </option>
+                                <option value="Retur ke Distributor">
+                                    Ke Distributor
+                                </option>
+                                <option value="Selesai (Distributor)">
+                                    Selesai Beres
+                                </option>
+                                <option value="Retur Dibatalkan">
+                                    Dibatalkan
+                                </option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
+                    <!-- Mobile Scroll Indicator Hint -->
+                    <div
+                        class="sm:hidden flex items-center justify-between text-[11px] text-slate-500 font-medium px-4 py-2.5 bg-slate-50/90 border-b border-slate-100 shrink-0"
+                    >
+                        <span class="flex items-center gap-1.5"
+                            ><i
+                                class="fas fa-arrows-left-right text-blue-500"
+                            ></i>
+                            Geser tabel untuk info & aksi</span
+                        >
+                        <span
+                            class="text-[10px] bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full font-bold"
+                            >↔ Geser</span
+                        >
+                    </div>
+
+                    <div class="overflow-x-auto custom-scroll">
+                        <table class="w-full min-w-[750px]">
                             <thead>
                                 <tr
-                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50 bg-slate-50/30"
+                                    class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 bg-slate-50/50"
                                 >
-                                    <th class="p-6 text-left">ID Retur</th>
-                                    <th class="p-6 text-left">Asal Invoice</th>
-                                    <th class="p-6 text-left">Nama Produk</th>
-                                    <th class="p-6 text-left">Alasan Retur</th>
-                                    <th class="p-6 text-center">
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-left whitespace-nowrap"
+                                    >
+                                        ID Retur
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-left whitespace-nowrap"
+                                    >
+                                        Asal Invoice
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-left whitespace-nowrap"
+                                    >
+                                        Nama Produk
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-left"
+                                    >
+                                        Alasan Retur
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-left whitespace-nowrap"
+                                    >
+                                        Petugas Penanggung Jawab
+                                    </th>
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-center whitespace-nowrap"
+                                    >
                                         Status System
                                     </th>
-                                    <th class="p-6 text-center w-64">
+                                    <th
+                                        class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-center whitespace-nowrap w-56 sm:w-64"
+                                    >
                                         Tindakan Lanjutan
                                     </th>
                                 </tr>
@@ -214,132 +388,430 @@
         <script>
             const API_URL =
                 "https://langgeng-cashier-backend-production.up.railway.app/api";
+            let allReturData = [];
+
+            function formatTanggalRetur(dateStr) {
+                if (!dateStr) return "-";
+                try {
+                    const d = new Date(dateStr);
+                    if (isNaN(d.getTime())) return "-";
+                    return d.toLocaleDateString("id-ID", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    });
+                } catch (e) {
+                    return "-";
+                }
+            }
 
             async function fetchRetur() {
                 const tbody = document.getElementById("retur-body");
                 const emptyState = document.getElementById("retur-empty");
-                tbody.innerHTML = `<tr><td colspan="6" class="py-20 text-center text-slate-400 font-medium">Memuat data log retur...</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="py-20 text-center text-slate-400 font-medium"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat data log retur & pertanggungjawaban...</td></tr>`;
 
                 try {
-                    const response = await fetch(`${API_URL}/retur`);
+                    const token = localStorage.getItem("token");
+                    const headers = {};
+                    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+                    const response = await fetch(`${API_URL}/retur`, {
+                        headers,
+                    });
                     const data = await response.json();
-                    tbody.innerHTML = "";
+                    allReturData = Array.isArray(data) ? data : [];
 
-                    if (data && data.length > 0) {
-                        emptyState.classList.add("hidden");
-
-                        data.forEach((r) => {
-                            const id = r.ID || r.id;
-                            const status =
-                                r.Status || r.status || "Retur Sukses";
-                            const reason = r.Reason || r.reason || "-";
-
-                            const sales = r.Sales || r.sales || {};
-                            const invoice =
-                                sales.Invoice || sales.invoice || "";
-                            const invoiceBadge = invoice
-                                ? `<span class="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg text-xs font-bold border">#${escapeHTML(invoice)}</span>`
-                                : `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-lg text-xs font-bold"><i class="fas fa-box-open mr-1"></i>Retur Langsung</span>`;
-
-                            // ==========================================
-                            // RESOLUSI DINAMIS PRODUCT ID & DETAIL PRODUK
-                            // ==========================================
-                            let product = null;
-                            let resolvedProductId = null;
-
-                            // Cek apakah ProductID di record retur tidak null / terisi
-                            const directProductId = r.ProductID ?? r.product_id;
-
-                            if (
-                                directProductId != null &&
-                                directProductId !== 0 &&
-                                directProductId !== ""
-                            ) {
-                                // 1. Jika ProductID pada Retur tidak null -> ambil langsung
-                                resolvedProductId = directProductId;
-                                product = r.Product || r.product || {};
-                            } else {
-                                // 2. Jika ProductID pada Retur null -> ambil dari Sales
-                                resolvedProductId =
-                                    sales.ProductID ||
-                                    sales.product_id ||
-                                    sales.Product?.ID ||
-                                    sales.product?.id;
-                                product = sales.Product || sales.product || {};
-                            }
-
-                            const productName =
-                                product.Nama ||
-                                product.nama ||
-                                (resolvedProductId
-                                    ? `Produk #${resolvedProductId}`
-                                    : "Produk Induk");
-                            const productCode =
-                                product.Kode || product.kode
-                                    ? `<span class="text-[10px] text-slate-400 uppercase font-mono font-bold block">${escapeHTML(product.Kode || product.kode)}</span>`
-                                    : "";
-
-                            let badgeHtml = "";
-                            let actionButtons = "";
-
-                            if (status === "Retur Sukses") {
-                                badgeHtml = `<span class="bg-blue-50 text-blue-600 border border-blue-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Retur Sukses (Di Toko)</span>`;
-                                actionButtons = `
-                                <button onclick="triggerAction(${id}, 'batal')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all mr-1">
-                                    <i class="fas fa-times mr-1"></i> Batalkan
-                                </button>
-                                <button onclick="triggerAction(${id}, 'distributor')" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm">
-                                    <i class="fas fa-truck mr-1"></i> Ke Distributor
-                                </button>
-                            `;
-                            } else if (status === "Retur ke Distributor") {
-                                badgeHtml = `<span class="bg-amber-50 text-amber-600 border border-amber-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase animate-pulse">Menunggu Supplier</span>`;
-                                actionButtons = `
-                                <button onclick="triggerAction(${id}, 'selesai')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm w-full">
-                                    <i class="fas fa-check-circle mr-1"></i> Selesaikan Retur
-                                </button>
-                            `;
-                            } else if (status === "Retur Dibatalkan") {
-                                badgeHtml = `<span class="bg-slate-100 text-slate-400 border border-slate-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Dibatalkan</span>`;
-                                actionButtons = `<span class="text-xs italic text-slate-400 font-medium">No Action Needed</span>`;
-                            } else if (status === "Selesai (Distributor)") {
-                                badgeHtml = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Selesai Beres</span>`;
-                                actionButtons = `<span class="text-xs text-emerald-500 font-bold"><i class="fas fa-check"></i> Selesai</span>`;
-                            }
-
-                            const row = document.createElement("tr");
-                            row.className =
-                                "hover:bg-slate-50/50 transition-all";
-                            row.innerHTML = `
-                            <td class="p-6 text-slate-400 font-bold">#RET-${id}</td>
-                            <td class="p-6">${invoiceBadge}</td>
-                            <td class="p-6 text-slate-800 font-bold">
-                                ${escapeHTML(productName)}
-                                ${productCode}
-                            </td>
-                            <td class="p-6 text-xs text-slate-500 font-medium max-w-[200px] truncate" title="${escapeHTML(reason)}">${escapeHTML(reason)}</td>
-                            <td class="p-6 text-center">${badgeHtml}</td>
-                            <td class="p-6 text-center">${actionButtons}</td>
-                        `;
-                            tbody.appendChild(row);
-                        });
-                    } else {
-                        emptyState.classList.remove("hidden");
-                    }
+                    filterReturTable();
                 } catch (err) {
                     console.error(err);
-                    tbody.innerHTML = `<tr><td colspan="6" class="py-20 text-center text-red-400 font-bold">Gagal mengambil data dari API Server</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" class="py-20 text-center text-red-400 font-bold">Gagal mengambil data dari API Server</td></tr>`;
                 }
+            }
+
+            function filterReturTable() {
+                const searchQuery = (
+                    document.getElementById("retur-search")?.value || ""
+                )
+                    .toLowerCase()
+                    .trim();
+                const statusFilter =
+                    document.getElementById("retur-status-filter")?.value ||
+                    "all";
+
+                const filtered = allReturData.filter((r) => {
+                    const status = r.Status || r.status || "Retur Sukses";
+                    if (statusFilter !== "all" && status !== statusFilter) {
+                        return false;
+                    }
+
+                    if (!searchQuery) return true;
+
+                    const id = String(r.ID || r.id || "");
+                    const reason = String(
+                        r.Reason || r.reason || "",
+                    ).toLowerCase();
+                    const sales = r.Sales || r.sales || {};
+                    const invoice = String(
+                        sales.Invoice || sales.invoice || "",
+                    ).toLowerCase();
+
+                    const userName = String(
+                        r.user_name ||
+                            r.UserName ||
+                            r.user?.name ||
+                            r.User?.Name ||
+                            sales.User?.Name ||
+                            sales.user?.name ||
+                            "",
+                    ).toLowerCase();
+
+                    let product =
+                        r.Product ||
+                        r.product ||
+                        sales.Product ||
+                        sales.product ||
+                        {};
+                    const prodName = String(
+                        product.Nama || product.nama || "",
+                    ).toLowerCase();
+                    const prodCode = String(
+                        product.Kode || product.kode || "",
+                    ).toLowerCase();
+
+                    return (
+                        id.includes(searchQuery) ||
+                        reason.includes(searchQuery) ||
+                        invoice.includes(searchQuery) ||
+                        userName.includes(searchQuery) ||
+                        prodName.includes(searchQuery) ||
+                        prodCode.includes(searchQuery)
+                    );
+                });
+
+                renderReturTable(filtered);
+            }
+
+            function renderReturTable(data) {
+                const tbody = document.getElementById("retur-body");
+                const emptyState = document.getElementById("retur-empty");
+                tbody.innerHTML = "";
+
+                if (data && data.length > 0) {
+                    emptyState.classList.add("hidden");
+
+                    data.forEach((r) => {
+                        const id = r.ID || r.id;
+                        const status = r.Status || r.status || "Retur Sukses";
+                        const reason = r.Reason || r.reason || "-";
+
+                        const sales = r.Sales || r.sales || {};
+                        const invoice = sales.Invoice || sales.invoice || "";
+                        const invoiceBadge = invoice
+                            ? `<span class="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg text-xs font-bold border">#${escapeHTML(invoice)}</span>`
+                            : `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-lg text-xs font-bold"><i class="fas fa-box-open mr-1"></i>Retur Langsung</span>`;
+
+                        // ==========================================
+                        // RESOLUSI DINAMIS PRODUCT ID & DETAIL PRODUK
+                        // ==========================================
+                        let product = null;
+                        let resolvedProductId = null;
+
+                        const directProductId = r.ProductID ?? r.product_id;
+                        if (
+                            directProductId != null &&
+                            directProductId !== 0 &&
+                            directProductId !== ""
+                        ) {
+                            resolvedProductId = directProductId;
+                            product = r.Product || r.product || {};
+                        } else {
+                            resolvedProductId =
+                                sales.ProductID ||
+                                sales.product_id ||
+                                sales.Product?.ID ||
+                                sales.product?.id;
+                            product = sales.Product || sales.product || {};
+                        }
+
+                        const productName =
+                            product.Nama ||
+                            product.nama ||
+                            (resolvedProductId
+                                ? `Produk #${resolvedProductId}`
+                                : "Produk Induk");
+                        const productCode =
+                            product.Kode || product.kode
+                                ? `<span class="text-[10px] text-slate-400 uppercase font-mono font-bold block">${escapeHTML(product.Kode || product.kode)}</span>`
+                                : "";
+
+                        // ==========================================
+                        // PETUGAS PENANGGUNG JAWAB RETUR
+                        // ==========================================
+                        const userName =
+                            r.user_name ||
+                            r.UserName ||
+                            r.user?.name ||
+                            r.User?.Name ||
+                            sales.User?.Name ||
+                            sales.user?.name ||
+                            "Petugas Kasir";
+
+                        const rawRole =
+                            r.user_role ||
+                            r.UserRole ||
+                            r.user?.role ||
+                            r.User?.Role ||
+                            sales.User?.Role ||
+                            sales.user?.role ||
+                            "KASIR";
+                        const userRole = String(rawRole).toUpperCase();
+
+                        let roleBadgeClass =
+                            "bg-blue-100 text-blue-700 border-blue-200";
+                        if (
+                            userRole.includes("ADMIN") ||
+                            userRole.includes("SUPERADMIN")
+                        ) {
+                            roleBadgeClass =
+                                "bg-purple-100 text-purple-700 border-purple-200";
+                        } else if (
+                            userRole.includes("SUPER-KASIR") ||
+                            userRole.includes("SUPERKASIR")
+                        ) {
+                            roleBadgeClass =
+                                "bg-indigo-100 text-indigo-700 border-indigo-200";
+                        } else if (userRole.includes("AKUNTAN")) {
+                            roleBadgeClass =
+                                "bg-emerald-100 text-emerald-700 border-emerald-200";
+                        }
+
+                        const createdAtFormatted = formatTanggalRetur(
+                            r.CreatedAt || r.created_at,
+                        );
+
+                        const userDisplayHtml = `
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 border border-slate-200 flex items-center justify-center text-xs font-bold shrink-0">
+                                    <i class="fas fa-user-shield text-slate-500"></i>
+                                </div>
+                                <div class="leading-tight">
+                                    <span class="font-bold text-slate-800 text-xs block">${escapeHTML(userName)}</span>
+                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                        <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase border ${roleBadgeClass}">${escapeHTML(userRole)}</span>
+                                        <span class="text-[10px] text-slate-400 font-medium">${createdAtFormatted}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        let badgeHtml = "";
+                        let actionButtons = "";
+
+                        if (status === "Retur Sukses") {
+                            badgeHtml = `<span class="bg-blue-50 text-blue-600 border border-blue-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Retur Sukses (Di Toko)</span>`;
+                            actionButtons = `
+                            <button onclick="triggerAction(${id}, 'batal')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all mr-1" title="Batalkan Retur">
+                                <i class="fas fa-times mr-1"></i> Batal
+                            </button>
+                            <button onclick="triggerAction(${id}, 'distributor')" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Kirim ke Distributor">
+                                <i class="fas fa-truck mr-1"></i> Ke Dist.
+                            </button>
+                        `;
+                        } else if (status === "Retur ke Distributor") {
+                            badgeHtml = `<span class="bg-amber-50 text-amber-600 border border-amber-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase animate-pulse">Menunggu Supplier</span>`;
+                            actionButtons = `
+                            <button onclick="triggerAction(${id}, 'selesai')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Selesaikan Penggantian">
+                                <i class="fas fa-check-circle mr-1"></i> Selesaikan
+                            </button>
+                        `;
+                        } else if (status === "Retur Dibatalkan") {
+                            badgeHtml = `<span class="bg-slate-100 text-slate-400 border border-slate-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Dibatalkan</span>`;
+                            actionButtons = `<span class="text-xs italic text-slate-400 font-medium">Batal</span>`;
+                        } else if (status === "Selesai (Distributor)") {
+                            badgeHtml = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Selesai Beres</span>`;
+                            actionButtons = `<span class="text-xs text-emerald-500 font-bold"><i class="fas fa-check"></i> Beres</span>`;
+                        }
+
+                        const row = document.createElement("tr");
+                        row.className = "hover:bg-slate-50/50 transition-all";
+                        row.innerHTML = `
+                        <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-slate-400 font-bold whitespace-nowrap">#RET-${id}</td>
+                        <td class="px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">${invoiceBadge}</td>
+                        <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-slate-800 font-bold min-w-[160px]">
+                            ${escapeHTML(productName)}
+                            ${productCode}
+                        </td>
+                        <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-xs text-slate-500 font-medium max-w-[180px] truncate" title="${escapeHTML(reason)}">${escapeHTML(reason)}</td>
+                        <td class="px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">${userDisplayHtml}</td>
+                        <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-center whitespace-nowrap">${badgeHtml}</td>
+                        <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-center whitespace-nowrap">
+                            <div class="flex items-center justify-center gap-1.5 flex-nowrap">
+                                ${actionButtons}
+                                <button onclick="showReturDetail(${id})" class="p-2 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 transition-all text-xs" title="Lihat Detail Pertanggungjawaban">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    emptyState.classList.remove("hidden");
+                }
+            }
+
+            function showReturDetail(id) {
+                const item = allReturData.find((r) => (r.id || r.ID) == id);
+                if (!item) return;
+
+                const sales = item.sales || item.Sales || {};
+                const invoice = sales.invoice || sales.Invoice || "";
+                const userName =
+                    item.user_name ||
+                    item.UserName ||
+                    item.user?.name ||
+                    item.User?.Name ||
+                    sales.User?.Name ||
+                    sales.user?.name ||
+                    "Petugas Kasir";
+                const userRole = String(
+                    item.user_role ||
+                        item.UserRole ||
+                        item.user?.role ||
+                        item.User?.Role ||
+                        sales.User?.Role ||
+                        sales.user?.role ||
+                        "KASIR",
+                ).toUpperCase();
+                const userId =
+                    item.user_id ||
+                    item.UserID ||
+                    item.user?.id ||
+                    item.User?.ID ||
+                    "-";
+                const reason = item.reason || item.Reason || "-";
+                const status = item.status || item.Status || "-";
+                const dateFormatted = formatTanggalRetur(
+                    item.CreatedAt || item.created_at,
+                );
+
+                let product =
+                    item.product ||
+                    item.Product ||
+                    sales.product ||
+                    sales.Product ||
+                    {};
+                const prodName = product.nama || product.Nama || "Produk Retur";
+                const prodCode = product.kode || product.Kode || "-";
+                const qtyRetur =
+                    item.qty_retur ||
+                    item.QtyRetur ||
+                    sales.qty ||
+                    sales.Qty ||
+                    1;
+
+                Swal.fire({
+                    title: '<div class="flex items-center justify-center gap-2 text-slate-800 font-bold text-lg"><i class="fas fa-file-invoice text-blue-600"></i> Akuntabilitas Retur Barang</div>',
+                    html: `
+                        <div class="text-left text-xs space-y-3 font-sans pt-2">
+                            <!-- Header Card ID Retur -->
+                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-2xl border border-blue-100 flex items-center justify-between">
+                                <div>
+                                    <span class="text-[10px] text-blue-500 font-black uppercase tracking-wider block">Nomor Retur</span>
+                                    <span class="font-extrabold text-slate-800 text-sm">#RET-${id}</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] text-slate-400 font-semibold block">Tanggal & Waktu</span>
+                                    <span class="font-bold text-slate-700">${dateFormatted}</span>
+                                </div>
+                            </div>
+
+                            <!-- Petugas Penanggung Jawab Card -->
+                            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
+                                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-2">Petugas Penanggung Jawab</span>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-sm shadow-blue-200">
+                                            <i class="fas fa-user-shield"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-slate-800 text-sm">${escapeHTML(userName)}</p>
+                                            <p class="text-[10px] text-slate-400 font-mono">User ID: ${escapeHTML(userId)}</p>
+                                        </div>
+                                    </div>
+                                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase bg-blue-50 text-blue-700 border border-blue-200">${escapeHTML(userRole)}</span>
+                                </div>
+                            </div>
+
+                            <!-- Asal Transaksi & Produk -->
+                            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2.5">
+                                <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                                    <span class="text-slate-500 font-semibold">Asal Transaksi:</span>
+                                    <span class="font-mono font-bold text-slate-800">${invoice ? `#${escapeHTML(invoice)}` : "Retur Langsung ke Pabrik / Distributor"}</span>
+                                </div>
+                                <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                                    <span class="text-slate-500 font-semibold">Produk:</span>
+                                    <div class="text-right">
+                                        <span class="font-bold text-slate-800 block">${escapeHTML(prodName)}</span>
+                                        <span class="text-[10px] text-slate-400 font-mono">${escapeHTML(prodCode)}</span>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                                    <span class="text-slate-500 font-semibold">Kuantitas Diretur:</span>
+                                    <span class="font-black text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100">${qtyRetur} Pcs</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-500 font-semibold">Status Sistem:</span>
+                                    <span class="font-bold text-slate-800">${escapeHTML(status)}</span>
+                                </div>
+                            </div>
+
+                            <!-- Alasan Retur -->
+                            <div class="bg-amber-50/70 p-3.5 rounded-xl border border-amber-200">
+                                <span class="text-[10px] text-amber-700 font-black uppercase tracking-wider block mb-1">Alasan Kerusakan / Retur:</span>
+                                <p class="text-slate-700 font-medium italic">"${escapeHTML(reason)}"</p>
+                            </div>
+                        </div>
+                    `,
+                    confirmButtonText: "Tutup",
+                    confirmButtonColor: "#2563EB",
+                });
             }
 
             // FUNGSI BARU: MENAMPILKAN POP UP MODAL TAMBAH DATA RETUR
             let returSearchTimer = null;
 
             async function openAddReturModal() {
+                const userData = getUserDataFromToken() || {};
+                const currentUserName =
+                    userData.name || userData.username || "Petugas Kasir";
+                const currentUserRole = (
+                    userData.role || "kasir"
+                ).toUpperCase();
+                const currentUserId = userData.user_id
+                    ? String(userData.user_id)
+                    : "";
+
                 await Swal.fire({
                     title: '<span class="text-slate-800 font-bold text-xl">Form Retur ke Distributor</span>',
                     html: `
                         <div class="text-left space-y-4 font-sans px-1">
+                            <!-- Info Petugas Pencatat -->
+                            <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
+                                        <i class="fas fa-user-shield"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Petugas Penanggung Jawab</span>
+                                        <span class="font-bold text-slate-800">${escapeHTML(currentUserName)}</span>
+                                    </div>
+                                </div>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-blue-100 text-blue-700 border border-blue-200">${escapeHTML(currentUserRole)}</span>
+                            </div>
+
                             <!-- Info Status -->
                             <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center gap-2">
                                 <i class="fas fa-truck text-amber-600"></i>
@@ -454,7 +926,6 @@
                             return false;
                         }
 
-                        // Statis langsung ke distributor
                         return {
                             product_id: parseInt(productId),
                             qty_retur: qty,
@@ -462,6 +933,9 @@
                             status: "Retur ke Distributor",
                             is_retur: true,
                             is_retur_to_company: true,
+                            user_id: currentUserId,
+                            user_name: currentUserName,
+                            user_role: currentUserRole,
                         };
                     },
                 }).then((result) => {
@@ -549,9 +1023,13 @@
                 });
 
                 try {
+                    const token = localStorage.getItem("token");
+                    const headers = { "Content-Type": "application/json" };
+                    if (token) headers["Authorization"] = `Bearer ${token}`;
+
                     const res = await fetch(`${API_URL}/retur/direct`, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: headers,
                         body: JSON.stringify(payload),
                     });
 
@@ -589,9 +1067,13 @@
                 });
 
                 try {
+                    const token = localStorage.getItem("token");
+                    const headers = { "Content-Type": "application/json" };
+                    if (token) headers["Authorization"] = `Bearer ${token}`;
+
                     const res = await fetch(`${API_URL}/retur`, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: headers,
                         body: JSON.stringify(payload),
                     });
 
@@ -659,8 +1141,13 @@
                 });
 
                 try {
+                    const token = localStorage.getItem("token");
+                    const headers = {};
+                    if (token) headers["Authorization"] = `Bearer ${token}`;
+
                     const res = await fetch(`${API_URL}${config.urlPath}`, {
                         method: "PUT",
+                        headers: headers,
                     });
                     if (res.ok) {
                         Swal.fire(
@@ -683,6 +1170,7 @@
 
             const ROLE_PERMISSIONS = {
                 admin: [
+                    "dashboard.html",
                     "riwayat.html",
                     "product.html",
                     "purchase.html",
@@ -691,7 +1179,7 @@
                     "absensi.html",
                     "report.html",
                 ],
-                kasir: ["dashboard.html", "riwayat.html"],
+                kasir: ["dashboard.html", "riwayat.html", "absensi.html"],
                 "super-kasir": [
                     "dashboard.html",
                     "riwayat.html",
@@ -699,6 +1187,7 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 super_kasir: [
                     "dashboard.html",
@@ -707,6 +1196,7 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 superkasir: [
                     "dashboard.html",
@@ -715,12 +1205,16 @@
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "absensi.html",
                 ],
                 akuntan: [
                     "akuntansi.html",
                     "purchase.html",
                     "expense.html",
                     "retur.html",
+                    "riwayat.html",
+                    "report.html",
+                    "absensi.html",
                 ],
                 superadmin: [
                     "dashboard.html",
@@ -915,6 +1409,7 @@
 
             // Init Load
             checkRoleAccess("retur.html");
+
             fetchRetur();
 
             // Live Clock
@@ -925,6 +1420,98 @@
                         timeStyle: "medium",
                     });
             }, 1000);
+            // --- GLOBAL TABLE ROW CLICK-TO-HIGHLIGHT (IDENTIFIKASI DATA CEPAT) ---
+            document.addEventListener("click", (e) => {
+                const tr = e.target.closest("tbody tr");
+                if (!tr) return;
+
+                // Jangan highlight baris loading / empty state yang memiliki colspan
+                if (tr.querySelector("td[colspan]")) return;
+
+                const tbody = tr.closest("tbody");
+                if (!tbody) return;
+
+                const isInteractive = e.target.closest(
+                    "button, a, input, select",
+                );
+                const wasSelected = tr.classList.contains("row-selected");
+
+                if (isInteractive) {
+                    // Jika menekan tombol aksi (Edit, Hapus, Detail, Cetak, Retur, dll.),
+                    // pastikan baris ditandai (highlight) agar pengguna yakin baris mana yang sedang diproses!
+                    tbody.querySelectorAll("tr").forEach((r) => {
+                        if (r !== tr) r.classList.remove("row-selected");
+                    });
+                    tr.classList.add("row-selected");
+                } else {
+                    // Klik biasa pada baris data: toggle highlight
+                    tbody.querySelectorAll("tr").forEach((r) => {
+                        if (r !== tr) r.classList.remove("row-selected");
+                    });
+                    if (wasSelected) {
+                        tr.classList.remove("row-selected");
+                    } else {
+                        tr.classList.add("row-selected");
+                    }
+                }
+            });
+        </script>
+
+        <!-- UNIFIED SIDEBAR CONTROLLER -->
+        <script>
+            function toggleSidebar() {
+                const isMobile = window.innerWidth < 1024;
+                const sidebar = document.getElementById("app-sidebar");
+                const backdrop = document.getElementById("sidebar-backdrop");
+                if (!sidebar) return;
+
+                if (isMobile) {
+                    const isClosed =
+                        sidebar.classList.contains("-translate-x-full");
+                    if (isClosed) {
+                        sidebar.classList.remove("-translate-x-full");
+                        if (backdrop) backdrop.classList.remove("hidden");
+                        document.body.classList.add("overflow-hidden");
+                    } else {
+                        sidebar.classList.add("-translate-x-full");
+                        if (backdrop) backdrop.classList.add("hidden");
+                        document.body.classList.remove("overflow-hidden");
+                    }
+                } else {
+                    const isCollapsed =
+                        sidebar.classList.contains("desktop-collapsed") ||
+                        sidebar.classList.contains("lg:hidden");
+                    if (isCollapsed) {
+                        sidebar.classList.remove(
+                            "desktop-collapsed",
+                            "lg:hidden",
+                        );
+                    } else {
+                        sidebar.classList.add("desktop-collapsed", "lg:hidden");
+                    }
+                }
+            }
+            window.toggleSidebar = toggleSidebar;
+            window.toggleMobileSidebar = toggleSidebar;
+
+            window.addEventListener("resize", () => {
+                const sidebar = document.getElementById("app-sidebar");
+                const backdrop = document.getElementById("sidebar-backdrop");
+                if (window.innerWidth >= 1024) {
+                    if (!sidebar?.classList.contains("desktop-collapsed")) {
+                        sidebar?.classList.remove(
+                            "-translate-x-full",
+                            "lg:hidden",
+                        );
+                    }
+                    backdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
+                } else {
+                    sidebar?.classList.add("-translate-x-full");
+                    backdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
+                }
+            });
         </script>
     </body>
 </html>
