@@ -1289,6 +1289,31 @@
                     "retur.html",
                     "absensi.html",
                 ],
+                supersubkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                ],
+                "super-subkasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                ],
+                super_subkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                ],
+                "super-sub-kasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                ],
+                super_sub_kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                ],
                 akuntan: [
                     "akuntansi.html",
                     "purchase.html",
@@ -1372,9 +1397,12 @@
                 const userRole = (userData.role || "kasir")
                     .toLowerCase()
                     .trim();
-                const allowedPages = ROLE_PERMISSIONS[userRole] || [
-                    "dashboard.html",
-                ];
+                const normalizedRole = userRole.replace(/[-_]/g, "");
+                const allowedPages =
+                    ROLE_PERMISSIONS[userRole] ||
+                    ROLE_PERMISSIONS[normalizedRole] || [
+                        "dashboard.html",
+                    ];
 
                 if (!allowedPages.includes(currentPage)) {
                     if (userRole === "akuntan")

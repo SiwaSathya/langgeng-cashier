@@ -816,9 +816,11 @@
                 <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right whitespace-nowrap">
                     ${
                         isSuperSubKasir
-                            ? "-"
+                            ? `
+                    <button onclick="editProduct('${p.ID || p.id}')" class="text-blue-500 hover:text-blue-700 mx-2 transition-colors" title="Lihat Detail Produk"><i class="fas fa-eye"></i></button>
+                    `
                             : `
-                    <button onclick="editProduct('${p.ID || p.id}')" class="text-blue-500 hover:text-blue-700 mx-2 transition-colors"><i class="fas fa-edit"></i></button>
+                    <button onclick="editProduct('${p.ID || p.id}')" class="text-blue-500 hover:text-blue-700 mx-2 transition-colors" title="Edit Produk"><i class="fas fa-edit"></i></button>
                     <button onclick="deleteProduct('${p.ID || p.id}')" class="text-red-400 hover:text-red-600 mx-2 transition-colors"><i class="fas fa-trash"></i></button>
                     `
                     }
@@ -1097,6 +1099,31 @@
                     "retur.html",
                     "absensi.html",
                 ],
+                supersubkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                ],
+                "super-subkasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                ],
+                super_subkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                ],
+                "super-sub-kasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                ],
+                super_sub_kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                ],
                 akuntan: [
                     "akuntansi.html",
                     "purchase.html",
@@ -1245,12 +1272,17 @@
                 const userRole = (userData.role || "kasir")
                     .toLowerCase()
                     .trim();
-                const allowedPages = ROLE_PERMISSIONS[userRole] || [
-                    "dashboard.html",
-                ];
+                const normalizedRole = userRole.replace(/[-_]/g, "");
+                const allowedPages =
+                    ROLE_PERMISSIONS[userRole] ||
+                    ROLE_PERMISSIONS[normalizedRole] || [
+                        "dashboard.html",
+                    ];
 
                 // Set global flag for supersubkasir
-                isSuperSubKasir = userRole === "supersubkasir";
+                isSuperSubKasir =
+                    userRole === "supersubkasir" ||
+                    normalizedRole === "supersubkasir";
 
                 if (!allowedPages.includes(currentPage)) {
                     if (userRole === "akuntan")
