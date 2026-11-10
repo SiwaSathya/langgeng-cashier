@@ -170,6 +170,13 @@
                     <i class="fas fa-chart-bar"></i>
                     <span>Laporan Analitik</span>
                 </a>
+                <a
+                    href="opname.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Stock Opname</span>
+                </a>
             </nav>
             <div class="pt-6 border-t border-slate-100 shrink-0">
                 <div class="bg-slate-50 p-4 rounded-2xl mb-4">
@@ -2319,8 +2326,14 @@ ${RECEIPT_BASE_CSS}
                     "retur.html",
                     "absensi.html",
                     "report.html",
+                    "opname.html",
                 ],
-                kasir: ["dashboard.html", "riwayat.html", "absensi.html"],
+                kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "absensi.html",
+                    "opname.html",
+                ],
                 "super-kasir": [
                     "dashboard.html",
                     "riwayat.html",
@@ -2329,6 +2342,7 @@ ${RECEIPT_BASE_CSS}
                     "expense.html",
                     "retur.html",
                     "absensi.html",
+                    "opname.html",
                 ],
                 super_kasir: [
                     "dashboard.html",
@@ -2338,6 +2352,7 @@ ${RECEIPT_BASE_CSS}
                     "expense.html",
                     "retur.html",
                     "absensi.html",
+                    "opname.html",
                 ],
                 superkasir: [
                     "dashboard.html",
@@ -2347,6 +2362,7 @@ ${RECEIPT_BASE_CSS}
                     "expense.html",
                     "retur.html",
                     "absensi.html",
+                    "opname.html",
                 ],
                 supersubkasir: [
                     "dashboard.html",
@@ -2381,6 +2397,7 @@ ${RECEIPT_BASE_CSS}
                     "riwayat.html",
                     "report.html",
                     "absensi.html",
+                    "opname.html",
                 ],
                 superadmin: [
                     "dashboard.html",
@@ -2392,6 +2409,7 @@ ${RECEIPT_BASE_CSS}
                     "akuntansi.html",
                     "absensi.html",
                     "report.html",
+                    "opname.html",
                 ],
             };
 
@@ -2410,11 +2428,8 @@ ${RECEIPT_BASE_CSS}
                     .toLowerCase()
                     .trim();
                 const normalizedRole = userRole.replace(/[-_]/g, "");
-                const allowedPages =
-                    ROLE_PERMISSIONS[userRole] ||
-                    ROLE_PERMISSIONS[normalizedRole] || [
-                        "dashboard.html",
-                    ];
+                const allowedPages = ROLE_PERMISSIONS[userRole] ||
+                    ROLE_PERMISSIONS[normalizedRole] || ["dashboard.html"];
 
                 if (!allowedPages.includes(currentPage)) {
                     if (userRole === "akuntan")

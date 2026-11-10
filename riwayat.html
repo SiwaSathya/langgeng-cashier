@@ -166,6 +166,13 @@
                     <i class="fas fa-chart-bar"></i>
                     <span>Laporan Analitik</span>
                 </a>
+                <a
+                    href="opname.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Stock Opname</span>
+                </a>
             </nav>
 
             <div class="pt-6 border-t border-slate-100 shrink-0">
@@ -279,6 +286,7 @@
             </header>
 
             <div
+                id="riwayatScrollContainer"
                 class="flex-1 p-4 sm:p-6 lg:p-10 overflow-y-auto custom-scroll"
             >
                 <div
@@ -630,52 +638,35 @@
                         </p>
                     </div>
 
-                    <!-- PAGINATION FOOTER -->
+                    <!-- INFINITE SCROLL FOOTER -->
                     <div
-                        id="paginationContainer"
-                        class="p-5 px-8 bg-slate-50/70 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4"
+                        id="infiniteScrollFooter"
+                        class="p-4 sm:p-5 px-6 sm:px-8 bg-slate-50/80 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3"
                     >
-                        <div class="flex items-center gap-4 flex-wrap">
-                            <p class="text-xs text-slate-500 font-medium">
-                                Menampilkan
-                                <span
-                                    id="countInfo"
-                                    class="font-bold text-slate-800"
-                                    >0</span
-                                >
-                                transaksi (Halaman
-                                <span
-                                    id="pageInfo"
-                                    class="font-bold text-blue-600"
-                                    >1</span
-                                >
-                                dari
-                                <span
-                                    id="totalPagesInfo"
-                                    class="font-bold text-slate-800"
-                                    >1</span
-                                >)
-                            </p>
-                            <div
-                                class="flex items-center gap-2 text-xs text-slate-500"
+                        <div
+                            class="flex items-center gap-2 text-xs text-slate-500 font-medium"
+                        >
+                            <span>Menampilkan</span>
+                            <span
+                                id="displayedCountInfo"
+                                class="font-bold text-blue-600"
+                                >0</span
                             >
-                                <span class="font-medium">Data per hal:</span>
-                                <select
-                                    id="limitSelect"
-                                    onchange="changeLimit(this.value)"
-                                    class="bg-white border border-slate-200 px-2.5 py-1 rounded-xl font-bold text-slate-700 outline-none cursor-pointer focus:border-blue-500"
-                                >
-                                    <option value="20" selected>20</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
-                            </div>
+                            <span>dari</span>
+                            <span
+                                id="totalCountInfo"
+                                class="font-bold text-slate-800"
+                                >0</span
+                            >
+                            <span>transaksi</span>
                         </div>
                         <div
-                            id="paginationControls"
-                            class="flex items-center gap-1.5 flex-wrap"
+                            id="infiniteScrollStatus"
+                            class="flex items-center gap-2"
                         ></div>
                     </div>
+                    <!-- Sentinel for Infinite Scroll trigger -->
+                    <div id="infiniteScrollSentinel" class="h-6 w-full"></div>
                 </div>
             </div>
         </main>
@@ -685,9 +676,13 @@
                 "https://langgeng-cashier-backend-production.up.railway.app/api";
             let localSalesData = [];
             let currentPage = 1;
-            let limit = 20;
+            const limit = 20;
             let totalTransactions = 0;
             let totalPages = 1;
+            let isLoadingMore = false;
+            let hasMoreData = true;
+            let infiniteScrollObserver = null;
+            let isScrollListenerAttached = false;
 
             const RECEIPT_BASE_CSS = `
             @page { size: 80mm auto; margin: 0; }
@@ -934,17 +929,31 @@
                 fetchRiwayat(1);
             }
 
-            async function fetchRiwayat(page = currentPage) {
+            async function fetchRiwayat(page = 1, isAppend = false) {
                 if (typeof page === "number" && page >= 1) {
                     currentPage = page;
+                } else {
+                    currentPage = 1;
                 }
+
                 const tbody = document.getElementById("riwayat-body");
                 const emptyState = document.getElementById("empty-state");
-                const paginationContainer = document.getElementById(
-                    "paginationContainer",
-                );
 
-                tbody.innerHTML = `<tr><td colspan="9" class="py-20 text-center text-slate-400 font-medium">Memproses data...</td></tr>`;
+                if (isAppend) {
+                    if (isLoadingMore || !hasMoreData) return;
+                    isLoadingMore = true;
+                    updateInfiniteScrollStatus(true);
+                } else {
+                    currentPage = 1;
+                    hasMoreData = true;
+                    localSalesData = [];
+                    isLoadingMore = false;
+                    if (tbody) {
+                        tbody.innerHTML = `<tr><td colspan="9" class="py-20 text-center text-slate-400 font-medium"><i class="fas fa-spinner fa-spin mr-2"></i> Memproses data...</td></tr>`;
+                    }
+                    if (emptyState) emptyState.classList.add("hidden");
+                    updateInfiniteScrollStatus(true);
+                }
 
                 const userData = getUserDataFromToken() || {};
                 const userLoc = (userData.location || "Toko Utama").trim();
@@ -1062,432 +1071,506 @@
 
                     const response = await fetch(url);
                     const resJson = await response.json();
-                    tbody.innerHTML = "";
 
-                    const items = Array.isArray(resJson)
+                    if (!isAppend && tbody) {
+                        tbody.innerHTML = "";
+                    }
+
+                    const batchSales = Array.isArray(resJson)
                         ? resJson
                         : resJson.data || [];
                     totalTransactions = Array.isArray(resJson)
-                        ? items.length
+                        ? batchSales.length
                         : resJson.total || 0;
                     totalPages = Array.isArray(resJson)
                         ? Math.max(1, Math.ceil(totalTransactions / limit))
                         : resJson.total_pages || 1;
-                    currentPage = Array.isArray(resJson)
-                        ? 1
-                        : resJson.page || currentPage;
 
-                    const countInfoEl = document.getElementById("countInfo");
-                    if (countInfoEl) countInfoEl.innerText = totalTransactions;
-                    const pageInfoEl = document.getElementById("pageInfo");
-                    if (pageInfoEl) pageInfoEl.innerText = currentPage;
-                    const totalPagesInfoEl =
-                        document.getElementById("totalPagesInfo");
-                    if (totalPagesInfoEl)
-                        totalPagesInfoEl.innerText = totalPages;
-
-                    if (items && items.length > 0) {
-                        localSalesData = items;
-                        emptyState.classList.add("hidden");
-                        if (paginationContainer)
-                            paginationContainer.classList.remove("hidden");
-
-                        items.forEach((s, idx) => {
-                            const invoice = s.invoice || s.Invoice || "-";
-                            const createdAt = s.created_at || s.CreatedAt;
-                            const formattedDate = createdAt
-                                ? new Date(createdAt).toLocaleString("id-ID", {
-                                      dateStyle: "medium",
-                                      timeStyle: "short",
-                                  })
-                                : "-";
-                            const cashierName =
-                                s.user?.name ||
-                                s.User?.name ||
-                                s.member_name ||
-                                s.MemberName ||
-                                "-";
-                            const storeLocation =
-                                s.location || s.user?.location || "Toko Utama";
-                            const customer = s.customer || s.Customer;
-                            const customerName =
-                                customer?.name || customer?.Name || "";
-                            const customerPhone =
-                                customer?.phone_number ||
-                                customer?.PhoneNumber ||
-                                "";
-
-                            const isBon =
-                                s.is_bon ||
-                                s.IsBon ||
-                                s.status === "Bon" ||
-                                s.Status === "Bon";
-                            const isDp =
-                                s.is_dp ||
-                                s.IsDp ||
-                                s.status === "DP" ||
-                                s.Status === "DP";
-                            const status =
-                                s.status ||
-                                s.Status ||
-                                (isBon ? "Bon" : isDp ? "DP" : "Lunas");
-                            const paymentMethod =
-                                s.payment_method || s.PaymentMethod || "Tunai";
-                            const totalNetto = Number(
-                                s.total_netto ?? s.TotalNetto ?? 0,
-                            );
-                            const amountPaid = Number(
-                                s.amount_paid ?? s.AmountPaid ?? 0,
-                            );
-                            const remainingAmount = Number(
-                                s.remaining_amount ??
-                                    (totalNetto - amountPaid > 0
-                                        ? totalNetto - amountPaid
-                                        : 0),
-                            );
-                            const items = s.items || s.Items || [];
-                            const totalQty = Number(
-                                s.total_qty ??
-                                    s.TotalQty ??
-                                    items.reduce(
-                                        (acc, it) =>
-                                            acc + Number(it.qty || it.Qty || 0),
-                                        0,
-                                    ),
-                            );
-                            const hasPelunasan =
-                                paymentMethod.includes("[Pelunasan:") ||
-                                (status === "Lunas" &&
-                                    (isBon || isDp || customerName));
-
-                            let statusBadge = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Lunas</span>`;
-                            if (isBon || status === "Bon") {
-                                statusBadge = `
-                        <div class="inline-flex flex-col items-center">
-                            <span class="bg-rose-50 text-rose-600 border border-rose-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">BON / UTANG</span>
-                            <span class="text-[10px] text-rose-500 font-bold mt-1">Sisa: IDR ${remainingAmount.toLocaleString("id-ID")}</span>
-                        </div>
-                    `;
-                            } else if (isDp || status === "DP") {
-                                statusBadge = `
-                        <div class="inline-flex flex-col items-center">
-                            <span class="bg-amber-50 text-amber-600 border border-amber-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">DP / Belum Lunas</span>
-                            ${remainingAmount > 0 ? `<span class="text-[10px] text-rose-500 font-bold mt-1">Sisa: IDR ${remainingAmount.toLocaleString("id-ID")}</span>` : ""}
-                        </div>
-                    `;
-                            }
-
-                            let actionButtons = "";
-                            // 1. Tombol Pelunasan (Hanya muncul jika belum lunas)
-                            if (
-                                isDp ||
-                                isBon ||
-                                status === "DP" ||
-                                status === "Bon"
-                            ) {
-                                actionButtons += `
-        <button onclick="openPelunasanModal(${idx})" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Pelunasan Nota">
-            <i class="fas fa-money-bill-wave mr-1"></i> Pelunasan
-        </button>
-    `;
-                            }
-
-                            // 2. Tombol Cetak Ulang Nota Pelunasan (Muncul jika transaksi telah dilunasi)
-                            if (hasPelunasan) {
-                                actionButtons += `
-        <button onclick="reprintPelunasanReceipt(${idx})" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Cetak Ulang Bukti Pelunasan">
-            <i class="fas fa-file-invoice-dollar mr-1"></i> Nota Lunas
-        </button>
-    `;
-                            }
-
-                            // 3. Tombol Cetak Ulang Nota Transaksi Utama (Selalu ada untuk semua transaksi)
-                            actionButtons += `
-    <button onclick="reprintSaleReceipt(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Cetak Ulang Nota Transaksi">
-        <i class="fas fa-print"></i>
-    </button>
-`;
-
-                            // 4. Tombol Retur Barang
-                            actionButtons += `
-    <button onclick="openReturModal(${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Retur Barang">
-        <i class="fas fa-undo"></i>
-    </button>
-`;
-
-                            // 5. Tombol Expand Rincian Item
-                            if (items.length > 0) {
-                                actionButtons += `
-        <button onclick="toggleDetailRow(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1.5 rounded-lg text-xs font-bold transition-all" title="Lihat Rincian Item">
-            <i id="toggle-icon-${idx}" class="fas fa-chevron-down transition-transform duration-200"></i>
-        </button>
-    `;
-                            }
-
-                            const userRole = (userData.role || "")
-                                .toLowerCase()
-                                .trim();
-                            if (
-                                userRole === "admin" ||
-                                userRole === "superadmin"
-                            ) {
-                                actionButtons += `
-                                <button onclick="deleteTransaction('${escapeHTML(invoice)}')" class="bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 border border-rose-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Hapus & Batalkan Transaksi (Rollback Stok)">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            `;
-                            }
-
-                            let productSummaryHTML = "";
-                            if (items.length === 0) {
-                                productSummaryHTML = `<p class="text-slate-400 italic text-xs">Tidak ada item</p>`;
-                            } else if (items.length === 1) {
-                                const firstItem = items[0];
-                                const pName =
-                                    firstItem.product?.nama ||
-                                    firstItem.Product?.Nama ||
-                                    firstItem.product_search ||
-                                    "Produk";
-                                const pCode =
-                                    firstItem.product?.kode ||
-                                    firstItem.Product?.Kode ||
-                                    "-";
-                                productSummaryHTML = `
-                        <p class="text-slate-800 font-bold">${escapeHTML(pName)}</p>
-                        <p class="text-[10px] text-slate-400 uppercase font-black">${escapeHTML(pCode)} • ${firstItem.qty || firstItem.Qty || 1} pcs</p>
-                    `;
-                            } else {
-                                const firstItem = items[0];
-                                const pName =
-                                    firstItem.product?.nama ||
-                                    firstItem.Product?.Nama ||
-                                    firstItem.product_search ||
-                                    "Produk";
-                                productSummaryHTML = `
-                        <p class="text-slate-800 font-bold">${escapeHTML(pName)}</p>
-                        <div class="flex items-center gap-1.5 mt-0.5">
-                            <span class="bg-blue-50 text-blue-600 border border-blue-100 px-1.5 py-0.5 rounded text-[10px] font-bold">+${items.length - 1} item lainnya</span>
-                            <button onclick="toggleDetailRow(${idx})" class="text-[10px] text-slate-400 hover:text-blue-600 font-semibold underline">Lihat Detail</button>
-                        </div>
-                    `;
-                            }
-
-                            const row = document.createElement("tr");
-                            row.className =
-                                "hover:bg-slate-50/60 transition-all";
-                            row.id = `group-row-${idx}`;
-                            row.innerHTML = `
-                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
-                        <div class="flex items-center gap-1.5 flex-wrap mb-1">
-                            <span class="bg-blue-50 text-blue-600 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-lg text-xs font-bold border border-blue-100 inline-block">
-                                #${escapeHTML(invoice)}
-                            </span>
-                            <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200">
-                                <i class="fas fa-store mr-1 text-blue-500"></i>${escapeHTML(storeLocation)}
-                            </span>
-                        </div>
-                        <p class="text-[11px] text-slate-400 font-bold"><i class="fas fa-user-circle mr-1"></i>${escapeHTML(cashierName)}</p>
-                        ${
-                            customerName
-                                ? `
-                            <p class="text-[10px] text-emerald-600 font-bold mt-0.5">
-                                <i class="fas fa-user mr-1"></i>${escapeHTML(customerName)} ${customerPhone ? `(${escapeHTML(customerPhone)})` : ""}
-                            </p>
-                        `
-                                : ""
+                    if (!batchSales || batchSales.length === 0) {
+                        hasMoreData = false;
+                        if (!isAppend) {
+                            if (emptyState)
+                                emptyState.classList.remove("hidden");
+                            if (tbody) tbody.innerHTML = "";
                         }
-                    </td>
-                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-xs text-slate-500 font-bold whitespace-nowrap">
-                        ${escapeHTML(formattedDate)}
-                    </td>
-                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 min-w-[180px]">
-                        ${productSummaryHTML}
-                    </td>
-                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-center whitespace-nowrap">${statusBadge}</td>
-                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-xs text-slate-500 max-w-[130px] truncate whitespace-nowrap" title="${escapeHTML(paymentMethod)}">
-                        ${escapeHTML(paymentMethod)}
-                    </td>
-                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-center font-bold text-slate-700 whitespace-nowrap">${totalQty}</td>
-                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right font-extrabold text-slate-800 whitespace-nowrap font-mono text-xs sm:text-sm">IDR ${totalNetto.toLocaleString("id-ID")}</td>
-                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right text-emerald-600 font-bold whitespace-nowrap font-mono text-xs sm:text-sm">IDR ${amountPaid.toLocaleString("id-ID")}</td>
-                    <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-center whitespace-nowrap">
-                        <div class="flex items-center justify-center gap-1.5 flex-nowrap">
-                            ${actionButtons}
+                        updateInfiniteScrollStatus(false);
+                        return;
+                    }
+
+                    if (emptyState) emptyState.classList.add("hidden");
+
+                    batchSales.forEach((s) => {
+                        const idx = localSalesData.length;
+                        localSalesData.push(s);
+
+                        const invoice = s.invoice || s.Invoice || "-";
+                        const createdAt = s.created_at || s.CreatedAt;
+                        const formattedDate = createdAt
+                            ? new Date(createdAt).toLocaleString("id-ID", {
+                                  dateStyle: "medium",
+                                  timeStyle: "short",
+                              })
+                            : "-";
+                        const cashierName =
+                            s.user?.name ||
+                            s.User?.name ||
+                            s.member_name ||
+                            s.MemberName ||
+                            "-";
+                        const storeLocation =
+                            s.location || s.user?.location || "Toko Utama";
+                        const customer = s.customer || s.Customer;
+                        const customerName =
+                            customer?.name || customer?.Name || "";
+                        const customerPhone =
+                            customer?.phone_number ||
+                            customer?.PhoneNumber ||
+                            "";
+
+                        const isBon =
+                            s.is_bon ||
+                            s.IsBon ||
+                            s.status === "Bon" ||
+                            s.Status === "Bon";
+                        const isDp =
+                            s.is_dp ||
+                            s.IsDp ||
+                            s.status === "DP" ||
+                            s.Status === "DP";
+                        const txStatus =
+                            s.status ||
+                            s.Status ||
+                            (isBon ? "Bon" : isDp ? "DP" : "Lunas");
+                        const paymentMethod =
+                            s.payment_method || s.PaymentMethod || "Tunai";
+                        const totalNetto = Number(
+                            s.total_netto ?? s.TotalNetto ?? 0,
+                        );
+                        const amountPaid = Number(
+                            s.amount_paid ?? s.AmountPaid ?? 0,
+                        );
+                        const remainingAmount = Number(
+                            s.remaining_amount ??
+                                (totalNetto - amountPaid > 0
+                                    ? totalNetto - amountPaid
+                                    : 0),
+                        );
+                        const saleItems = s.items || s.Items || [];
+                        const totalQty = Number(
+                            s.total_qty ??
+                                s.TotalQty ??
+                                saleItems.reduce(
+                                    (acc, it) =>
+                                        acc + Number(it.qty || it.Qty || 0),
+                                    0,
+                                ),
+                        );
+                        const hasPelunasan =
+                            paymentMethod.includes("[Pelunasan:") ||
+                            (txStatus === "Lunas" &&
+                                (isBon || isDp || customerName));
+
+                        let statusBadge = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Lunas</span>`;
+                        if (isBon || txStatus === "Bon") {
+                            statusBadge = `
+                    <div class="inline-flex flex-col items-center">
+                        <span class="bg-rose-50 text-rose-600 border border-rose-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">BON / UTANG</span>
+                        <span class="text-[10px] text-rose-500 font-bold mt-1">Sisa: IDR ${remainingAmount.toLocaleString("id-ID")}</span>
+                    </div>
+                `;
+                        } else if (isDp || txStatus === "DP") {
+                            statusBadge = `
+                    <div class="inline-flex flex-col items-center">
+                        <span class="bg-amber-50 text-amber-600 border border-amber-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">DP / Belum Lunas</span>
+                        ${remainingAmount > 0 ? `<span class="text-[10px] text-rose-500 font-bold mt-1">Sisa: IDR ${remainingAmount.toLocaleString("id-ID")}</span>` : ""}
+                    </div>
+                `;
+                        }
+
+                        let actionButtons = "";
+                        // 1. Tombol Pelunasan (Hanya muncul jika belum lunas)
+                        if (
+                            isDp ||
+                            isBon ||
+                            txStatus === "DP" ||
+                            txStatus === "Bon"
+                        ) {
+                            actionButtons += `
+    <button onclick="openPelunasanModal(${idx})" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Pelunasan Nota">
+        <i class="fas fa-money-bill-wave mr-1"></i> Pelunasan
+    </button>
+`;
+                        }
+
+                        // 2. Tombol Cetak Ulang Nota Pelunasan (Muncul jika transaksi telah dilunasi)
+                        if (hasPelunasan) {
+                            actionButtons += `
+    <button onclick="reprintPelunasanReceipt(${idx})" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Cetak Ulang Bukti Pelunasan">
+        <i class="fas fa-file-invoice-dollar mr-1"></i> Nota Lunas
+    </button>
+`;
+                        }
+
+                        // 3. Tombol Cetak Ulang Nota Transaksi Utama (Selalu ada untuk semua transaksi)
+                        actionButtons += `
+<button onclick="reprintSaleReceipt(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Cetak Ulang Nota Transaksi">
+    <i class="fas fa-print"></i>
+</button>
+`;
+
+                        // 4. Tombol Retur Barang
+                        actionButtons += `
+<button onclick="openReturModal(${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Retur Barang">
+    <i class="fas fa-undo"></i>
+</button>
+`;
+
+                        // 5. Tombol Expand Rincian Item
+                        if (saleItems.length > 0) {
+                            actionButtons += `
+    <button onclick="toggleDetailRow(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1.5 rounded-lg text-xs font-bold transition-all" title="Lihat Rincian Item">
+        <i id="toggle-icon-${idx}" class="fas fa-chevron-down transition-transform duration-200"></i>
+    </button>
+`;
+                        }
+
+                        const userRole = (userData.role || "")
+                            .toLowerCase()
+                            .trim();
+                        if (userRole === "admin" || userRole === "superadmin") {
+                            actionButtons += `
+                            <button onclick="deleteTransaction('${escapeHTML(invoice)}')" class="bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 border border-rose-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm" title="Hapus & Batalkan Transaksi (Rollback Stok)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        `;
+                        }
+
+                        let productSummaryHTML = "";
+                        if (saleItems.length === 0) {
+                            productSummaryHTML = `<p class="text-slate-400 italic text-xs">Tidak ada item</p>`;
+                        } else if (saleItems.length === 1) {
+                            const firstItem = saleItems[0];
+                            const pName =
+                                firstItem.product?.nama ||
+                                firstItem.Product?.Nama ||
+                                firstItem.product_search ||
+                                "Produk";
+                            const pCode =
+                                firstItem.product?.kode ||
+                                firstItem.Product?.Kode ||
+                                "-";
+                            productSummaryHTML = `
+                    <p class="text-slate-800 font-bold">${escapeHTML(pName)}</p>
+                    <p class="text-[10px] text-slate-400 uppercase font-black">${escapeHTML(pCode)} • ${firstItem.qty || firstItem.Qty || 1} pcs</p>
+                `;
+                        } else {
+                            const firstItem = saleItems[0];
+                            const pName =
+                                firstItem.product?.nama ||
+                                firstItem.Product?.Nama ||
+                                firstItem.product_search ||
+                                "Produk";
+                            productSummaryHTML = `
+                    <p class="text-slate-800 font-bold">${escapeHTML(pName)}</p>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="bg-blue-50 text-blue-600 border border-blue-100 px-1.5 py-0.5 rounded text-[10px] font-bold">+${saleItems.length - 1} item lainnya</span>
+                        <button onclick="toggleDetailRow(${idx})" class="text-[10px] text-slate-400 hover:text-blue-600 font-semibold underline">Lihat Detail</button>
+                    </div>
+                `;
+                        }
+
+                        const row = document.createElement("tr");
+                        row.className = "hover:bg-slate-50/60 transition-all";
+                        row.id = `group-row-${idx}`;
+                        row.innerHTML = `
+                <td class="px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-1.5 flex-wrap mb-1">
+                        <span class="bg-blue-50 text-blue-600 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-lg text-xs font-bold border border-blue-100 inline-block">
+                            #${escapeHTML(invoice)}
+                        </span>
+                        <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200">
+                            <i class="fas fa-store mr-1 text-blue-500"></i>${escapeHTML(storeLocation)}
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 font-bold"><i class="fas fa-user-circle mr-1"></i>${escapeHTML(cashierName)}</p>
+                    ${
+                        customerName
+                            ? `
+                        <p class="text-[10px] text-emerald-600 font-bold mt-0.5">
+                            <i class="fas fa-user mr-1"></i>${escapeHTML(customerName)} ${customerPhone ? `(${escapeHTML(customerPhone)})` : ""}
+                        </p>
+                    `
+                            : ""
+                    }
+                </td>
+                <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-xs text-slate-500 font-bold whitespace-nowrap">
+                    ${escapeHTML(formattedDate)}
+                </td>
+                <td class="px-3.5 py-3 sm:px-6 sm:py-4 min-w-[180px]">
+                    ${productSummaryHTML}
+                </td>
+                <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-center whitespace-nowrap">${statusBadge}</td>
+                <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-xs text-slate-500 max-w-[130px] truncate whitespace-nowrap" title="${escapeHTML(paymentMethod)}">
+                    ${escapeHTML(paymentMethod)}
+                </td>
+                <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-center font-bold text-slate-700 whitespace-nowrap">${totalQty}</td>
+                <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right font-extrabold text-slate-800 whitespace-nowrap font-mono text-xs sm:text-sm">IDR ${totalNetto.toLocaleString("id-ID")}</td>
+                <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right text-emerald-600 font-bold whitespace-nowrap font-mono text-xs sm:text-sm">IDR ${amountPaid.toLocaleString("id-ID")}</td>
+                <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-center whitespace-nowrap">
+                    <div class="flex items-center justify-center gap-1.5 flex-nowrap">
+                        ${actionButtons}
+                    </div>
+                </td>
+            `;
+                        tbody.appendChild(row);
+
+                        if (saleItems.length > 0) {
+                            const detailRow = document.createElement("tr");
+                            detailRow.id = `detail-row-${idx}`;
+                            detailRow.className =
+                                "hidden bg-slate-50/80 border-b border-slate-200";
+
+                            const itemRowsHTML = saleItems
+                                .map((it, itemIdx) => {
+                                    const itName =
+                                        it.product?.nama ||
+                                        it.product?.Nama ||
+                                        it.Product?.Nama ||
+                                        it.product_search ||
+                                        `Item #${it.id || ""}`;
+                                    const itCode =
+                                        it.product?.kode ||
+                                        it.product?.Kode ||
+                                        "-";
+                                    const itSatuan =
+                                        it.product?.satuan ||
+                                        it.product?.Satuan ||
+                                        "PCS";
+                                    const itQty = Number(it.qty || it.Qty || 0);
+                                    const itPrice = Number(
+                                        it.h_jual || it.HJual || it.price || 0,
+                                    );
+                                    const itDiscount = Number(
+                                        it.discount || it.Discount || 0,
+                                    );
+                                    const itSubtotal = Number(
+                                        it.total_netto ||
+                                            it.TotalNetto ||
+                                            itQty * itPrice - itDiscount,
+                                    );
+
+                                    return `
+                        <tr class="border-b border-slate-100 hover:bg-slate-50 text-xs transition-all cursor-pointer">
+                            <td class="py-2.5 px-4 font-mono font-bold text-slate-500">${escapeHTML(itCode)}</td>
+                            <td class="py-2.5 px-4 font-bold text-slate-700">${escapeHTML(itName)}</td>
+                            <td class="py-2.5 px-4 text-center font-bold text-slate-600">${itQty} ${escapeHTML(itSatuan)}</td>
+                            <td class="py-2.5 px-4 text-right font-semibold text-slate-600">IDR ${itPrice.toLocaleString("id-ID")}</td>
+                            <td class="py-2.5 px-4 text-right text-slate-400 font-semibold">${itDiscount > 0 ? `IDR ${itDiscount.toLocaleString("id-ID")}` : "-"}</td>
+                            <td class="py-2.5 px-4 text-right font-bold text-slate-800">IDR ${itSubtotal.toLocaleString("id-ID")}</td>
+                            <td class="py-2.5 px-4 text-center">
+                                <button onclick="openReturModal(${idx}, ${itemIdx})" class="bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 px-2.5 py-1 rounded-md text-[10px] font-bold transition-all shadow-sm">
+                                    <i class="fas fa-undo mr-1"></i> Retur
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                                })
+                                .join("");
+
+                            detailRow.innerHTML = `
+                    <td colspan="9" class="p-4 pl-12 pr-6">
+                        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                            <div class="bg-slate-100/60 px-4 py-2 border-b border-slate-200 flex justify-between items-center">
+                                <span class="text-[11px] font-black uppercase text-slate-500 tracking-wider">
+                                    <i class="fas fa-boxes text-blue-500 mr-1.5"></i> Rincian Barang (#${escapeHTML(invoice)})
+                                </span>
+                                <span class="text-[11px] font-bold text-slate-400">${saleItems.length} Macam Barang</span>
+                            </div>
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50 border-b border-slate-100">
+                                        <th class="py-2 px-4 text-left">Kode</th>
+                                        <th class="py-2 px-4 text-left">Nama Produk</th>
+                                        <th class="py-2 px-4 text-center">Qty</th>
+                                        <th class="py-2 px-4 text-right">Harga Satuan</th>
+                                        <th class="py-2 px-4 text-right">Diskon</th>
+                                        <th class="py-2 px-4 text-right">Subtotal</th>
+                                        <th class="py-2 px-4 text-center w-28">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${itemRowsHTML}
+                                </tbody>
+                            </table>
                         </div>
                     </td>
                 `;
-                            tbody.appendChild(row);
+                            tbody.appendChild(detailRow);
+                        }
+                    });
 
-                            if (items.length > 0) {
-                                const detailRow = document.createElement("tr");
-                                detailRow.id = `detail-row-${idx}`;
-                                detailRow.className =
-                                    "hidden bg-slate-50/80 border-b border-slate-200";
-
-                                const itemRowsHTML = items
-                                    .map((it, itemIdx) => {
-                                        const itName =
-                                            it.product?.nama ||
-                                            it.product?.Nama ||
-                                            it.Product?.Nama ||
-                                            it.product_search ||
-                                            `Item #${it.id || ""}`;
-                                        const itCode =
-                                            it.product?.kode ||
-                                            it.product?.Kode ||
-                                            "-";
-                                        const itSatuan =
-                                            it.product?.satuan ||
-                                            it.product?.Satuan ||
-                                            "PCS";
-                                        const itQty = Number(
-                                            it.qty || it.Qty || 0,
-                                        );
-                                        const itPrice = Number(
-                                            it.h_jual ||
-                                                it.HJual ||
-                                                it.price ||
-                                                0,
-                                        );
-                                        const itDiscount = Number(
-                                            it.discount || it.Discount || 0,
-                                        );
-                                        const itSubtotal = Number(
-                                            it.total_netto ||
-                                                it.TotalNetto ||
-                                                itQty * itPrice - itDiscount,
-                                        );
-
-                                        return `
-                            <tr class="border-b border-slate-100 hover:bg-slate-50 text-xs transition-all cursor-pointer">
-                                <td class="py-2.5 px-4 font-mono font-bold text-slate-500">${escapeHTML(itCode)}</td>
-                                <td class="py-2.5 px-4 font-bold text-slate-700">${escapeHTML(itName)}</td>
-                                <td class="py-2.5 px-4 text-center font-bold text-slate-600">${itQty} ${escapeHTML(itSatuan)}</td>
-                                <td class="py-2.5 px-4 text-right font-semibold text-slate-600">IDR ${itPrice.toLocaleString("id-ID")}</td>
-                                <td class="py-2.5 px-4 text-right text-slate-400 font-semibold">${itDiscount > 0 ? `IDR ${itDiscount.toLocaleString("id-ID")}` : "-"}</td>
-                                <td class="py-2.5 px-4 text-right font-bold text-slate-800">IDR ${itSubtotal.toLocaleString("id-ID")}</td>
-                                <td class="py-2.5 px-4 text-center">
-                                    <button onclick="openReturModal(${idx}, ${itemIdx})" class="bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 px-2.5 py-1 rounded-md text-[10px] font-bold transition-all shadow-sm">
-                                        <i class="fas fa-undo mr-1"></i> Retur
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                                    })
-                                    .join("");
-
-                                detailRow.innerHTML = `
-                        <td colspan="9" class="p-4 pl-12 pr-6">
-                            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-                                <div class="bg-slate-100/60 px-4 py-2 border-b border-slate-200 flex justify-between items-center">
-                                    <span class="text-[11px] font-black uppercase text-slate-500 tracking-wider">
-                                        <i class="fas fa-boxes text-blue-500 mr-1.5"></i> Rincian Barang (#${escapeHTML(invoice)})
-                                    </span>
-                                    <span class="text-[11px] font-bold text-slate-400">${items.length} Macam Barang</span>
-                                </div>
-                                <table class="w-full">
-                                    <thead>
-                                        <tr class="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50 border-b border-slate-100">
-                                            <th class="py-2 px-4 text-left">Kode</th>
-                                            <th class="py-2 px-4 text-left">Nama Produk</th>
-                                            <th class="py-2 px-4 text-center">Qty</th>
-                                            <th class="py-2 px-4 text-right">Harga Satuan</th>
-                                            <th class="py-2 px-4 text-right">Diskon</th>
-                                            <th class="py-2 px-4 text-right">Subtotal</th>
-                                            <th class="py-2 px-4 text-center w-28">Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${itemRowsHTML}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </td>
-                    `;
-                                tbody.appendChild(detailRow);
-                            }
-                        });
-                        renderPagination(totalTransactions);
+                    if (
+                        localSalesData.length >= totalTransactions ||
+                        batchSales.length < limit
+                    ) {
+                        hasMoreData = false;
                     } else {
-                        localSalesData = [];
-                        emptyState.classList.remove("hidden");
-                        tbody.innerHTML = "";
-                        if (paginationContainer)
-                            paginationContainer.classList.add("hidden");
-                        renderPagination(0);
+                        hasMoreData = true;
                     }
+                    updateInfiniteScrollStatus(false);
                 } catch (error) {
-                    console.error(error);
-                    tbody.innerHTML = `<tr><td colspan="9" class="py-20 text-center text-red-400 font-bold">Gagal terhubung ke API Server</td></tr>`;
+                    console.error("fetchRiwayat error:", error);
+                    if (!isAppend && tbody) {
+                        tbody.innerHTML = `<tr><td colspan="9" class="py-20 text-center text-red-400 font-bold">Gagal terhubung ke API Server</td></tr>`;
+                    }
+                    updateInfiniteScrollStatus(false);
+                } finally {
+                    isLoadingMore = false;
+                    setupInfiniteScroll();
                 }
             }
 
-            function changePage(page) {
-                if (page < 1 || page > totalPages) return;
-                currentPage = page;
-                fetchRiwayat(currentPage);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-            }
+            function updateInfiniteScrollStatus(loading = false) {
+                const displayedEl =
+                    document.getElementById("displayedCountInfo");
+                const totalEl = document.getElementById("totalCountInfo");
+                const statusEl = document.getElementById(
+                    "infiniteScrollStatus",
+                );
 
-            function changeLimit(newLimit) {
-                limit = parseInt(newLimit, 10) || 20;
-                currentPage = 1;
-                fetchRiwayat(1);
-            }
+                if (displayedEl)
+                    displayedEl.innerText =
+                        localSalesData.length.toLocaleString("id-ID");
+                if (totalEl)
+                    totalEl.innerText =
+                        totalTransactions.toLocaleString("id-ID");
 
-            function renderPagination(total) {
-                const container = document.getElementById("paginationControls");
-                if (!container) return;
+                if (!statusEl) return;
 
-                if (totalPages <= 1) {
-                    container.innerHTML = "";
+                if (loading) {
+                    statusEl.innerHTML = `
+                        <div class="flex items-center gap-2 text-xs text-blue-600 font-bold bg-blue-50 px-3.5 py-1.5 rounded-xl border border-blue-100">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Memuat transaksi...</span>
+                        </div>
+                    `;
                     return;
                 }
 
-                let html = "";
-
-                // Tombol Previous
-                html += `<button onclick="changePage(${currentPage - 1})" ${currentPage <= 1 ? "disabled" : ""}
-                    class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-500 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-1">
-                    <i class="fas fa-chevron-left text-[10px]"></i> Sebelumnya
-                </button>`;
-
-                // Sliding window
-                let start = Math.max(1, currentPage - 2);
-                let end = Math.min(totalPages, start + 4);
-                if (end - start < 4) start = Math.max(1, end - 4);
-
-                if (start > 1) {
-                    html += `<button onclick="changePage(1)" class="w-8 h-8 rounded-xl text-xs font-bold transition-all bg-white text-slate-600 hover:bg-slate-50 border border-slate-200">1</button>`;
-                    if (start > 2) {
-                        html += `<span class="px-1 text-slate-400 font-bold text-xs">...</span>`;
-                    }
-                }
-
-                for (let i = start; i <= end; i++) {
-                    if (i < 1) continue;
-                    html += `
-                        <button onclick="changePage(${i})"
-                            class="w-8 h-8 rounded-xl text-xs font-bold transition-all ${currentPage === i ? "bg-blue-600 text-white shadow-md shadow-blue-200" : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200"}">
-                            ${i}
+                if (totalTransactions === 0) {
+                    statusEl.innerHTML = `<span class="text-slate-400 italic text-xs">Tidak ada data transaksi</span>`;
+                } else if (
+                    !hasMoreData ||
+                    localSalesData.length >= totalTransactions
+                ) {
+                    statusEl.innerHTML = `
+                        <span class="text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                            <i class="fas fa-check-circle text-emerald-500"></i> Semua ${totalTransactions.toLocaleString("id-ID")} transaksi telah dimuat
+                        </span>
+                    `;
+                } else {
+                    statusEl.innerHTML = `
+                        <button
+                            type="button"
+                            onclick="loadMoreRiwayat()"
+                            class="px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 rounded-xl font-bold transition-all flex items-center gap-1.5 shadow-sm text-xs cursor-pointer"
+                        >
+                            <i class="fas fa-arrow-down text-xs"></i> Muat Lebih Banyak (${localSalesData.length}/${totalTransactions})
                         </button>
                     `;
                 }
+            }
 
-                if (end < totalPages) {
-                    if (end < totalPages - 1) {
-                        html += `<span class="px-1 text-slate-400 font-bold text-xs">...</span>`;
+            function loadMoreRiwayat() {
+                if (isLoadingMore || !hasMoreData) return;
+                currentPage++;
+                fetchRiwayat(currentPage, true);
+            }
+
+            function setupInfiniteScroll() {
+                const scrollContainer = document.getElementById(
+                    "riwayatScrollContainer",
+                );
+                const sentinel = document.getElementById(
+                    "infiniteScrollSentinel",
+                );
+
+                if (!sentinel) return;
+
+                // 1. IntersectionObserver: triggers seamlessly as sentinel approaches viewport
+                if ("IntersectionObserver" in window) {
+                    if (infiniteScrollObserver) {
+                        infiniteScrollObserver.disconnect();
                     }
-                    html += `<button onclick="changePage(${totalPages})" class="w-8 h-8 rounded-xl text-xs font-bold transition-all bg-white text-slate-600 hover:bg-slate-50 border border-slate-200">${totalPages}</button>`;
+                    infiniteScrollObserver = new IntersectionObserver(
+                        (entries) => {
+                            entries.forEach((entry) => {
+                                if (
+                                    entry.isIntersecting &&
+                                    !isLoadingMore &&
+                                    hasMoreData
+                                ) {
+                                    loadMoreRiwayat();
+                                }
+                            });
+                        },
+                        {
+                            root: null,
+                            rootMargin: "350px",
+                            threshold: 0.01,
+                        },
+                    );
+                    infiniteScrollObserver.observe(sentinel);
                 }
 
-                // Tombol Next
-                html += `<button onclick="changePage(${currentPage + 1})" ${currentPage >= totalPages ? "disabled" : ""}
-                    class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-500 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-1">
-                    Berikutnya <i class="fas fa-chevron-right text-[10px]"></i>
-                </button>`;
+                // 2. Scroll container & Window scroll listeners as dual fallbacks
+                if (!isScrollListenerAttached) {
+                    isScrollListenerAttached = true;
 
-                container.innerHTML = html;
+                    if (scrollContainer) {
+                        scrollContainer.addEventListener(
+                            "scroll",
+                            () => {
+                                if (isLoadingMore || !hasMoreData) return;
+                                const threshold = 350;
+                                if (
+                                    scrollContainer.scrollTop +
+                                        scrollContainer.clientHeight >=
+                                    scrollContainer.scrollHeight - threshold
+                                ) {
+                                    loadMoreRiwayat();
+                                }
+                            },
+                            { passive: true },
+                        );
+                    }
+
+                    window.addEventListener(
+                        "scroll",
+                        () => {
+                            if (isLoadingMore || !hasMoreData) return;
+                            const threshold = 400;
+                            const scrollPos =
+                                window.innerHeight + window.scrollY;
+                            const totalHeight =
+                                document.documentElement.scrollHeight ||
+                                document.body.scrollHeight;
+                            if (scrollPos >= totalHeight - threshold) {
+                                loadMoreRiwayat();
+                            }
+                        },
+                        { passive: true },
+                    );
+                }
+            }
+
+            if (document.readyState === "loading") {
+                document.addEventListener(
+                    "DOMContentLoaded",
+                    setupInfiniteScroll,
+                );
+            } else {
+                setupInfiniteScroll();
             }
 
             function toggleDetailRow(idx) {
@@ -2654,8 +2737,14 @@
                     "retur.html",
                     "absensi.html",
                     "report.html",
+                    "opname.html",
                 ],
-                kasir: ["dashboard.html", "riwayat.html", "absensi.html"],
+                kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "absensi.html",
+                    "opname.html",
+                ],
                 "super-kasir": [
                     "dashboard.html",
                     "riwayat.html",
@@ -2664,6 +2753,7 @@
                     "expense.html",
                     "retur.html",
                     "absensi.html",
+                    "opname.html",
                 ],
                 super_kasir: [
                     "dashboard.html",
@@ -2673,6 +2763,7 @@
                     "expense.html",
                     "retur.html",
                     "absensi.html",
+                    "opname.html",
                 ],
                 superkasir: [
                     "dashboard.html",
@@ -2682,6 +2773,7 @@
                     "expense.html",
                     "retur.html",
                     "absensi.html",
+                    "opname.html",
                 ],
                 supersubkasir: [
                     "dashboard.html",
@@ -2716,6 +2808,7 @@
                     "riwayat.html",
                     "report.html",
                     "absensi.html",
+                    "opname.html",
                 ],
                 superadmin: [
                     "dashboard.html",
@@ -2727,6 +2820,7 @@
                     "akuntansi.html",
                     "absensi.html",
                     "report.html",
+                    "opname.html",
                 ],
             };
 
@@ -2820,11 +2914,8 @@
                     .toLowerCase()
                     .trim();
                 const normalizedRole = userRole.replace(/[-_]/g, "");
-                const allowedPages =
-                    ROLE_PERMISSIONS[userRole] ||
-                    ROLE_PERMISSIONS[normalizedRole] || [
-                        "dashboard.html",
-                    ];
+                const allowedPages = ROLE_PERMISSIONS[userRole] ||
+                    ROLE_PERMISSIONS[normalizedRole] || ["dashboard.html"];
 
                 if (!allowedPages.includes(currentPage)) {
                     if (userRole === "akuntan")

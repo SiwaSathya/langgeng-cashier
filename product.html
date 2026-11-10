@@ -175,6 +175,13 @@
                     <i class="fas fa-chart-bar"></i>
                     <span>Laporan Analitik</span>
                 </a>
+                <a
+                    href="opname.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Stock Opname</span>
+                </a>
             </nav>
 
             <div class="pt-6 border-t border-slate-100 shrink-0">
@@ -731,6 +738,181 @@
             </div>
         </div>
 
+        <!-- MODAL KARTU STOK / AUDIT TRAIL -->
+        <div
+            id="stockCardModal"
+            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4"
+        >
+            <div
+                class="bg-white w-full max-w-5xl rounded-2xl sm:rounded-[2rem] shadow-2xl animate-fade-in overflow-hidden max-h-[92vh] flex flex-col"
+            >
+                <!-- Modal Header -->
+                <div
+                    class="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 shrink-0 bg-slate-50/50"
+                >
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold"
+                            >
+                                <i class="fas fa-history text-sm"></i>
+                            </span>
+                            <h3
+                                class="text-xl sm:text-2xl font-black text-slate-800"
+                            >
+                                Kartu Stok & Audit Trail
+                            </h3>
+                        </div>
+                        <p
+                            class="text-xs sm:text-sm text-slate-500 font-medium mt-1"
+                        >
+                            Histori mutasi stok pergerakan:
+                            <span
+                                id="stockCardProductName"
+                                class="font-bold text-slate-800"
+                                >-</span
+                            >
+                            <span
+                                id="stockCardProductCode"
+                                class="ml-2 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-200 text-slate-700"
+                                >-</span
+                            >
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <select
+                            id="stockCardLocationFilter"
+                            onchange="loadStockCard(1)"
+                            class="bg-white border border-slate-200 text-xs font-bold text-slate-700 rounded-xl px-3 py-2 outline-none cursor-pointer focus:border-blue-400"
+                        >
+                            <option value="">Semua Lokasi Toko</option>
+                            <option value="Toko Sudirman">Toko Sudirman</option>
+                            <option value="Toko Paye">Toko Paye</option>
+                            <option value="Toko Kota">Toko Kota</option>
+                        </select>
+                        <button
+                            type="button"
+                            onclick="loadStockCard(1)"
+                            class="p-2 text-slate-500 hover:text-blue-600 hover:bg-slate-100 rounded-xl transition-colors"
+                            title="Refresh Data"
+                        >
+                            <i class="fas fa-sync-alt text-sm"></i>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="closeStockCardModal()"
+                            class="text-slate-300 hover:text-slate-600 p-2 transition-colors"
+                        >
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI / Summary Bar -->
+                <div
+                    class="grid grid-cols-3 gap-3 p-4 sm:p-6 bg-slate-50/30 border-b border-slate-100 shrink-0"
+                >
+                    <div
+                        class="bg-white p-3 sm:p-4 rounded-xl border border-slate-100 shadow-sm"
+                    >
+                        <p
+                            class="text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+                        >
+                            Total Masuk
+                        </p>
+                        <h4
+                            id="stockCardTotalIn"
+                            class="text-lg sm:text-xl font-black text-emerald-600 mt-0.5"
+                        >
+                            0 Unit
+                        </h4>
+                    </div>
+                    <div
+                        class="bg-white p-3 sm:p-4 rounded-xl border border-slate-100 shadow-sm"
+                    >
+                        <p
+                            class="text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+                        >
+                            Total Keluar
+                        </p>
+                        <h4
+                            id="stockCardTotalOut"
+                            class="text-lg sm:text-xl font-black text-rose-500 mt-0.5"
+                        >
+                            0 Unit
+                        </h4>
+                    </div>
+                    <div
+                        class="bg-white p-3 sm:p-4 rounded-xl border border-slate-100 shadow-sm"
+                    >
+                        <p
+                            class="text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+                        >
+                            Saldo Terakhir
+                        </p>
+                        <h4
+                            id="stockCardCurrentSaldo"
+                            class="text-lg sm:text-xl font-black text-blue-600 mt-0.5"
+                        >
+                            0 Unit
+                        </h4>
+                    </div>
+                </div>
+
+                <!-- Table Content -->
+                <div class="overflow-y-auto flex-1 custom-scroll p-4 sm:p-6">
+                    <table class="w-full text-left border-collapse">
+                        <thead
+                            class="bg-slate-100 text-[10px] uppercase tracking-wider text-slate-500 font-bold sticky top-0 border-b border-slate-200"
+                        >
+                            <tr>
+                                <th class="p-3 pl-4">Waktu</th>
+                                <th class="p-3">Lokasi</th>
+                                <th class="p-3">Jenis Mutasi</th>
+                                <th class="p-3">No. Referensi</th>
+                                <th class="p-3 text-right">Masuk</th>
+                                <th class="p-3 text-right">Keluar</th>
+                                <th class="p-3 text-right">Saldo Awal</th>
+                                <th class="p-3 text-right">Saldo Akhir</th>
+                                <th class="p-3 pr-4">Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody
+                            id="stockCardTableBody"
+                            class="divide-y divide-slate-100 text-xs text-slate-700 font-semibold"
+                        >
+                            <tr>
+                                <td
+                                    colspan="9"
+                                    class="py-16 text-center text-slate-400"
+                                >
+                                    <i
+                                        class="fas fa-spinner fa-spin text-2xl text-blue-500 mb-2"
+                                    ></i>
+                                    <p>Memuat histori mutasi...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Footer Pagination -->
+                <div
+                    class="p-4 border-t border-slate-100 bg-slate-50/50 flex justify-between items-center shrink-0"
+                >
+                    <span
+                        id="stockCardPaginationInfo"
+                        class="text-xs text-slate-500 font-semibold"
+                        >Menampilkan 0 data</span
+                    >
+                    <div
+                        id="stockCardPaginationControls"
+                        class="flex gap-1.5"
+                    ></div>
+                </div>
+            </div>
+        </div>
+
         <!-- JAVASCRIPT LOGIC -->
         <script>
             const BASE_URL =
@@ -797,37 +979,62 @@
                     }
 
                     tbody.innerHTML = products
-                        .map(
-                            (p) => `
+                        .map((p) => {
+                            const stocks = p.Stocks || p.stocks || [];
+                            let badgesHTML = "";
+                            if (stocks.length > 0) {
+                                badgesHTML = `<div class="flex flex-wrap gap-1 mt-1.5">${stocks
+                                    .map((s) => {
+                                        const locName = (
+                                            s.Location ||
+                                            s.location ||
+                                            ""
+                                        ).replace(/^Toko\s+/i, "");
+                                        const qty =
+                                            s.Saldo !== undefined
+                                                ? s.Saldo
+                                                : s.saldo !== undefined
+                                                  ? s.saldo
+                                                  : 0;
+                                        return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">${escapeHTML(locName)}: <span class="ml-1 ${qty > 0 ? "text-blue-600 font-extrabold" : "text-slate-400"}">${qty}</span></span>`;
+                                    })
+                                    .join("")}</div>`;
+                            }
+                            const pName = p.Nama || p.nama || "-";
+                            const pKode = p.Kode || p.kode || "-";
+                            const pId = p.ID || p.id;
+                            return `
             <tr class="hover:bg-slate-50/50 transition-colors">
                 <td class="px-3.5 py-3 sm:px-6 sm:py-4 min-w-[160px]">
-                    <div class="font-bold text-slate-800 text-xs sm:text-sm">${p.Nama || p.nama || "-"}</div>
-                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">${p.Kode || p.kode || "-"}</div>
+                    <div class="font-bold text-slate-800 text-xs sm:text-sm">${escapeHTML(pName)}</div>
+                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">${escapeHTML(pKode)}</div>
                 </td>
                 <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm text-slate-500 font-semibold whitespace-nowrap">
-                    ${p.Category ? p.Category.Nama || p.Category.Name || p.Category.name : p.CategoryID || "-"}
+                    ${p.Category ? escapeHTML(p.Category.Nama || p.Category.Name || p.Category.name) : p.CategoryID || "-"}
                 </td>
                 <td class="px-3.5 py-3 sm:px-6 sm:py-4 font-bold text-slate-700 text-xs sm:text-sm font-mono whitespace-nowrap">
                     Rp ${parseFloat(p.HJual || p.Hjual || p.hjual || 0).toLocaleString("id-ID")}
                 </td>
                 <td class="px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                     <span class="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold">${p.Saldo || p.saldo || 0} Unit</span>
+                    ${badgesHTML}
                 </td>
                 <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right whitespace-nowrap">
+                    <button onclick="openStockCardModal('${pId}', '${encodeURIComponent(pName)}', '${encodeURIComponent(pKode)}')" class="text-amber-500 hover:text-amber-700 mx-1.5 transition-colors" title="Lihat Kartu Stok / Audit Trail"><i class="fas fa-history"></i></button>
                     ${
                         isSuperSubKasir
                             ? `
-                    <button onclick="editProduct('${p.ID || p.id}')" class="text-blue-500 hover:text-blue-700 mx-2 transition-colors" title="Lihat Detail Produk"><i class="fas fa-eye"></i></button>
+                    <button onclick="editProduct('${pId}')" class="text-blue-500 hover:text-blue-700 mx-1.5 transition-colors" title="Lihat Detail Produk"><i class="fas fa-eye"></i></button>
                     `
                             : `
-                    <button onclick="editProduct('${p.ID || p.id}')" class="text-blue-500 hover:text-blue-700 mx-2 transition-colors" title="Edit Produk"><i class="fas fa-edit"></i></button>
-                    <button onclick="deleteProduct('${p.ID || p.id}')" class="text-red-400 hover:text-red-600 mx-2 transition-colors"><i class="fas fa-trash"></i></button>
+                    <button onclick="editProduct('${pId}')" class="text-blue-500 hover:text-blue-700 mx-1.5 transition-colors" title="Edit Produk"><i class="fas fa-edit"></i></button>
+                    <button onclick="deleteProduct('${pId}')" class="text-red-400 hover:text-red-600 mx-1.5 transition-colors"><i class="fas fa-trash"></i></button>
                     `
                     }
                 </td>
             </tr>
-        `,
-                        )
+        `;
+                        })
                         .join("");
 
                     document.getElementById("countInfo").innerText = total;
@@ -1070,8 +1277,14 @@
                     "retur.html",
                     "absensi.html",
                     "report.html",
+                    "opname.html",
                 ],
-                kasir: ["dashboard.html", "riwayat.html", "absensi.html"],
+                kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "absensi.html",
+                    "opname.html",
+                ],
                 "super-kasir": [
                     "dashboard.html",
                     "riwayat.html",
@@ -1080,6 +1293,7 @@
                     "expense.html",
                     "retur.html",
                     "absensi.html",
+                    "opname.html",
                 ],
                 super_kasir: [
                     "dashboard.html",
@@ -1089,6 +1303,7 @@
                     "expense.html",
                     "retur.html",
                     "absensi.html",
+                    "opname.html",
                 ],
                 superkasir: [
                     "dashboard.html",
@@ -1098,6 +1313,7 @@
                     "expense.html",
                     "retur.html",
                     "absensi.html",
+                    "opname.html",
                 ],
                 supersubkasir: [
                     "dashboard.html",
@@ -1132,6 +1348,7 @@
                     "riwayat.html",
                     "report.html",
                     "absensi.html",
+                    "opname.html",
                 ],
                 superadmin: [
                     "dashboard.html",
@@ -1143,6 +1360,7 @@
                     "akuntansi.html",
                     "absensi.html",
                     "report.html",
+                    "opname.html",
                 ],
             };
 
@@ -1273,11 +1491,8 @@
                     .toLowerCase()
                     .trim();
                 const normalizedRole = userRole.replace(/[-_]/g, "");
-                const allowedPages =
-                    ROLE_PERMISSIONS[userRole] ||
-                    ROLE_PERMISSIONS[normalizedRole] || [
-                        "dashboard.html",
-                    ];
+                const allowedPages = ROLE_PERMISSIONS[userRole] ||
+                    ROLE_PERMISSIONS[normalizedRole] || ["dashboard.html"];
 
                 // Set global flag for supersubkasir
                 isSuperSubKasir =
@@ -1540,6 +1755,222 @@
                     url += `&role=${encodeURIComponent(userRole)}`;
                 }
                 window.open(url, "_blank");
+            }
+
+            // ==========================================
+            // KARTU STOK & AUDIT TRAIL PER CABANG
+            // ==========================================
+            let currentStockCardProductId = null;
+            let currentStockCardPage = 1;
+            const stockCardLimit = 25;
+
+            async function openStockCardModal(
+                productId,
+                productName,
+                productCode,
+            ) {
+                currentStockCardProductId = productId;
+                currentStockCardPage = 1;
+                document.getElementById("stockCardProductName").innerText =
+                    decodeURIComponent(productName);
+                document.getElementById("stockCardProductCode").innerText =
+                    decodeURIComponent(productCode);
+                document.getElementById("stockCardLocationFilter").value = "";
+                document
+                    .getElementById("stockCardModal")
+                    .classList.remove("hidden");
+                document.body.classList.add("modal-active");
+                await loadStockCard(1);
+            }
+
+            function closeStockCardModal() {
+                document
+                    .getElementById("stockCardModal")
+                    .classList.add("hidden");
+                document.body.classList.remove("modal-active");
+                currentStockCardProductId = null;
+            }
+
+            function formatMovementTypeBadge(type) {
+                switch (type) {
+                    case "SALE":
+                        return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fas fa-shopping-bag mr-1"></i>Penjualan</span>`;
+                    case "SALE_ROLLBACK":
+                        return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200"><i class="fas fa-undo mr-1"></i>Batal Jual</span>`;
+                    case "PURCHASE":
+                        return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200"><i class="fas fa-truck-loading mr-1"></i>Pembelian</span>`;
+                    case "PURCHASE_CANCEL":
+                        return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200"><i class="fas fa-ban mr-1"></i>Batal Beli</span>`;
+                    case "CUSTOMER_RETURN":
+                        return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200"><i class="fas fa-undo-alt mr-1"></i>Retur Customer</span>`;
+                    case "DISTRIBUTOR_RETURN":
+                        return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200"><i class="fas fa-arrow-right-from-bracket mr-1"></i>Retur Supplier</span>`;
+                    case "OPNAME_ADJUST":
+                        return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500 text-white shadow-sm"><i class="fas fa-clipboard-check mr-1"></i>Opname</span>`;
+                    case "STOCK_TRANSFER":
+                        return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200"><i class="fas fa-exchange-alt mr-1"></i>Transfer</span>`;
+                    default:
+                        return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">${escapeHTML(type || "-")}</span>`;
+                }
+            }
+
+            async function loadStockCard(page = 1) {
+                if (!currentStockCardProductId) return;
+                currentStockCardPage = page;
+                const tbody = document.getElementById("stockCardTableBody");
+                tbody.innerHTML = `<tr><td colspan="9" class="py-16 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl text-blue-500 mb-2"></i><p>Memuat histori mutasi...</p></td></tr>`;
+
+                const loc = document.getElementById(
+                    "stockCardLocationFilter",
+                ).value;
+                let url = `${BASE_URL}/api/products/${currentStockCardProductId}/stock-card?page=${page}&limit=${stockCardLimit}`;
+                if (loc) {
+                    url += `&location=${encodeURIComponent(loc)}`;
+                }
+
+                try {
+                    const token = localStorage.getItem("token");
+                    const headers = token
+                        ? { Authorization: `Bearer ${token}` }
+                        : {};
+                    const res = await fetch(url, { headers });
+                    if (!res.ok) {
+                        const err = await res.json().catch(() => ({}));
+                        tbody.innerHTML = `<tr><td colspan="9" class="py-16 text-center text-rose-500 font-bold">Gagal memuat kartu stok: ${escapeHTML(err.error || "Server error")}</td></tr>`;
+                        return;
+                    }
+
+                    const data = await res.json();
+                    const items = data.data || [];
+                    const total = data.total || 0;
+
+                    let sumIn = 0;
+                    let sumOut = 0;
+                    let latestSaldo = 0;
+                    if (items.length > 0) {
+                        latestSaldo =
+                            items[0].SaldoAfter !== undefined
+                                ? items[0].SaldoAfter
+                                : items[0].saldo_after || 0;
+                    }
+
+                    items.forEach((m) => {
+                        sumIn += m.QtyIn || m.qty_in || 0;
+                        sumOut += m.QtyOut || m.qty_out || 0;
+                    });
+
+                    document.getElementById("stockCardTotalIn").innerText =
+                        `+${sumIn} Unit`;
+                    document.getElementById("stockCardTotalOut").innerText =
+                        `-${sumOut} Unit`;
+                    document.getElementById("stockCardCurrentSaldo").innerText =
+                        `${latestSaldo} Unit`;
+
+                    if (items.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="9" class="py-16 text-center text-slate-400">Belum ada riwayat mutasi stok untuk produk ini.</td></tr>`;
+                        document.getElementById(
+                            "stockCardPaginationInfo",
+                        ).innerText = "0 data";
+                        document.getElementById(
+                            "stockCardPaginationControls",
+                        ).innerHTML = "";
+                        return;
+                    }
+
+                    tbody.innerHTML = items
+                        .map((m) => {
+                            const dt = new Date(
+                                m.CreatedAt || m.created_at || Date.now(),
+                            );
+                            const dateStr = dt.toLocaleDateString("id-ID", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                            });
+                            const timeStr = dt.toLocaleTimeString("id-ID", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            });
+                            const qtyIn =
+                                m.QtyIn !== undefined ? m.QtyIn : m.qty_in || 0;
+                            const qtyOut =
+                                m.QtyOut !== undefined
+                                    ? m.QtyOut
+                                    : m.qty_out || 0;
+                            const saldoBefore =
+                                m.SaldoBefore !== undefined
+                                    ? m.SaldoBefore
+                                    : m.saldo_before || 0;
+                            const saldoAfter =
+                                m.SaldoAfter !== undefined
+                                    ? m.SaldoAfter
+                                    : m.saldo_after || 0;
+                            const movementType =
+                                m.MovementType || m.movement_type || "";
+                            const location = m.Location || m.location || "-";
+                            const refNo =
+                                m.ReferenceNo || m.reference_no || "-";
+                            const notes = m.Notes || m.notes || "-";
+
+                            return `
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="p-3 pl-4 whitespace-nowrap">
+                                    <div class="font-bold text-slate-800">${dateStr}</div>
+                                    <div class="text-[10px] text-slate-400 font-mono">${timeStr}</div>
+                                </td>
+                                <td class="p-3 whitespace-nowrap font-bold text-slate-700">
+                                    <span class="px-2 py-1 rounded bg-slate-100 text-slate-700 text-xs border border-slate-200">
+                                        ${escapeHTML(location)}
+                                    </span>
+                                </td>
+                                <td class="p-3 whitespace-nowrap">
+                                    ${formatMovementTypeBadge(movementType)}
+                                </td>
+                                <td class="p-3 whitespace-nowrap font-mono text-xs text-blue-600 font-bold">
+                                    ${escapeHTML(refNo)}
+                                </td>
+                                <td class="p-3 text-right font-mono font-bold ${qtyIn > 0 ? "text-emerald-600" : "text-slate-300"}">
+                                    ${qtyIn > 0 ? `+${qtyIn}` : "0"}
+                                </td>
+                                <td class="p-3 text-right font-mono font-bold ${qtyOut > 0 ? "text-rose-600" : "text-slate-300"}">
+                                    ${qtyOut > 0 ? `-${qtyOut}` : "0"}
+                                </td>
+                                <td class="p-3 text-right font-mono text-slate-500 font-semibold">
+                                    ${saldoBefore}
+                                </td>
+                                <td class="p-3 text-right font-mono font-black text-slate-800">
+                                    ${saldoAfter}
+                                </td>
+                                <td class="p-3 pr-4 text-xs text-slate-500 max-w-[200px] truncate" title="${escapeHTML(notes)}">
+                                    ${escapeHTML(notes)}
+                                </td>
+                            </tr>
+                        `;
+                        })
+                        .join("");
+
+                    document.getElementById(
+                        "stockCardPaginationInfo",
+                    ).innerText =
+                        `Menampilkan ${items.length} dari ${total} mutasi`;
+
+                    const totalPages = Math.ceil(total / stockCardLimit);
+                    const container = document.getElementById(
+                        "stockCardPaginationControls",
+                    );
+                    if (totalPages <= 1) {
+                        container.innerHTML = "";
+                        return;
+                    }
+
+                    let phtml = "";
+                    phtml += `<button onclick="loadStockCard(${page - 1})" ${page <= 1 ? "disabled" : ""} class="px-2.5 py-1 text-xs rounded border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-30"><i class="fas fa-chevron-left"></i></button>`;
+                    phtml += `<span class="px-2 py-1 text-xs font-bold text-slate-700">${page} / ${totalPages}</span>`;
+                    phtml += `<button onclick="loadStockCard(${page + 1})" ${page >= totalPages ? "disabled" : ""} class="px-2.5 py-1 text-xs rounded border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-30"><i class="fas fa-chevron-right"></i></button>`;
+                    container.innerHTML = phtml;
+                } catch (err) {
+                    tbody.innerHTML = `<tr><td colspan="9" class="py-16 text-center text-rose-500 font-bold">Koneksi Error: ${err.message}</td></tr>`;
+                }
             }
 
             checkRoleAccess("product.html");
