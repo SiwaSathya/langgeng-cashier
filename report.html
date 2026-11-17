@@ -2,15 +2,27 @@
 <html lang="id">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+                <!-- Progressive Web App (PWA) Meta & Icons -->
+        <link rel="manifest" href="manifest.json" />
+        <meta name="theme-color" content="#2563EB" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Langgeng POS" />
+        <link rel="apple-touch-icon" href="logo.svg" />
+        <link rel="icon" type="image/svg+xml" href="logo.svg" />
         <title>SMARTPOS - Executive Owner Suite</title>
-        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="vendor/tailwindcss.js"></script>
         <link
             rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        />
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+        <script src="vendor/sweetalert2.all.min.js"></script>
+        <script defer src="vendor/alpine.min.js"></script>
+        <script src="spa-router.js"></script>
+        <script src="env.js"></script>
+        <script src="shortcuts.js" defer></script>
+        <script src="mobile-nav.js" defer></script>
+        <script src="vendor/chart.umd.min.js"></script>
         <style>
             @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&display=swap");
 
@@ -49,6 +61,41 @@
             tbody tr {
                 cursor: pointer;
             }
+
+            /* Tampilan Tabel, Kontrol & Kartu Minimalis Khusus Mobile (< 640px) */
+            @media (max-width: 639px) {
+                table th {
+                    padding-top: 0.4rem !important;
+                    padding-bottom: 0.4rem !important;
+                    padding-left: 0.5rem !important;
+                    padding-right: 0.5rem !important;
+                    font-size: 0.65rem !important;
+                    letter-spacing: 0.02em !important;
+                }
+                table td {
+                    padding-top: 0.45rem !important;
+                    padding-bottom: 0.45rem !important;
+                    padding-left: 0.5rem !important;
+                    padding-right: 0.5rem !important;
+                    font-size: 0.72rem !important;
+                    line-height: 1.25 !important;
+                }
+                select {
+                    height: 2.15rem !important;
+                    min-height: 2.15rem !important;
+                    font-size: 0.72rem !important;
+                    font-weight: 600 !important;
+                    border-radius: 0.55rem !important;
+                }
+            }
+
+            .no-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+            .no-scrollbar {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
         </style>
     </head>
 
@@ -67,31 +114,24 @@
             id="app-sidebar"
             class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 sm:p-8 fixed inset-y-0 left-0 z-50 h-full lg:static lg:h-full lg:shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out"
         >
-            <div class="flex items-center justify-between mb-8 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div
-                        class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
-                    >
-                        <i class="fas fa-store"></i>
+                        <div class="flex items-center mb-8 shrink-0">
+                <a href="dashboard.html" class="flex items-center gap-3 group">
+                    <img
+                        src="logo.svg"
+                        alt="Logo Langgeng Elektronika"
+                        class="w-10 h-10 shrink-0 drop-shadow-md rounded-xl transition-transform group-hover:scale-105"
+                    />
+                    <div>
+                        <h1 class="text-base font-black text-slate-900 tracking-tight leading-tight">
+                            LANGGENG
+                        </h1>
+                        <span class="text-[10px] font-extrabold text-blue-600 tracking-widest uppercase block -mt-0.5">
+                            ELEKTRONIKA POS
+                        </span>
                     </div>
-                    <h1
-                        class="text-xl font-extrabold text-slate-800 tracking-tight"
-                    >
-                        SMARTPOS
-                    </h1>
-                </div>
-                <button
-                    type="button"
-                    onclick="toggleSidebar()"
-                    class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                    title="Tutup / Collapse Sidebar"
-                    aria-label="Toggle Sidebar"
-                >
-                    <i class="fas fa-times text-lg lg:hidden"></i>
-                    <i class="fas fa-angles-left text-lg hidden lg:block"></i>
-                </button>
+                </a>
             </div>
-            <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
+                        <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
                 <a
                     href="dashboard.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
@@ -102,8 +142,7 @@
                     href="riwayat.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-history"></i>
-                    <span>Riwayat Transaksi</span>
+                    <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
                 </a>
                 <a
                     href="product.html"
@@ -115,8 +154,7 @@
                     href="purchase.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Riwayat Purchase</span>
+                    <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
                 </a>
                 <a
                     href="expense.html"
@@ -134,81 +172,65 @@
                     href="akuntansi.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-book-open"></i>
-                    <span>Jurnal & Keuangan</span>
+                    <i class="fas fa-book-open"></i> <span>Jurnal & Keuangan</span>
                 </a>
                 <a
                     href="absensi.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Absensi Karyawan</span>
+                    <i class="fas fa-calendar-check"></i> <span>Absensi Karyawan</span>
                 </a>
                 <a
                     href="report.html"
                     class="flex items-center gap-4 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100"
                 >
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Laporan Analitik</span>
+                    <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
                 </a>
                 <a
                     href="opname.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Stock Opname</span>
+                    <i class="fas fa-clipboard-check"></i> <span>Stock Opname</span>
+                </a>
+                <a
+                    href="online-users.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-user-clock"></i> <span>Pengguna & Log</span>
                 </a>
             </nav>
-            <div class="pt-6 border-t border-slate-100 shrink-0">
-                <div class="bg-slate-50 p-4 rounded-2xl mb-4">
+                        <div class="pt-6 border-t border-slate-100 shrink-0">
+                <div class="bg-slate-50 p-4 rounded-2xl mb-4 border border-slate-100">
                     <p
                         class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"
                     >
-                        User Aktif
+                        Login Sebagai
                     </p>
-                    <p
-                        id="sidebar-username"
-                        class="font-bold text-slate-700 user-name-display"
-                    >
-                        Desak Owner
+                    <p class="font-bold text-slate-700 user-name-display truncate">
+                        Pengguna
                     </p>
                 </div>
-                <a
-                    href="#"
+                <button
+                    type="button"
                     onclick="confirmLogout()"
-                    class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all"
+                    class="w-full flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all cursor-pointer"
                 >
                     <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
-                </a>
+                </button>
             </div>
         </aside>
 
-        <!-- Mobile Top Bar -->
+                <!-- Mobile Top Bar -->
         <div
-            class="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full"
+            class="lg:hidden bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full h-14"
         >
-            <div class="flex items-center gap-3">
-                <button
-                    type="button"
-                    onclick="toggleSidebar()"
-                    class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-xl focus:outline-none"
-                    aria-label="Buka Menu"
-                >
-                    <i class="fas fa-bars text-lg"></i>
-                </button>
-                <span
-                    class="font-extrabold text-slate-800 tracking-tight flex items-center gap-2"
-                >
-                    <span
-                        class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs shadow"
-                        ><i class="fas fa-store"></i
-                    ></span>
-                    SMARTPOS
-                </span>
+            <div class="flex items-center gap-2 shrink-0">
+                <img src="logo.svg" alt="Logo" class="w-7 h-7 rounded-lg shrink-0 drop-shadow-sm" />
+                <span class="font-extrabold text-slate-800 tracking-tight text-sm">LANGGENG POS</span>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 shrink-0 ml-auto min-w-0">
                 <span
-                    class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg user-name-display"
+                    class="text-[11px] font-bold text-slate-700 bg-slate-100 border border-slate-200/80 px-2.5 py-1 rounded-lg truncate max-w-[140px] user-name-display text-center leading-tight inline-block"
                     >Kasir</span
                 >
             </div>
@@ -226,25 +248,16 @@
                     class="flex items-center justify-between xl:justify-start gap-3 w-full xl:w-auto"
                 >
                     <div class="flex items-center gap-3 min-w-0">
-                        <button
-                            type="button"
-                            onclick="toggleSidebar()"
-                            class="hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-blue-600 shadow-sm transition-all cursor-pointer shrink-0"
-                            title="Buka / Tutup Sidebar"
-                            aria-label="Toggle Sidebar"
-                        >
-                            <i class="fas fa-bars text-sm"></i>
-                        </button>
                         <div class="flex flex-col min-w-0">
                             <h2
-                                class="text-base sm:text-lg font-bold text-slate-800 truncate"
+                                class="text-sm sm:text-lg font-bold text-slate-800 truncate"
                             >
-                                Pusat Data Logistik & Pengambilan Keputusan
-                                Bisnis
+                                <span class="sm:hidden">Laporan Analitik Bisnis</span>
+                                <span class="hidden sm:inline">Pusat Data Logistik & Keputusan Bisnis</span>
                             </h2>
                             <p
                                 id="clock"
-                                class="text-[11px] sm:text-xs text-slate-400 font-medium"
+                                class="text-[10px] sm:text-xs text-slate-400 font-medium truncate"
                             ></p>
                         </div>
                     </div>
@@ -257,47 +270,47 @@
                     <!-- Swipeable Tabs -->
                     <div class="w-full xl:w-auto min-w-0">
                         <div
-                            class="bg-slate-100 p-1 rounded-xl flex items-center gap-1 border border-slate-200 overflow-x-auto w-full custom-scroll overscroll-x-contain touch-pan-x"
+                            class="bg-slate-100 p-1 rounded-xl flex items-center gap-1 border border-slate-200 overflow-x-auto w-full no-scrollbar overscroll-x-contain touch-pan-x"
                         >
                             <button
                                 onclick="switchTab('ringkasan')"
                                 id="btn-tab-ringkasan"
-                                class="px-3.5 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap shrink-0 bg-white text-blue-600 shadow-sm"
+                                class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs font-bold transition-all whitespace-nowrap shrink-0 bg-white text-blue-600 shadow-2xs"
                             >
                                 Ringkasan Utama
                             </button>
                             <button
                                 onclick="switchTab('margin')"
                                 id="btn-tab-margin"
-                                class="px-3.5 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap shrink-0 text-slate-600 hover:bg-slate-50"
+                                class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs font-bold transition-all whitespace-nowrap shrink-0 text-slate-600 hover:bg-slate-50"
                             >
                                 Matriks Laba & Margin
                             </button>
                             <button
                                 onclick="switchTab('forecasting')"
                                 id="btn-tab-forecasting"
-                                class="px-3.5 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap shrink-0 text-slate-600 hover:bg-slate-50"
+                                class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs font-bold transition-all whitespace-nowrap shrink-0 text-slate-600 hover:bg-slate-50"
                             >
                                 Proyeksi Kas & Stok
                             </button>
                             <button
                                 onclick="switchTab('staf')"
                                 id="btn-tab-staf"
-                                class="px-3.5 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap shrink-0 text-slate-600 hover:bg-slate-50"
+                                class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs font-bold transition-all whitespace-nowrap shrink-0 text-slate-600 hover:bg-slate-50"
                             >
                                 Audit Performa Staf
                             </button>
                         </div>
                     </div>
 
-                    <!-- Dropdowns & Actions -->
+                    <!-- Dropdowns & Actions (Symmetrical on Mobile) -->
                     <div
-                        class="flex flex-wrap items-center gap-2 w-full xl:w-auto shrink-0"
+                        class="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-2 w-full xl:w-auto shrink-0"
                     >
                         <select
                             id="filter-toko"
                             onchange="loadDataLaporan()"
-                            class="flex-1 sm:flex-initial min-w-[125px] bg-slate-50 border border-slate-200 p-2 sm:p-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer"
+                            class="w-full sm:w-auto min-w-0 sm:min-w-[125px] bg-slate-50 border border-slate-200 px-2.5 py-1.5 sm:py-2 rounded-lg sm:rounded-xl font-bold text-[11px] sm:text-xs text-slate-700 outline-none cursor-pointer h-[2.1rem] sm:h-auto"
                         >
                             <option value="">Semua Toko</option>
                             <option value="Toko Utama">Toko Utama</option>
@@ -307,15 +320,32 @@
                         <select
                             id="filter-bulan"
                             onchange="loadDataLaporan()"
-                            class="flex-1 sm:flex-initial min-w-[110px] bg-slate-50 border border-slate-200 p-2 sm:p-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer"
+                            class="w-full sm:w-auto min-w-0 sm:min-w-[110px] bg-slate-50 border border-slate-200 px-2.5 py-1.5 sm:py-2 rounded-lg sm:rounded-xl font-bold text-[11px] sm:text-xs text-slate-700 outline-none cursor-pointer h-[2.1rem] sm:h-auto"
                         >
                             <option value="this-month">Bulan Ini</option>
                             <option value="last-month">Bulan Lalu</option>
                             <option value="this-year">Tahun Ini</option>
                         </select>
+                        <div class="col-span-2 flex items-center gap-2 sm:hidden">
+                            <button
+                                onclick="loadDataLaporan()"
+                                class="flex-1 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-600 text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer h-[2.1rem]"
+                                title="Segarkan Data"
+                                aria-label="Segarkan Data"
+                            >
+                                <i class="fas fa-sync-alt text-xs text-blue-600"></i> <span>Refresh</span>
+                            </button>
+                            <button
+                                onclick="window.print()"
+                                class="flex-1 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer h-[2.1rem]"
+                                title="Cetak Laporan"
+                            >
+                                <i class="fas fa-print text-xs"></i> <span>Cetak</span>
+                            </button>
+                        </div>
                         <button
                             onclick="loadDataLaporan()"
-                            class="p-2 sm:p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-slate-600 text-xs font-bold transition-all shrink-0 cursor-pointer"
+                            class="hidden sm:inline-flex p-2 sm:p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-slate-600 text-xs font-bold transition-all shrink-0 cursor-pointer"
                             title="Segarkan Data"
                             aria-label="Segarkan Data"
                         >
@@ -323,7 +353,7 @@
                         </button>
                         <button
                             onclick="window.print()"
-                            class="px-3 sm:px-3.5 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 shrink-0 cursor-pointer"
+                            class="hidden sm:inline-flex px-3 sm:px-3.5 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm items-center gap-1.5 shrink-0 cursor-pointer"
                             title="Cetak Laporan"
                         >
                             <i class="fas fa-print"></i> <span>Cetak</span>
@@ -333,96 +363,96 @@
             </header>
 
             <div
-                class="flex-1 p-4 sm:p-6 lg:p-10 space-y-6 sm:space-y-8 overflow-y-auto custom-scroll"
+                class="flex-1 p-2.5 sm:p-6 lg:p-10 space-y-4 sm:space-y-8 overflow-y-auto custom-scroll"
             >
                 <div id="tab-ringkasan" class="tab-content space-y-8">
                     <div
-                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
+                        class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-6"
                     >
                         <div
-                            class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
+                            class="bg-white p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs sm:shadow-sm flex items-center justify-between min-w-0"
                         >
-                            <div>
+                            <div class="min-w-0 pr-1">
                                 <p
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    class="text-[8.5px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5 truncate"
                                 >
-                                    Total Omset Penjualan
+                                    Total Omset
                                 </p>
                                 <h3
                                     id="stat-omset"
-                                    class="text-xl font-extrabold text-slate-800"
+                                    class="text-xs sm:text-xl font-extrabold text-slate-800 truncate"
                                 >
                                     Rp 0
                                 </h3>
                             </div>
                             <div
-                                class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-lg"
+                                class="w-8 h-8 sm:w-12 sm:h-12 bg-blue-50 text-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center text-xs sm:text-lg shrink-0"
                             >
                                 <i class="fas fa-cash-register"></i>
                             </div>
                         </div>
                         <div
-                            class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
+                            class="bg-white p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs sm:shadow-sm flex items-center justify-between min-w-0"
                         >
-                            <div>
+                            <div class="min-w-0 pr-1">
                                 <p
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    class="text-[8.5px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5 truncate"
                                 >
-                                    Total Pengeluaran
+                                    Pengeluaran
                                 </p>
                                 <h3
                                     id="stat-pengeluaran"
-                                    class="text-xl font-extrabold text-red-600"
+                                    class="text-xs sm:text-xl font-extrabold text-red-600 truncate"
                                 >
                                     Rp 0
                                 </h3>
                             </div>
                             <div
-                                class="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center text-lg"
+                                class="w-8 h-8 sm:w-12 sm:h-12 bg-red-50 text-red-600 rounded-lg sm:rounded-xl flex items-center justify-center text-xs sm:text-lg shrink-0"
                             >
                                 <i class="fas fa-wallet"></i>
                             </div>
                         </div>
                         <div
-                            class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
+                            class="bg-white p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs sm:shadow-sm flex items-center justify-between min-w-0"
                         >
-                            <div>
+                            <div class="min-w-0 pr-1">
                                 <p
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    class="text-[8.5px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5 truncate"
                                 >
-                                    Pendapatan Bersih (Profit)
+                                    Laba Bersih
                                 </p>
                                 <h3
                                     id="stat-profit"
-                                    class="text-xl font-extrabold text-emerald-600"
+                                    class="text-xs sm:text-xl font-extrabold text-emerald-600 truncate"
                                 >
                                     Rp 0
                                 </h3>
                             </div>
                             <div
-                                class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg"
+                                class="w-8 h-8 sm:w-12 sm:h-12 bg-emerald-50 text-emerald-600 rounded-lg sm:rounded-xl flex items-center justify-center text-xs sm:text-lg shrink-0"
                             >
                                 <i class="fas fa-coins"></i>
                             </div>
                         </div>
                         <div
-                            class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
+                            class="bg-white p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs sm:shadow-sm flex items-center justify-between min-w-0"
                         >
-                            <div>
+                            <div class="min-w-0 pr-1">
                                 <p
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    class="text-[8.5px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5 truncate"
                                 >
-                                    Volume Transaksi
+                                    Transaksi
                                 </p>
                                 <h3
                                     id="stat-transaksi"
-                                    class="text-xl font-extrabold text-indigo-600"
+                                    class="text-xs sm:text-xl font-extrabold text-indigo-600 truncate"
                                 >
                                     0 Nota (0 Unit)
                                 </h3>
                             </div>
                             <div
-                                class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-lg"
+                                class="w-8 h-8 sm:w-12 sm:h-12 bg-indigo-50 text-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center text-xs sm:text-lg shrink-0"
                             >
                                 <i class="fas fa-file-invoice"></i>
                             </div>
@@ -441,7 +471,7 @@
                                 ></i
                                 >Tren Keuangan Mingguan
                             </h3>
-                            <div class="relative w-full h-80">
+                            <div class="relative w-full h-56 sm:h-80">
                                 <canvas id="chartTrenUtama"></canvas>
                             </div>
                         </div>
@@ -825,86 +855,84 @@
 
                 <!-- ================= TAB 2: MATRIKS LABA & MARGIN ================= -->
                 <div id="tab-margin" class="tab-content hidden space-y-8">
-                    <!-- KPI Cards (3 Cards) -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- KPI Cards (3 Cards, Responsive Grid) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-6">
                         <div
-                            class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
+                            class="bg-white p-3.5 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs sm:shadow-sm flex items-center justify-between min-w-0"
                         >
-                            <div>
+                            <div class="min-w-0 pr-2">
                                 <p
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    class="text-[9px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5"
                                 >
-                                    Rata-rata Margin Toko
+                                    Rata-rata Margin
                                 </p>
                                 <h3
                                     id="stat-avg-margin"
-                                    class="text-2xl font-extrabold text-blue-600"
+                                    class="text-base sm:text-2xl font-extrabold text-blue-600"
                                 >
                                     0%
                                 </h3>
-                                <p class="text-xs text-slate-400 mt-2">
-                                    Dihitung dari rasio laba kotor terhadap
-                                    total omset.
+                                <p class="text-[9.5px] sm:text-xs text-slate-400 mt-1">
+                                    Rasio laba kotor terhadap omset.
                                 </p>
                             </div>
                             <div
-                                class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-lg shrink-0"
+                                class="w-9 h-9 sm:w-12 sm:h-12 bg-blue-50 text-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center text-sm sm:text-lg shrink-0"
                             >
                                 <i class="fas fa-percentage"></i>
                             </div>
                         </div>
 
                         <div
-                            class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
+                            class="bg-white p-3.5 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs sm:shadow-sm flex items-center justify-between min-w-0"
                         >
-                            <div>
+                            <div class="min-w-0 pr-2">
                                 <p
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    class="text-[9px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5"
                                 >
-                                    Kontribusi Laba Terbesar
+                                    Laba Terbesar
                                 </p>
                                 <h3
                                     id="stat-top-profit-cat"
-                                    class="text-2xl font-extrabold text-emerald-600"
+                                    class="text-base sm:text-2xl font-extrabold text-emerald-600 truncate"
                                 >
                                     -
                                 </h3>
                                 <p
                                     id="stat-top-profit-sub"
-                                    class="text-xs text-slate-400 mt-2"
+                                    class="text-[9.5px] sm:text-xs text-slate-400 mt-1 truncate"
                                 >
                                     Menyumbang laba terbesar toko.
                                 </p>
                             </div>
                             <div
-                                class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg shrink-0"
+                                class="w-9 h-9 sm:w-12 sm:h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-sm sm:text-lg shrink-0"
                             >
                                 <i class="fas fa-award"></i>
                             </div>
                         </div>
 
                         <div
-                            class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
+                            class="bg-white p-3.5 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs sm:shadow-sm flex items-center justify-between min-w-0"
                         >
-                            <div>
+                            <div class="min-w-0 pr-2">
                                 <p
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    class="text-[9px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5"
                                 >
                                     Total HPP Berjalan
                                 </p>
                                 <h3
                                     id="stat-running-hpp"
-                                    class="text-2xl font-extrabold text-slate-800"
+                                    class="text-base sm:text-2xl font-extrabold text-slate-800"
                                 >
                                     Rp 0
                                 </h3>
-                                <p class="text-xs text-slate-400 mt-2">
-                                    Nilai harga pokok modal penjualan pada
-                                    periode ini.
+                                <p class="text-[9.5px] sm:text-xs text-slate-400 mt-1">
+                                    Harga pokok modal periode ini.
                                 </p>
                             </div>
                             <div
-                                class="w-12 h-12 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center text-lg shrink-0"
+                                class="w-9 h-9 sm:w-12 sm:h-12 bg-slate-100 text-slate-700 rounded-lg sm:rounded-xl flex items-center justify-center text-sm sm:text-lg shrink-0"
                             >
                                 <i class="fas fa-receipt"></i>
                             </div>
@@ -940,7 +968,7 @@
                                     >Omset vs Modal</span
                                 >
                             </div>
-                            <div class="relative w-full h-80">
+                            <div class="relative w-full h-56 sm:h-80">
                                 <canvas id="chartMarginHPP"></canvas>
                             </div>
                         </div>
@@ -1057,109 +1085,109 @@
 
                 <!-- ================= TAB 3: PROYEKSI KAS & STOK ================= -->
                 <div id="tab-forecasting" class="tab-content hidden space-y-8">
-                    <!-- KPI Cards (4 Cards) -->
+                    <!-- KPI Cards (4 Cards, Symmetrical 2x2 on Mobile) -->
                     <div
-                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+                        class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-6"
                     >
                         <div
-                            class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
+                            class="bg-white p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs sm:shadow-sm flex items-center justify-between min-w-0"
                         >
-                            <div>
+                            <div class="min-w-0 pr-1">
                                 <p
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    class="text-[8px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5 truncate"
                                 >
-                                    Operasional Burn Rate / Bulan
+                                    Burn Rate / Bln
                                 </p>
                                 <h3
                                     id="stat-burn-rate"
-                                    class="text-xl font-extrabold text-red-600"
+                                    class="text-xs sm:text-xl font-extrabold text-red-600 truncate"
                                 >
                                     Rp 0
                                 </h3>
-                                <p class="text-[10px] text-slate-400 mt-1">
-                                    Total pengeluaran biaya & restock.
+                                <p class="text-[7.5px] sm:text-[10px] text-slate-400 mt-0.5 truncate">
+                                    Beban & restock.
                                 </p>
                             </div>
                             <div
-                                class="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center text-lg shrink-0"
+                                class="w-8 h-8 sm:w-12 sm:h-12 bg-red-50 text-red-600 rounded-lg sm:rounded-xl flex items-center justify-center text-xs sm:text-lg shrink-0"
                             >
                                 <i class="fas fa-fire"></i>
                             </div>
                         </div>
 
                         <div
-                            class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
+                            class="bg-white p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs sm:shadow-sm flex items-center justify-between min-w-0"
                         >
-                            <div>
+                            <div class="min-w-0 pr-1">
                                 <p
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    class="text-[8px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5 truncate"
                                 >
-                                    Sisa Kas Toko (Liquid)
+                                    Kas Liquid
                                 </p>
                                 <h3
                                     id="stat-kas-liquid"
-                                    class="text-xl font-extrabold text-slate-800"
+                                    class="text-xs sm:text-xl font-extrabold text-slate-800 truncate"
                                 >
                                     Rp 0
                                 </h3>
-                                <p class="text-[10px] text-slate-400 mt-1">
-                                    Saldo akumulatif di rekening & kas.
+                                <p class="text-[7.5px] sm:text-[10px] text-slate-400 mt-0.5 truncate">
+                                    Rekening & kas fisik.
                                 </p>
                             </div>
                             <div
-                                class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg shrink-0"
+                                class="w-8 h-8 sm:w-12 sm:h-12 bg-emerald-50 text-emerald-600 rounded-lg sm:rounded-xl flex items-center justify-center text-xs sm:text-lg shrink-0"
                             >
                                 <i class="fas fa-wallet"></i>
                             </div>
                         </div>
 
                         <div
-                            class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
+                            class="bg-white p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs sm:shadow-sm flex items-center justify-between min-w-0"
                         >
-                            <div>
+                            <div class="min-w-0 pr-1">
                                 <p
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    class="text-[8px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5 truncate"
                                 >
-                                    Cash Runway (Kekuatan Kas)
+                                    Cash Runway
                                 </p>
                                 <h3
                                     id="stat-cash-runway"
-                                    class="text-xl font-extrabold text-emerald-600"
+                                    class="text-xs sm:text-xl font-extrabold text-emerald-600 truncate"
                                 >
                                     0.0 Bulan
                                 </h3>
-                                <p class="text-[10px] text-slate-400 mt-1">
-                                    Ketahanan toko jika penjualan Rp 0.
+                                <p class="text-[7.5px] sm:text-[10px] text-slate-400 mt-0.5 truncate">
+                                    Ketahanan toko kas.
                                 </p>
                             </div>
                             <div
-                                class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-lg shrink-0"
+                                class="w-8 h-8 sm:w-12 sm:h-12 bg-indigo-50 text-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center text-xs sm:text-lg shrink-0"
                             >
                                 <i class="fas fa-shield-alt"></i>
                             </div>
                         </div>
 
                         <div
-                            class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
+                            class="bg-white p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs sm:shadow-sm flex items-center justify-between min-w-0"
                         >
-                            <div>
+                            <div class="min-w-0 pr-1">
                                 <p
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    class="text-[8px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5 truncate"
                                 >
-                                    Akurasi Prediksi Sistem
+                                    Akurasi AI
                                 </p>
                                 <h3
                                     id="stat-accuracy"
-                                    class="text-xl font-extrabold text-indigo-600"
+                                    class="text-xs sm:text-xl font-extrabold text-indigo-600 truncate"
                                 >
                                     95.4%
                                 </h3>
-                                <p class="text-[10px] text-slate-400 mt-1">
-                                    Moving average tren transaksi histori.
+                                <p class="text-[7.5px] sm:text-[10px] text-slate-400 mt-0.5 truncate">
+                                    Moving average model.
                                 </p>
                             </div>
                             <div
-                                class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-lg shrink-0"
+                                class="w-8 h-8 sm:w-12 sm:h-12 bg-purple-50 text-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center text-xs sm:text-lg shrink-0"
                             >
                                 <i class="fas fa-chart-line"></i>
                             </div>
@@ -1195,7 +1223,7 @@
                                     >Forecasting 90 Hari</span
                                 >
                             </div>
-                            <div class="relative w-full h-80">
+                            <div class="relative w-full h-56 sm:h-80">
                                 <canvas id="chartForecastingCash"></canvas>
                             </div>
                         </div>
@@ -1314,89 +1342,89 @@
 
                 <!-- ================= TAB 4: AUDIT PERFORMA STAF ================= -->
                 <div id="tab-staf" class="tab-content hidden space-y-8">
-                    <!-- Staff KPI Summary Cards -->
+                    <!-- Staff KPI Summary Cards (Responsive Grid) -->
                     <div
-                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                        class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-6"
                     >
                         <div
-                            class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
+                            class="bg-white p-3.5 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs sm:shadow-sm flex items-center justify-between min-w-0"
                         >
-                            <div>
+                            <div class="min-w-0 pr-2">
                                 <p
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    class="text-[9px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5"
                                 >
                                     Top Sales Person
                                 </p>
                                 <h3
                                     id="stat-top-staff-name"
-                                    class="text-xl font-extrabold text-slate-800"
+                                    class="text-base sm:text-xl font-extrabold text-slate-800 truncate"
                                 >
                                     -
                                 </h3>
                                 <p
                                     id="stat-top-staff-sub"
-                                    class="text-xs text-emerald-600 font-bold mt-1"
+                                    class="text-[9.5px] sm:text-xs text-emerald-600 font-bold mt-0.5 truncate"
                                 >
                                     Capaian: Rp 0
                                 </p>
                             </div>
                             <div
-                                class="w-12 h-12 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center text-lg shrink-0"
+                                class="w-9 h-9 sm:w-12 sm:h-12 bg-amber-50 text-amber-500 rounded-lg sm:rounded-xl flex items-center justify-center text-sm sm:text-lg shrink-0"
                             >
                                 <i class="fas fa-trophy"></i>
                             </div>
                         </div>
 
                         <div
-                            class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
+                            class="bg-white p-3.5 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs sm:shadow-sm flex items-center justify-between min-w-0"
                         >
-                            <div>
+                            <div class="min-w-0 pr-2">
                                 <p
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    class="text-[9px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5"
                                 >
-                                    Total Staf Berkontribusi
+                                    Staf Berkontribusi
                                 </p>
                                 <h3
                                     id="stat-active-staff-count"
-                                    class="text-xl font-extrabold text-blue-600"
+                                    class="text-base sm:text-xl font-extrabold text-blue-600"
                                 >
                                     0 Staf
                                 </h3>
-                                <p class="text-xs text-slate-400 mt-1">
-                                    Staf kasir aktif membukukan penjualan.
+                                <p class="text-[9.5px] sm:text-xs text-slate-400 mt-0.5">
+                                    Kasir aktif bertransaksi.
                                 </p>
                             </div>
                             <div
-                                class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-lg shrink-0"
+                                class="w-9 h-9 sm:w-12 sm:h-12 bg-blue-50 text-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center text-sm sm:text-lg shrink-0"
                             >
                                 <i class="fas fa-users"></i>
                             </div>
                         </div>
 
                         <div
-                            class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
+                            class="bg-white p-3.5 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs sm:shadow-sm flex items-center justify-between min-w-0"
                         >
-                            <div>
+                            <div class="min-w-0 pr-2">
                                 <p
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1"
+                                    class="text-[9px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5"
                                 >
-                                    Jam Puncak Operasional (Peak Hour)
+                                    Jam Puncak (Peak Hour)
                                 </p>
                                 <h3
                                     id="stat-peak-hour"
-                                    class="text-xl font-extrabold text-indigo-600"
+                                    class="text-base sm:text-xl font-extrabold text-indigo-600"
                                 >
                                     -
                                 </h3>
                                 <p
                                     id="stat-peak-hour-sub"
-                                    class="text-xs text-slate-400 mt-1"
+                                    class="text-[9.5px] sm:text-xs text-slate-400 mt-0.5 truncate"
                                 >
-                                    Waktu paling padat antrean belanja.
+                                    Waktu terpadat belanja.
                                 </p>
                             </div>
                             <div
-                                class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-lg shrink-0"
+                                class="w-9 h-9 sm:w-12 sm:h-12 bg-indigo-50 text-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center text-sm sm:text-lg shrink-0"
                             >
                                 <i class="fas fa-clock"></i>
                             </div>
@@ -1461,7 +1489,7 @@
                                     >08:00 - 22:00</span
                                 >
                             </div>
-                            <div class="relative w-full h-80 flex-1">
+                            <div class="relative w-full h-56 sm:h-80 flex-1">
                                 <canvas id="chartPeakHours"></canvas>
                             </div>
                         </div>
@@ -1471,8 +1499,8 @@
         </main>
 
         <script>
-            const BASE_URL =
-                "https://langgeng-cashier-backend-production.up.railway.app";
+            var BASE_URL = window.BASE_URL || "http://127.0.0.1:4000";
+            var API_URL = window.API_URL || (BASE_URL + "/api");
             let chartTren = null;
             let chartMetodeDetail = null;
             let chartMargin = null;
@@ -1483,88 +1511,6 @@
             let reportDataCache = null;
 
             const ROLE_PERMISSIONS = {
-                admin: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "report.html",
-                    "opname.html",
-                ],
-                kasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                "super-kasir": [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                super_kasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                superkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                supersubkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                "super-subkasir": [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                super_subkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                "super-sub-kasir": [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                super_sub_kasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                akuntan: [
-                    "akuntansi.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "riwayat.html",
-                    "report.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
                 superadmin: [
                     "dashboard.html",
                     "riwayat.html",
@@ -1576,79 +1522,138 @@
                     "absensi.html",
                     "report.html",
                     "opname.html",
+                    "online-users.html",
+                ],
+                "super-admin": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "akuntansi.html",
+                    "absensi.html",
+                    "report.html",
+                    "opname.html",
+                    "online-users.html",
+                ],
+                admin: [
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "akuntansi.html",
+                    "absensi.html",
+                    "report.html",
+                    "opname.html",
+                    "online-users.html",
+                ],
+                "super-kasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                superkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                super_kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                supersubkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                "super-subkasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                super_subkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                "super-sub-kasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                super_sub_kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "expense.html",
+                    "opname.html",
+                ],
+                akuntan: [
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
                 ],
             };
 
             async function confirmLogout() {
                 const result = await Swal.fire({
                     title: "Konfirmasi Keluar",
-                    text: "Pilih tindakan logout yang ingin Anda lakukan:",
+                    text: "Apakah Anda yakin ingin keluar dari sistem kasir?",
                     icon: "question",
                     showCancelButton: true,
-                    showDenyButton: true,
-                    confirmButtonText:
-                        '<i class="fas fa-check-circle mr-1"></i> Logout & Selesaikan Shift',
-                    denyButtonText:
-                        '<i class="fas fa-sign-out-alt mr-1"></i> Logout Saja',
-                    cancelButtonText: '<i class="fas fa-times mr-1"></i> Batal',
-                    confirmButtonColor: "#2563EB",
-                    denyButtonColor: "#F59E0B",
+                    confirmButtonText: '<i class="fas fa-sign-out-alt mr-1.5"></i> Ya, Keluar',
+                    cancelButtonText: '<i class="fas fa-times mr-1.5"></i> Batal',
+                    confirmButtonColor: "#EF4444",
                     cancelButtonColor: "#64748B",
                     reverseButtons: true,
+                    focusCancel: true,
                 });
 
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        title: "Menutup Shift...",
-                        allowOutsideClick: false,
-                        didOpen: () => Swal.showLoading(),
-                    });
-
-                    try {
-                        const shiftResponse = await fetch(
-                            `${BASE_URL}/api/shift/current`,
-                        );
-                        const shiftData = await shiftResponse.json();
-                        const shift = shiftData.shift || 1;
-
-                        const updateResponse = await fetch(
-                            `${BASE_URL}/api/sales/update/shift`,
-                            {
-                                method: "PUT",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify({
-                                    shift: shift,
-                                }),
-                            },
-                        );
-
-                        if (updateResponse.ok) {
-                            await Swal.fire({
-                                icon: "success",
-                                title: "Shift Berhasil Ditutup",
-                                text: `Transaksi berhasil dimasukkan ke Shift ${shift}. Anda telah keluar.`,
-                                confirmButtonColor: "#2563EB",
-                            });
-                            localStorage.removeItem("token");
-                            window.location.href = "index.html";
-                        } else {
-                            Swal.fire(
-                                "Gagal",
-                                "Gagal memperbarui shift transaksi",
-                                "error",
-                            );
-                        }
-                    } catch (error) {
-                        console.error(error);
-                        Swal.fire(
-                            "Error",
-                            "Server tidak dapat dihubungi",
-                            "error",
-                        );
+                    if (window.recordLogout) {
+                        const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                        await window.recordLogout("LOGOUT_ONLY", null, curUser.location || "", "Logout");
                     }
-                } else if (result.isDenied) {
                     localStorage.removeItem("token");
                     window.location.href = "index.html";
                 }
@@ -1701,11 +1706,11 @@
                     ROLE_PERMISSIONS[normalizedRole] || ["dashboard.html"];
 
                 if (!allowedPages.includes(currentPage)) {
-                    if (userRole === "akuntan")
-                        window.location.href = "akuntansi.html";
-                    else if (userRole === "admin")
-                        window.location.href = "riwayat.html";
-                    else window.location.href = "dashboard.html";
+                    let fallback = "dashboard.html";
+                    if (!allowedPages.includes("dashboard.html")) {
+                        fallback = allowedPages[0] || "riwayat.html";
+                    }
+                    window.location.href = fallback;
                     return;
                 }
 
@@ -2723,13 +2728,47 @@
                 }
             }
 
+            window.addEventListener("spa:before-navigate", function () {
+                [
+                    chartTren,
+                    chartMetodeDetail,
+                    chartMargin,
+                    chartProfitKat,
+                    chartHours,
+                    chartForecastingCash,
+                    chartStockHealth,
+                ].forEach((c) => {
+                    if (c && typeof c.destroy === "function") {
+                        try {
+                            c.destroy();
+                        } catch (_) {}
+                    }
+                });
+                chartTren = null;
+                chartMetodeDetail = null;
+                chartMargin = null;
+                chartProfitKat = null;
+                chartHours = null;
+                chartForecastingCash = null;
+                chartStockHealth = null;
+                reportDataCache = null;
+            });
+
             setInterval(() => {
                 const clockEl = document.getElementById("clock");
-                if (clockEl)
-                    clockEl.innerText = new Date().toLocaleString("id-ID", {
-                        dateStyle: "full",
-                        timeStyle: "medium",
-                    });
+                if (clockEl) {
+                    if (window.innerWidth < 640) {
+                        clockEl.innerText = new Date().toLocaleString("id-ID", {
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                        });
+                    } else {
+                        clockEl.innerText = new Date().toLocaleString("id-ID", {
+                            dateStyle: "full",
+                            timeStyle: "medium",
+                        });
+                    }
+                }
             }, 1000);
 
             // Global Enter Handler: Prioritize SweetAlert confirm & Active modal submit buttons
@@ -2816,17 +2855,13 @@
                         document.body.classList.remove("overflow-hidden");
                     }
                 } else {
-                    const isCollapsed =
-                        sidebar.classList.contains("desktop-collapsed") ||
-                        sidebar.classList.contains("lg:hidden");
-                    if (isCollapsed) {
-                        sidebar.classList.remove(
-                            "desktop-collapsed",
-                            "lg:hidden",
-                        );
-                    } else {
-                        sidebar.classList.add("desktop-collapsed", "lg:hidden");
-                    }
+                    // Desktop: Sidebar selalu permanen terbuka (fitur collapse ditiadakan sesuai instruksi)
+                    sidebar.classList.remove(
+                        "desktop-collapsed",
+                        "lg:hidden",
+                        "hidden",
+                        "-translate-x-full",
+                    );
                 }
             }
             window.toggleSidebar = toggleSidebar;
@@ -2836,12 +2871,12 @@
                 const sidebar = document.getElementById("app-sidebar");
                 const backdrop = document.getElementById("sidebar-backdrop");
                 if (window.innerWidth >= 1024) {
-                    if (!sidebar?.classList.contains("desktop-collapsed")) {
-                        sidebar?.classList.remove(
-                            "-translate-x-full",
-                            "lg:hidden",
-                        );
-                    }
+                    sidebar?.classList.remove(
+                        "-translate-x-full",
+                        "lg:hidden",
+                        "desktop-collapsed",
+                        "hidden",
+                    );
                     backdrop?.classList.add("hidden");
                     document.body.classList.remove("overflow-hidden");
                 } else {

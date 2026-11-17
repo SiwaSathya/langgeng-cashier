@@ -2,14 +2,26 @@
 <html lang="id">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+                <!-- Progressive Web App (PWA) Meta & Icons -->
+        <link rel="manifest" href="manifest.json" />
+        <meta name="theme-color" content="#2563EB" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Langgeng POS" />
+        <link rel="apple-touch-icon" href="logo.svg" />
+        <link rel="icon" type="image/svg+xml" href="logo.svg" />
         <title>Expenses - SmartPOS</title>
-        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="vendor/tailwindcss.js"></script>
         <link
             rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        />
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+        <script src="vendor/sweetalert2.all.min.js"></script>
+        <script defer src="vendor/alpine.min.js"></script>
+        <script src="spa-router.js"></script>
+        <script src="env.js"></script>
+        <script src="shortcuts.js" defer></script>
+        <script src="mobile-nav.js" defer></script>
         <style>
             @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap");
 
@@ -69,6 +81,49 @@
             tbody tr {
                 cursor: pointer;
             }
+
+            /* Pastikan tabel fit rapat ke data tanpa gap di bawah */
+            .overflow-x-auto,
+            .overflow-x-auto.custom-scroll,
+            table,
+            tbody {
+                padding-bottom: 0 !important;
+                margin-bottom: 0 !important;
+            }
+
+            /* Placeholder Minimalis Global */
+            #searchInput::placeholder,
+            input::placeholder,
+            textarea::placeholder {
+                font-size: 0.68rem !important;
+                font-weight: 400 !important;
+                color: #94a3b8 !important;
+                opacity: 0.9 !important;
+            }
+
+            @media (max-width: 639px) {
+                /* Compact padding & sizing for mobile table */
+                table th {
+                    padding: 0.4rem 0.45rem !important;
+                    font-size: 0.65rem !important;
+                }
+                table td {
+                    padding: 0.45rem 0.45rem !important;
+                    font-size: 0.72rem !important;
+                    line-height: 1.25 !important;
+                }
+                /* Compact input on mobile */
+                #searchInput {
+                    height: 2.15rem !important;
+                    min-height: 2.15rem !important;
+                    font-size: 0.72rem !important;
+                }
+                #searchInput::placeholder {
+                    font-size: 0.68rem !important;
+                    font-weight: 400 !important;
+                    color: #94a3b8 !important;
+                }
+            }
         </style>
     </head>
 
@@ -88,32 +143,25 @@
             id="app-sidebar"
             class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 sm:p-8 fixed inset-y-0 left-0 z-50 h-full lg:static lg:h-full lg:shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out"
         >
-            <div class="flex items-center justify-between mb-8 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div
-                        class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
-                    >
-                        <i class="fas fa-store"></i>
+                        <div class="flex items-center mb-8 shrink-0">
+                <a href="dashboard.html" class="flex items-center gap-3 group">
+                    <img
+                        src="logo.svg"
+                        alt="Logo Langgeng Elektronika"
+                        class="w-10 h-10 shrink-0 drop-shadow-md rounded-xl transition-transform group-hover:scale-105"
+                    />
+                    <div>
+                        <h1 class="text-base font-black text-slate-900 tracking-tight leading-tight">
+                            LANGGENG
+                        </h1>
+                        <span class="text-[10px] font-extrabold text-blue-600 tracking-widest uppercase block -mt-0.5">
+                            ELEKTRONIKA POS
+                        </span>
                     </div>
-                    <h1
-                        class="text-xl font-extrabold text-slate-800 tracking-tight"
-                    >
-                        SMARTPOS
-                    </h1>
-                </div>
-                <button
-                    type="button"
-                    onclick="toggleSidebar()"
-                    class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                    title="Tutup / Collapse Sidebar"
-                    aria-label="Toggle Sidebar"
-                >
-                    <i class="fas fa-times text-lg lg:hidden"></i>
-                    <i class="fas fa-angles-left text-lg hidden lg:block"></i>
-                </button>
+                </a>
             </div>
 
-            <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
+                        <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
                 <a
                     href="dashboard.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
@@ -124,8 +172,7 @@
                     href="riwayat.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-history"></i>
-                    <span>Riwayat Transaksi</span>
+                    <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
                 </a>
                 <a
                     href="product.html"
@@ -137,8 +184,7 @@
                     href="purchase.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Riwayat Purchase</span>
+                    <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
                 </a>
                 <a
                     href="expense.html"
@@ -156,79 +202,66 @@
                     href="akuntansi.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-book-open"></i>
-                    <span>Jurnal & Keuangan</span>
+                    <i class="fas fa-book-open"></i> <span>Jurnal & Keuangan</span>
                 </a>
                 <a
                     href="absensi.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Absensi Karyawan</span>
+                    <i class="fas fa-calendar-check"></i> <span>Absensi Karyawan</span>
                 </a>
                 <a
                     href="report.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Laporan Analitik</span>
+                    <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
                 </a>
                 <a
                     href="opname.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Stock Opname</span>
+                    <i class="fas fa-clipboard-check"></i> <span>Stock Opname</span>
+                </a>
+                <a
+                    href="online-users.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-user-clock"></i> <span>Pengguna & Log</span>
                 </a>
             </nav>
 
-            <div class="pt-6 border-t border-slate-100 shrink-0">
-                <div class="bg-slate-50 p-4 rounded-2xl mb-4">
+                        <div class="pt-6 border-t border-slate-100 shrink-0">
+                <div class="bg-slate-50 p-4 rounded-2xl mb-4 border border-slate-100">
                     <p
                         class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"
                     >
-                        User Aktif
+                        Login Sebagai
                     </p>
-                    <p class="font-bold text-slate-700 user-name-display">
-                        Desak Kasir
+                    <p class="font-bold text-slate-700 user-name-display truncate">
+                        Pengguna
                     </p>
                 </div>
-                <a
-                    href="#"
+                <button
+                    type="button"
                     onclick="confirmLogout()"
-                    class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all"
+                    class="w-full flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all cursor-pointer"
                 >
                     <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
-                </a>
+                </button>
             </div>
         </aside>
 
-        <!-- Mobile Top Bar -->
+                <!-- Mobile Top Bar -->
         <div
-            class="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full"
+            class="lg:hidden bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full h-14"
         >
-            <div class="flex items-center gap-3">
-                <button
-                    type="button"
-                    onclick="toggleSidebar()"
-                    class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-xl focus:outline-none"
-                    aria-label="Buka Menu"
-                >
-                    <i class="fas fa-bars text-lg"></i>
-                </button>
-                <span
-                    class="font-extrabold text-slate-800 tracking-tight flex items-center gap-2"
-                >
-                    <span
-                        class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs shadow"
-                        ><i class="fas fa-store"></i
-                    ></span>
-                    SMARTPOS
-                </span>
+            <div class="flex items-center gap-2 shrink-0">
+                <img src="logo.svg" alt="Logo" class="w-7 h-7 rounded-lg shrink-0 drop-shadow-sm" />
+                <span class="font-extrabold text-slate-800 tracking-tight text-sm">LANGGENG POS</span>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 shrink-0 ml-auto min-w-0">
                 <span
-                    class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg user-name-display"
+                    class="text-[11px] font-bold text-slate-700 bg-slate-100 border border-slate-200/80 px-2.5 py-1 rounded-lg truncate max-w-[140px] user-name-display text-center leading-tight inline-block"
                     >Kasir</span
                 >
             </div>
@@ -237,60 +270,51 @@
         <!-- MAIN CONTENT -->
         <main
             id="main-content"
-            class="flex-1 p-4 sm:p-6 lg:p-10 min-w-0 w-full overflow-y-auto custom-scroll"
+            class="flex-1 p-3.5 sm:p-6 lg:p-10 min-w-0 w-full overflow-y-auto custom-scroll"
         >
             <!-- HEADER SECTION -->
             <div
-                class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8"
+                class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-8"
             >
                 <div class="flex items-center gap-3">
-                    <button
-                        type="button"
-                        onclick="toggleSidebar()"
-                        class="hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-blue-600 shadow-sm transition-all cursor-pointer shrink-0"
-                        title="Buka / Tutup Sidebar"
-                        aria-label="Toggle Sidebar"
-                    >
-                        <i class="fas fa-bars text-sm"></i>
-                    </button>
-                    <div>
+                    <div class="min-w-0">
                         <h1
-                            class="text-3xl font-800 text-slate-800 tracking-tight"
+                            class="text-lg sm:text-3xl font-extrabold text-slate-800 tracking-tight"
                         >
                             Expenses
                         </h1>
-                        <p class="text-slate-400 mt-1">
-                            Pantau biaya operasional dan pengeluaran kas
-                            lainnya.
+                        <p class="text-slate-400 mt-0.5 sm:mt-1 font-medium text-xs sm:text-sm">
+                            Pantau biaya operasional dan pengeluaran kas lainnya.
                         </p>
                     </div>
                 </div>
-                <div>
+                <div class="w-full sm:w-auto">
                     <button
+                        type="button"
                         onclick="openModal()"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-blue-100"
+                        class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-7 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold flex items-center justify-center gap-2 sm:gap-3 transition-all shadow-md sm:shadow-xl shadow-blue-500/10 text-xs sm:text-sm cursor-pointer"
                     >
-                        <i class="fas fa-plus text-sm"></i> Tambah Pengeluaran
+                        <i class="fas fa-plus text-xs sm:text-sm"></i> <span>Tambah Pengeluaran</span>
                     </button>
                 </div>
             </div>
 
             <div
-                class="bg-white rounded-2xl sm:rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-fade-in"
+                class="bg-white rounded-xl sm:rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden animate-fade-in flex flex-col"
             >
                 <div
-                    class="p-4 sm:p-8 border-b border-slate-50 flex flex-col sm:flex-row gap-4"
+                    class="p-3 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row gap-2.5 sm:gap-4 bg-white"
                 >
                     <div class="relative flex-1">
                         <i
-                            class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"
+                            class="fas fa-search absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm"
                         ></i>
                         <input
                             type="text"
                             id="searchInput"
                             onkeyup="debounceSearch()"
                             placeholder="Cari keterangan pengeluaran..."
-                            class="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-[1.25rem] outline-none focus:border-blue-400 transition-all text-sm font-medium"
+                            class="w-full pl-8 sm:pl-11 pr-3 sm:pr-4 py-1.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 text-xs font-semibold text-slate-700 transition-all placeholder:text-slate-400 placeholder:text-[10.5px] sm:placeholder:text-xs placeholder:font-normal"
                         />
                     </div>
                 </div>
@@ -311,32 +335,32 @@
 
                 <div class="overflow-x-auto custom-scroll">
                     <table
-                        class="w-full text-left border-collapse min-w-[620px]"
+                        class="w-full text-left border-collapse min-w-full sm:min-w-[620px]"
                     >
                         <thead
                             class="bg-slate-50/50 text-[10px] sm:text-[11px] uppercase tracking-widest text-slate-400 font-bold border-b border-slate-100"
                         >
                             <tr>
                                 <th
-                                    class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                    class="px-2.5 py-2.5 sm:px-6 sm:py-4 whitespace-nowrap"
                                 >
                                     Tanggal
                                 </th>
-                                <th class="px-3.5 py-3.5 sm:px-6 sm:py-4">
+                                <th class="px-2.5 py-2.5 sm:px-6 sm:py-4">
                                     Keterangan
                                 </th>
                                 <th
-                                    class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                    class="hidden sm:table-cell px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
                                 >
                                     Kategori
                                 </th>
                                 <th
-                                    class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-right whitespace-nowrap"
+                                    class="px-2.5 py-2.5 sm:px-6 sm:py-4 text-right whitespace-nowrap"
                                 >
                                     Jumlah (Rp)
                                 </th>
                                 <th
-                                    class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-right whitespace-nowrap"
+                                    class="px-2 py-2.5 sm:px-6 sm:py-4 text-right whitespace-nowrap"
                                 >
                                     Aksi
                                 </th>
@@ -350,18 +374,18 @@
                 </div>
 
                 <div
-                    class="p-4 sm:p-8 bg-slate-50/30 flex flex-col sm:flex-row justify-between items-center gap-4"
+                    class="p-3.5 sm:p-6 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 border-t border-slate-100"
                 >
-                    <p class="text-slate-500 text-sm">
+                    <p class="text-slate-500 text-xs sm:text-sm font-medium">
                         Menampilkan
                         <span
                             id="countInfo"
-                            class="font-bold text-slate-800 text-base"
+                            class="font-bold text-slate-800 text-sm sm:text-base"
                             >0</span
                         >
                         data
                     </p>
-                    <div id="paginationControls" class="flex gap-2"></div>
+                    <div id="paginationControls" class="flex items-center gap-1.5 sm:gap-2"></div>
                 </div>
             </div>
         </main>
@@ -369,54 +393,55 @@
         <!-- MODAL POPUP -->
         <div
             id="expenseModal"
-            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4"
         >
             <div
                 class="bg-white w-full max-w-xl rounded-2xl sm:rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden max-h-[92vh] flex flex-col"
             >
                 <div
-                    class="p-8 border-b border-slate-50 flex justify-between items-center"
+                    class="p-4 sm:p-7 border-b border-slate-100 flex justify-between items-center bg-white shrink-0"
                 >
                     <h3
                         id="modalTitle"
-                        class="text-2xl font-800 text-slate-800"
+                        class="text-base sm:text-2xl font-extrabold text-slate-800"
                     >
                         Catat Pengeluaran
                     </h3>
                     <button
+                        type="button"
                         onclick="closeModal()"
-                        class="text-slate-300 hover:text-slate-600"
+                        class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
                     >
-                        <i class="fas fa-times text-xl"></i>
+                        <i class="fas fa-times text-xs sm:text-sm"></i>
                     </button>
                 </div>
                 <!-- Ganti konten di dalam <form id="expenseForm"> -->
-                <form id="expenseForm" class="p-8 space-y-6">
+                <form id="expenseForm" class="p-4 sm:p-7 space-y-3.5 sm:space-y-5 overflow-y-auto custom-scroll">
                     <input type="hidden" id="expenseId" />
 
-                    <div class="grid grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
                             <label
-                                class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1"
+                                class="block text-[11px] font-bold text-slate-400 uppercase mb-1.5 ml-1"
                                 >No. Nota</label
                             >
                             <input
                                 type="text"
                                 id="nota"
                                 required
-                                class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold"
+                                class="w-full bg-slate-50 border border-slate-200 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 font-bold text-xs sm:text-sm text-slate-700 transition-all placeholder:text-slate-400 placeholder:text-xs"
                                 placeholder="Contoh: EXP-001"
                             />
                         </div>
                         <div>
                             <label
-                                class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1"
+                                class="block text-[11px] font-bold text-slate-400 uppercase mb-1.5 ml-1"
                                 >Kategori</label
                             >
                             <select
                                 id="kategori"
                                 required
-                                class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold"
+                                class="w-full bg-slate-50 border border-slate-200 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 font-bold text-xs sm:text-sm text-slate-700 transition-all cursor-pointer"
                             >
                                 <option value="">Pilih Kategori</option>
                                 <option value="Pembelian Stok Barang">
@@ -486,49 +511,50 @@
 
                     <div>
                         <label
-                            class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1"
+                            class="block text-[11px] font-bold text-slate-400 uppercase mb-1.5 ml-1"
                             >Deskripsi</label
                         >
                         <textarea
                             id="deskripsi"
                             required
                             rows="3"
-                            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold text-slate-700 resize-none"
+                            class="w-full bg-slate-50 border border-slate-200 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 font-bold text-slate-700 text-xs sm:text-sm resize-none transition-all placeholder:text-slate-400 placeholder:text-xs"
                             placeholder="Masukkan detail pengeluaran..."
                         ></textarea>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
                             <label
-                                class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1"
+                                class="block text-[11px] font-bold text-slate-400 uppercase mb-1.5 ml-1"
                                 >Total (Rp)</label
                             >
                             <input
                                 type="number"
                                 id="total"
                                 required
-                                class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold"
+                                class="w-full bg-slate-50 border border-slate-200 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 font-bold text-xs sm:text-sm text-slate-700 transition-all"
+                                placeholder="0"
                             />
                         </div>
                         <div>
                             <label
-                                class="block text-[11px] font-bold text-slate-400 uppercase mb-2 ml-1"
+                                class="block text-[11px] font-bold text-slate-400 uppercase mb-1.5 ml-1"
                                 >Tanggal</label
                             >
                             <input
                                 type="date"
                                 id="tanggal"
                                 required
-                                class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 font-bold text-slate-700"
+                                class="w-full bg-slate-50 border border-slate-200 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 font-bold text-slate-700 text-xs sm:text-sm transition-all"
                             />
                         </div>
                     </div>
 
-                    <div class="pt-4">
+                    <div class="pt-2">
                         <button
                             type="submit"
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white p-5 rounded-2xl font-800 transition-all shadow-lg uppercase tracking-widest"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 sm:p-4 rounded-xl sm:rounded-2xl font-extrabold transition-all shadow-md uppercase tracking-wider text-xs sm:text-sm cursor-pointer"
                         >
                             Simpan Data
                         </button>
@@ -538,8 +564,8 @@
         </div>
 
         <script>
-            const BASE_URL =
-                "https://langgeng-cashier-backend-production.up.railway.app";
+            var BASE_URL = window.BASE_URL || "http://127.0.0.1:4000";
+            var API_URL = window.API_URL || (BASE_URL + "/api");
             let currentPage = 1;
             const limit = 10;
             let searchTimer;
@@ -562,6 +588,9 @@
                     const expenses = result.data || [];
                     const total = result.meta?.total || expenses.length;
                     currentExpensesList = expenses; // Simpan cache data
+                    const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                    const curRole = (curUser.role || "").toLowerCase().replace(/[-_]/g, "");
+                    const canModifyExpense = (curRole === "admin" || curRole === "superadmin");
 
                     document.getElementById("expenseTableBody").innerHTML =
                         expenses
@@ -569,33 +598,47 @@
                                 const expId = e.ID || e.id;
                                 return `
                             <tr class="hover:bg-slate-50/50 transition-colors">
-                                <td class="px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">
-                                        ${new Date(e.tanggal || e.CreatedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                                <td class="px-2.5 py-2.5 sm:px-6 sm:py-4 whitespace-nowrap">
+                                    <div class="font-bold text-slate-500 text-[10px] sm:text-[11px] uppercase tracking-wider">
+                                        ${new Date(e.tanggal || e.CreatedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
                                     </div>
-                                    <p class="text-[11px] text-slate-400 font-bold"><i class="fas fa-user-circle mr-1"></i>${escapeHTML(e.user?.name || e.user?.Name || "Kasir")}</p>
+                                    <p class="text-[10px] sm:text-[11px] text-slate-400 font-bold"><i class="fas fa-user-circle mr-1"></i>${escapeHTML(e.user?.name || e.user?.Name || "Kasir")}</p>
                                 </td>
-                                <td class="px-3.5 py-3 sm:px-6 sm:py-4 min-w-[160px]">
+                                <td class="px-2.5 py-2.5 sm:px-6 sm:py-4">
                                     <div class="font-bold text-slate-800 text-xs sm:text-sm">${escapeHTML(e.deskripsi || "-")}</div>
-                                    <div class="text-[10px] text-slate-400 font-mono">Nota: #${escapeHTML(e.nota || "-")}</div>
+                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                        <span class="text-[10px] text-slate-400 font-mono">#${escapeHTML(e.nota || "-")}</span>
+                                        <span class="sm:hidden text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-medium">${escapeHTML(e.kategori || "Umum")}</span>
+                                    </div>
                                 </td>
-                                <td class="px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                                <td class="hidden sm:table-cell px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                                     <span class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg text-xs font-semibold">
                                         ${escapeHTML(e.kategori || "Umum")}
                                     </span>
                                 </td>
-                                <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right font-extrabold text-red-500 font-mono whitespace-nowrap text-xs sm:text-sm">
+                                <td class="px-2.5 py-2.5 sm:px-6 sm:py-4 text-right font-extrabold text-red-500 font-mono whitespace-nowrap text-xs sm:text-sm">
                                     Rp ${(e.total || 0).toLocaleString("id-ID")}
                                 </td>
-                                <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right whitespace-nowrap">
-                                    <button onclick="printExpenseReceipt('${expId}')" class="text-slate-500 hover:text-blue-600 mx-1.5 p-1.5 rounded-lg hover:bg-blue-50 transition-all" title="Cetak Bukti Pengeluaran">
-                                        <i class="fas fa-print text-sm"></i>
-                                    </button>
-                                    <button onclick="editExpense('${expId}')" class="text-blue-500 hover:text-blue-700 mx-1.5 p-1.5 rounded-lg hover:bg-blue-50 transition-all" title="Edit Data">
-                                        <i class="fas fa-edit text-sm"></i>
-                                    </button>
-                                    <button onclick="deleteExpense('${expId}')" class="text-red-400 hover:text-red-600 mx-1.5 p-1.5 rounded-lg hover:bg-red-50 transition-all" title="Hapus Data">
-                                        <i class="fas fa-trash text-sm"></i>
+                                <td class="px-2 py-2.5 sm:px-6 sm:py-4 text-right whitespace-nowrap">
+                                    <div class="hidden sm:inline-flex items-center gap-1">
+                                        <button onclick="printExpenseReceipt('${expId}')" class="text-slate-500 hover:text-blue-600 mx-0.5 sm:mx-1.5 p-1 sm:p-1.5 rounded-lg hover:bg-blue-50 transition-all cursor-pointer" title="Cetak Bukti Pengeluaran">
+                                            <i class="fas fa-print text-xs sm:text-sm"></i>
+                                        </button>
+                                        ${
+                                            canModifyExpense
+                                                ? `
+                                        <button onclick="editExpense('${expId}')" class="text-blue-500 hover:text-blue-700 mx-0.5 sm:mx-1.5 p-1 sm:p-1.5 rounded-lg hover:bg-blue-50 transition-all cursor-pointer" title="Edit Data">
+                                            <i class="fas fa-edit text-xs sm:text-sm"></i>
+                                        </button>
+                                        <button onclick="deleteExpense('${expId}')" class="text-red-400 hover:text-red-600 mx-0.5 sm:mx-1.5 p-1 sm:p-1.5 rounded-lg hover:bg-red-50 transition-all cursor-pointer" title="Hapus Data">
+                                            <i class="fas fa-trash text-xs sm:text-sm"></i>
+                                        </button>
+                                        `
+                                                : ""
+                                        }
+                                    </div>
+                                    <button type="button" onclick="openExpenseActionMenu('${expId}', '${escapeHTML(e.description || e.keterangan || "Pengeluaran")}', ${e.total || 0})" class="sm:hidden px-2 py-1 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold text-xs inline-flex items-center gap-1 border border-blue-200 cursor-pointer shadow-2xs">
+                                        <i class="fas fa-ellipsis-v text-[10px]"></i> Aksi
                                     </button>
                                 </td>
                             </tr>
@@ -762,6 +805,46 @@
                 return stores[location] || stores["Toko Utama"];
             }
 
+            
+            function openExpenseActionMenu(expId, desc, total) {
+                const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                const curRole = (curUser.role || "").toLowerCase().replace(/[-_]/g, "");
+                const canModifyExpense = (curRole === "admin" || curRole === "superadmin");
+
+                const actions = [
+                    {
+                        label: "Cetak Bukti Pengeluaran",
+                        icon: "fas fa-print",
+                        color: "indigo",
+                        desc: "Cetak struk / tanda bukti kas",
+                        onClick: () => printExpenseReceipt(expId),
+                    },
+                ];
+
+                if (canModifyExpense) {
+                    actions.push({
+                        label: "Edit Pengeluaran",
+                        icon: "fas fa-edit",
+                        color: "blue",
+                        desc: "Ubah data keterangan atau nominal",
+                        onClick: () => editExpense(expId),
+                    });
+                    actions.push({
+                        label: "Hapus Pengeluaran",
+                        icon: "fas fa-trash",
+                        color: "rose",
+                        desc: "Hapus catatan pengeluaran ini",
+                        onClick: () => deleteExpense(expId),
+                    });
+                }
+
+                window.showRowActionMenu({
+                    title: "Pilih Aksi Pengeluaran",
+                    subtitle: `${desc} (Rp ${Number(total).toLocaleString("id-ID")})`,
+                    actions: actions,
+                });
+            }
+
             async function printExpenseReceipt(id) {
                 let exp = currentExpensesList.find(
                     (item) => String(item.ID || item.id) === String(id),
@@ -818,7 +901,15 @@
             <html lang="id">
             <head>
                 <meta charset="UTF-8">
-                <title>Nota Pengeluaran ${escapeHTML(notaNo)}</title>
+                        <!-- Progressive Web App (PWA) Meta & Icons -->
+        <link rel="manifest" href="manifest.json" />
+        <meta name="theme-color" content="#2563EB" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Langgeng POS" />
+        <link rel="apple-touch-icon" href="logo.svg" />
+        <link rel="icon" type="image/svg+xml" href="logo.svg" />
+        <title>Nota Pengeluaran ${escapeHTML(notaNo)}</title>
                 <style>
 ${RECEIPT_BASE_CSS}
         </style>
@@ -896,6 +987,12 @@ ${RECEIPT_BASE_CSS}
             }
 
             async function editExpense(id) {
+                const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                const curRole = (curUser.role || "").toLowerCase().replace(/[-_]/g, "");
+                if (curRole !== "admin" && curRole !== "superadmin") {
+                    Swal.fire("Akses Ditolak", "Hanya Admin dan Super Admin yang berhak mengedit data pengeluaran.", "error");
+                    return;
+                }
                 const res = await fetch(`${BASE_URL}/api/expenses/${id}`);
                 const result = await res.json();
                 const e = result.data || result;
@@ -918,88 +1015,6 @@ ${RECEIPT_BASE_CSS}
             }
 
             const ROLE_PERMISSIONS = {
-                admin: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "report.html",
-                    "opname.html",
-                ],
-                kasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                "super-kasir": [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                super_kasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                superkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                supersubkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                "super-subkasir": [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                super_subkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                "super-sub-kasir": [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                super_sub_kasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                akuntan: [
-                    "akuntansi.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "riwayat.html",
-                    "report.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
                 superadmin: [
                     "dashboard.html",
                     "riwayat.html",
@@ -1011,85 +1026,150 @@ ${RECEIPT_BASE_CSS}
                     "absensi.html",
                     "report.html",
                     "opname.html",
+                    "online-users.html",
+                ],
+                "super-admin": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "akuntansi.html",
+                    "absensi.html",
+                    "report.html",
+                    "opname.html",
+                    "online-users.html",
+                ],
+                admin: [
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "akuntansi.html",
+                    "absensi.html",
+                    "report.html",
+                    "opname.html",
+                    "online-users.html",
+                ],
+                "super-kasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                superkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                super_kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                supersubkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                "super-subkasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                super_subkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                "super-sub-kasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                super_sub_kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "expense.html",
+                    "opname.html",
+                ],
+                akuntan: [
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
                 ],
             };
 
             async function confirmLogout() {
                 const result = await Swal.fire({
                     title: "Konfirmasi Keluar",
-                    text: "Pilih tindakan logout yang ingin Anda lakukan:",
+                    text: "Apakah Anda yakin ingin keluar dari sistem kasir?",
                     icon: "question",
                     showCancelButton: true,
-                    showDenyButton: true,
-                    confirmButtonText:
-                        '<i class="fas fa-check-circle mr-1"></i> Logout & Selesaikan Shift',
-                    denyButtonText:
-                        '<i class="fas fa-sign-out-alt mr-1"></i> Logout Saja',
-                    cancelButtonText: '<i class="fas fa-times mr-1"></i> Batal',
-                    confirmButtonColor: "#2563EB",
-                    denyButtonColor: "#F59E0B",
+                    confirmButtonText: '<i class="fas fa-sign-out-alt mr-1.5"></i> Ya, Keluar',
+                    cancelButtonText: '<i class="fas fa-times mr-1.5"></i> Batal',
+                    confirmButtonColor: "#EF4444",
                     cancelButtonColor: "#64748B",
                     reverseButtons: true,
+                    focusCancel: true,
                 });
 
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        title: "Menutup Shift...",
-                        allowOutsideClick: false,
-                        didOpen: () => Swal.showLoading(),
-                    });
-
-                    try {
-                        const shiftResponse = await fetch(
-                            `${BASE_URL}/api/shift/current`,
-                        );
-                        const shiftData = await shiftResponse.json();
-                        const shift = shiftData.shift || 1;
-
-                        const updateResponse = await fetch(
-                            `${BASE_URL}/api/sales/update/shift`,
-                            {
-                                method: "PUT",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify({
-                                    shift: shift,
-                                }),
-                            },
-                        );
-
-                        if (updateResponse.ok) {
-                            await Swal.fire({
-                                icon: "success",
-                                title: "Shift Berhasil Ditutup",
-                                text: `Transaksi berhasil dimasukkan ke Shift ${shift}. Anda telah keluar.`,
-                                confirmButtonColor: "#2563EB",
-                            });
-                            localStorage.removeItem("token");
-                            window.location.href = "index.html";
-                        } else {
-                            Swal.fire(
-                                "Gagal",
-                                "Gagal memperbarui shift transaksi",
-                                "error",
-                            );
-                        }
-                    } catch (error) {
-                        console.error(error);
-                        Swal.fire(
-                            "Error",
-                            "Server tidak dapat dihubungi",
-                            "error",
-                        );
+                    if (window.recordLogout) {
+                        const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                        await window.recordLogout("LOGOUT_ONLY", null, curUser.location || "", "Logout");
                     }
-                } else if (result.isDenied) {
                     localStorage.removeItem("token");
                     window.location.href = "index.html";
                 }
             }
 
             async function deleteExpense(id) {
+                const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                const curRole = (curUser.role || "").toLowerCase().replace(/[-_]/g, "");
+                if (curRole !== "admin" && curRole !== "superadmin") {
+                    Swal.fire("Akses Ditolak", "Hanya Admin dan Super Admin yang berhak menghapus data pengeluaran.", "error");
+                    return;
+                }
                 if (!id || id === "undefined") {
                     Swal.fire(
                         "Error",
@@ -1215,11 +1295,11 @@ ${RECEIPT_BASE_CSS}
                     ROLE_PERMISSIONS[normalizedRole] || ["dashboard.html"];
 
                 if (!allowedPages.includes(currentPage)) {
-                    if (userRole === "akuntan")
-                        window.location.href = "akuntansi.html";
-                    else if (userRole === "admin")
-                        window.location.href = "riwayat.html";
-                    else window.location.href = "dashboard.html";
+                    let fallback = "dashboard.html";
+                    if (!allowedPages.includes("dashboard.html")) {
+                        fallback = allowedPages[0] || "riwayat.html";
+                    }
+                    window.location.href = fallback;
                     return;
                 }
 
@@ -1347,17 +1427,13 @@ ${RECEIPT_BASE_CSS}
                         document.body.classList.remove("overflow-hidden");
                     }
                 } else {
-                    const isCollapsed =
-                        sidebar.classList.contains("desktop-collapsed") ||
-                        sidebar.classList.contains("lg:hidden");
-                    if (isCollapsed) {
-                        sidebar.classList.remove(
-                            "desktop-collapsed",
-                            "lg:hidden",
-                        );
-                    } else {
-                        sidebar.classList.add("desktop-collapsed", "lg:hidden");
-                    }
+                    // Desktop: Sidebar selalu permanen terbuka (fitur collapse ditiadakan sesuai instruksi)
+                    sidebar.classList.remove(
+                        "desktop-collapsed",
+                        "lg:hidden",
+                        "hidden",
+                        "-translate-x-full",
+                    );
                 }
             }
             window.toggleSidebar = toggleSidebar;
@@ -1367,12 +1443,12 @@ ${RECEIPT_BASE_CSS}
                 const sidebar = document.getElementById("app-sidebar");
                 const backdrop = document.getElementById("sidebar-backdrop");
                 if (window.innerWidth >= 1024) {
-                    if (!sidebar?.classList.contains("desktop-collapsed")) {
-                        sidebar?.classList.remove(
-                            "-translate-x-full",
-                            "lg:hidden",
-                        );
-                    }
+                    sidebar?.classList.remove(
+                        "-translate-x-full",
+                        "lg:hidden",
+                        "desktop-collapsed",
+                        "hidden",
+                    );
                     backdrop?.classList.add("hidden");
                     document.body.classList.remove("overflow-hidden");
                 } else {

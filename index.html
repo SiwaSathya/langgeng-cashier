@@ -2,175 +2,1334 @@
 <html lang="id">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Login - Administration</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    </head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+        <!-- Progressive Web App (PWA) Meta & Icons -->
+        <link rel="manifest" href="manifest.json" />
+        <meta name="theme-color" content="#2563EB" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Langgeng POS" />
+        <link rel="apple-touch-icon" href="logo.svg" />
+        <link rel="icon" type="image/svg+xml" href="logo.svg" />
+        <title>LANGGENG SMARTPOS - Masuk Sistem</title>
+        <script src="vendor/tailwindcss.js"></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        />
+        <script src="vendor/sweetalert2.all.min.js"></script>
+        <script src="env.js"></script>
+        <script src="shortcuts.js" defer></script>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap");
 
-    <body
-        class="bg-blue-50 flex items-center justify-center min-h-screen p-4 sm:p-6"
-    >
-        <div
-            class="bg-white p-6 sm:p-10 rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl w-full max-w-md border border-blue-100 my-auto"
-        >
-            <div class="text-center mb-10">
-                <div
-                    class="bg-blue-400 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg"
-                >
-                    <svg
-                        class="w-8 h-8 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                        ></path>
-                    </svg>
-                </div>
-                <h1 class="text-3xl font-bold text-blue-600 italic">
-                    Shop Name
-                </h1>
-                <p class="text-gray-400 mt-2">
-                    Masuk untuk memulai shift kasir
-                </p>
-            </div>
+            body {
+                font-family: "Plus Jakarta Sans", sans-serif;
+            }
 
-            <form onsubmit="handleLogin(event)" class="space-y-6">
-                <div>
-                    <label class="block text-gray-700 font-bold mb-2 ml-1"
-                        >Username</label
-                    >
-                    <input
-                        type="text"
-                        id="username"
-                        required
-                        class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-400 outline-none transition"
-                        placeholder="admin"
-                    />
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-bold mb-2 ml-1"
-                        >Kata Sandi</label
-                    >
-                    <input
-                        type="password"
-                        id="password"
-                        required
-                        class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-400 outline-none transition"
-                        placeholder="••••••••"
-                    />
-                </div>
-                <button
-                    type="submit"
-                    class="w-full bg-blue-500 hover:bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg transition transform active:scale-95"
-                >
-                    MASUK SEKARANG
-                </button>
-            </form>
-        </div>
+            /* Ambient background patterns */
+            .bg-grid-pattern {
+                background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+                background-size: 24px 24px;
+            }
+            .bg-dot-pattern {
+                background-image: radial-gradient(rgba(37, 99, 235, 0.08) 1.2px, transparent 1.2px);
+                background-size: 20px 20px;
+            }
 
-        <script>
-            const API_URL =
-                "https://langgeng-cashier-backend-production.up.railway.app/api";
+            #cursorSpotlight {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 440px;
+                height: 440px;
+                background: radial-gradient(circle, rgba(37, 99, 235, 0.16) 0%, rgba(250, 204, 21, 0.05) 45%, transparent 70%);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 5;
+                transform: translate(-9999px, -9999px);
+                will-change: transform;
+            }
 
-            function getUserDataFromToken(token) {
-                if (!token) return null;
-                try {
-                    const base64Url = token.split(".")[1];
-                    const base64 = base64Url
-                        .replace(/-/g, "+")
-                        .replace(/_/g, "/");
-                    const jsonPayload = decodeURIComponent(
-                        window
-                            .atob(base64)
-                            .split("")
-                            .map(function (c) {
-                                return (
-                                    "%" +
-                                    ("00" + c.charCodeAt(0).toString(16)).slice(
-                                        -2,
-                                    )
-                                );
-                            })
-                            .join(""),
-                    );
-                    return JSON.parse(jsonPayload);
-                } catch (err) {
-                    return null;
+            .login-card-interactive {
+                transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s ease;
+            }
+            .login-card-interactive:hover {
+                box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.22), 0 0 35px rgba(37, 99, 235, 0.12);
+            }
+
+            /* =========================================================================
+               CINEMATIC INTRO ANIMATION: LOGO INFINITY & NEURAL REVEAL
+               ========================================================================= */
+            #introSplashOverlay {
+                position: fixed;
+                inset: 0;
+                z-index: 9999;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background: radial-gradient(circle at center, #0f172a 0%, #030712 65%, #020617 100%);
+                overflow: hidden;
+                pointer-events: auto;
+                user-select: none;
+                transition: opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .intro-ambient-glow {
+                position: absolute;
+                width: 520px;
+                height: 520px;
+                border-radius: 50%;
+                background: radial-gradient(circle, rgba(37, 99, 235, 0.32) 0%, rgba(250, 204, 21, 0.12) 40%, transparent 70%);
+                filter: blur(45px);
+                pointer-events: none;
+                animation: introGlowBreath 3.2s infinite alternate ease-in-out;
+            }
+
+            @keyframes introGlowBreath {
+                0% { transform: scale(0.85); opacity: 0.6; }
+                100% { transform: scale(1.18); opacity: 1; }
+            }
+
+            @keyframes nexusShockwavePulse {
+                0% {
+                    r: 5;
+                    stroke-width: 2.8px;
+                    opacity: 1;
+                }
+                100% {
+                    r: 32;
+                    stroke-width: 0.2px;
+                    opacity: 0;
                 }
             }
 
-            async function handleLogin(e) {
-                e.preventDefault();
+            .intro-ripple.active {
+                animation: nexusShockwavePulse 1.25s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+            }
 
-                const usernameInput = document.getElementById("username").value;
-                const passwordInput = document.getElementById("password").value;
+            @keyframes logoDockGlint {
+                0% {
+                    transform: scale(1);
+                    filter: brightness(1);
+                }
+                35% {
+                    transform: scale(1.22);
+                    filter: brightness(1.7) drop-shadow(0 0 20px rgba(56, 189, 248, 0.95)) drop-shadow(0 0 35px rgba(250, 204, 21, 0.75));
+                }
+                100% {
+                    transform: scale(1);
+                    filter: brightness(1);
+                }
+            }
 
-                // Tampilkan loading spinner saat memproses kiriman data
-                Swal.fire({
-                    title: "Memverifikasi...",
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    },
+            .logo-dock-glint {
+                animation: logoDockGlint 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+            }
+
+            .intro-node {
+                opacity: 0;
+                transform-origin: center;
+                transform-box: fill-box;
+                transform: scale(0);
+                transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+            }
+            .intro-node.active {
+                opacity: 1;
+                transform: scale(1);
+            }
+            .intro-node.burst {
+                transform: scale(1.35);
+                filter: drop-shadow(0 0 8px #facc15);
+            }
+
+            .intro-node-blue {
+                opacity: 0;
+                transform-origin: center;
+                transform-box: fill-box;
+                transform: scale(0);
+                transition: transform 0.4s ease 0.1s, opacity 0.3s ease;
+            }
+            .intro-node-blue.active {
+                opacity: 0.9;
+                transform: scale(1);
+            }
+            .intro-axon-blue {
+                opacity: 0;
+                transition: opacity 0.5s ease;
+            }
+            .intro-axon-blue.active {
+                opacity: 0.8;
+            }
+
+            /* =========================================================================
+               CONTINUOUS LIVING LOGO ANIMATIONS (IDLE & POST-DOCK STATE)
+               ========================================================================= */
+            @keyframes brandLogoFloat {
+                0%, 100% {
+                    transform: translateY(0px) rotate(0deg);
+                }
+                50% {
+                    transform: translateY(-4px) rotate(0.5deg);
+                }
+            }
+
+            @keyframes brandHaloPulse {
+                0%, 100% {
+                    opacity: 0.35;
+                    transform: scale(0.96);
+                    filter: blur(10px);
+                }
+                50% {
+                    opacity: 0.75;
+                    transform: scale(1.15);
+                    filter: blur(15px);
+                }
+            }
+
+            .brand-logo-alive {
+                animation: brandLogoFloat 4.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+                will-change: transform;
+            }
+
+            .brand-halo-pulse {
+                animation: brandHaloPulse 3.6s ease-in-out infinite;
+                will-change: transform, opacity;
+            }
+
+            .brand-logo-interactive:hover .brand-logo-alive {
+                transform: scale(1.08) rotate(1.2deg);
+                filter: brightness(1.15) drop-shadow(0 0 18px rgba(56, 189, 248, 0.6));
+            }
+
+            /* =========================================================================
+               MOBILE LIQUID GLASS CARD & EYE-CATCHING AMBIENT (< 1024px)
+               ========================================================================= */
+            @media (max-width: 1023px) {
+                .glass-login-card {
+                    background: rgba(15, 23, 42, 0.48) !important;
+                    backdrop-filter: blur(28px) saturate(210%) !important;
+                    -webkit-backdrop-filter: blur(28px) saturate(210%) !important;
+                    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+                    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.25) !important;
+                }
+                .glass-title {
+                    color: #ffffff !important;
+                }
+                .glass-subtitle {
+                    color: #94a3b8 !important;
+                }
+                .glass-badge {
+                    background: rgba(37, 99, 235, 0.25) !important;
+                    color: #93c5fd !important;
+                    border: 1px solid rgba(59, 130, 246, 0.35) !important;
+                    backdrop-filter: blur(12px) !important;
+                }
+                .glass-label {
+                    color: #cbd5e1 !important;
+                }
+                .glass-input {
+                    background: rgba(255, 255, 255, 0.08) !important;
+                    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+                    color: #ffffff !important;
+                    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25) !important;
+                }
+                .glass-input::placeholder {
+                    color: #64748b !important;
+                }
+                .glass-input:focus {
+                    background: rgba(255, 255, 255, 0.14) !important;
+                    border-color: #38bdf8 !important;
+                    box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.25) !important;
+                }
+                .glass-input-icon {
+                    color: #94a3b8 !important;
+                }
+                .glass-footer-divider {
+                    border-color: rgba(255, 255, 255, 0.12) !important;
+                    color: #94a3b8 !important;
+                }
+                .glass-subfooter {
+                    color: #64748b !important;
+                }
+            }
+
+            /* DESKTOP VIEW (>= 1024px) */
+            @media (min-width: 1024px) {
+                .glass-login-card {
+                    background: #ffffff;
+                    border: 1px solid rgba(226, 232, 240, 0.9);
+                    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+                }
+                .glass-title {
+                    color: #0f172a;
+                }
+                .glass-subtitle {
+                    color: #64748b;
+                }
+                .glass-badge {
+                    background: #eff6ff;
+                    color: #1d4ed8;
+                    border: 1px solid transparent;
+                }
+                .glass-label {
+                    color: #334155;
+                }
+                .glass-input {
+                    background: #f8fafc;
+                    border: 1px solid #e2e8f0;
+                    color: #1e293b;
+                }
+                .glass-input::placeholder {
+                    color: #94a3b8;
+                }
+                .glass-input:focus {
+                    background: #ffffff;
+                    border-color: #2563eb;
+                    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+                }
+                .glass-input-icon {
+                    color: #94a3b8;
+                }
+                .glass-footer-divider {
+                    border-color: #f1f5f9;
+                    color: #94a3b8;
+                }
+                .glass-subfooter {
+                    color: #94a3b8;
+                }
+            }
+        </style>
+    </head>
+
+    <body class="bg-slate-900 text-slate-800 antialiased min-h-screen flex flex-col justify-between selection:bg-blue-500 selection:text-white">
+        <!-- ================= CINEMATIC INTRO ANIMATION OVERLAY ================= -->
+        <div id="introSplashOverlay">
+            <div class="intro-ambient-glow"></div>
+            <div class="absolute inset-0 bg-grid-pattern opacity-30 pointer-events-none"></div>
+
+            <!-- Skip Button -->
+            <button
+                type="button"
+                id="btnSkipIntro"
+                onclick="skipIntroAnimation()"
+                class="absolute top-6 right-6 text-slate-300 hover:text-white text-xs font-semibold px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/15 transition-all z-50 flex items-center gap-2 cursor-pointer shadow-lg"
+                title="Lewati Animasi (Tekan Esc / Spasi)"
+            >
+                <span>Lewati</span>
+                <i class="fas fa-forward text-[10px]"></i>
+            </button>
+
+            <!-- Main Stage -->
+            <div id="introLogoHero" class="relative z-10 flex flex-col items-center justify-center p-4">
+                <div
+                    id="introLogoStage"
+                    class="relative w-48 h-48 sm:w-56 sm:h-56 filter drop-shadow-[0_15px_35px_rgba(15,23,42,0.8)] will-change-transform"
+                >
+                    <svg id="introSvg" viewBox="0 0 100 100" class="w-full h-full overflow-visible">
+                        <defs>
+                            <linearGradient id="introBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#0f172a" />
+                                <stop offset="40%" stop-color="#1e3a8a" />
+                                <stop offset="100%" stop-color="#1d4ed8" />
+                            </linearGradient>
+                            <linearGradient id="introInfinityBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#1d4ed8" />
+                                <stop offset="50%" stop-color="#2563eb" />
+                                <stop offset="100%" stop-color="#38bdf8" />
+                            </linearGradient>
+                            <linearGradient id="introGoldOutline" x1="0%" y1="50%" x2="100%" y2="50%">
+                                <stop offset="0%" stop-color="#fde047" />
+                                <stop offset="30%" stop-color="#facc15" />
+                                <stop offset="60%" stop-color="#fbbf24" />
+                                <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.7" />
+                            </linearGradient>
+                            <linearGradient id="introNeuronFlow" x1="0%" y1="50%" x2="100%" y2="50%">
+                                <stop offset="0%" stop-color="#ffffff" />
+                                <stop offset="20%" stop-color="#fef08a" />
+                                <stop offset="60%" stop-color="#facc15" />
+                                <stop offset="100%" stop-color="#fbbf24" />
+                            </linearGradient>
+                            <linearGradient id="introGlassShine" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.32" />
+                                <stop offset="100%" stop-color="#ffffff" stop-opacity="0.0" />
+                            </linearGradient>
+                            <filter id="introDropShadow" x="-20%" y="-20%" width="140%" height="145%">
+                                <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.6" />
+                            </filter>
+                            <filter id="introGoldGlow" x="-30%" y="-30%" width="160%" height="160%">
+                                <feGaussianBlur stdDeviation="2.2" result="blur" />
+                                <feMerge>
+                                    <feMergeNode in="blur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- SQUIRCLE BASE -->
+                        <rect id="introBaseRect" x="6" y="6" width="88" height="88" rx="24" fill="url(#introBgGrad)" filter="url(#introDropShadow)" />
+                        <!-- CIRCUIT GRID -->
+                        <path id="introCircuitGrid" d="M 14 30 H 86 M 14 50 H 86 M 14 70 H 86 M 30 14 V 86 M 50 14 V 86 M 70 14 V 86" fill="none" stroke="#38bdf8" stroke-width="0.5" stroke-opacity="0.18" />
+                        <!-- TOP GLASS -->
+                        <rect id="introGlassTop" x="8" y="8" width="84" height="42" rx="22" fill="url(#introGlassShine)" />
+                        <!-- RIM -->
+                        <rect id="introOuterRim" x="6.5" y="6.5" width="87" height="87" rx="23.5" fill="none" stroke="#38bdf8" stroke-width="1.2" stroke-opacity="0.35" />
+
+                        <!-- INFINITY STROKES (DRAWING LEFT TO RIGHT) -->
+                        <path id="introGoldOutlinePath"
+                              d="M 19 39 C 11 47, 11 53, 19 61 C 27 69, 42 65, 50 50 C 58 35, 73 31, 81 39 C 89 47, 89 53, 81 61 C 73 69, 58 65, 50 50 C 42 35, 27 31, 19 39 Z"
+                              fill="none" stroke="url(#introGoldOutline)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" filter="url(#introGoldGlow)" opacity="0.95" />
+
+                        <path id="introBlueCorePath"
+                              d="M 19 39 C 11 47, 11 53, 19 61 C 27 69, 42 65, 50 50 C 58 35, 73 31, 81 39 C 89 47, 89 53, 81 61 C 73 69, 58 65, 50 50 C 42 35, 27 31, 19 39 Z"
+                              fill="none" stroke="url(#introInfinityBlue)" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round" />
+
+                        <path id="introGlossLinePath"
+                              d="M 19 39 C 11 47, 11 53, 19 61 C 27 69, 42 65, 50 50 C 58 35, 73 31, 81 39 C 89 47, 89 53, 81 61 C 73 69, 58 65, 50 50 C 42 35, 27 31, 19 39 Z"
+                              fill="none" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" stroke-opacity="0.4" />
+
+                        <!-- NEURAL NETWORK GROUP (LEFT TO CENTER) -->
+                        <g id="introNeuralGroup" filter="url(#introGoldGlow)">
+                            <path id="axon1" class="intro-axon" d="M 16 50 L 25 43 L 36 47 L 50 50" fill="none" stroke="url(#introNeuronFlow)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                            <path id="axon2" class="intro-axon" d="M 16 50 L 25 57 L 36 53 L 50 50" fill="none" stroke="url(#introNeuronFlow)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+
+                            <path id="axonD1" class="intro-axon" d="M 21 41 L 28 35 L 37 38 L 44 44" fill="none" stroke="#fef08a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+                            <path id="axonD2" class="intro-axon" d="M 28 35 L 34 29" fill="none" stroke="#fde047" stroke-width="1.1" stroke-linecap="round" />
+                            <path id="axonD3" class="intro-axon" d="M 21 59 L 28 65 L 37 62 L 44 56" fill="none" stroke="#fef08a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+                            <path id="axonD4" class="intro-axon" d="M 28 65 L 34 71" fill="none" stroke="#fde047" stroke-width="1.1" stroke-linecap="round" />
+
+                            <path id="axonCross1" class="intro-axon" d="M 25 43 L 25 57" fill="none" stroke="#facc15" stroke-width="1.1" stroke-dasharray="1.5 2" />
+                            <path id="axonCross2" class="intro-axon" d="M 36 47 L 36 53" fill="none" stroke="#facc15" stroke-width="1.3" stroke-dasharray="2 2" />
+
+                            <!-- SOMA NODES -->
+                            <circle id="nodeLeftRoot" class="intro-node" cx="16" cy="50" r="3.2" fill="#ffffff" stroke="#facc15" stroke-width="1.8" />
+                            <circle id="node2" class="intro-node" cx="21" cy="41" r="2.2" fill="#fef08a" />
+                            <circle id="node3" class="intro-node" cx="21" cy="59" r="2.2" fill="#fef08a" />
+                            <circle id="node4" class="intro-node" cx="25" cy="43" r="2.6" fill="#ffffff" stroke="#facc15" stroke-width="1.4" />
+                            <circle id="node5" class="intro-node" cx="25" cy="57" r="2.6" fill="#ffffff" stroke="#facc15" stroke-width="1.4" />
+                            <circle id="node6" class="intro-node" cx="28" cy="35" r="2.4" fill="#ffffff" stroke="#f59e0b" stroke-width="1.2" />
+                            <circle id="node7" class="intro-node" cx="28" cy="65" r="2.4" fill="#ffffff" stroke="#f59e0b" stroke-width="1.2" />
+                            <circle id="node8" class="intro-node" cx="34" cy="29" r="1.8" fill="#fde047" />
+                            <circle id="node9" class="intro-node" cx="34" cy="71" r="1.8" fill="#fde047" />
+                            <circle id="node10" class="intro-node" cx="36" cy="47" r="2.4" fill="#ffffff" stroke="#facc15" stroke-width="1.2" />
+                            <circle id="node11" class="intro-node" cx="36" cy="53" r="2.4" fill="#ffffff" stroke="#facc15" stroke-width="1.2" />
+                            <circle id="node12" class="intro-node" cx="37" cy="38" r="2" fill="#fef08a" />
+                            <circle id="node13" class="intro-node" cx="37" cy="62" r="2" fill="#fef08a" />
+                            <circle id="node14" class="intro-node" cx="44" cy="44" r="2" fill="#fef08a" />
+                            <circle id="node15" class="intro-node" cx="44" cy="56" r="2" fill="#fef08a" />
+
+                            <!-- CENTRAL NEXUS EPICENTER -->
+                            <circle id="nodeNexusOuter" class="intro-node" cx="50" cy="50" r="4.5" fill="#ffffff" stroke="#f59e0b" stroke-width="2.2" />
+                            <circle id="nodeNexusInner" class="intro-node" cx="50" cy="50" r="2" fill="#fef08a" />
+                            <circle id="nodeNexusRipple" class="intro-ripple" cx="50" cy="50" r="6" fill="none" stroke="#fde047" stroke-width="1.2" stroke-opacity="0.8" />
+                        </g>
+
+                        <!-- RIGHT LOOP ELECTRONIC DATA NODES -->
+                        <g id="introRightLoop" opacity="0.85">
+                            <circle id="rNode1" class="intro-node-blue" cx="75" cy="38" r="2" fill="#93c5fd" />
+                            <circle id="rNode2" class="intro-node-blue" cx="84" cy="50" r="2.5" fill="#60a5fa" />
+                            <circle id="rNode3" class="intro-node-blue" cx="75" cy="62" r="2" fill="#93c5fd" />
+                            <path id="rAxon" class="intro-axon-blue" d="M 65 44 L 75 38 M 75 38 L 84 50 M 84 50 L 75 62 M 75 62 L 65 56" fill="none" stroke="#60a5fa" stroke-width="1" stroke-dasharray="2 2" stroke-opacity="0.6" />
+                        </g>
+                    </svg>
+                </div>
+
+                <div
+                    id="introBrandText"
+                    class="mt-6 text-center opacity-0 transform translate-y-4 transition-all duration-700 pointer-events-none"
+                >
+                    <h1 class="text-xl sm:text-2xl font-black text-white tracking-widest uppercase">
+                        LANGGENG <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">SMARTPOS</span>
+                    </h1>
+                    <p class="text-xs font-semibold tracking-widest text-amber-400 mt-1 uppercase">
+                        Enterprise Management & POS
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Mouse Ambient Spotlight -->
+        <div id="cursorSpotlight"></div>
+
+        <div class="min-h-screen flex w-full">
+            <!-- ================= LEFT PANEL: BRAND EXPERIENCE & VISUAL SHOWCASE (HIDDEN ON MOBILE, SPLIT ON DESKTOP) ================= -->
+            <div
+                class="hidden lg:flex lg:w-7/12 xl:w-3/5 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 relative overflow-hidden flex-col justify-between p-12 xl:p-16 text-white border-r border-slate-800"
+            >
+                <!-- Interactive Neural Canvas Animation -->
+                <canvas id="neuralCanvas" class="absolute inset-0 w-full h-full pointer-events-auto z-0"></canvas>
+
+                <!-- Ambient Glow Lights -->
+                <div
+                    class="absolute -top-32 -left-32 w-96 h-96 bg-blue-600/25 rounded-full blur-3xl pointer-events-none z-0"
+                ></div>
+                <div
+                    class="absolute -bottom-32 right-10 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none z-0"
+                ></div>
+                <div
+                    class="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none z-0"
+                ></div>
+
+                <!-- Brand Header -->
+                <div class="relative z-10 flex items-center gap-3.5 group brand-logo-interactive cursor-pointer" onclick="replayIntroAnimation()" title="Klik untuk memutar ulang animasi intro">
+                    <div class="relative shrink-0">
+                        <div class="absolute -inset-1.5 rounded-2xl bg-gradient-to-tr from-blue-600 via-sky-400 to-amber-400 opacity-40 blur-md brand-halo-pulse pointer-events-none"></div>
+                        <img
+                            id="desktopBrandLogo"
+                            src="logo.svg"
+                            alt="Logo Langgeng Elektronika"
+                            class="relative w-12 h-12 rounded-2xl shadow-xl p-1.5 bg-slate-900/60 backdrop-blur-md border border-white/25 shrink-0 brand-logo-alive transition-all duration-300"
+                        />
+                    </div>
+                    <div>
+                        <h2
+                            class="text-lg font-black tracking-tight text-white leading-tight"
+                        >
+                            LANGGENG ELEKTRONIKA
+                        </h2>
+                        <p
+                            class="text-[11px] font-bold tracking-widest text-amber-400 uppercase"
+                        >
+                            SmartPOS & Enterprise Management
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Hero Center Narrative -->
+                <div class="relative z-10 max-w-xl my-auto py-8">
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-300 text-xs font-bold mb-6 backdrop-blur-md"
+                    >
+                        <span
+                            class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"
+                        ></span>
+                        <span>Sistem Kasir Terintegrasi v2.6 Online</span>
+                    </div>
+
+                    <h1
+                        class="text-3xl xl:text-4xl 2xl:text-5xl font-black text-white leading-tight tracking-tight mb-3"
+                    >
+                        LANGGENG <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">SMARTPOS</span>
+                    </h1>
+
+                    <p
+                        class="text-slate-300 text-sm xl:text-base leading-relaxed mb-8"
+                    >
+                        Pusat kendali operasional kasir, inventaris multi-cabang, dan pembukuan keuangan toko terpadu.
+                    </p>
+
+                    <!-- Feature Pillars -->
+                    <div class="space-y-3.5">
+                        <div
+                            class="flex items-center gap-4 p-3.5 bg-white/[0.04] hover:bg-white/[0.07] border border-white/10 rounded-2xl backdrop-blur-md transition-all"
+                        >
+                            <div
+                                class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 text-blue-400 flex items-center justify-center font-black text-sm shrink-0"
+                            >
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h3
+                                    class="text-xs font-bold text-white tracking-wide"
+                                >
+                                    Sinkronisasi Real-Time Multi-Cabang
+                                </h3>
+                                <p class="text-[11px] text-slate-400 truncate">
+                                    Perubahan stok dan kartu inventaris sinkron seketika via Server-Sent Events (SSE).
+                                </p>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center gap-4 p-3.5 bg-white/[0.04] hover:bg-white/[0.07] border border-white/10 rounded-2xl backdrop-blur-md transition-all"
+                        >
+                            <div
+                                class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-400 flex items-center justify-center font-black text-sm shrink-0"
+                            >
+                                <i class="fas fa-book-journal-whills"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h3
+                                    class="text-xs font-bold text-white tracking-wide"
+                                >
+                                    Jurnal Berpasangan & Akuntansi Otomatis
+                                </h3>
+                                <p class="text-[11px] text-slate-400 truncate">
+                                    Buku besar, neraca saldo, pelunasan bon piutang, dan laba kotor dibukukan otomatis.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center gap-4 p-3.5 bg-white/[0.04] hover:bg-white/[0.07] border border-white/10 rounded-2xl backdrop-blur-md transition-all"
+                        >
+                            <div
+                                class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 text-amber-400 flex items-center justify-center font-black text-sm shrink-0"
+                            >
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h3
+                                    class="text-xs font-bold text-white tracking-wide"
+                                >
+                                    Kontrol Shift Kasir & Audit Trail Aman
+                                </h3>
+                                <p class="text-[11px] text-slate-400 truncate">
+                                    Rekap setoran shift terpisah, monitoring pengguna online, dan proteksi otentikasi JWT.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Status -->
+                <div
+                    class="relative z-10 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80 pt-6"
+                >
+                    <div class="flex items-center gap-2">
+                        <i
+                            class="fas fa-circle-check text-emerald-400 text-xs"
+                        ></i>
+                        <span>Enkripsi 256-bit Aktif</span>
+                    </div>
+                    <span>&copy; 2026 Langgeng Elektronika. All rights reserved.</span>
+                </div>
+            </div>
+
+            <!-- ================= RIGHT PANEL: MODERN LOGIN FORM (EYE-CATCHING GLASS ON MOBILE) ================= -->
+            <div
+                class="w-full lg:w-5/12 xl:w-2/5 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 lg:bg-none lg:bg-slate-50 relative flex flex-col justify-center items-center p-5 sm:p-10 lg:p-12 xl:p-16 overflow-y-auto min-h-screen"
+            >
+                <!-- Mobile Eye-Catching Ambient Glow Lights (< lg) -->
+                <div class="lg:hidden absolute -top-24 -left-24 w-80 h-80 bg-blue-600/35 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="lg:hidden absolute -bottom-24 -right-24 w-80 h-80 bg-amber-500/25 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="lg:hidden absolute top-1/3 -right-20 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="lg:hidden absolute inset-0 bg-grid-pattern opacity-30 pointer-events-none"></div>
+                <div class="hidden lg:block absolute inset-0 bg-dot-pattern opacity-70 pointer-events-none"></div>
+
+                <div class="relative z-10 w-full max-w-md mx-auto">
+                    <!-- Mobile Brand Showcase (Only visible on screens < lg) -->
+                    <div class="lg:hidden text-center mb-7">
+                        <div class="inline-flex justify-center mb-3">
+                            <div class="relative brand-logo-interactive cursor-pointer" onclick="replayIntroAnimation()" title="Ketuk untuk putar ulang animasi intro">
+                                <div class="absolute -inset-2.5 rounded-2xl bg-gradient-to-tr from-blue-500 via-sky-400 to-amber-400 opacity-45 blur-md brand-halo-pulse pointer-events-none"></div>
+                                <img
+                                    id="mobileBrandLogo"
+                                    src="logo.svg"
+                                    alt="Logo Langgeng Elektronika"
+                                    class="relative w-16 h-16 drop-shadow-2xl p-1.5 bg-slate-900/70 backdrop-blur-md rounded-2xl border border-white/25 brand-logo-alive transition-all duration-300"
+                                />
+                            </div>
+                        </div>
+                        <h2
+                            class="text-2xl font-black text-white tracking-tight"
+                        >
+                            LANGGENG ELEKTRONIKA
+                        </h2>
+                        <p
+                            class="text-xs font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300 uppercase mt-1"
+                        >
+                            SmartPOS & Enterprise Management
+                        </p>
+                    </div>
+
+                    <!-- Modern Login Card (Liquid Glass on Mobile, Crisp Solid on Desktop) -->
+                    <div
+                        class="glass-login-card p-6 sm:p-10 rounded-3xl login-card-interactive relative z-10 w-full"
+                    >
+                        <div class="mb-7">
+                            <div
+                                class="glass-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-3"
+                            >
+                                <i class="fas fa-key text-[10px]"></i>
+                                <span>Akses Masuk Staf</span>
+                            </div>
+                            <h2
+                                class="glass-title text-2xl font-black tracking-tight"
+                            >
+                                Selamat Datang Kembali
+                            </h2>
+                            <p class="glass-subtitle text-xs font-medium mt-1">
+                                Masukkan username dan kata sandi untuk memulai sesi kerja Anda.
+                            </p>
+                        </div>
+
+                        <form
+                            onsubmit="handleLogin(event)"
+                            class="space-y-4 sm:space-y-5"
+                            autocomplete="on"
+                        >
+                            <div>
+                                <label
+                                    for="username"
+                                    class="glass-label block text-xs font-bold uppercase tracking-wider mb-2 ml-1"
+                                >
+                                    Username
+                                </label>
+                                <div class="relative group">
+                                    <div
+                                        class="glass-input-icon absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-400"
+                                    >
+                                        <i class="fas fa-user text-sm"></i>
+                                    </div>
+                                    <input
+                                        type="text"
+                                        id="username"
+                                        required
+                                        autofocus
+                                        class="glass-input w-full pl-11 pr-4 py-3.5 rounded-xl font-semibold outline-none transition text-sm"
+                                        placeholder="Ketik username Anda"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <div
+                                    class="flex items-center justify-between mb-2 ml-1"
+                                >
+                                    <label
+                                        for="password"
+                                        class="glass-label block text-xs font-bold uppercase tracking-wider"
+                                    >
+                                        Kata Sandi
+                                    </label>
+                                    <span
+                                        id="capsWarning"
+                                        class="hidden text-[10px] font-bold text-amber-400 lg:text-amber-600 items-center gap-1"
+                                    >
+                                        <i class="fas fa-arrow-up"></i> Caps Lock Aktif
+                                    </span>
+                                </div>
+                                <div class="relative group">
+                                    <div
+                                        class="glass-input-icon absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-400"
+                                    >
+                                        <i class="fas fa-lock text-sm"></i>
+                                    </div>
+                                    <input
+                                        type="password"
+                                        id="password"
+                                        required
+                                        class="glass-input w-full pl-11 pr-11 py-3.5 rounded-xl font-semibold outline-none transition text-sm"
+                                        placeholder="••••••••"
+                                    />
+                                    <button
+                                        type="button"
+                                        id="btnTogglePassword"
+                                        onclick="togglePasswordVisibility()"
+                                        class="glass-input-icon absolute inset-y-0 right-0 pr-3.5 flex items-center hover:opacity-100 transition-opacity cursor-pointer"
+                                        title="Tampilkan / Sembunyikan Kata Sandi"
+                                        tabindex="-1"
+                                    >
+                                        <i
+                                            class="fas fa-eye text-sm"
+                                            id="eyeIcon"
+                                        ></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                id="btnLoginSubmit"
+                                class="w-full group bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold py-3.5 sm:py-4 px-6 rounded-xl shadow-lg shadow-blue-600/35 hover:shadow-blue-600/50 transition-all transform active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 mt-4 text-sm tracking-wide"
+                            >
+                                <span>MASUK KE SISTEM</span>
+                                <i
+                                    class="fas fa-arrow-right text-xs transition-transform group-hover:translate-x-1"
+                                ></i>
+                            </button>
+                        </form>
+
+                        <div
+                            class="glass-footer-divider mt-6 pt-5 border-t flex items-center justify-center gap-2 text-xs font-medium"
+                        >
+                            <i
+                                class="fas fa-shield-halved text-emerald-400 text-sm"
+                            ></i>
+                            <span>Sesi terenkripsi & dilindungi otentikasi JWT</span>
+                        </div>
+                    </div>
+
+                    <!-- Store Info & Version Info -->
+                    <div
+                        class="glass-subfooter mt-6 text-center text-xs space-y-1"
+                    >
+                        <p class="font-medium">
+                            Point of Sale & Inventory &bull; Langgeng Elektronika
+                        </p>
+                        <p class="text-[11px] opacity-75">
+                            Hubungi Super Admin jika mengalami kendala login.
+                        </p>
+                        <div class="mt-4 text-center">
+                            <button
+                                type="button"
+                                onclick="replayIntroAnimation()"
+                                class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-400 hover:text-blue-400 transition-colors cursor-pointer py-1 px-2.5 rounded-lg hover:bg-white/10"
+                                title="Lihat Kembali Animasi Intro Logo"
+                            >
+                                <i class="fas fa-play text-[9px]"></i>
+                                <span>Putar Ulang Animasi Logo</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= INTERACTIVE SCRIPTS & LOGIC ================= -->
+        <script>
+            // Caps Lock Warning Detection
+            const passwordInput = document.getElementById("password");
+            const capsWarning = document.getElementById("capsWarning");
+
+            if (passwordInput && capsWarning) {
+                passwordInput.addEventListener("keyup", function (event) {
+                    if (event.getModifierState && event.getModifierState("CapsLock")) {
+                        capsWarning.classList.remove("hidden");
+                        capsWarning.classList.add("inline-flex");
+                    } else {
+                        capsWarning.classList.remove("inline-flex");
+                        capsWarning.classList.add("hidden");
+                    }
+                });
+            }
+
+            // Password Visibility Toggle
+            function togglePasswordVisibility() {
+                const pass = document.getElementById("password");
+                const icon = document.getElementById("eyeIcon");
+                if (!pass || !icon) return;
+                if (pass.type === "password") {
+                    pass.type = "text";
+                    icon.classList.remove("fa-eye");
+                    icon.classList.add("fa-eye-slash");
+                } else {
+                    pass.type = "password";
+                    icon.classList.remove("fa-eye-slash");
+                    icon.classList.add("fa-eye");
+                }
+            }
+
+            // Interactive Ambient Mouse Spotlight
+            (function initSpotlight() {
+                const spotlight = document.getElementById("cursorSpotlight");
+                if (!spotlight) return;
+                window.addEventListener("mousemove", (e) => {
+                    spotlight.style.transform = `translate(${e.clientX - 220}px, ${e.clientY - 220}px)`;
+                });
+            })();
+
+            // Interactive Neural Particle Canvas
+            (function initNeuralCanvas() {
+                const canvas = document.getElementById("neuralCanvas");
+                if (!canvas) return;
+                const ctx = canvas.getContext("2d");
+                if (!ctx) return;
+
+                let width = (canvas.width = canvas.offsetWidth);
+                let height = (canvas.height = canvas.offsetHeight);
+
+                window.addEventListener("resize", () => {
+                    if (!canvas) return;
+                    width = canvas.width = canvas.offsetWidth;
+                    height = canvas.height = canvas.offsetHeight;
                 });
 
+                const particles = [];
+                const particleCount = 45;
+                const colors = ["#38bdf8", "#60a5fa", "#facc15", "#ffffff"];
+
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * 0.8,
+                        vy: (Math.random() - 0.5) * 0.8,
+                        r: Math.random() * 2 + 1,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                    });
+                }
+
+                let mouse = { x: -9999, y: -9999 };
+                window.addEventListener("mousemove", (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    mouse.x = e.clientX - rect.left;
+                    mouse.y = e.clientY - rect.top;
+                });
+
+                function render() {
+                    ctx.clearRect(0, 0, width, height);
+
+                    // Connect particles
+                    for (let i = 0; i < particles.length; i++) {
+                        for (let j = i + 1; j < particles.length; j++) {
+                            const dx = particles[i].x - particles[j].x;
+                            const dy = particles[i].y - particles[j].y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            if (dist < 110) {
+                                ctx.strokeStyle = `rgba(56, 189, 248, ${0.2 * (1 - dist / 110)})`;
+                                ctx.lineWidth = 0.6;
+                                ctx.beginPath();
+                                ctx.moveTo(particles[i].x, particles[i].y);
+                                ctx.lineTo(particles[j].x, particles[j].y);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+
+                    // Draw & update particles
+                    particles.forEach((p) => {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        if (p.x < 0 || p.x > width) p.vx *= -1;
+                        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                        // Mouse interact
+                        const mdx = p.x - mouse.x;
+                        const mdy = p.y - mouse.y;
+                        const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+                        if (mdist < 100) {
+                            ctx.strokeStyle = `rgba(250, 204, 21, ${0.4 * (1 - mdist / 100)})`;
+                            ctx.lineWidth = 0.8;
+                            ctx.beginPath();
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(mouse.x, mouse.y);
+                            ctx.stroke();
+                        }
+
+                        ctx.fillStyle = p.color;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+
+                    requestAnimationFrame(render);
+                }
+                render();
+            })();
+
+            // Login Request Handler
+            async function handleLogin(event) {
+                event.preventDefault();
+
+                const usernameInput = document.getElementById("username");
+                const passwordInput = document.getElementById("password");
+                const submitBtn = document.getElementById("btnLoginSubmit");
+
+                if (!usernameInput || !passwordInput) return;
+
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value;
+
+                if (!username || !password) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Kolom Kosong",
+                        text: "Harap isi username dan kata sandi Anda.",
+                        confirmButtonColor: "#2563eb",
+                    });
+                    return;
+                }
+
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = `
+                        <i class="fas fa-spinner fa-spin text-sm"></i>
+                        <span>Memproses Autentikasi...</span>
+                    `;
+                }
+
                 try {
-                    const response = await fetch(`${API_URL}/auth/login`, {
+                    const apiUrl = (typeof API_URL !== "undefined") ? API_URL : "http://localhost:4000/api";
+                    const response = await fetch(`${apiUrl}/auth/login`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                         },
                         body: JSON.stringify({
-                            username: usernameInput,
-                            password: passwordInput,
+                            username: username,
+                            password: password,
                         }),
                     });
 
                     const result = await response.json();
 
-                    if (response.ok) {
-                        // Simpan JWT token ke dalam localStorage browser
-                        localStorage.setItem("token", result.token);
-
-                        const userData = getUserDataFromToken(result.token);
-                        const role = (userData?.role || "")
-                            .toLowerCase()
-                            .trim();
-
-                        // Alihkan user sesuai dengan role masing-masing
-                        if (role === "akuntan") {
-                            window.location.href = "akuntansi.html";
-                        } else if (role === "admin") {
-                            window.location.href = "riwayat.html";
-                        } else {
-                            window.location.href = "dashboard.html";
+                    if (response.ok && (result.token || result.data?.token)) {
+                        const token = result.token || result.data.token;
+                        localStorage.setItem("token", token);
+                        if (result.session_id) {
+                            localStorage.setItem("session_id", result.session_id);
                         }
+                        if (result.user || result.data?.user) {
+                            localStorage.setItem("user", JSON.stringify(result.user || result.data.user));
+                        }
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Berhasil Masuk!",
+                            text: "Selamat datang kembali. Membuka dashboard...",
+                            timer: 1200,
+                            showConfirmButton: false,
+                        });
+
+                        setTimeout(() => {
+                            const curUserData = typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null;
+                            const curRole = (curUserData?.role || "").toLowerCase().replace(/[-_]/g, "");
+                            if (curRole === "admin" || curRole === "akuntan") {
+                                window.location.href = "riwayat.html";
+                            } else {
+                                window.location.href = "dashboard.html";
+                            }
+                        }, 1200);
                     } else {
-                        // Jika API mengembalikan error status (400/401)
                         Swal.fire({
                             icon: "error",
                             title: "Gagal Masuk",
-                            text:
-                                result.error || "Username atau Password salah!",
-                            confirmButtonColor: "#3B82F6",
+                            text: result.error || result.message || "Username atau kata sandi salah.",
+                            confirmButtonColor: "#2563eb",
                         });
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = `
+                                <span>MASUK KE SISTEM</span>
+                                <i class="fas fa-arrow-right text-xs"></i>
+                            `;
+                        }
                     }
-                } catch (err) {
-                    console.error(err);
+                } catch (error) {
+                    console.error("Login error:", error);
                     Swal.fire({
                         icon: "error",
-                        title: "Kesalahan Sistem",
-                        text: "Tidak dapat terhubung ke server API.",
-                        confirmButtonColor: "#3B82F6",
+                        title: "Koneksi Terputus",
+                        text: "Gagal menghubungi server kasir. Pastikan backend aktif.",
+                        confirmButtonColor: "#2563eb",
                     });
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `
+                            <span>MASUK KE SISTEM</span>
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        `;
+                    }
                 }
             }
+        </script>
+
+        <!-- ================= CINEMATIC INTRO ANIMATION CONTROLLER (CRASH-PROOF & WATCHDOG EQUIPPED) ================= -->
+        <script>
+            (function initCinematicIntro() {
+                let introAnimationRunning = false;
+                let introTimeouts = [];
+
+                function clearIntroTimers() {
+                    introTimeouts.forEach((t) => clearTimeout(t));
+                    introTimeouts = [];
+                }
+
+                function addTimer(fn, delay) {
+                    const id = setTimeout(fn, delay);
+                    introTimeouts.push(id);
+                    return id;
+                }
+
+                function focusLoginField() {
+                    const userInput = document.getElementById("username");
+                    if (userInput) userInput.focus();
+                }
+
+                window.skipIntroAnimation = function () {
+                    if (!introAnimationRunning) return;
+                    clearIntroTimers();
+                    introAnimationRunning = false;
+                    const overlay = document.getElementById("introSplashOverlay");
+                    if (overlay) {
+                        overlay.style.transition = "opacity 0.25s ease";
+                        overlay.style.opacity = "0";
+                        setTimeout(() => {
+                            overlay.style.display = "none";
+                            focusLoginField();
+                        }, 260);
+                    }
+                };
+
+                window.replayIntroAnimation = function () {
+                    startIntroAnimation(true);
+                };
+
+                window.startIntroAnimation = function (force = false) {
+                    const overlay = document.getElementById("introSplashOverlay");
+                    const stage = document.getElementById("introLogoStage");
+                    const brandText = document.getElementById("introBrandText");
+                    if (!overlay || !stage) return;
+
+                    clearIntroTimers();
+                    introAnimationRunning = true;
+
+                    // AIRTIGHT WATCHDOG: Pastikan overlay PASTI hilang setelah 3.6 detik jika ada error atau glitch apa pun!
+                    addTimer(() => {
+                        if (overlay && overlay.style.display !== "none") {
+                            overlay.style.transition = "opacity 0.4s ease";
+                            overlay.style.opacity = "0";
+                            setTimeout(() => {
+                                overlay.style.display = "none";
+                                introAnimationRunning = false;
+                                focusLoginField();
+                            }, 400);
+                        }
+                    }, 3600);
+
+                    // 1. Reset state
+                    overlay.style.display = "flex";
+                    overlay.style.opacity = "1";
+                    stage.style.transition = "none";
+                    stage.style.transform = "none";
+                    stage.style.opacity = "1";
+                    if (brandText) {
+                        brandText.style.opacity = "0";
+                        brandText.style.transform = "translateY(16px)";
+                    }
+
+                    // Reset SVG elements
+                    const goldPath = document.getElementById("introGoldOutlinePath");
+                    const bluePath = document.getElementById("introBlueCorePath");
+                    const glossPath = document.getElementById("introGlossLinePath");
+                    const ripple = document.getElementById("nodeNexusRipple");
+
+                    if (ripple) ripple.classList.remove("active");
+
+                    // Measure and reset infinity stroke lengths safely
+                    if (goldPath && bluePath && glossPath) {
+                        let infLen = 260;
+                        try {
+                            if (typeof goldPath.getTotalLength === "function") {
+                                infLen = goldPath.getTotalLength() || 260;
+                            }
+                        } catch (e) {
+                            infLen = 260;
+                        }
+
+                        [goldPath, bluePath, glossPath].forEach((p) => {
+                            p.style.transition = "none";
+                            p.style.strokeDasharray = `${infLen} ${infLen}`;
+                            p.style.strokeDashoffset = infLen;
+                        });
+
+                        // Trigger draw animation
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                [goldPath, bluePath, glossPath].forEach((p) => {
+                                    p.style.transition = "stroke-dashoffset 1.15s cubic-bezier(0.4, 0, 0.2, 1)";
+                                    p.style.strokeDashoffset = "0";
+                                });
+                            });
+                        });
+                    }
+
+                    // Reset and prepare axons
+                    const axons = stage.querySelectorAll(".intro-axon");
+                    axons.forEach((ax) => {
+                        let len = 60;
+                        try {
+                            if (typeof ax.getTotalLength === "function") {
+                                len = ax.getTotalLength() || 60;
+                            }
+                        } catch (e) {
+                            len = 60;
+                        }
+                        ax.style.transition = "none";
+                        ax.style.strokeDasharray = `${len} ${len}`;
+                        ax.style.strokeDashoffset = len;
+                    });
+
+                    // Reset all nodes
+                    stage.querySelectorAll(".intro-node").forEach((n) => {
+                        n.classList.remove("active", "burst");
+                    });
+                    stage.querySelectorAll(".intro-node-blue, .intro-axon-blue").forEach((n) => {
+                        n.classList.remove("active");
+                    });
+
+                    // 2. Wave Sequence: Neuron tersambung satu per satu dari kiri ke kanan
+                    // Wave 1: Far Left Root Soma
+                    addTimer(() => {
+                        const root = document.getElementById("nodeLeftRoot");
+                        if (root) root.classList.add("active", "burst");
+                    }, 700);
+
+                    // Wave 2: Axons begin branching to nodes 2 & 3
+                    addTimer(() => {
+                        ["axon1", "axon2"].forEach((id) => {
+                            const ax = document.getElementById(id);
+                            if (ax) {
+                                ax.style.transition = "stroke-dashoffset 0.85s cubic-bezier(0.2, 0.8, 0.3, 1)";
+                                ax.style.strokeDashoffset = "0";
+                            }
+                        });
+                        ["node2", "node3"].forEach((id) => {
+                            const nd = document.getElementById(id);
+                            if (nd) nd.classList.add("active");
+                        });
+                    }, 860);
+
+                    // Wave 3: Nodes 4 & 5 + Cross Synapse 1 + Dendrites D1 & D3
+                    addTimer(() => {
+                        ["node4", "node5"].forEach((id) => {
+                            const nd = document.getElementById(id);
+                            if (nd) nd.classList.add("active", "burst");
+                        });
+                        ["axonCross1", "axonD1", "axonD3"].forEach((id) => {
+                            const ax = document.getElementById(id);
+                            if (ax) {
+                                ax.style.transition = "stroke-dashoffset 0.6s ease";
+                                ax.style.strokeDashoffset = "0";
+                            }
+                        });
+                    }, 1020);
+
+                    // Wave 4: Outer Dendrites D2 & D4 + Nodes 6, 7, 8, 9
+                    addTimer(() => {
+                        ["node6", "node7", "node8", "node9"].forEach((id) => {
+                            const nd = document.getElementById(id);
+                            if (nd) nd.classList.add("active");
+                        });
+                        ["axonD2", "axonD4"].forEach((id) => {
+                            const ax = document.getElementById(id);
+                            if (ax) {
+                                ax.style.transition = "stroke-dashoffset 0.5s ease";
+                                ax.style.strokeDashoffset = "0";
+                            }
+                        });
+                    }, 1180);
+
+                    // Wave 5: Mid Axons & Cross Synapse 2 + Nodes 10, 11, 12, 13
+                    addTimer(() => {
+                        ["node10", "node11", "node12", "node13"].forEach((id) => {
+                            const nd = document.getElementById(id);
+                            if (nd) nd.classList.add("active");
+                        });
+                        const c2 = document.getElementById("axonCross2");
+                        if (c2) {
+                            c2.style.transition = "stroke-dashoffset 0.4s ease";
+                            c2.style.strokeDashoffset = "0";
+                        }
+                    }, 1340);
+
+                    // Wave 6: Pre-Nexus Nodes 14 & 15 reaching center
+                    addTimer(() => {
+                        ["node14", "node15"].forEach((id) => {
+                            const nd = document.getElementById(id);
+                            if (nd) nd.classList.add("active");
+                        });
+                    }, 1480);
+
+                    // Wave 7: CENTRAL NEXUS SYNAPSE ACTIVATION (EPICENTER)
+                    addTimer(() => {
+                        const nxOuter = document.getElementById("nodeNexusOuter");
+                        const nxInner = document.getElementById("nodeNexusInner");
+                        const nxRipple = document.getElementById("nodeNexusRipple");
+                        if (nxOuter) nxOuter.classList.add("active", "burst");
+                        if (nxInner) nxInner.classList.add("active");
+                        if (nxRipple) nxRipple.classList.add("active");
+
+                        // Awaken right loop electronic nodes
+                        stage.querySelectorAll(".intro-node-blue, .intro-axon-blue").forEach((el) => {
+                            el.classList.add("active");
+                        });
+
+                        // Show brand text
+                        if (brandText) {
+                            brandText.style.opacity = "1";
+                            brandText.style.transform = "translateY(0)";
+                        }
+                    }, 1650);
+
+                    // Wave 8: Morph & Fly to Corner Position (Desktop top-left header / Mobile brand logo)
+                    addTimer(() => {
+                        if (brandText) {
+                            brandText.style.opacity = "0";
+                            brandText.style.transform = "translateY(-8px)";
+                        }
+
+                        // Determine target element
+                        const isDesktop = window.innerWidth >= 1024;
+                        let targetLogo = isDesktop ? document.getElementById("desktopBrandLogo") : document.getElementById("mobileBrandLogo");
+                        if (!targetLogo || targetLogo.offsetParent === null) {
+                            // Fallback to whichever logo is rendered
+                            targetLogo = document.getElementById("desktopBrandLogo") || document.getElementById("mobileBrandLogo");
+                        }
+
+                        if (!targetLogo) {
+                            skipIntroAnimation();
+                            return;
+                        }
+
+                        try {
+                            const targetRect = targetLogo.getBoundingClientRect();
+                            const currentRect = stage.getBoundingClientRect();
+
+                            if (targetRect.width > 0 && targetRect.height > 0) {
+                                const targetCenterX = targetRect.left + targetRect.width / 2;
+                                const targetCenterY = targetRect.top + targetRect.height / 2;
+                                const currentCenterX = currentRect.left + currentRect.width / 2;
+                                const currentCenterY = currentRect.top + currentRect.height / 2;
+
+                                const dx = targetCenterX - currentCenterX;
+                                const dy = targetCenterY - currentCenterY;
+                                const scale = (targetRect.width || 48) / currentRect.width;
+
+                                stage.style.transition = "transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease 0.55s";
+                                stage.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`;
+                            } else {
+                                stage.style.transition = "opacity 0.5s ease";
+                                stage.style.opacity = "0";
+                            }
+                        } catch (e) {
+                            stage.style.opacity = "0";
+                        }
+
+                        // Fade overlay backdrop
+                        overlay.style.transition = "opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.2s";
+                        overlay.style.opacity = "0";
+                    }, 2350);
+
+                    // Wave 9: Docking Flash & Complete
+                    addTimer(() => {
+                        const isDesktop = window.innerWidth >= 1024;
+                        const targetLogo = isDesktop ? document.getElementById("desktopBrandLogo") : document.getElementById("mobileBrandLogo");
+                        if (targetLogo) {
+                            targetLogo.classList.remove("logo-dock-glint");
+                            void targetLogo.offsetWidth; // Reflow
+                            targetLogo.classList.add("logo-dock-glint");
+                            setTimeout(() => {
+                                if (targetLogo) targetLogo.classList.remove("logo-dock-glint");
+                            }, 750);
+                        }
+
+                        overlay.style.display = "none";
+                        introAnimationRunning = false;
+                        focusLoginField();
+                    }, 3200);
+                };
+
+                // Keyboard escape / space listener
+                document.addEventListener("keydown", (e) => {
+                    if (introAnimationRunning && (e.key === "Escape" || e.key === " " || e.key === "Enter")) {
+                        e.preventDefault();
+                        skipIntroAnimation();
+                    }
+                });
+
+                if (document.readyState === "loading") {
+                    document.addEventListener("DOMContentLoaded", () => startIntroAnimation(false));
+                } else {
+                    startIntroAnimation(false);
+                }
+            })();
         </script>
     </body>
 </html>

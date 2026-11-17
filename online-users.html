@@ -1,0 +1,1860 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+                <!-- Progressive Web App (PWA) Meta & Icons -->
+        <link rel="manifest" href="manifest.json" />
+        <meta name="theme-color" content="#2563EB" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Langgeng POS" />
+        <link rel="apple-touch-icon" href="logo.svg" />
+        <link rel="icon" type="image/svg+xml" href="logo.svg" />
+        <title>Monitoring & Log Pengguna - SmartPOS</title>
+        <script src="vendor/tailwindcss.js"></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+        <script src="vendor/sweetalert2.all.min.js"></script>
+        <script
+            defer
+            src="vendor/alpine.min.js"
+        ></script>
+        <script src="spa-router.js"></script>
+        <script src="env.js"></script>
+        <script src="shortcuts.js" defer></script>
+        <script src="mobile-nav.js" defer></script>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Courier+Prime:wght@400;700&display=swap");
+
+            body {
+                font-family: "Plus Jakarta Sans", sans-serif;
+                background-color: #f8fafc;
+            }
+
+            /* Custom Scrollbar */
+            ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+            ::-webkit-scrollbar-track {
+                background: #f1f5f9;
+            }
+            ::-webkit-scrollbar-thumb {
+                background: #cbd5e1;
+                border-radius: 9999px;
+            }
+            ::-webkit-scrollbar-thumb:hover {
+                background: #94a3b8;
+            }
+
+            .pulse-dot {
+                animation: pulseAnimation 2s cubic-bezier(0.4, 0, 0.6, 1)
+                    infinite;
+            }
+            @keyframes pulseAnimation {
+                0%,
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+                50% {
+                    opacity: 0.4;
+                    transform: scale(1.15);
+                }
+            }
+
+            .fade-in {
+                animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(6px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        
+            /* Placeholder Minimalis Global */
+            #searchInput::placeholder,
+            #logSearchInput::placeholder,
+            input::placeholder,
+            textarea::placeholder {
+                font-size: 0.68rem !important;
+                font-weight: 400 !important;
+                color: #94a3b8 !important;
+                opacity: 0.9 !important;
+            }
+
+            @media (max-width: 639px) {
+                /* Compact padding & sizing for mobile table */
+                table th {
+                    padding: 0.4rem 0.45rem !important;
+                    font-size: 0.65rem !important;
+                }
+                table td {
+                    padding: 0.45rem 0.45rem !important;
+                    font-size: 0.72rem !important;
+                    line-height: 1.25 !important;
+                }
+                /* Compact input & select on mobile */
+                #searchInput,
+                #logSearchInput {
+                    height: 2.15rem !important;
+                    min-height: 2.15rem !important;
+                    font-size: 0.72rem !important;
+                }
+                #filterRole,
+                #filterLocation,
+                #logFilterAction,
+                #logFilterRole,
+                #logFilterDate {
+                    height: 2.15rem !important;
+                    min-height: 2.15rem !important;
+                    font-size: 0.72rem !important;
+                    padding-top: 0.25rem !important;
+                    padding-bottom: 0.25rem !important;
+                }
+            }
+
+            /* Pastikan tabel fit rapat ke data tanpa gap di bawah */
+            .overflow-x-auto,
+            .overflow-x-auto.custom-scroll,
+            table,
+            tbody {
+                padding-bottom: 0 !important;
+                margin-bottom: 0 !important;
+            }
+        </style>
+    </head>
+
+    <body
+        class="bg-[#F8FAFC] flex flex-col lg:flex-row min-h-screen lg:h-screen lg:overflow-hidden w-full overflow-x-hidden text-slate-800"
+    >
+        <!-- Mobile Backdrop -->
+        <div
+            id="sidebar-backdrop"
+            onclick="toggleSidebar()"
+            class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity duration-300"
+        ></div>
+
+        <!-- SIDEBAR -->
+        <aside
+            id="app-sidebar"
+            class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 sm:p-8 fixed inset-y-0 left-0 z-50 h-full lg:static lg:h-full lg:shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out"
+        >
+                        <div class="flex items-center mb-8 shrink-0">
+                <a href="dashboard.html" class="flex items-center gap-3 group">
+                    <img
+                        src="logo.svg"
+                        alt="Logo Langgeng Elektronika"
+                        class="w-10 h-10 shrink-0 drop-shadow-md rounded-xl transition-transform group-hover:scale-105"
+                    />
+                    <div>
+                        <h1 class="text-base font-black text-slate-900 tracking-tight leading-tight">
+                            LANGGENG
+                        </h1>
+                        <span class="text-[10px] font-extrabold text-blue-600 tracking-widest uppercase block -mt-0.5">
+                            ELEKTRONIKA POS
+                        </span>
+                    </div>
+                </a>
+            </div>
+
+                        <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
+                <a
+                    href="dashboard.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-th-large"></i> <span>Dashboard</span>
+                </a>
+                <a
+                    href="riwayat.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
+                </a>
+                <a
+                    href="product.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-box"></i> <span>Master Produk</span>
+                </a>
+                <a
+                    href="purchase.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
+                </a>
+                <a
+                    href="expense.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-wallet"></i> <span>Pengeluaran</span>
+                </a>
+                <a
+                    href="retur.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-undo"></i> <span>Manajemen Retur</span>
+                </a>
+                <a
+                    href="akuntansi.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-book-open"></i> <span>Jurnal & Keuangan</span>
+                </a>
+                <a
+                    href="absensi.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-calendar-check"></i> <span>Absensi Karyawan</span>
+                </a>
+                <a
+                    href="report.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
+                </a>
+                <a
+                    href="opname.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-clipboard-check"></i> <span>Stock Opname</span>
+                </a>
+                <a
+                    href="online-users.html"
+                    class="flex items-center gap-4 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100"
+                >
+                    <i class="fas fa-user-clock"></i> <span>Pengguna & Log</span>
+                </a>
+            </nav>
+
+                        <div class="pt-6 border-t border-slate-100 shrink-0">
+                <div class="bg-slate-50 p-4 rounded-2xl mb-4 border border-slate-100">
+                    <p
+                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"
+                    >
+                        Login Sebagai
+                    </p>
+                    <p class="font-bold text-slate-700 user-name-display truncate">
+                        Pengguna
+                    </p>
+                </div>
+                <button
+                    type="button"
+                    onclick="confirmLogout()"
+                    class="w-full flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all cursor-pointer"
+                >
+                    <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <div id="main-content" class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+                        <!-- Mobile Top Bar -->
+            <div
+                class="lg:hidden bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full h-14"
+            >
+                <div class="flex items-center gap-2 shrink-0">
+                    <img src="logo.svg" alt="Logo" class="w-7 h-7 rounded-lg shrink-0 drop-shadow-sm" />
+                    <span class="font-extrabold text-slate-800 tracking-tight text-sm">LANGGENG POS</span>
+                </div>
+                <div class="flex items-center gap-2 shrink-0 ml-auto min-w-0">
+                    <span
+                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0"
+                    >
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot"></span>
+                        Live
+                    </span>
+                    <span
+                        class="text-[11px] font-bold text-slate-700 bg-slate-100 border border-slate-200/80 px-2.5 py-1 rounded-lg truncate max-w-[130px] user-name-display text-center leading-tight inline-block"
+                        >Kasir</span
+                    >
+                </div>
+            </div>
+
+
+            <!-- Page Header Bar -->
+            <header
+                class="bg-white border-b border-slate-200 px-3.5 sm:px-8 py-3 sm:py-5 shrink-0"
+            >
+                <div
+                    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+                >
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <h2
+                                class="text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight leading-tight"
+                            >
+                                Monitoring & Log Pengguna
+                            </h2>
+                            <div
+                                id="sseLiveBadge"
+                                class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-full text-xs font-bold"
+                            >
+                                <span
+                                    class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"
+                                ></span>
+                                <span>Realtime Aktif</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-500 mt-1">
+                            Pantau pengguna yang sedang online serta histori jam
+                            login, tutup shift, dan logout staf.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                    <!-- Main Tab Navigation -->
+                    <div
+                        class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200/80"
+                    >
+                        <button
+                            type="button"
+                            id="tabBtnOnline"
+                            onclick="switchMainTab('online')"
+                            class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all shadow-sm bg-white text-blue-600 flex items-center gap-2 cursor-pointer"
+                        >
+                            <i class="fas fa-user-clock"></i>
+                            <span>Pengguna Online</span>
+                            <span
+                                id="tabBadgeOnlineCount"
+                                class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[11px] font-black"
+                                >0</span
+                            >
+                        </button>
+                        <button
+                            type="button"
+                            id="tabBtnLogs"
+                            onclick="switchMainTab('logs')"
+                            class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-600 hover:text-slate-900 flex items-center gap-2 cursor-pointer"
+                        >
+                            <i class="fas fa-clock-rotate-left"></i>
+                            <span>Histori Sesi & Shift</span>
+                        </button>
+                    </div>
+                    <button
+                        type="button"
+                        onclick="window.toggleShortcutModal()"
+                        class="shortcut-header-btn hidden lg:inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 px-3.5 py-2.5 rounded-2xl font-bold transition-all border border-blue-200 shadow-2xs text-xs hover:scale-105 active:scale-95 cursor-pointer"
+                        title="Panduan Pintasan Keyboard (Tekan ? atau Alt + H)"
+                    >
+                        <i class="fas fa-keyboard text-blue-600"></i>
+                        <span class="hidden sm:inline">Shortcut</span>
+                        <kbd class="px-1.5 py-0.5 bg-white text-blue-700 rounded text-[10px] font-mono font-black border border-blue-200 shadow-2xs">?</kbd>
+                    </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable Content Body -->
+            <main
+                class="flex-1 overflow-y-auto custom-scroll p-3.5 sm:p-8 space-y-4 sm:space-y-6"
+            >
+                <!-- ========================================== -->
+                <!-- SECTION 1: PENGGUNA ONLINE REAL-TIME TAB  -->
+                <!-- ========================================== -->
+                <div id="sectionOnlineUsers" class="space-y-6 fade-in">
+                    <!-- STATS METRIC CARDS ONLINE -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                        <!-- Total Online -->
+                        <div
+                            class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden group hover:border-blue-300 transition-all"
+                        >
+                            <div class="flex items-center justify-between mb-3">
+                                <span
+                                    class="text-xs font-bold text-slate-400 uppercase tracking-wider"
+                                    >Total Online</span
+                                >
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg"
+                                >
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                <h3
+                                    id="statTotalOnline"
+                                    class="text-3xl font-extrabold text-slate-900 tracking-tight"
+                                >
+                                    0
+                                </h3>
+                                <span
+                                    class="text-xs text-slate-400 font-semibold"
+                                    >pengguna</span
+                                >
+                            </div>
+                            <p
+                                class="text-[11px] text-emerald-600 font-bold mt-2 flex items-center gap-1.5"
+                            >
+                                <span
+                                    class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"
+                                ></span>
+                                Terhubung Real-time
+                            </p>
+                        </div>
+
+                        <!-- Kasir Online -->
+                        <div
+                            class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden group hover:border-blue-300 transition-all"
+                        >
+                            <div class="flex items-center justify-between mb-3">
+                                <span
+                                    class="text-xs font-bold text-slate-400 uppercase tracking-wider"
+                                    >Kasir Aktif</span
+                                >
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg"
+                                >
+                                    <i class="fas fa-cash-register"></i>
+                                </div>
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                <h3
+                                    id="statKasirOnline"
+                                    class="text-3xl font-extrabold text-slate-900 tracking-tight"
+                                >
+                                    0
+                                </h3>
+                                <span
+                                    class="text-xs text-slate-400 font-semibold"
+                                    >kasir</span
+                                >
+                            </div>
+                            <p
+                                class="text-[11px] text-slate-400 font-semibold mt-2"
+                            >
+                                Kasir & Super Kasir
+                            </p>
+                        </div>
+
+                        <!-- Staf Manajemen -->
+                        <div
+                            class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden group hover:border-amber-300 transition-all"
+                        >
+                            <div class="flex items-center justify-between mb-3">
+                                <span
+                                    class="text-xs font-bold text-slate-400 uppercase tracking-wider"
+                                    >Manajemen & Akuntan</span
+                                >
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg"
+                                >
+                                    <i class="fas fa-user-shield"></i>
+                                </div>
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                <h3
+                                    id="statAdminOnline"
+                                    class="text-3xl font-extrabold text-slate-900 tracking-tight"
+                                >
+                                    0
+                                </h3>
+                                <span
+                                    class="text-xs text-slate-400 font-semibold"
+                                    >staf</span
+                                >
+                            </div>
+                            <p
+                                class="text-[11px] text-slate-400 font-semibold mt-2"
+                            >
+                                Admin, Akuntan, Super Admin
+                            </p>
+                        </div>
+
+                        <!-- Cabang Aktif -->
+                        <div
+                            class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden group hover:border-emerald-300 transition-all"
+                        >
+                            <div class="flex items-center justify-between mb-3">
+                                <span
+                                    class="text-xs font-bold text-slate-400 uppercase tracking-wider"
+                                    >Cabang Terkoneksi</span
+                                >
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg"
+                                >
+                                    <i class="fas fa-store"></i>
+                                </div>
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                <h3
+                                    id="statCabangOnline"
+                                    class="text-3xl font-extrabold text-slate-900 tracking-tight"
+                                >
+                                    0
+                                </h3>
+                                <span
+                                    class="text-xs text-slate-400 font-semibold"
+                                    >lokasi</span
+                                >
+                            </div>
+                            <p
+                                id="statCabangDetail"
+                                class="text-[11px] text-slate-400 font-semibold mt-2 truncate"
+                            >
+                                Memuat data...
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- FILTER & CONTROLS TOOLBAR ONLINE -->
+                    <div
+                        class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4"
+                    >
+                        <div
+                            class="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3"
+                        >
+                            <div class="relative flex-1">
+                                <i
+                                    class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"
+                                ></i>
+                                <input
+                                    type="text"
+                                    id="searchInput"
+                                    oninput="filterAndRenderUsers()"
+                                    placeholder="Cari nama, username, IP, atau halaman..."
+                                    class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                                />
+                            </div>
+
+                            <div class="sm:w-44">
+                                <select
+                                    id="filterRole"
+                                    onchange="filterAndRenderUsers()"
+                                    class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition cursor-pointer"
+                                >
+                                    <option value="ALL">Semua Peran</option>
+                                    <option value="superadmin">
+                                        Super Admin
+                                    </option>
+                                    <option value="admin">Admin</option>
+                                    <option value="kasir">Kasir</option>
+                                    <option value="super-kasir">
+                                        Super Kasir
+                                    </option>
+                                    <option value="akuntan">Akuntan</option>
+                                </select>
+                            </div>
+
+                            <div class="sm:w-44">
+                                <select
+                                    id="filterLocation"
+                                    onchange="filterAndRenderUsers()"
+                                    class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition cursor-pointer"
+                                >
+                                    <option value="ALL">Semua Cabang</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center justify-between sm:justify-end gap-3 text-xs font-semibold text-slate-500"
+                        >
+                            <span id="filteredCounter">0 pengguna aktif</span>
+                            <button
+                                type="button"
+                                onclick="loadOnlineUsers(true)"
+                                class="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-lg border border-slate-200 transition flex items-center gap-1.5 cursor-pointer"
+                                title="Segarkan status"
+                            >
+                                <i
+                                    id="refreshIcon"
+                                    class="fas fa-arrows-rotate"
+                                ></i>
+                                <span>Segarkan</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TABLE VIEW CONTAINER ONLINE -->
+                    <div
+                        id="tableViewContainer"
+                        class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden"
+                    >
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse min-w-full sm:min-w-[700px]">
+                                <thead>
+                                    <tr
+                                        class="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider"
+                                    >
+                                        <th class="py-4 px-6">Pengguna</th>
+                                        <th class="py-4 px-5">Peran</th>
+                                        <th class="py-4 px-5">
+                                            Cabang / Lokasi
+                                        </th>
+                                        <th class="py-4 px-5">
+                                            Halaman Yang Diakses
+                                        </th>
+                                        <th class="py-4 px-5">
+                                            Perangkat & IP
+                                        </th>
+                                        <th class="py-4 px-5">
+                                            Terakhir Aktif
+                                        </th>
+                                        <th class="py-4 px-6 text-center">
+                                            Status
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody
+                                    id="userTableBody"
+                                    class="divide-y divide-slate-100 text-sm"
+                                >
+                                    <tr>
+                                        <td
+                                            colspan="7"
+                                            class="py-12 text-center text-slate-400"
+                                        >
+                                            <i
+                                                class="fas fa-spinner fa-spin text-2xl text-blue-500 mb-2"
+                                            ></i>
+                                            <p class="text-sm font-medium">
+                                                Menghubungkan ke layanan
+                                                realtime...
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- EMPTY STATE ONLINE -->
+                    <div
+                        id="emptyState"
+                        class="hidden bg-white p-12 rounded-2xl border border-slate-200/80 text-center shadow-sm"
+                    >
+                        <div
+                            class="w-16 h-16 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl"
+                        >
+                            <i class="fas fa-user-slash"></i>
+                        </div>
+                        <h4 class="text-base font-bold text-slate-700">
+                            Tidak Ada Pengguna Ditemukan
+                        </h4>
+                        <p class="text-sm text-slate-400 mt-1 max-w-sm mx-auto">
+                            Tidak ada sesi online yang cocok dengan filter atau
+                            pencarian.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- SECTION 2: HISTORI LOG SESI & SHIFT TAB    -->
+                <!-- ========================================== -->
+                <div id="sectionUserLogs" class="hidden space-y-6 fade-in">
+                    <!-- STATS METRIC CARDS LOGS -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                        <!-- Total Sesi -->
+                        <div
+                            class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm relative"
+                        >
+                            <div class="flex items-center justify-between mb-3">
+                                <span
+                                    class="text-xs font-bold text-slate-400 uppercase tracking-wider"
+                                    >Total Sesi Dicatat</span
+                                >
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg"
+                                >
+                                    <i class="fas fa-clipboard-list"></i>
+                                </div>
+                            </div>
+                            <h3
+                                id="statLogTotalSessions"
+                                class="text-3xl font-extrabold text-slate-900 tracking-tight"
+                            >
+                                0
+                            </h3>
+                            <p
+                                class="text-[11px] text-slate-400 font-semibold mt-2"
+                            >
+                                Seluruh histori login
+                            </p>
+                        </div>
+
+                        <!-- Selesai Shift & Logout -->
+                        <div
+                            class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm relative"
+                        >
+                            <div class="flex items-center justify-between mb-3">
+                                <span
+                                    class="text-xs font-bold text-slate-400 uppercase tracking-wider"
+                                    >Tutup Shift & Logout</span
+                                >
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg"
+                                >
+                                    <i class="fas fa-check-double"></i>
+                                </div>
+                            </div>
+                            <h3
+                                id="statLogShiftLogout"
+                                class="text-3xl font-extrabold text-emerald-600 tracking-tight"
+                            >
+                                0
+                            </h3>
+                            <p
+                                class="text-[11px] text-emerald-700 font-semibold mt-2"
+                            >
+                                Menyelesaikan shift kasir
+                            </p>
+                        </div>
+
+                        <!-- Logout Biasa -->
+                        <div
+                            class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm relative"
+                        >
+                            <div class="flex items-center justify-between mb-3">
+                                <span
+                                    class="text-xs font-bold text-slate-400 uppercase tracking-wider"
+                                    >Logout Biasa</span
+                                >
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg"
+                                >
+                                    <i class="fas fa-right-from-bracket"></i>
+                                </div>
+                            </div>
+                            <h3
+                                id="statLogOnlyLogout"
+                                class="text-3xl font-extrabold text-amber-600 tracking-tight"
+                            >
+                                0
+                            </h3>
+                            <p
+                                class="text-[11px] text-amber-700 font-semibold mt-2"
+                            >
+                                Tanpa tutup shift
+                            </p>
+                        </div>
+
+                        <!-- Sedang Aktif -->
+                        <div
+                            class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm relative"
+                        >
+                            <div class="flex items-center justify-between mb-3">
+                                <span
+                                    class="text-xs font-bold text-slate-400 uppercase tracking-wider"
+                                    >Sesi Aktif Sekarang</span
+                                >
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg"
+                                >
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
+                            </div>
+                            <h3
+                                id="statLogActiveNow"
+                                class="text-3xl font-extrabold text-blue-600 tracking-tight"
+                            >
+                                0
+                            </h3>
+                            <p
+                                class="text-[11px] text-blue-700 font-semibold mt-2"
+                            >
+                                Shift masih berlangsung
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- FILTER & SEARCH BAR FOR LOGS -->
+                    <div
+                        class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4"
+                    >
+                        <div
+                            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3"
+                        >
+                            <!-- Search -->
+                            <div class="lg:col-span-2 relative">
+                                <i
+                                    class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"
+                                ></i>
+                                <input
+                                    type="text"
+                                    id="logSearchInput"
+                                    placeholder="Cari nama, username, lokasi, atau catatan..."
+                                    class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                                />
+                            </div>
+
+                            <!-- Filter Logout Type -->
+                            <div>
+                                <select
+                                    id="logFilterType"
+                                    class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition cursor-pointer"
+                                >
+                                    <option value="ALL">
+                                        Semua Skema Logout
+                                    </option>
+                                    <option value="LOGOUT_WITH_SHIFT">
+                                        🟢 Selesai Shift & Logout
+                                    </option>
+                                    <option value="LOGOUT_ONLY">
+                                        🟡 Logout Saja (Biasa)
+                                    </option>
+                                    <option value="ACTIVE">
+                                        🔵 Sedang Aktif (Shift Berjalan)
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Start Date -->
+                            <div>
+                                <input
+                                    type="date"
+                                    id="logStartDate"
+                                    class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition cursor-pointer"
+                                    title="Tanggal Mulai"
+                                />
+                            </div>
+
+                            <!-- End Date -->
+                            <div>
+                                <input
+                                    type="date"
+                                    id="logEndDate"
+                                    class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition cursor-pointer"
+                                    title="Tanggal Akhir"
+                                />
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 border-t border-slate-100 text-xs font-semibold text-slate-500"
+                        >
+                            <div class="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onclick="applyLogFilters(1)"
+                                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition flex items-center gap-2 shadow-sm cursor-pointer"
+                                >
+                                    <i class="fas fa-filter"></i>
+                                    <span>Terapkan Filter</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onclick="resetLogFilters()"
+                                    class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold transition cursor-pointer"
+                                >
+                                    Reset
+                                </button>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <span id="logCounterDisplay"
+                                    >Menampilkan 0 log sesi</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TABLE VIEW FOR LOGS -->
+                    <div
+                        class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden"
+                    >
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse min-w-full sm:min-w-[700px]">
+                                <thead>
+                                    <tr
+                                        class="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider"
+                                    >
+                                        <th class="py-4 px-6">Pengguna</th>
+                                        <th class="py-4 px-5">
+                                            Peran & Lokasi
+                                        </th>
+                                        <th class="py-4 px-5">Waktu Login</th>
+                                        <th class="py-4 px-5">Waktu Logout</th>
+                                        <th class="py-4 px-5">Skema Logout</th>
+                                        <th class="py-4 px-5">Durasi Sesi</th>
+                                        <th class="py-4 px-6">
+                                            Perangkat & Catatan
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody
+                                    id="logTableBody"
+                                    class="divide-y divide-slate-100 text-sm"
+                                >
+                                    <tr>
+                                        <td
+                                            colspan="7"
+                                            class="py-12 text-center text-slate-400"
+                                        >
+                                            <i
+                                                class="fas fa-spinner fa-spin text-2xl text-blue-500 mb-2"
+                                            ></i>
+                                            <p class="text-sm font-medium">
+                                                Memuat histori log aktivitas...
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination Footer -->
+                        <div
+                            class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs font-semibold text-slate-600"
+                        >
+                            <span id="logPageInfo">Halaman 1 dari 1</span>
+                            <div class="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    id="btnLogPrev"
+                                    onclick="changeLogPage(-1)"
+                                    class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg font-bold hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                                >
+                                    <i class="fas fa-chevron-left mr-1"></i>
+                                    Sebelumnya
+                                </button>
+                                <button
+                                    type="button"
+                                    id="btnLogNext"
+                                    onclick="changeLogPage(1)"
+                                    class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg font-bold hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                                >
+                                    Selanjutnya
+                                    <i class="fas fa-chevron-right ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- JAVASCRIPT LOGIC -->
+        <script>
+            var BASE_URL = window.BASE_URL || "http://127.0.0.1:4000";
+            var API_URL = window.API_URL || BASE_URL + "/api";
+
+            let currentMainTab = "online";
+            let allUsers = [];
+            let sseSource = null;
+            let pollTimer = null;
+            let tickTimer = null;
+
+            // State untuk Log Sesi
+            let logCurrentPage = 1;
+            let logTotalPages = 1;
+            const LOG_LIMIT = 50;
+
+            const PAGE_LABELS = {
+                "dashboard.html": {
+                    title: "POS Kasir (Penjualan)",
+                    icon: "fa-cash-register",
+                    color: "text-blue-600 bg-blue-50 border-blue-200",
+                },
+                "riwayat.html": {
+                    title: "Riwayat Transaksi",
+                    icon: "fa-history",
+                    color: "text-blue-600 bg-blue-50 border-blue-200",
+                },
+                "product.html": {
+                    title: "Master Produk",
+                    icon: "fa-box",
+                    color: "text-emerald-600 bg-emerald-50 border-emerald-200",
+                },
+                "purchase.html": {
+                    title: "Riwayat Pembelian",
+                    icon: "fa-shopping-cart",
+                    color: "text-teal-600 bg-teal-50 border-teal-200",
+                },
+                "expense.html": {
+                    title: "Biaya Operasional",
+                    icon: "fa-wallet",
+                    color: "text-amber-600 bg-amber-50 border-amber-200",
+                },
+                "retur.html": {
+                    title: "Manajemen Retur",
+                    icon: "fa-undo",
+                    color: "text-rose-600 bg-rose-50 border-rose-200",
+                },
+                "akuntansi.html": {
+                    title: "Jurnal & Keuangan",
+                    icon: "fa-book-open",
+                    color: "text-purple-600 bg-purple-50 border-purple-200",
+                },
+                "absensi.html": {
+                    title: "Absensi Karyawan",
+                    icon: "fa-calendar-check",
+                    color: "text-cyan-600 bg-cyan-50 border-cyan-200",
+                },
+                "report.html": {
+                    title: "Laporan Analitik",
+                    icon: "fa-chart-bar",
+                    color: "text-orange-600 bg-orange-50 border-orange-200",
+                },
+                "opname.html": {
+                    title: "Stock Opname",
+                    icon: "fa-clipboard-check",
+                    color: "text-violet-600 bg-violet-50 border-violet-200",
+                },
+                "online-users.html": {
+                    title: "Monitoring & Log",
+                    icon: "fa-user-clock",
+                    color: "text-blue-600 bg-blue-50 border-blue-200",
+                },
+                "index.html": {
+                    title: "Halaman Login",
+                    icon: "fa-key",
+                    color: "text-slate-600 bg-slate-50 border-slate-200",
+                },
+            };
+
+            function getUserDataFromToken(
+                token = localStorage.getItem("token"),
+            ) {
+                if (!token) return null;
+                try {
+                    const base64Url = token.split(".")[1];
+                    const base64 = base64Url
+                        .replace(/-/g, "+")
+                        .replace(/_/g, "/");
+                    const jsonPayload = decodeURIComponent(
+                        window
+                            .atob(base64)
+                            .split("")
+                            .map(
+                                (c) =>
+                                    "%" +
+                                    ("00" + c.charCodeAt(0).toString(16)).slice(
+                                        -2,
+                                    ),
+                            )
+                            .join(""),
+                    );
+                    return JSON.parse(jsonPayload);
+                } catch (err) {
+                    return null;
+                }
+            }
+
+            function verifySuperAdminAccess() {
+                const token = localStorage.getItem("token");
+                if (!token) {
+                    window.location.href = "index.html";
+                    return false;
+                }
+
+                const userData = getUserDataFromToken(token);
+                if (!userData) {
+                    window.location.href = "index.html";
+                    return false;
+                }
+
+                const role = (userData.role || "").toLowerCase().trim();
+                const normalizedRole = role.replace(/[-_]/g, "");
+
+                const nameDisplay =
+                    document.querySelector(".user-name-display");
+                if (nameDisplay) {
+                    nameDisplay.innerText = `${userData.name || "User"} (${role.toUpperCase()})`;
+                }
+
+                if (normalizedRole !== "superadmin" && normalizedRole !== "admin") {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Akses Ditolak",
+                        text: "Halaman Monitoring Pengguna & Log hanya dapat diakses oleh Super Admin dan Admin.",
+                        confirmButtonColor: "#2563eb",
+                        allowOutsideClick: false,
+                    }).then(() => {
+                        window.location.href = "riwayat.html";
+                    });
+                    return false;
+                }
+
+                return true;
+            }
+
+            // Tab Switching
+            function switchMainTab(tab) {
+                currentMainTab = tab;
+                const btnOnline = document.getElementById("tabBtnOnline");
+                const btnLogs = document.getElementById("tabBtnLogs");
+                const secOnline = document.getElementById("sectionOnlineUsers");
+                const secLogs = document.getElementById("sectionUserLogs");
+
+                if (tab === "online") {
+                    btnOnline.className =
+                        "px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all shadow-sm bg-white text-blue-600 flex items-center gap-2 cursor-pointer";
+                    btnLogs.className =
+                        "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-600 hover:text-slate-900 flex items-center gap-2 cursor-pointer";
+                    secOnline.classList.remove("hidden");
+                    secLogs.classList.add("hidden");
+                } else {
+                    btnLogs.className =
+                        "px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all shadow-sm bg-white text-blue-600 flex items-center gap-2 cursor-pointer";
+                    btnOnline.className =
+                        "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-600 hover:text-slate-900 flex items-center gap-2 cursor-pointer";
+                    secLogs.classList.remove("hidden");
+                    secOnline.classList.add("hidden");
+                    loadUserLogs(logCurrentPage);
+                }
+            }
+
+            // ===============================================
+            // LOGIC TAB 1: PENGGUNA ONLINE REAL-TIME
+            // ===============================================
+            async function loadOnlineUsers(isManual = false) {
+                const token = localStorage.getItem("token");
+                if (!token) return;
+
+                const refreshIcon = document.getElementById("refreshIcon");
+                if (isManual && refreshIcon)
+                    refreshIcon.classList.add("fa-spin");
+
+                try {
+                    const res = await fetch(`${API_URL}/presence/online`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    if (res.status === 401 || res.status === 403) {
+                        verifySuperAdminAccess();
+                        return;
+                    }
+                    if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+
+                    const json = await res.json();
+                    updatePresenceData(json.summary, json.users);
+                } catch (err) {
+                    console.warn("[Presence] Gagal memuat data online:", err);
+                } finally {
+                    if (isManual && refreshIcon) {
+                        setTimeout(
+                            () => refreshIcon.classList.remove("fa-spin"),
+                            400,
+                        );
+                    }
+                }
+            }
+
+            function setupLivePresenceSSE() {
+                const token = localStorage.getItem("token");
+                if (!token) return;
+
+                if (sseSource) {
+                    sseSource.close();
+                    sseSource = null;
+                }
+
+                const sseUrl = `${API_URL}/presence/live`;
+                try {
+                    sseSource = typeof window.createSSEReader === "function"
+                        ? window.createSSEReader(sseUrl)
+                        : new EventSource(`${sseUrl}?token=${encodeURIComponent(token)}`);
+                    sseSource.addEventListener("connected", () =>
+                        updateBadgeLiveStatus(true),
+                    );
+                    sseSource.addEventListener("presence_changed", (e) => {
+                        try {
+                            const data =
+                                typeof e.data === "string"
+                                    ? JSON.parse(e.data)
+                                    : e.data;
+                            if (data && data.users) {
+                                updatePresenceData(data.summary, data.users);
+                            }
+                        } catch (err) {
+                            console.error(
+                                "[Presence SSE] Error parse payload:",
+                                err,
+                            );
+                        }
+                    });
+
+                    sseSource.onerror = () => {
+                        updateBadgeLiveStatus(false);
+                        if (!pollTimer) {
+                            pollTimer = setInterval(
+                                () => loadOnlineUsers(false),
+                                8000,
+                            );
+                        }
+                    };
+                } catch (err) {
+                    updateBadgeLiveStatus(false);
+                    if (!pollTimer) {
+                        pollTimer = setInterval(
+                            () => loadOnlineUsers(false),
+                            8000,
+                        );
+                    }
+                }
+            }
+
+            function updateBadgeLiveStatus(isLive) {
+                const badge = document.getElementById("sseLiveBadge");
+                if (!badge) return;
+                if (isLive) {
+                    badge.className =
+                        "inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-full text-xs font-bold";
+                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span><span>Realtime Aktif</span>`;
+                } else {
+                    badge.className =
+                        "inline-flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-200 text-amber-700 rounded-full text-xs font-bold";
+                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500"></span><span>Mode Polling</span>`;
+                }
+            }
+
+            function updatePresenceData(summary, users) {
+                allUsers = Array.isArray(users) ? users : [];
+                allUsers.sort(
+                    (a, b) =>
+                        new Date(b.last_seen || 0) - new Date(a.last_seen || 0),
+                );
+
+                const tabBadge = document.getElementById("tabBadgeOnlineCount");
+                if (tabBadge) tabBadge.innerText = allUsers.length;
+
+                renderSummaryCards(summary, allUsers);
+                updateLocationFilterOptions(allUsers);
+                filterAndRenderUsers();
+            }
+
+            function renderSummaryCards(summary, users) {
+                const totalOnline = summary?.total_online ?? users.length;
+                document.getElementById("statTotalOnline").innerText =
+                    totalOnline;
+
+                let kasirCount = 0;
+                let adminCount = 0;
+                const locSet = new Set();
+
+                users.forEach((u) => {
+                    const r = (u.role || "").toLowerCase().trim();
+                    if (r === "kasir" || r.includes("kasir")) kasirCount++;
+                    else adminCount++;
+                    if (u.location) locSet.add(u.location.trim());
+                });
+
+                document.getElementById("statKasirOnline").innerText =
+                    kasirCount;
+                document.getElementById("statAdminOnline").innerText =
+                    adminCount;
+                document.getElementById("statCabangOnline").innerText =
+                    locSet.size || (totalOnline > 0 ? 1 : 0);
+
+                const cabangDetail =
+                    document.getElementById("statCabangDetail");
+                if (cabangDetail) {
+                    if (locSet.size > 0) {
+                        cabangDetail.innerText =
+                            Array.from(locSet).slice(0, 3).join(", ") +
+                            (locSet.size > 3 ? "..." : "");
+                    } else {
+                        cabangDetail.innerText = "Belum ada lokasi aktif";
+                    }
+                }
+            }
+
+            function updateLocationFilterOptions(users) {
+                const select = document.getElementById("filterLocation");
+                if (!select) return;
+                const currentVal = select.value;
+                const locs = Array.from(
+                    new Set(users.map((u) => (u.location || "Pusat").trim())),
+                ).sort();
+
+                select.innerHTML = '<option value="ALL">Semua Cabang</option>';
+                locs.forEach((loc) => {
+                    const opt = document.createElement("option");
+                    opt.value = loc;
+                    opt.innerText = loc;
+                    if (loc === currentVal) opt.selected = true;
+                    select.appendChild(opt);
+                });
+            }
+
+            function filterAndRenderUsers() {
+                const search = (
+                    document.getElementById("searchInput")?.value || ""
+                )
+                    .toLowerCase()
+                    .trim();
+                const roleFilter =
+                    document.getElementById("filterRole")?.value || "ALL";
+                const locFilter =
+                    document.getElementById("filterLocation")?.value || "ALL";
+
+                const filtered = allUsers.filter((u) => {
+                    if (roleFilter !== "ALL") {
+                        const r = (u.role || "")
+                            .toLowerCase()
+                            .replace(/[-_]/g, "");
+                        const target = roleFilter
+                            .toLowerCase()
+                            .replace(/[-_]/g, "");
+                        if (!r.includes(target)) return false;
+                    }
+                    if (locFilter !== "ALL") {
+                        const loc = (u.location || "Pusat").trim();
+                        if (loc !== locFilter) return false;
+                    }
+                    if (search) {
+                        const name = (u.name || "").toLowerCase();
+                        const uname = (u.username || "").toLowerCase();
+                        const ip = (u.ip_address || "").toLowerCase();
+                        const page = (u.current_page || "").toLowerCase();
+                        const dev = (u.device || "").toLowerCase();
+                        return (
+                            name.includes(search) ||
+                            uname.includes(search) ||
+                            ip.includes(search) ||
+                            page.includes(search) ||
+                            dev.includes(search)
+                        );
+                    }
+                    return true;
+                });
+
+                document.getElementById("filteredCounter").innerText =
+                    `${filtered.length} dari ${allUsers.length} pengguna aktif`;
+
+                const emptyState = document.getElementById("emptyState");
+                const tableView = document.getElementById("tableViewContainer");
+
+                if (filtered.length === 0) {
+                    emptyState.classList.remove("hidden");
+                    tableView.classList.add("hidden");
+                } else {
+                    emptyState.classList.add("hidden");
+                    tableView.classList.remove("hidden");
+                    renderTableView(filtered);
+                }
+            }
+
+            function renderTableView(users) {
+                const tbody = document.getElementById("userTableBody");
+                tbody.innerHTML = "";
+
+                users.forEach((u) => {
+                    const tr = document.createElement("tr");
+                    tr.className = "hover:bg-slate-50/80 transition-colors";
+
+                    tr.innerHTML = `
+                        <td class="py-4 px-6">
+                            <div class="flex items-center gap-3">
+                                ${getAvatarMonogram(u.name, u.role)}
+                                <div>
+                                    <h4 class="font-bold text-slate-800 leading-tight">${escapeHTML(u.name || "Pengguna")}</h4>
+                                    <span class="text-xs text-slate-400 font-semibold">@${escapeHTML(u.username || "-")}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-4 px-5 whitespace-nowrap">${getRoleBadge(u.role)}</td>
+                        <td class="py-4 px-5 whitespace-nowrap">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-bold">
+                                <i class="fas fa-location-dot text-slate-400 text-[10px]"></i>
+                                ${escapeHTML(u.location || "Pusat")}
+                            </span>
+                        </td>
+                        <td class="py-4 px-5 whitespace-nowrap">${getPageBadge(u.current_page)}</td>
+                        <td class="py-4 px-5">
+                            <div class="text-xs space-y-0.5">
+                                <p class="font-bold text-slate-700 flex items-center gap-1.5">
+                                    <i class="fas fa-desktop text-slate-400 text-[10px]"></i>
+                                    <span>${escapeHTML(u.device || "Browser")}</span>
+                                </p>
+                                <p class="text-slate-400 font-mono text-[11px]">${escapeHTML(u.ip_address || "127.0.0.1")}</p>
+                            </div>
+                        </td>
+                        <td class="py-4 px-5 whitespace-nowrap text-xs text-slate-500 font-semibold" data-lastseen="${u.last_seen || ""}">
+                            ${formatRelativeTime(u.last_seen)}
+                        </td>
+                        <td class="py-4 px-6 text-center whitespace-nowrap">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
+                                <span>Online</span>
+                            </span>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // ===============================================
+            // LOGIC TAB 2: HISTORI LOG SESI & SHIFT USER
+            // ===============================================
+            async function loadUserLogs(page = 1) {
+                const token = localStorage.getItem("token");
+                if (!token) return;
+
+                logCurrentPage = page;
+                const search = encodeURIComponent(
+                    document.getElementById("logSearchInput")?.value || "",
+                );
+                const type = encodeURIComponent(
+                    document.getElementById("logFilterType")?.value || "ALL",
+                );
+                const startDate = encodeURIComponent(
+                    document.getElementById("logStartDate")?.value || "",
+                );
+                const endDate = encodeURIComponent(
+                    document.getElementById("logEndDate")?.value || "",
+                );
+
+                const tbody = document.getElementById("logTableBody");
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="py-12 text-center text-slate-400">
+                            <i class="fas fa-spinner fa-spin text-2xl text-blue-500 mb-2"></i>
+                            <p class="text-sm font-medium">Memuat data log sesi...</p>
+                        </td>
+                    </tr>
+                `;
+
+                try {
+                    let url = `${API_URL}/user-logs?page=${page}&limit=${LOG_LIMIT}`;
+                    if (search) url += `&search=${search}`;
+                    if (type !== "ALL") url += `&logout_type=${type}`;
+                    if (startDate) url += `&start_date=${startDate}`;
+                    if (endDate) url += `&end_date=${endDate}`;
+
+                    const res = await fetch(url, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+
+                    if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+                    const json = await res.json();
+
+                    renderUserLogsTable(
+                        json.data || [],
+                        json.total || 0,
+                        page,
+                        LOG_LIMIT,
+                    );
+                    renderLogSummaryCards(json.summary || {});
+                } catch (err) {
+                    console.error("[UserLogs] Error fetching logs:", err);
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="py-12 text-center text-red-500 font-semibold">
+                                <i class="fas fa-triangle-exclamation text-2xl mb-2"></i>
+                                <p>Gagal memuat log aktivitas. Periksa koneksi backend Anda.</p>
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+
+            function renderLogSummaryCards(summary) {
+                document.getElementById("statLogTotalSessions").innerText =
+                    summary.total_sessions || 0;
+                document.getElementById("statLogShiftLogout").innerText =
+                    summary.total_logout_with_shift || 0;
+                document.getElementById("statLogOnlyLogout").innerText =
+                    summary.total_logout_only || 0;
+                document.getElementById("statLogActiveNow").innerText =
+                    summary.total_active || 0;
+            }
+
+            function renderUserLogsTable(logs, total, page, limit) {
+                const tbody = document.getElementById("logTableBody");
+                tbody.innerHTML = "";
+
+                document.getElementById("logCounterDisplay").innerText =
+                    `Menampilkan ${logs.length} dari ${total} catatan log`;
+
+                logTotalPages = Math.max(1, Math.ceil(total / limit));
+                document.getElementById("logPageInfo").innerText =
+                    `Halaman ${page} dari ${logTotalPages} (Total: ${total})`;
+
+                document.getElementById("btnLogPrev").disabled = page <= 1;
+                document.getElementById("btnLogNext").disabled =
+                    page >= logTotalPages;
+
+                if (logs.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="py-12 text-center text-slate-400">
+                                <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-2 text-slate-400 text-xl">
+                                    <i class="fas fa-inbox"></i>
+                                </div>
+                                <p class="text-sm font-semibold text-slate-600">Belum ada riwayat aktivitas yang sesuai</p>
+                                <p class="text-xs text-slate-400 mt-0.5">Silakan sesuaikan tanggal atau kriteria filter Anda.</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                logs.forEach((item) => {
+                    const tr = document.createElement("tr");
+                    tr.className = "hover:bg-slate-50/80 transition-colors";
+
+                    // Badge Skema Logout
+                    let logoutTypeBadge = "";
+                    if (item.logout_type === "LOGOUT_WITH_SHIFT") {
+                        const shiftText = item.shift_number
+                            ? `Shift ${item.shift_number}`
+                            : "Shift Selesai";
+                        logoutTypeBadge = `
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <i class="fas fa-check-circle text-emerald-500"></i>
+                                <span>Tutup Shift (${shiftText})</span>
+                            </span>
+                        `;
+                    } else if (item.logout_type === "LOGOUT_ONLY") {
+                        logoutTypeBadge = `
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                <i class="fas fa-arrow-right-from-bracket text-amber-500"></i>
+                                <span>Logout Saja</span>
+                            </span>
+                        `;
+                    } else if (item.logout_type === "ACTIVE") {
+                        logoutTypeBadge = `
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                <span class="w-2 h-2 rounded-full bg-blue-500 pulse-dot"></span>
+                                <span>Sedang Aktif (Shift Berjalan)</span>
+                            </span>
+                        `;
+                    } else {
+                        logoutTypeBadge = `
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-slate-100 text-slate-600">
+                                <i class="fas fa-power-off text-slate-400"></i>
+                                <span>${escapeHTML(item.logout_type || "Selesai")}</span>
+                            </span>
+                        `;
+                    }
+
+                    // Format Waktu
+                    const loginTimeStr = formatDateTime(item.login_at);
+                    const logoutTimeStr = item.logout_at
+                        ? formatDateTime(item.logout_at)
+                        : `<span class="text-blue-600 font-bold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block pulse-dot"></span> Masih Login</span>`;
+
+                    // Format Durasi
+                    let durationText = "-";
+                    if (item.logout_at && item.duration_seconds > 0) {
+                        durationText = formatDuration(item.duration_seconds);
+                    } else if (!item.logout_at && item.login_at) {
+                        const curSec = Math.floor(
+                            (Date.now() - new Date(item.login_at).getTime()) /
+                                1000,
+                        );
+                        if (curSec > 0)
+                            durationText = `<span class="text-blue-600 font-semibold">${formatDuration(curSec)} (berjalan)</span>`;
+                    }
+
+                    tr.innerHTML = `
+                        <!-- Pengguna -->
+                        <td class="py-4 px-6 whitespace-nowrap">
+                            <div class="flex items-center gap-3">
+                                ${getAvatarMonogram(item.name, item.role)}
+                                <div>
+                                    <h4 class="font-bold text-slate-800 leading-tight">${escapeHTML(item.name || "User")}</h4>
+                                    <span class="text-xs text-slate-400 font-semibold">@${escapeHTML(item.username || "-")}</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Peran & Cabang -->
+                        <td class="py-4 px-5 whitespace-nowrap">
+                            <div class="space-y-1">
+                                ${getRoleBadge(item.role)}
+                                <div class="text-[11px] font-bold text-slate-500 flex items-center gap-1">
+                                    <i class="fas fa-location-dot text-slate-400 text-[10px]"></i>
+                                    <span>${escapeHTML(item.location || "Pusat")}</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Waktu Login -->
+                        <td class="py-4 px-5 whitespace-nowrap">
+                            <div class="text-xs">
+                                <p class="font-bold text-slate-800">${loginTimeStr.date}</p>
+                                <p class="text-slate-500 font-mono font-semibold">${loginTimeStr.time}</p>
+                            </div>
+                        </td>
+
+                        <!-- Waktu Logout -->
+                        <td class="py-4 px-5 whitespace-nowrap">
+                            <div class="text-xs">
+                                ${
+                                    typeof logoutTimeStr === "string"
+                                        ? logoutTimeStr
+                                        : `
+                                    <p class="font-bold text-slate-800">${logoutTimeStr.date}</p>
+                                    <p class="text-slate-500 font-mono font-semibold">${logoutTimeStr.time}</p>
+                                `
+                                }
+                            </div>
+                        </td>
+
+                        <!-- Skema Logout & Shift -->
+                        <td class="py-4 px-5 whitespace-nowrap">
+                            ${logoutTypeBadge}
+                        </td>
+
+                        <!-- Durasi Sesi -->
+                        <td class="py-4 px-5 whitespace-nowrap text-xs font-bold text-slate-700">
+                            ${durationText}
+                        </td>
+
+                        <!-- Perangkat & Catatan -->
+                        <td class="py-4 px-6 text-xs">
+                            <p class="font-semibold text-slate-700 flex items-center gap-1.5">
+                                <i class="fas fa-display text-slate-400 text-[10px]"></i>
+                                <span>${escapeHTML(item.device || "Browser")} (${escapeHTML(item.ip_address || "127.0.0.1")})</span>
+                            </p>
+                            ${item.notes ? `<p class="text-[11px] text-slate-500 italic mt-0.5">${escapeHTML(item.notes)}</p>` : ""}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            function applyLogFilters(page = 1) {
+                loadUserLogs(page);
+            }
+
+            function resetLogFilters() {
+                document.getElementById("logSearchInput").value = "";
+                document.getElementById("logFilterType").value = "ALL";
+                document.getElementById("logStartDate").value = "";
+                document.getElementById("logEndDate").value = "";
+                loadUserLogs(1);
+            }
+
+            function changeLogPage(delta) {
+                const target = logCurrentPage + delta;
+                if (target >= 1 && target <= logTotalPages) {
+                    loadUserLogs(target);
+                }
+            }
+
+            // Helpers Format Waktu & Durasi
+            function formatDateTime(isoString) {
+                if (!isoString) return { date: "-", time: "-" };
+                const d = new Date(isoString);
+                if (isNaN(d.getTime())) return { date: "-", time: "-" };
+
+                const date = d.toLocaleDateString("id-ID", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                });
+                const time = d.toLocaleTimeString("id-ID", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                });
+                return { date, time };
+            }
+
+            function formatDuration(sec) {
+                const s = Math.floor(sec);
+                if (s < 60) return `${s} detik`;
+                const m = Math.floor(s / 60);
+                if (m < 60) {
+                    const remSec = s % 60;
+                    return remSec > 0 ? `${m} mnt ${remSec} dtk` : `${m} menit`;
+                }
+                const h = Math.floor(m / 60);
+                const remMin = m % 60;
+                return remMin > 0 ? `${h} jam ${remMin} mnt` : `${h} jam`;
+            }
+
+            function getRoleBadge(role) {
+                const r = (role || "kasir").toLowerCase().trim();
+                if (r === "superadmin" || r === "super-admin") {
+                    return `<span class="px-2.5 py-0.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg text-[11px] font-bold uppercase tracking-wider inline-flex items-center gap-1"><i class="fas fa-crown text-[9px]"></i> Super Admin</span>`;
+                }
+                if (r === "admin") {
+                    return `<span class="px-2.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-[11px] font-bold uppercase tracking-wider inline-flex items-center gap-1"><i class="fas fa-user-gear text-[9px]"></i> Admin</span>`;
+                }
+                if (r === "akuntan") {
+                    return `<span class="px-2.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg text-[11px] font-bold uppercase tracking-wider inline-flex items-center gap-1"><i class="fas fa-calculator text-[9px]"></i> Akuntan</span>`;
+                }
+                if (r === "super-kasir" || r === "superkasir") {
+                    return `<span class="px-2.5 py-0.5 bg-teal-50 text-teal-700 border border-teal-200 rounded-lg text-[11px] font-bold uppercase tracking-wider inline-flex items-center gap-1"><i class="fas fa-star text-[9px]"></i> Super Kasir</span>`;
+                }
+                return `<span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-[11px] font-bold uppercase tracking-wider inline-flex items-center gap-1"><i class="fas fa-cash-register text-[9px]"></i> Kasir</span>`;
+            }
+
+            function getPageBadge(pageName) {
+                const baseName =
+                    (pageName || "").split("/").pop() || "dashboard.html";
+                const info = PAGE_LABELS[baseName] || {
+                    title: baseName,
+                    icon: "fa-window-maximize",
+                    color: "text-slate-600 bg-slate-50 border-slate-200",
+                };
+
+                return `
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-xl text-xs font-bold border ${info.color}">
+                        <i class="fas ${info.icon}"></i>
+                        <span class="truncate max-w-[150px]">${info.title}</span>
+                    </span>
+                `;
+            }
+
+            function formatRelativeTime(dateString) {
+                if (!dateString) return "Baru saja";
+                const d = new Date(dateString);
+                const diffMs = Date.now() - d.getTime();
+                const diffSec = Math.floor(diffMs / 1000);
+
+                if (diffSec < 5) return "Baru saja";
+                if (diffSec < 60) return `${diffSec} detik lalu`;
+                const diffMin = Math.floor(diffSec / 60);
+                if (diffMin < 60) return `${diffMin} menit lalu`;
+                const diffHour = Math.floor(diffMin / 60);
+                return `${diffHour} jam lalu`;
+            }
+
+            function getAvatarMonogram(name, role) {
+                const cleanName = (name || "User").trim();
+                const initials = cleanName
+                    .split(" ")
+                    .map((p) => p[0])
+                    .slice(0, 2)
+                    .join("")
+                    .toUpperCase();
+
+                const r = (role || "").toLowerCase();
+                let bgGradient = "from-emerald-500 to-teal-600";
+                if (r.includes("superadmin"))
+                    bgGradient = "from-indigo-600 to-purple-600";
+                else if (r.includes("admin"))
+                    bgGradient = "from-blue-600 to-indigo-600";
+                else if (r.includes("akuntan"))
+                    bgGradient = "from-amber-500 to-orange-600";
+
+                return `
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br ${bgGradient} text-white font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                        ${initials}
+                    </div>
+                `;
+            }
+
+            function escapeHTML(str) {
+                if (!str) return "";
+                return String(str)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            function toggleSidebar() {
+                const isMobile = window.innerWidth < 1024;
+                const sidebar = document.getElementById("app-sidebar");
+                const backdrop = document.getElementById("sidebar-backdrop");
+                if (!sidebar) return;
+
+                if (isMobile) {
+                    const isClosed = sidebar.classList.contains("-translate-x-full");
+                    if (isClosed) {
+                        sidebar.classList.remove("-translate-x-full");
+                        if (backdrop) backdrop.classList.remove("hidden");
+                        document.body.classList.add("overflow-hidden");
+                    } else {
+                        sidebar.classList.add("-translate-x-full");
+                        if (backdrop) backdrop.classList.add("hidden");
+                        document.body.classList.remove("overflow-hidden");
+                    }
+                } else {
+                    sidebar.classList.remove(
+                        "desktop-collapsed",
+                        "lg:hidden",
+                        "hidden",
+                        "-translate-x-full",
+                    );
+                }
+            }
+            window.toggleSidebar = toggleSidebar;
+            window.toggleMobileSidebar = toggleSidebar;
+
+            window.addEventListener("resize", () => {
+                const sidebar = document.getElementById("app-sidebar");
+                const backdrop = document.getElementById("sidebar-backdrop");
+                if (window.innerWidth >= 1024) {
+                    sidebar?.classList.remove(
+                        "-translate-x-full",
+                        "lg:hidden",
+                        "desktop-collapsed",
+                        "hidden",
+                    );
+                    backdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
+                } else {
+                    sidebar?.classList.add("-translate-x-full");
+                    backdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
+                }
+            });
+
+            async function confirmLogout() {
+                const result = await Swal.fire({
+                    title: "Konfirmasi Keluar",
+                    text: "Apakah Anda yakin ingin keluar dari sistem kasir?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="fas fa-sign-out-alt mr-1.5"></i> Ya, Keluar',
+                    cancelButtonText: '<i class="fas fa-times mr-1.5"></i> Batal',
+                    confirmButtonColor: "#EF4444",
+                    cancelButtonColor: "#64748B",
+                    reverseButtons: true,
+                    focusCancel: true,
+                });
+
+                if (result.isConfirmed) {
+                    if (window.recordLogout) {
+                        const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                        await window.recordLogout("LOGOUT_ONLY", null, curUser.location || "", "Logout");
+                    }
+                    localStorage.removeItem("token");
+                    window.location.href = "index.html";
+                }
+            }
+
+            // Inisialisasi
+            document.addEventListener("DOMContentLoaded", () => {
+                if (!verifySuperAdminAccess()) return;
+
+                // Load data online awal
+                loadOnlineUsers();
+                setupLivePresenceSSE();
+
+                // Live dynamic timer tick
+                tickTimer = setInterval(() => {
+                    document
+                        .querySelectorAll("[data-lastseen]")
+                        .forEach((el) => {
+                            const ts = el.getAttribute("data-lastseen");
+                            if (ts) el.innerText = formatRelativeTime(ts);
+                        });
+                }, 1000);
+            });
+
+            function cleanupPresenceListeners() {
+                if (sseSource) {
+                    sseSource.close();
+                    sseSource = null;
+                }
+                if (pollTimer) {
+                    clearInterval(pollTimer);
+                    pollTimer = null;
+                }
+                if (tickTimer) {
+                    clearInterval(tickTimer);
+                    tickTimer = null;
+                }
+            }
+
+            window.addEventListener("beforeunload", cleanupPresenceListeners);
+            window.addEventListener("spa:before-navigate", cleanupPresenceListeners);
+        </script>
+    </body>
+</html>

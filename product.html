@@ -2,14 +2,26 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+                <!-- Progressive Web App (PWA) Meta & Icons -->
+        <link rel="manifest" href="manifest.json" />
+        <meta name="theme-color" content="#2563EB" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Langgeng POS" />
+        <link rel="apple-touch-icon" href="logo.svg" />
+        <link rel="icon" type="image/svg+xml" href="logo.svg" />
         <title>Master Product - SmartPOS</title>
-        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="vendor/tailwindcss.js"></script>
         <link
             rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        />
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+        <script src="vendor/sweetalert2.all.min.js"></script>
+        <script defer src="vendor/alpine.min.js"></script>
+        <script src="spa-router.js"></script>
+        <script src="env.js"></script>
+        <script src="shortcuts.js" defer></script>
+        <script src="mobile-nav.js" defer></script>
         <style>
             @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap");
 
@@ -71,6 +83,133 @@
             tbody tr {
                 cursor: pointer;
             }
+
+            /* Tampilan Tabel & Kontrol Minimalis Khusus Mobile (< 640px) */
+            @media (max-width: 639px) {
+                #productTableBody td {
+                    padding-top: 0.45rem !important;
+                    padding-bottom: 0.45rem !important;
+                    padding-left: 0.6rem !important;
+                    padding-right: 0.6rem !important;
+                    font-size: 0.72rem !important;
+                    line-height: 1.25 !important;
+                }
+                table thead th {
+                    padding-top: 0.4rem !important;
+                    padding-bottom: 0.4rem !important;
+                    padding-left: 0.6rem !important;
+                    padding-right: 0.6rem !important;
+                    font-size: 0.65rem !important;
+                    letter-spacing: 0.02em !important;
+                }
+                #searchInput {
+                    height: 2.15rem !important;
+                    min-height: 2.15rem !important;
+                    font-size: 0.72rem !important;
+                    padding-left: 1.95rem !important;
+                    padding-top: 0.25rem !important;
+                    padding-bottom: 0.25rem !important;
+                    border-radius: 0.55rem !important;
+                }
+                #searchInput::placeholder {
+                    font-size: 0.68rem !important;
+                    color: #94a3b8 !important;
+                }
+
+                /* Minimalist Form Inputs on Mobile Modals */
+                #productForm input,
+                #productForm select {
+                    padding: 0.35rem 0.6rem !important;
+                    font-size: 0.72rem !important;
+                    border-radius: 0.55rem !important;
+                    height: 2.15rem !important;
+                    min-height: 2.15rem !important;
+                }
+                #productForm label {
+                    margin-bottom: 0.2rem !important;
+                    font-size: 0.65rem !important;
+                }
+                #submitProductButton {
+                    padding: 0.65rem !important;
+                    font-size: 0.75rem !important;
+                    border-radius: 0.55rem !important;
+                }
+
+                /* Modal Valuasi Stok Controls & Inputs */
+                #stockCutoffDate,
+                #stockLocationFilter {
+                    height: 2.1rem !important;
+                    min-height: 2.1rem !important;
+                    font-size: 0.72rem !important;
+                    font-weight: 600 !important;
+                    padding-left: 0.5rem !important;
+                    padding-right: 0.5rem !important;
+                    padding-top: 0.2rem !important;
+                    padding-bottom: 0.2rem !important;
+                    border-radius: 0.5rem !important;
+                }
+                #stockCutoffDate::-webkit-date-and-time-value {
+                    font-size: 0.72rem !important;
+                    font-weight: 600 !important;
+                    min-height: 1.2em !important;
+                    color: #334155 !important;
+                }
+                #stockCutoffDate::-webkit-datetime-edit {
+                    font-size: 0.72rem !important;
+                    font-weight: 600 !important;
+                    color: #334155 !important;
+                }
+
+                /* Valuasi Stok Modal Mobile Table: 100% Width Fit, No Horizontal Cut-off */
+                #stockValuationTable {
+                    table-layout: fixed !important;
+                    width: 100% !important;
+                }
+                #stockValuationTable th:nth-child(1),
+                #stockValuationTable td:nth-child(1) {
+                    width: 48% !important;
+                }
+                #stockValuationTable th:nth-child(4),
+                #stockValuationTable td:nth-child(4) {
+                    width: 22% !important;
+                }
+                #stockValuationTable th:nth-child(5),
+                #stockValuationTable td:nth-child(5) {
+                    width: 30% !important;
+                }
+                #stockValuationTable td {
+                    padding: 0.35rem 0.25rem !important;
+                    font-size: 0.68rem !important;
+                    line-height: 1.25 !important;
+                }
+                #stockValuationTable th {
+                    padding: 0.35rem 0.25rem !important;
+                    font-size: 0.62rem !important;
+                    letter-spacing: 0.02em !important;
+                }
+
+                /* Kartu Stok Modal Mobile Table */
+                #stockCardTableBody td {
+                    padding: 0.4rem 0.5rem !important;
+                    font-size: 0.7rem !important;
+                }
+                #stockCardModal table th {
+                    padding: 0.35rem 0.5rem !important;
+                    font-size: 0.65rem !important;
+                }
+
+                /* Pagination Mobile */
+                #paginationControls button {
+                    width: 2rem !important;
+                    height: 2rem !important;
+                    font-size: 0.72rem !important;
+                    border-radius: 0.5rem !important;
+                    padding: 0 !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                }
+            }
         </style>
     </head>
 
@@ -90,32 +229,25 @@
             id="app-sidebar"
             class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 sm:p-8 fixed inset-y-0 left-0 z-50 h-full lg:static lg:h-full lg:shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out"
         >
-            <div class="flex items-center justify-between mb-8 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div
-                        class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
-                    >
-                        <i class="fas fa-store"></i>
+                        <div class="flex items-center mb-8 shrink-0">
+                <a href="dashboard.html" class="flex items-center gap-3 group">
+                    <img
+                        src="logo.svg"
+                        alt="Logo Langgeng Elektronika"
+                        class="w-10 h-10 shrink-0 drop-shadow-md rounded-xl transition-transform group-hover:scale-105"
+                    />
+                    <div>
+                        <h1 class="text-base font-black text-slate-900 tracking-tight leading-tight">
+                            LANGGENG
+                        </h1>
+                        <span class="text-[10px] font-extrabold text-blue-600 tracking-widest uppercase block -mt-0.5">
+                            ELEKTRONIKA POS
+                        </span>
                     </div>
-                    <h1
-                        class="text-xl font-extrabold text-slate-800 tracking-tight"
-                    >
-                        SMARTPOS
-                    </h1>
-                </div>
-                <button
-                    type="button"
-                    onclick="toggleSidebar()"
-                    class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                    title="Tutup / Collapse Sidebar"
-                    aria-label="Toggle Sidebar"
-                >
-                    <i class="fas fa-times text-lg lg:hidden"></i>
-                    <i class="fas fa-angles-left text-lg hidden lg:block"></i>
-                </button>
+                </a>
             </div>
 
-            <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
+                        <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
                 <a
                     href="dashboard.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
@@ -126,8 +258,7 @@
                     href="riwayat.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-history"></i>
-                    <span>Riwayat Transaksi</span>
+                    <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
                 </a>
                 <a
                     href="product.html"
@@ -139,8 +270,7 @@
                     href="purchase.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Riwayat Purchase</span>
+                    <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
                 </a>
                 <a
                     href="expense.html"
@@ -158,80 +288,67 @@
                     href="akuntansi.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-book-open"></i>
-                    <span>Jurnal & Keuangan</span>
+                    <i class="fas fa-book-open"></i> <span>Jurnal & Keuangan</span>
                 </a>
                 <a
                     href="absensi.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Absensi Karyawan</span>
+                    <i class="fas fa-calendar-check"></i> <span>Absensi Karyawan</span>
                 </a>
                 <a
                     href="report.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Laporan Analitik</span>
+                    <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
                 </a>
                 <a
                     href="opname.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Stock Opname</span>
+                    <i class="fas fa-clipboard-check"></i> <span>Stock Opname</span>
+                </a>
+                <a
+                    href="online-users.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-user-clock"></i> <span>Pengguna & Log</span>
                 </a>
             </nav>
 
-            <div class="pt-6 border-t border-slate-100 shrink-0">
-                <div class="bg-slate-50 p-4 rounded-2xl mb-4">
+                        <div class="pt-6 border-t border-slate-100 shrink-0">
+                <div class="bg-slate-50 p-4 rounded-2xl mb-4 border border-slate-100">
                     <p
                         class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"
                     >
-                        User Aktif
+                        Login Sebagai
                     </p>
-                    <p class="font-bold text-slate-700 user-name-display">
-                        Desak Kasir
+                    <p class="font-bold text-slate-700 user-name-display truncate">
+                        Pengguna
                     </p>
                 </div>
-                <a
-                    href="#"
+                <button
+                    type="button"
                     onclick="confirmLogout()"
-                    class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all"
+                    class="w-full flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all cursor-pointer"
                 >
                     <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
-                </a>
+                </button>
             </div>
         </aside>
 
         <!-- MAIN CONTENT -->
-        <!-- Mobile Top Bar -->
+                <!-- Mobile Top Bar -->
         <div
-            class="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full"
+            class="lg:hidden bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full h-14"
         >
-            <div class="flex items-center gap-3">
-                <button
-                    type="button"
-                    onclick="toggleSidebar()"
-                    class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-xl focus:outline-none"
-                    aria-label="Buka Menu"
-                >
-                    <i class="fas fa-bars text-lg"></i>
-                </button>
-                <span
-                    class="font-extrabold text-slate-800 tracking-tight flex items-center gap-2"
-                >
-                    <span
-                        class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs shadow"
-                        ><i class="fas fa-store"></i
-                    ></span>
-                    SMARTPOS
-                </span>
+            <div class="flex items-center gap-2 shrink-0">
+                <img src="logo.svg" alt="Logo" class="w-7 h-7 rounded-lg shrink-0 drop-shadow-sm" />
+                <span class="font-extrabold text-slate-800 tracking-tight text-sm">LANGGENG POS</span>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 shrink-0 ml-auto min-w-0">
                 <span
-                    class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg user-name-display"
+                    class="text-[11px] font-bold text-slate-700 bg-slate-100 border border-slate-200/80 px-2.5 py-1 rounded-lg truncate max-w-[140px] user-name-display text-center leading-tight inline-block"
                     >Kasir</span
                 >
             </div>
@@ -240,71 +357,76 @@
         <!-- MAIN CONTENT -->
         <main
             id="main-content"
-            class="flex-1 p-4 sm:p-6 lg:p-10 min-w-0 w-full overflow-y-auto custom-scroll"
+            class="flex-1 p-2.5 sm:p-6 lg:p-10 min-w-0 w-full overflow-y-auto custom-scroll"
         >
             <!-- HEADER SECTION -->
             <div
-                class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8"
+                class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-8"
             >
-                <div class="flex items-center gap-3">
-                    <button
-                        type="button"
-                        onclick="toggleSidebar()"
-                        class="hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-blue-600 shadow-sm transition-all cursor-pointer shrink-0"
-                        title="Buka / Tutup Sidebar"
-                        aria-label="Toggle Sidebar"
-                    >
-                        <i class="fas fa-bars text-sm"></i>
-                    </button>
-                    <div>
-                        <h1
-                            class="text-3xl font-800 text-slate-800 tracking-tight"
-                        >
-                            Master Product
-                        </h1>
-                        <p class="text-slate-400 mt-1">
-                            Kelola data barang dan stok inventaris Anda secara
-                            real-time.
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <h1 class="text-lg sm:text-3xl font-extrabold text-slate-800 tracking-tight truncate">Master Produk</h1>
+                            <span
+                                id="sseLiveBadge"
+                                class="hidden inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs shrink-0"
+                                title="Live Real-time Sinkronisasi Stok Multi-Cabang via SSE"
+                            >
+                                <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span id="sseLiveText">Live SSE</span>
+                            </span>
+                        </div>
+                        <p class="text-slate-400 mt-0.5 sm:mt-1 text-[11px] sm:text-sm truncate">
+                            Kelola data barang dan stok inventaris multi-cabang.
                         </p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                    <button
+                        type="button"
+                        onclick="window.toggleShortcutModal()"
+                        class="shortcut-header-btn hidden lg:inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-4 rounded-2xl font-bold transition-all border border-blue-200 shadow-sm text-sm hover:scale-105 active:scale-95 cursor-pointer"
+                        title="Panduan Pintasan Keyboard (Tekan ? atau Alt + H)"
+                    >
+                        <i class="fas fa-keyboard text-blue-600"></i>
+                        <span class="hidden sm:inline">Shortcut</span>
+                        <kbd class="px-1.5 py-0.5 bg-white text-blue-700 rounded text-[10px] font-mono font-black border border-blue-200 shadow-2xs">?</kbd>
+                    </button>
                     <button
                         id="btn-cek-nilai-stok"
                         onclick="openStockValuationModal()"
-                        class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-4 rounded-2xl font-bold flex items-center gap-2.5 transition-all shadow-xl shadow-emerald-100 text-sm"
+                        class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 sm:px-6 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold flex items-center justify-center gap-1.5 sm:gap-2.5 transition-all shadow-md sm:shadow-xl shadow-emerald-100 text-xs sm:text-sm text-center cursor-pointer"
                     >
-                        <i class="fas fa-chart-line text-sm"></i> Cek Nilai Stok
-                        (Kembar)
+                        <i class="fas fa-chart-line text-xs sm:text-sm"></i> <span>Nilai Stok</span>
                     </button>
                     <button
                         id="addProductButton"
                         onclick="openModal()"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-blue-100 text-sm"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-7 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold flex items-center justify-center gap-1.5 sm:gap-3 transition-all shadow-md sm:shadow-xl shadow-blue-100 text-xs sm:text-sm text-center cursor-pointer"
                     >
-                        <i class="fas fa-plus text-sm"></i> Tambah Produk
+                        <i class="fas fa-plus text-xs sm:text-sm"></i> <span>Tambah Produk</span>
                     </button>
                 </div>
             </div>
 
             <!-- MAIN TABLE CARD -->
             <div
-                class="bg-white rounded-2xl sm:rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-fade-in"
+                class="bg-white rounded-xl sm:rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-fade-in"
             >
                 <!-- Toolbar Table -->
                 <div
-                    class="p-4 sm:p-8 border-b border-slate-50 flex flex-col sm:flex-row gap-4"
+                    class="p-2.5 sm:p-8 border-b border-slate-50 flex flex-col sm:flex-row gap-2.5 sm:gap-4"
                 >
                     <div class="relative flex-1">
                         <i
-                            class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"
+                            class="fas fa-search absolute left-3.5 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm"
                         ></i>
                         <input
                             type="text"
                             id="searchInput"
                             onkeyup="debounceSearch()"
                             placeholder="Cari nama atau kode produk..."
-                            class="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-[1.25rem] outline-none focus:border-blue-400 focus:bg-white transition-all text-sm font-medium"
+                            class="w-full pl-9 sm:pl-12 pr-4 sm:pr-6 py-2 sm:py-4 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-[1.25rem] outline-none focus:border-blue-400 focus:bg-white transition-all text-xs sm:text-sm font-medium placeholder:text-slate-400 placeholder:text-xs sm:placeholder:text-sm"
                         />
                     </div>
                 </div>
@@ -326,32 +448,32 @@
 
                 <div class="overflow-x-auto custom-scroll">
                     <table
-                        class="w-full text-left border-collapse min-w-[620px]"
+                        class="w-full text-left border-collapse min-w-[560px] sm:min-w-[620px]"
                     >
                         <thead
                             class="bg-slate-50/50 text-[10px] sm:text-[11px] uppercase tracking-widest text-slate-400 font-bold border-b border-slate-100"
                         >
                             <tr>
-                                <th class="px-3.5 py-3.5 sm:px-6 sm:py-4">
+                                <th class="px-2.5 py-2.5 sm:px-6 sm:py-4">
                                     Produk
                                 </th>
                                 <th
-                                    class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                    class="px-2.5 py-2.5 sm:px-6 sm:py-4 whitespace-nowrap"
                                 >
                                     Kategori
                                 </th>
                                 <th
-                                    class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                    class="px-2.5 py-2.5 sm:px-6 sm:py-4 whitespace-nowrap"
                                 >
                                     Harga Jual
                                 </th>
                                 <th
-                                    class="px-3.5 py-3.5 sm:px-6 sm:py-4 whitespace-nowrap"
+                                    class="px-2.5 py-2.5 sm:px-6 sm:py-4 whitespace-nowrap"
                                 >
                                     Stok
                                 </th>
                                 <th
-                                    class="px-3.5 py-3.5 sm:px-6 sm:py-4 text-right whitespace-nowrap"
+                                    class="px-2.5 py-2.5 sm:px-6 sm:py-4 text-right whitespace-nowrap"
                                 >
                                     Aksi
                                 </th>
@@ -368,18 +490,18 @@
 
                 <!-- Pagination & Info -->
                 <div
-                    class="p-4 sm:p-8 bg-slate-50/30 flex flex-col sm:flex-row justify-between items-center gap-4"
+                    class="p-3 sm:p-8 bg-slate-50/30 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4"
                 >
-                    <p class="text-slate-500 text-sm">
+                    <p class="text-slate-500 text-xs sm:text-sm">
                         Menampilkan
                         <span
                             id="countInfo"
-                            class="font-bold text-slate-800 text-base"
+                            class="font-bold text-slate-800 text-sm sm:text-base"
                             >0</span
                         >
                         produk
                     </p>
-                    <div id="paginationControls" class="flex gap-2">
+                    <div id="paginationControls" class="flex flex-wrap justify-center gap-1.5 sm:gap-2">
                         <!-- Pagination buttons -->
                     </div>
                 </div>
@@ -389,31 +511,31 @@
         <!-- MODAL POPUP (Create/Update) -->
         <div
             id="productModal"
-            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2.5 sm:p-4"
         >
             <div
                 class="bg-white w-full max-w-2xl rounded-2xl sm:rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden max-h-[92vh] flex flex-col"
             >
                 <div
-                    class="p-5 sm:p-8 border-b border-slate-50 flex justify-between items-center shrink-0"
+                    class="p-4 sm:p-8 border-b border-slate-50 flex justify-between items-center shrink-0"
                 >
                     <h3
                         id="modalTitle"
-                        class="text-2xl font-800 text-slate-800"
+                        class="text-base sm:text-2xl font-800 text-slate-800"
                     >
                         Tambah Produk Baru
                     </h3>
                     <button
                         onclick="closeModal()"
-                        class="text-slate-300 hover:text-slate-600 transition-colors"
+                        class="text-slate-300 hover:text-slate-600 transition-colors p-1"
                     >
-                        <i class="fas fa-times text-xl"></i>
+                        <i class="fas fa-times text-lg sm:text-xl"></i>
                     </button>
                 </div>
 
                 <form
                     id="productForm"
-                    class="p-5 sm:p-8 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 overflow-y-auto custom-scroll"
+                    class="p-3.5 sm:p-8 grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-6 overflow-y-auto custom-scroll"
                 >
                     <input type="hidden" id="productId" />
 
@@ -542,11 +664,11 @@
                         />
                     </div>
 
-                    <div class="col-span-2 pt-4">
+                    <div class="col-span-1 sm:col-span-2 pt-2 sm:pt-4">
                         <button
                             type="submit"
                             id="submitProductButton"
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white p-5 rounded-2xl font-800 transition-all shadow-lg shadow-blue-100 uppercase tracking-widest"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 sm:p-5 rounded-xl sm:rounded-2xl font-800 transition-all shadow-md sm:shadow-lg shadow-blue-100 uppercase tracking-wider sm:tracking-widest text-xs sm:text-sm cursor-pointer"
                         >
                             Simpan Data Produk
                         </button>
@@ -558,178 +680,130 @@
         <!-- MODAL VALUASI STOK PER TANGGAL (PERMINTAAN KEMBAR) -->
         <div
             id="stockValuationModal"
-            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2 sm:p-4"
         >
             <div
-                class="bg-white w-full max-w-5xl rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden flex flex-col max-h-[90vh]"
+                class="bg-white w-full max-w-5xl rounded-2xl sm:rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden flex flex-col h-[94vh] sm:h-[90vh]"
             >
+                <!-- MODAL HEADER (Fixed Top) -->
                 <div
-                    class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 shrink-0"
+                    class="p-3 sm:p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 shrink-0"
                 >
-                    <div>
-                        <div class="flex items-center gap-3">
-                            <span
-                                class="p-3 bg-emerald-100 text-emerald-700 rounded-2xl"
-                                ><i class="fas fa-boxes text-lg"></i
-                            ></span>
-                            <div>
-                                <h3 class="text-xl font-800 text-slate-800">
-                                    Laporan Nominal & Valuasi Stok Akhir
-                                </h3>
-                                <p class="text-xs text-slate-400 mt-0.5">
-                                    Lihat kuantitas (QTY) dan nilai aset
-                                    persediaan (Rp) per tanggal tertentu
-                                    (Historical Cutoff) untuk Laba Rugi.
-                                </p>
-                            </div>
+                    <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+                        <span
+                            class="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-100 text-emerald-700 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0"
+                        >
+                            <i class="fas fa-boxes text-xs sm:text-base"></i>
+                        </span>
+                        <div class="min-w-0">
+                            <h3 class="text-xs sm:text-lg font-black text-slate-800 truncate">
+                                Laporan Valuasi Stok Akhir
+                            </h3>
+                            <p class="text-[9.5px] sm:text-xs text-slate-400 mt-0.5 truncate">
+                                Kuantitas fisik & estimasi nilai aset per cutoff.
+                            </p>
                         </div>
                     </div>
                     <button
                         onclick="closeStockValuationModal()"
-                        class="w-10 h-10 rounded-2xl bg-white border border-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center shadow-sm"
+                        class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center shadow-2xs shrink-0 cursor-pointer"
+                        aria-label="Tutup Modal"
                     >
-                        <i class="fas fa-times text-sm"></i>
+                        <i class="fas fa-times text-xs"></i>
                     </button>
                 </div>
 
-                <!-- Toolbar Filter Valuasi -->
-                <div
-                    class="p-6 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4 bg-white shrink-0"
-                >
-                    <div class="flex items-center gap-3 flex-wrap">
-                        <div>
-                            <label
-                                class="block text-[10px] font-bold text-slate-400 uppercase mb-1"
-                                >Tanggal Cutoff Stok *</label
-                            >
-                            <input
-                                type="date"
-                                id="stockCutoffDate"
-                                class="bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-emerald-500 cursor-pointer"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                class="block text-[10px] font-bold text-slate-400 uppercase mb-1"
-                                >Lokasi Toko</label
-                            >
-                            <select
-                                id="stockLocationFilter"
-                                class="bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-emerald-500 cursor-pointer"
-                            >
-                                <option value="Semua Toko">
-                                    🌐 Semua Toko
-                                </option>
-                                <option value="Toko Utama">
-                                    🏬 Toko Utama
-                                </option>
-                                <option value="Toko Sudirman">
-                                    🏬 Toko Sudirman
-                                </option>
-                                <option value="Toko Paye">🏬 Toko Paye</option>
-                            </select>
-                        </div>
-                        <div class="pt-5">
+                <!-- Toolbar Filter Valuasi (Fixed Top, 2x2 Grid di Mobile) -->
+                <div class="p-2 sm:p-4 border-b border-slate-100 bg-white shrink-0">
+                    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-4">
+                        <div class="grid grid-cols-2 sm:flex sm:items-end gap-2 sm:gap-3 flex-1">
+                            <div>
+                                <label class="block text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Tanggal Cutoff *</label>
+                                <input
+                                    type="date"
+                                    id="stockCutoffDate"
+                                    class="w-full bg-slate-50 border border-slate-200 px-2 py-1 rounded-lg text-xs font-semibold sm:font-bold text-slate-700 outline-none focus:border-emerald-500 cursor-pointer h-[2.1rem] sm:h-auto"
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Lokasi Toko</label>
+                                <select
+                                    id="stockLocationFilter"
+                                    class="w-full bg-slate-50 border border-slate-200 px-2 py-1 rounded-lg text-xs font-semibold sm:font-bold text-slate-700 outline-none focus:border-emerald-500 cursor-pointer h-[2.1rem] sm:h-auto"
+                                >
+                                    <option value="Semua Toko">🌐 Semua Toko</option>
+                                    <option value="Toko Utama">🏬 Toko Utama</option>
+                                    <option value="Toko Sudirman">🏬 Toko Sudirman</option>
+                                    <option value="Toko Paye">🏬 Toko Paye</option>
+                                </select>
+                            </div>
                             <button
+                                type="button"
                                 onclick="fetchHistoricalStock()"
-                                class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md shadow-emerald-100 flex items-center gap-2 transition-all"
+                                class="col-span-1 bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-lg font-bold text-[11px] sm:text-xs shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer h-[2.1rem] sm:h-auto"
                             >
-                                <i class="fas fa-search"></i> Hitung Stok
+                                <i class="fas fa-search text-[10px]"></i> <span>Hitung Stok</span>
+                            </button>
+                            <button
+                                type="button"
+                                onclick="exportStockExcel()"
+                                class="col-span-1 sm:hidden bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1.5 rounded-lg font-bold text-[11px] shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer h-[2.1rem]"
+                            >
+                                <i class="fas fa-file-excel text-[10px]"></i> <span>Export Excel</span>
+                            </button>
+                        </div>
+
+                        <!-- Desktop Export Button -->
+                        <div class="hidden sm:flex items-center">
+                            <button
+                                type="button"
+                                onclick="exportStockExcel()"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md shadow-blue-100 flex items-center gap-2 transition-all cursor-pointer"
+                            >
+                                <i class="fas fa-file-excel"></i> Export Excel (.xlsx)
                             </button>
                         </div>
                     </div>
+                </div>
 
-                    <div class="pt-5 flex items-center gap-2">
-                        <button
-                            onclick="exportStockExcel()"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md shadow-blue-100 flex items-center gap-2 transition-all"
-                        >
-                            <i class="fas fa-file-excel"></i> Export Excel
-                            (.xlsx)
-                        </button>
+                <!-- KPI Ringkasan Valuasi (Fixed Top) -->
+                <div class="grid grid-cols-3 gap-1.5 sm:gap-4 p-2 sm:p-4 bg-slate-50/70 border-b border-slate-100 shrink-0">
+                    <div class="bg-white p-1.5 sm:p-4 rounded-xl border border-slate-200 shadow-2xs min-w-0">
+                        <p class="text-[7.5px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5 truncate">Total Macam</p>
+                        <h4 id="stockSummaryItems" class="text-[11px] sm:text-xl font-black text-slate-800 truncate">0 Item</h4>
+                    </div>
+                    <div class="bg-white p-1.5 sm:p-4 rounded-xl border border-slate-200 shadow-2xs min-w-0">
+                        <p class="text-[7.5px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5 truncate">Total Qty Fisik</p>
+                        <h4 id="stockSummaryQty" class="text-[11px] sm:text-xl font-black text-emerald-600 truncate">0 Unit</h4>
+                    </div>
+                    <div class="bg-white p-1.5 sm:p-4 rounded-xl border border-slate-200 shadow-2xs min-w-0">
+                        <p class="text-[7.5px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5 truncate">Total Nilai Aset</p>
+                        <h4 id="stockSummaryNominal" class="text-[9.5px] sm:text-xl font-black text-blue-700 tracking-tight leading-tight truncate sm:truncate-none">Rp 0</h4>
                     </div>
                 </div>
 
-                <!-- KPI Ringkasan Valuasi -->
-                <div
-                    class="grid grid-cols-3 gap-4 p-6 bg-slate-50/70 border-b border-slate-100 shrink-0"
-                >
-                    <div
-                        class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm"
-                    >
-                        <p
-                            class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
-                        >
-                            Total Macam Produk
-                        </p>
-                        <h4
-                            id="stockSummaryItems"
-                            class="text-xl font-black text-slate-800"
-                        >
-                            0 Item
-                        </h4>
-                    </div>
-                    <div
-                        class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm"
-                    >
-                        <p
-                            class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
-                        >
-                            Total QTY Fisik Stok
-                        </p>
-                        <h4
-                            id="stockSummaryQty"
-                            class="text-xl font-black text-emerald-600"
-                        >
-                            0 Unit
-                        </h4>
-                    </div>
-                    <div
-                        class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm"
-                    >
-                        <p
-                            class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
-                        >
-                            Total Nilai Persediaan (Aset)
-                        </p>
-                        <h4
-                            id="stockSummaryNominal"
-                            class="text-xl font-black text-blue-700"
-                        >
-                            Rp 0
-                        </h4>
-                    </div>
-                </div>
-
-                <!-- Tabel Data Valuasi Stok -->
-                <div class="overflow-y-auto flex-1 custom-scroll p-6">
-                    <table class="w-full text-left border-collapse">
-                        <thead
-                            class="bg-slate-100 text-[10px] uppercase tracking-wider text-slate-500 font-bold sticky top-0 border-b border-slate-200"
-                        >
+                <!-- Tabel Data Valuasi Stok (Dedicated Vertical Momentum Scroll) -->
+                <div class="flex-1 overflow-y-auto overflow-x-hidden custom-scroll min-h-0 p-1 sm:p-6 pb-6">
+                    <table id="stockValuationTable" class="w-full text-left border-collapse sm:min-w-[620px]">
+                        <thead class="bg-slate-100 text-[9px] sm:text-[10px] uppercase tracking-wider text-slate-500 font-bold sticky top-0 border-b border-slate-200 z-10 shadow-2xs">
                             <tr>
-                                <th class="p-3 pl-4">Produk</th>
-                                <th class="p-3">Kategori</th>
-                                <th class="p-3 text-right">
-                                    Harga Beli Satuan
+                                <th class="p-2 sm:p-3 pl-2 sm:pl-4">Produk</th>
+                                <th class="hidden sm:table-cell p-2 sm:p-3 whitespace-nowrap">Kategori</th>
+                                <th class="hidden sm:table-cell p-2 sm:p-3 text-right whitespace-nowrap">Harga Beli</th>
+                                <th class="p-2 sm:p-3 text-center whitespace-nowrap">
+                                    <span class="sm:hidden">Qty</span>
+                                    <span class="hidden sm:inline">Qty Cutoff</span>
                                 </th>
-                                <th class="p-3 text-center">Qty Stok Cutoff</th>
-                                <th class="p-3 text-right pr-4">
-                                    Nominal Persediaan
+                                <th class="p-2 sm:p-3 text-right pr-2 sm:pr-4 whitespace-nowrap">
+                                    <span class="sm:hidden">Nilai (Rp)</span>
+                                    <span class="hidden sm:inline">Nominal Aset</span>
                                 </th>
                             </tr>
                         </thead>
-                        <tbody
-                            id="stockValuationTableBody"
-                            class="divide-y divide-slate-100 text-xs text-slate-700 font-semibold"
-                        >
+                        <tbody id="stockValuationTableBody" class="divide-y divide-slate-100 text-xs text-slate-700 font-semibold">
                             <tr>
-                                <td
-                                    colspan="5"
-                                    class="py-16 text-center text-slate-400"
-                                >
-                                    Pilih tanggal cutoff dan klik "Hitung Stok"
-                                    untuk menampilkan nilai persediaan.
+                                <td colspan="5" class="py-12 sm:py-16 text-center text-slate-400 text-xs">
+                                    Pilih tanggal cutoff dan klik "Hitung Stok" untuk menampilkan nilai persediaan.
                                 </td>
                             </tr>
                         </tbody>
@@ -748,25 +822,25 @@
             >
                 <!-- Modal Header -->
                 <div
-                    class="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 shrink-0 bg-slate-50/50"
+                    class="p-3 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between sm:items-center gap-2.5 sm:gap-4 shrink-0 bg-slate-50/50"
                 >
                     <div>
                         <div class="flex items-center gap-2">
                             <span
-                                class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold"
+                                class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs sm:text-sm shrink-0"
                             >
-                                <i class="fas fa-history text-sm"></i>
+                                <i class="fas fa-history"></i>
                             </span>
                             <h3
-                                class="text-xl sm:text-2xl font-black text-slate-800"
+                                class="text-xs sm:text-2xl font-black text-slate-800 truncate"
                             >
                                 Kartu Stok & Audit Trail
                             </h3>
                         </div>
                         <p
-                            class="text-xs sm:text-sm text-slate-500 font-medium mt-1"
+                            class="text-[9.5px] sm:text-sm text-slate-500 font-medium mt-0.5 sm:mt-1 truncate"
                         >
-                            Histori mutasi stok pergerakan:
+                            Histori mutasi:
                             <span
                                 id="stockCardProductName"
                                 class="font-bold text-slate-800"
@@ -774,16 +848,16 @@
                             >
                             <span
                                 id="stockCardProductCode"
-                                class="ml-2 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-200 text-slate-700"
+                                class="ml-1 sm:ml-2 px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-mono font-bold bg-slate-200 text-slate-700"
                                 >-</span
                             >
                         </p>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
                         <select
                             id="stockCardLocationFilter"
                             onchange="loadStockCard(1)"
-                            class="bg-white border border-slate-200 text-xs font-bold text-slate-700 rounded-xl px-3 py-2 outline-none cursor-pointer focus:border-blue-400"
+                            class="flex-1 sm:flex-initial bg-white border border-slate-200 text-[11px] sm:text-xs font-bold text-slate-700 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:py-2 outline-none cursor-pointer focus:border-blue-400 h-[2.1rem] sm:h-auto"
                         >
                             <option value="">Semua Lokasi Toko</option>
                             <option value="Toko Sudirman">Toko Sudirman</option>
@@ -793,75 +867,82 @@
                         <button
                             type="button"
                             onclick="loadStockCard(1)"
-                            class="p-2 text-slate-500 hover:text-blue-600 hover:bg-slate-100 rounded-xl transition-colors"
+                            class="p-1.5 sm:p-2 text-slate-500 hover:text-blue-600 hover:bg-slate-100 rounded-lg sm:rounded-xl transition-colors cursor-pointer shrink-0"
                             title="Refresh Data"
                         >
-                            <i class="fas fa-sync-alt text-sm"></i>
+                            <i class="fas fa-sync-alt text-xs sm:text-sm"></i>
                         </button>
                         <button
                             type="button"
                             onclick="closeStockCardModal()"
-                            class="text-slate-300 hover:text-slate-600 p-2 transition-colors"
+                            class="text-slate-300 hover:text-slate-600 p-1.5 transition-colors cursor-pointer shrink-0"
+                            aria-label="Tutup Modal"
                         >
-                            <i class="fas fa-times text-xl"></i>
+                            <i class="fas fa-times text-base sm:text-xl"></i>
                         </button>
                     </div>
                 </div>
 
                 <!-- KPI / Summary Bar -->
                 <div
-                    class="grid grid-cols-3 gap-3 p-4 sm:p-6 bg-slate-50/30 border-b border-slate-100 shrink-0"
+                    class="grid grid-cols-3 gap-1.5 sm:gap-3 p-2 sm:p-6 bg-slate-50/30 border-b border-slate-100 shrink-0"
                 >
                     <div
-                        class="bg-white p-3 sm:p-4 rounded-xl border border-slate-100 shadow-sm"
+                        class="bg-white p-2 sm:p-4 rounded-lg sm:rounded-xl border border-slate-100 shadow-2xs min-w-0"
                     >
                         <p
-                            class="text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+                            class="text-[8.5px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate"
                         >
                             Total Masuk
                         </p>
                         <h4
                             id="stockCardTotalIn"
-                            class="text-lg sm:text-xl font-black text-emerald-600 mt-0.5"
+                            class="text-xs sm:text-xl font-black text-emerald-600 mt-0.5 truncate"
                         >
                             0 Unit
                         </h4>
                     </div>
                     <div
-                        class="bg-white p-3 sm:p-4 rounded-xl border border-slate-100 shadow-sm"
+                        class="bg-white p-2 sm:p-4 rounded-lg sm:rounded-xl border border-slate-100 shadow-2xs min-w-0"
                     >
                         <p
-                            class="text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+                            class="text-[8.5px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate"
                         >
                             Total Keluar
                         </p>
                         <h4
                             id="stockCardTotalOut"
-                            class="text-lg sm:text-xl font-black text-rose-500 mt-0.5"
+                            class="text-xs sm:text-xl font-black text-rose-500 mt-0.5 truncate"
                         >
                             0 Unit
                         </h4>
                     </div>
                     <div
-                        class="bg-white p-3 sm:p-4 rounded-xl border border-slate-100 shadow-sm"
+                        class="bg-white p-2 sm:p-4 rounded-lg sm:rounded-xl border border-slate-100 shadow-2xs min-w-0"
                     >
                         <p
-                            class="text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+                            class="text-[8.5px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate"
                         >
                             Saldo Terakhir
                         </p>
                         <h4
                             id="stockCardCurrentSaldo"
-                            class="text-lg sm:text-xl font-black text-blue-600 mt-0.5"
+                            class="text-xs sm:text-xl font-black text-blue-600 mt-0.5 truncate"
                         >
                             0 Unit
                         </h4>
                     </div>
                 </div>
 
+                <!-- Mobile Scroll Indicator Hint -->
+                <div class="sm:hidden flex items-center justify-between text-[10px] text-slate-500 font-medium px-3 py-1.5 bg-slate-50/90 border-b border-slate-100 shrink-0">
+                    <span class="flex items-center gap-1"><i class="fas fa-arrows-left-right text-amber-500"></i> Geser riwayat mutasi</span>
+                    <span class="text-[9px] bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.5 rounded-full font-bold">↔ Geser</span>
+                </div>
+
                 <!-- Table Content -->
-                <div class="overflow-y-auto flex-1 custom-scroll p-4 sm:p-6">
-                    <table class="w-full text-left border-collapse">
+                <div class="overflow-x-auto overflow-y-auto flex-1 custom-scroll p-2 sm:p-6">
+                    <table class="w-full text-left border-collapse min-w-[620px]">
                         <thead
                             class="bg-slate-100 text-[10px] uppercase tracking-wider text-slate-500 font-bold sticky top-0 border-b border-slate-200"
                         >
@@ -915,19 +996,113 @@
 
         <!-- JAVASCRIPT LOGIC -->
         <script>
-            const BASE_URL =
-                "https://langgeng-cashier-backend-production.up.railway.app";
+            var BASE_URL = window.BASE_URL || "http://127.0.0.1:4000";
+            var API_URL = window.API_URL || (BASE_URL + "/api");
             let currentPage = 1;
             const limit = 10; // Konsistensi limit
             let searchTimer;
             let isSuperSubKasir = false;
+            let isPageInitialized = false;
 
-            window.onload = () => {
+            // ==========================================
+            // REAL-TIME STOCK SYNCHRONIZATION VIA SSE
+            // ==========================================
+            let stockSSE = null;
+
+            function closeStockSSE() {
+                if (stockSSE) {
+                    try { stockSSE.close(); } catch (_) {}
+                    stockSSE = null;
+                }
+                const badge = document.getElementById("sseLiveBadge");
+                if (badge) badge.classList.add("hidden");
+            }
+
+            function initStockSSE() {
+                closeStockSSE();
+                try {
+                    const sseUrl = `${API_URL}/products/live`;
+                    stockSSE = typeof window.createSSEReader === "function"
+                        ? window.createSSEReader(sseUrl)
+                        : new EventSource(sseUrl);
+
+                    const badge = document.getElementById("sseLiveBadge");
+                    const badgeText = document.getElementById("sseLiveText");
+
+                    stockSSE.onopen = function () {
+                        if (badge) {
+                            badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs";
+                            badge.classList.remove("hidden");
+                        }
+                        if (badgeText) badgeText.innerText = "Live SSE";
+                    };
+
+                    stockSSE.addEventListener("stock_changed", function (e) {
+                        try {
+                            const data = JSON.parse(e.data);
+                            handleStockChanged(data);
+                        } catch (err) {
+                            console.error("Error parsing stock_changed:", err);
+                        }
+                    });
+
+                    stockSSE.addEventListener("product_updated", function (e) {
+                        try {
+                            fetchProducts();
+                        } catch (err) {
+                            console.error("Error parsing product_updated:", err);
+                        }
+                    });
+
+                    stockSSE.onerror = function () {
+                        if (badge) {
+                            badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200";
+                        }
+                        if (badgeText) badgeText.innerText = "SSE Reconnecting...";
+                    };
+                } catch (err) {
+                    console.warn("Failed to init stock SSE:", err);
+                }
+            }
+
+            function handleStockChanged(data) {
+                if (!data || !data.product_id) return;
+                const locClean = (data.location || "").replace(/^Toko\s+/i, "");
+                const span = document.querySelector(`span[data-loc-prod="${data.product_id}_${locClean}"]`);
+                if (span) {
+                    const newQty = Number(data.new_saldo || 0);
+                    span.innerText = newQty;
+                    span.className = `ml-1 ${newQty > 0 ? "text-blue-600 font-extrabold" : "text-slate-400"}`;
+                }
+            }
+
+            window.addEventListener("beforeunload", closeStockSSE);
+            window.addEventListener("spa:before-navigate", function () {
+                isPageInitialized = false;
+                if (typeof fetchProductsController !== "undefined" && fetchProductsController) {
+                    try { fetchProductsController.abort(); } catch (_) {}
+                    fetchProductsController = null;
+                }
+                clearTimeout(searchTimer);
+                closeStockSSE();
+            });
+
+            function initProductPage() {
+                if (isPageInitialized) return;
+                isPageInitialized = true;
+                initStockSSE();
                 fetchProducts();
                 loadResources();
-            };
+            }
 
-            // 1. LOAD RESOURCES (Tetap seperti kode Anda karena sudah benar)
+            window.onload = () => {
+                initProductPage();
+            };
+            if (document.readyState === "complete" || document.readyState === "interactive") {
+                setTimeout(initProductPage, 1);
+            }
+
+            // 1. LOAD RESOURCES
             async function loadResources() {
                 try {
                     const res = await fetch(`${BASE_URL}/api/master/resources`);
@@ -951,14 +1126,22 @@
                 }
             }
 
-            // 2. FETCH PRODUCTS (FIXED DATA MAPPING)
+            // 2. FETCH PRODUCTS (FIXED DATA MAPPING & VARIABLE SCOPE)
+            var fetchProductsController = null;
             async function fetchProducts() {
-                const search = document.getElementById("searchInput").value;
+                if (fetchProductsController) {
+                    try { fetchProductsController.abort(); } catch (_) {}
+                }
+                fetchProductsController = new AbortController();
+                const searchInput = document.getElementById("searchInput");
+                const search = (searchInput ? searchInput.value : "").trim();
                 const tbody = document.getElementById("productTableBody");
+                if (!tbody) return;
 
                 try {
                     const res = await fetch(
-                        `${BASE_URL}/api/products?page=${currentPage}&search=${search}&limit=${limit}`,
+                        `${BASE_URL}/api/products?page=${currentPage}&search=${encodeURIComponent(search)}&limit=${limit}`,
+                        { signal: fetchProductsController.signal }
                     );
                     const result = await res.json();
 
@@ -973,13 +1156,17 @@
 
                     if (products.length === 0) {
                         tbody.innerHTML = `<tr><td colspan="5" class="px-8 py-20 text-center text-slate-400">Data tidak ditemukan</td></tr>`;
-                        document.getElementById("countInfo").innerText = "0";
+                        const countEl = document.getElementById("countInfo");
+                        if (countEl) countEl.innerText = "0";
                         renderPagination(0);
                         return;
                     }
 
                     tbody.innerHTML = products
                         .map((p) => {
+                            const pId = p.ID || p.id;
+                            const pName = p.Nama || p.nama || "-";
+                            const pKode = p.Kode || p.kode || "-";
                             const stocks = p.Stocks || p.stocks || [];
                             let badgesHTML = "";
                             if (stocks.length > 0) {
@@ -996,15 +1183,12 @@
                                                 : s.saldo !== undefined
                                                   ? s.saldo
                                                   : 0;
-                                        return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">${escapeHTML(locName)}: <span class="ml-1 ${qty > 0 ? "text-blue-600 font-extrabold" : "text-slate-400"}">${qty}</span></span>`;
+                                        return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">${escapeHTML(locName)}: <span data-loc-prod="${pId}_${escapeHTML(locName)}" class="ml-1 ${qty > 0 ? "text-blue-600 font-extrabold" : "text-slate-400"}">${qty}</span></span>`;
                                     })
                                     .join("")}</div>`;
                             }
-                            const pName = p.Nama || p.nama || "-";
-                            const pKode = p.Kode || p.kode || "-";
-                            const pId = p.ID || p.id;
                             return `
-            <tr class="hover:bg-slate-50/50 transition-colors">
+            <tr class="hover:bg-slate-50/50 transition-colors" data-product-id="${pId}">
                 <td class="px-3.5 py-3 sm:px-6 sm:py-4 min-w-[160px]">
                     <div class="font-bold text-slate-800 text-xs sm:text-sm">${escapeHTML(pName)}</div>
                     <div class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">${escapeHTML(pKode)}</div>
@@ -1016,30 +1200,38 @@
                     Rp ${parseFloat(p.HJual || p.Hjual || p.hjual || 0).toLocaleString("id-ID")}
                 </td>
                 <td class="px-3.5 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
-                    <span class="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold">${p.Saldo || p.saldo || 0} Unit</span>
+                    <span id="totalStock_${pId}" class="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold">${p.Saldo || p.saldo || 0} Unit</span>
                     ${badgesHTML}
                 </td>
                 <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right whitespace-nowrap">
-                    <button onclick="openStockCardModal('${pId}', '${encodeURIComponent(pName)}', '${encodeURIComponent(pKode)}')" class="text-amber-500 hover:text-amber-700 mx-1.5 transition-colors" title="Lihat Kartu Stok / Audit Trail"><i class="fas fa-history"></i></button>
-                    ${
-                        isSuperSubKasir
-                            ? `
-                    <button onclick="editProduct('${pId}')" class="text-blue-500 hover:text-blue-700 mx-1.5 transition-colors" title="Lihat Detail Produk"><i class="fas fa-eye"></i></button>
-                    `
-                            : `
-                    <button onclick="editProduct('${pId}')" class="text-blue-500 hover:text-blue-700 mx-1.5 transition-colors" title="Edit Produk"><i class="fas fa-edit"></i></button>
-                    <button onclick="deleteProduct('${pId}')" class="text-red-400 hover:text-red-600 mx-1.5 transition-colors"><i class="fas fa-trash"></i></button>
-                    `
-                    }
+                    <div class="hidden sm:inline-flex items-center gap-1.5 justify-end">
+                        <button onclick="openStockCardModal('${pId}', '${encodeURIComponent(pName)}', '${encodeURIComponent(pKode)}')" class="text-amber-500 hover:text-amber-700 mx-1.5 transition-colors" title="Lihat Kartu Stok / Audit Trail"><i class="fas fa-history"></i></button>
+                        ${
+                            isSuperSubKasir
+                                ? `
+                        <button onclick="editProduct('${pId}')" class="text-blue-500 hover:text-blue-700 mx-1.5 transition-colors" title="Lihat Detail Produk"><i class="fas fa-eye"></i></button>
+                        `
+                                : `
+                        <button onclick="editProduct('${pId}')" class="text-blue-500 hover:text-blue-700 mx-1.5 transition-colors" title="Edit Produk"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteProduct('${pId}')" class="text-red-400 hover:text-red-600 mx-1.5 transition-colors"><i class="fas fa-trash"></i></button>
+                        `
+                        }
+                    </div>
+                    <button type="button" onclick="openProductActionMenu('${pId}', '${encodeURIComponent(pName)}', '${encodeURIComponent(pKode)}', ${isSuperSubKasir})" class="sm:hidden px-2 py-1 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold text-xs inline-flex items-center gap-1 border border-blue-200 cursor-pointer shadow-2xs">
+                        <i class="fas fa-ellipsis-v text-[10px]"></i> Aksi
+                    </button>
                 </td>
             </tr>
         `;
                         })
                         .join("");
 
-                    document.getElementById("countInfo").innerText = total;
+                    const countInfo = document.getElementById("countInfo");
+                    if (countInfo) countInfo.innerText = total;
                     renderPagination(total);
                 } catch (err) {
+                    if (err.name === "AbortError") return;
+                    console.error("fetchProducts error:", err);
                     tbody.innerHTML = `<tr><td colspan="5" class="px-8 py-20 text-center text-red-500">Koneksi Error: ${err.message}</td></tr>`;
                 }
             }
@@ -1185,6 +1377,43 @@
                 }
             };
 
+            function openProductActionMenu(pId, encName, encKode, isReadOnly) {
+                const pName = decodeURIComponent(encName);
+                const pKode = decodeURIComponent(encKode);
+                const actions = [
+                    {
+                        label: "Kartu Stok / Audit Trail",
+                        icon: "fas fa-history",
+                        color: "amber",
+                        desc: "Lihat riwayat pergerakan stok barang",
+                        onClick: () => openStockCardModal(pId, encName, encKode),
+                    },
+                    {
+                        label: isReadOnly ? "Lihat Detail Produk" : "Edit Produk",
+                        icon: isReadOnly ? "fas fa-eye" : "fas fa-edit",
+                        color: "blue",
+                        desc: isReadOnly ? "Lihat informasi spesifikasi produk" : "Ubah nama, harga, atau stok",
+                        onClick: () => editProduct(pId),
+                    },
+                ];
+
+                if (!isReadOnly) {
+                    actions.push({
+                        label: "Hapus Produk",
+                        icon: "fas fa-trash",
+                        color: "rose",
+                        desc: "Hapus master produk dari database",
+                        onClick: () => deleteProduct(pId),
+                    });
+                }
+
+                window.showRowActionMenu({
+                    title: "Pilih Aksi Produk",
+                    subtitle: `${pName} (${pKode})`,
+                    actions: actions,
+                });
+            }
+
             async function editProduct(id) {
                 // If supersubkasir, prevent editing, just open for view
                 if (isSuperSubKasir) {
@@ -1268,88 +1497,6 @@
             }
 
             const ROLE_PERMISSIONS = {
-                admin: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "report.html",
-                    "opname.html",
-                ],
-                kasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                "super-kasir": [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                super_kasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                superkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                supersubkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                "super-subkasir": [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                super_subkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                "super-sub-kasir": [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                super_sub_kasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                akuntan: [
-                    "akuntansi.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "riwayat.html",
-                    "report.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
                 superadmin: [
                     "dashboard.html",
                     "riwayat.html",
@@ -1361,79 +1508,138 @@
                     "absensi.html",
                     "report.html",
                     "opname.html",
+                    "online-users.html",
+                ],
+                "super-admin": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "akuntansi.html",
+                    "absensi.html",
+                    "report.html",
+                    "opname.html",
+                    "online-users.html",
+                ],
+                admin: [
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "akuntansi.html",
+                    "absensi.html",
+                    "report.html",
+                    "opname.html",
+                    "online-users.html",
+                ],
+                "super-kasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                superkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                super_kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                supersubkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                "super-subkasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                super_subkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                "super-sub-kasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                super_sub_kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "expense.html",
+                    "opname.html",
+                ],
+                akuntan: [
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
                 ],
             };
 
             async function confirmLogout() {
                 const result = await Swal.fire({
                     title: "Konfirmasi Keluar",
-                    text: "Pilih tindakan logout yang ingin Anda lakukan:",
+                    text: "Apakah Anda yakin ingin keluar dari sistem kasir?",
                     icon: "question",
                     showCancelButton: true,
-                    showDenyButton: true,
-                    confirmButtonText:
-                        '<i class="fas fa-check-circle mr-1"></i> Logout & Selesaikan Shift',
-                    denyButtonText:
-                        '<i class="fas fa-sign-out-alt mr-1"></i> Logout Saja',
-                    cancelButtonText: '<i class="fas fa-times mr-1"></i> Batal',
-                    confirmButtonColor: "#2563EB",
-                    denyButtonColor: "#F59E0B",
+                    confirmButtonText: '<i class="fas fa-sign-out-alt mr-1.5"></i> Ya, Keluar',
+                    cancelButtonText: '<i class="fas fa-times mr-1.5"></i> Batal',
+                    confirmButtonColor: "#EF4444",
                     cancelButtonColor: "#64748B",
                     reverseButtons: true,
+                    focusCancel: true,
                 });
 
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        title: "Menutup Shift...",
-                        allowOutsideClick: false,
-                        didOpen: () => Swal.showLoading(),
-                    });
-
-                    try {
-                        const shiftResponse = await fetch(
-                            `${BASE_URL}/api/shift/current`,
-                        );
-                        const shiftData = await shiftResponse.json();
-                        const shift = shiftData.shift || 1;
-
-                        const updateResponse = await fetch(
-                            `${BASE_URL}/api/sales/update/shift`,
-                            {
-                                method: "PUT",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify({
-                                    shift: shift,
-                                }),
-                            },
-                        );
-
-                        if (updateResponse.ok) {
-                            await Swal.fire({
-                                icon: "success",
-                                title: "Shift Berhasil Ditutup",
-                                text: `Transaksi berhasil dimasukkan ke Shift ${shift}. Anda telah keluar.`,
-                                confirmButtonColor: "#2563EB",
-                            });
-                            localStorage.removeItem("token");
-                            window.location.href = "index.html";
-                        } else {
-                            Swal.fire(
-                                "Gagal",
-                                "Gagal memperbarui shift transaksi",
-                                "error",
-                            );
-                        }
-                    } catch (error) {
-                        console.error(error);
-                        Swal.fire(
-                            "Error",
-                            "Server tidak dapat dihubungi",
-                            "error",
-                        );
+                    if (window.recordLogout) {
+                        const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                        await window.recordLogout("LOGOUT_ONLY", null, curUser.location || "", "Logout");
                     }
-                } else if (result.isDenied) {
                     localStorage.removeItem("token");
                     window.location.href = "index.html";
                 }
@@ -1494,17 +1700,16 @@
                 const allowedPages = ROLE_PERMISSIONS[userRole] ||
                     ROLE_PERMISSIONS[normalizedRole] || ["dashboard.html"];
 
-                // Set global flag for supersubkasir
-                isSuperSubKasir =
-                    userRole === "supersubkasir" ||
-                    normalizedRole === "supersubkasir";
+                // Hanya Admin dan Super Admin yang berhak Tambah, Edit, dan Hapus Data
+                const isAdminOrSuperAdmin = (normalizedRole === "admin" || normalizedRole === "superadmin");
+                isSuperSubKasir = !isAdminOrSuperAdmin;
 
                 if (!allowedPages.includes(currentPage)) {
-                    if (userRole === "akuntan")
-                        window.location.href = "akuntansi.html";
-                    else if (userRole === "admin")
-                        window.location.href = "riwayat.html";
-                    else window.location.href = "dashboard.html";
+                    let fallback = "dashboard.html";
+                    if (!allowedPages.includes("dashboard.html")) {
+                        fallback = allowedPages[0] || "riwayat.html";
+                    }
+                    window.location.href = fallback;
                     return;
                 }
 
@@ -1703,14 +1908,24 @@
                         .map(
                             (it) => `
                         <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="p-3 pl-4">
-                                <div class="font-bold text-slate-800">${escapeHTML(it.nama)}</div>
-                                <div class="text-[10px] text-slate-400 font-mono font-bold">${escapeHTML(it.kode)}</div>
+                            <td class="p-2 sm:p-3 pl-2 sm:pl-4">
+                                <div class="font-bold text-slate-800 text-[10.5px] sm:text-xs leading-tight break-words">${escapeHTML(it.nama)}</div>
+                                <div class="flex items-center gap-1 mt-0.5 flex-wrap">
+                                    <span class="text-[8.5px] sm:text-[10px] text-slate-400 font-mono font-bold">${escapeHTML(it.kode)}</span>
+                                    <span class="sm:hidden text-[8px] px-1 py-0.2 rounded bg-slate-100 text-slate-600 font-medium">${escapeHTML(it.category_name || "-")}</span>
+                                </div>
                             </td>
-                            <td class="p-3 text-slate-500 font-medium">${escapeHTML(it.category_name || "-")}</td>
-                            <td class="p-3 text-right font-mono font-semibold text-slate-600">Rp ${Number(it.h_beli || 0).toLocaleString("id-ID")}</td>
-                            <td class="p-3 text-center font-extrabold text-slate-800 bg-slate-50/50">${Number(it.qty_stok || 0).toLocaleString("id-ID")} ${escapeHTML(it.satuan || "Unit")}</td>
-                            <td class="p-3 text-right pr-4 font-mono font-black text-blue-700">Rp ${Number(it.nominal_stok || 0).toLocaleString("id-ID")}</td>
+                            <td class="hidden sm:table-cell p-3 text-slate-500 font-medium">${escapeHTML(it.category_name || "-")}</td>
+                            <td class="hidden sm:table-cell p-3 text-right font-mono font-semibold text-slate-600">Rp ${Number(it.h_beli || 0).toLocaleString("id-ID")}</td>
+                            <td class="p-2 sm:p-3 text-center bg-slate-50/50">
+                                <div class="font-extrabold text-slate-800 text-[10.5px] sm:text-xs leading-tight">${Number(it.qty_stok || 0).toLocaleString("id-ID")}</div>
+                                <div class="text-[8.5px] text-slate-500 font-semibold sm:hidden">${escapeHTML(it.satuan || "Unit")}</div>
+                                <span class="hidden sm:inline text-[10px] text-slate-500 font-semibold">${escapeHTML(it.satuan || "Unit")}</span>
+                            </td>
+                            <td class="p-2 sm:p-3 text-right pr-2 sm:pr-4">
+                                <div class="font-mono font-black text-blue-700 text-[10.5px] sm:text-xs tracking-tight">Rp ${Number(it.nominal_stok || 0).toLocaleString("id-ID")}</div>
+                                <div class="sm:hidden text-[8px] text-slate-400 font-mono font-normal mt-0.5">@ Rp ${Number(it.h_beli || 0).toLocaleString("id-ID")}</div>
+                            </td>
                         </tr>
                     `,
                         )
@@ -2033,17 +2248,13 @@
                         document.body.classList.remove("overflow-hidden");
                     }
                 } else {
-                    const isCollapsed =
-                        sidebar.classList.contains("desktop-collapsed") ||
-                        sidebar.classList.contains("lg:hidden");
-                    if (isCollapsed) {
-                        sidebar.classList.remove(
-                            "desktop-collapsed",
-                            "lg:hidden",
-                        );
-                    } else {
-                        sidebar.classList.add("desktop-collapsed", "lg:hidden");
-                    }
+                    // Desktop: Sidebar selalu permanen terbuka (fitur collapse ditiadakan sesuai instruksi)
+                    sidebar.classList.remove(
+                        "desktop-collapsed",
+                        "lg:hidden",
+                        "hidden",
+                        "-translate-x-full",
+                    );
                 }
             }
             window.toggleSidebar = toggleSidebar;
@@ -2053,12 +2264,12 @@
                 const sidebar = document.getElementById("app-sidebar");
                 const backdrop = document.getElementById("sidebar-backdrop");
                 if (window.innerWidth >= 1024) {
-                    if (!sidebar?.classList.contains("desktop-collapsed")) {
-                        sidebar?.classList.remove(
-                            "-translate-x-full",
-                            "lg:hidden",
-                        );
-                    }
+                    sidebar?.classList.remove(
+                        "-translate-x-full",
+                        "lg:hidden",
+                        "desktop-collapsed",
+                        "hidden",
+                    );
                     backdrop?.classList.add("hidden");
                     document.body.classList.remove("overflow-hidden");
                 } else {

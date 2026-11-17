@@ -1,0 +1,44 @@
+{
+  "name": "Langgeng SmartPOS - Kasir & Manajemen Toko",
+  "short_name": "Langgeng POS",
+  "description": "Sistem Kasir Pintar, Multi-Cabang, dan Manajemen Keuangan Terpadu Langgeng Elektronika",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F8FAFC",
+  "theme_color": "#2563EB",
+  "lang": "id",
+  "icons": [
+    {
+      "src": "logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "finance", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Dashboard Kasir",
+      "short_name": "Kasir",
+      "description": "Buka Dashboard Kasir Utama",
+      "url": "dashboard.html",
+      "icons": [{ "src": "logo.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Riwayat Transaksi",
+      "short_name": "Riwayat",
+      "description": "Lihat Rekap Penjualan",
+      "url": "riwayat.html",
+      "icons": [{ "src": "logo.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Master Produk",
+      "short_name": "Produk",
+      "description": "Kelola Data Barang & Stok",
+      "url": "product.html",
+      "icons": [{ "src": "logo.svg", "sizes": "any" }]
+    }
+  ]
+}

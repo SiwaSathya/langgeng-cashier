@@ -1,0 +1,837 @@
+/**
+ * Langgeng SmartPOS - iOS Style Floating Glass Bottom Navigation Engine
+ * HANYA aktif pada tampilan mobile (< 1024px).
+ * Tampilan Desktop (>= 1024px) DIJAMIN 100% UTUH tanpa modifikasi layout/padding apa pun.
+ */
+
+(function initIosMobileNav() {
+  // Jangan pasang di halaman login
+  const pathParts = window.location.pathname.split("/");
+  const currentPage = (
+    pathParts[pathParts.length - 1] || "dashboard.html"
+  ).toLowerCase();
+  if (
+    currentPage === "index.html" ||
+    currentPage === "" ||
+    currentPage === "login.html"
+  )
+    return;
+
+  // Cek apakah sudah terpasang
+  if (document.getElementById("ios-bottom-bar")) return;
+
+  // 1. Inject Stylesheet KHUSUS MOBILE (< 1024px)
+  // Semua aturan diwajibkan berada di dalam @media (max-width: 1023px)
+  // agar tampilan Desktop tidak tersentuh sama sekali.
+  const style = document.createElement("style");
+  style.id = "ios-nav-custom-styles";
+  style.innerHTML = `
+        /* JAMINAN DESKTOP: Sembunyikan mutlak seluruh komponen mobile di layar >= 1024px */
+        @media (min-width: 1024px) {
+            #ios-bottom-bar,
+            #ios-menu-wrapper,
+            #ios-menu-backdrop,
+            #ios-menu-sheet {
+                display: none !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
+            }
+        }
+
+        /* ATURAN EKSKLUSIF MOBILE (< 1024px) */
+        @media (max-width: 1023px) {
+            /* Floating Glass Bottom Navbar Styling (iPhone Safari - Posisi Pas Mengambang Rapi) */
+            #ios-bottom-bar {
+                backdrop-filter: blur(24px) saturate(190%);
+                -webkit-backdrop-filter: blur(24px) saturate(190%);
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.28) 100%);
+                border: 1px solid rgba(255, 255, 255, 0.55);
+                box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.16), 0 2px 10px rgba(0, 0, 0, 0.04), inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.85);
+                will-change: transform;
+                /* Diturunkan presisi agar pas mengambang dekat di atas bar Safari (~1.15rem) */
+                bottom: calc(env(safe-area-inset-bottom, 0px) + 1.15rem) !important;
+                transform: translateZ(0);
+                -webkit-transform: translateZ(0);
+            }
+
+            /* Safe padding bawah pada konten agar pas di mobile */
+            body {
+                padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)) !important;
+            }
+            main:not(.overflow-hidden), #main-content:not(.overflow-hidden) {
+                padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)) !important;
+            }
+            /* Pastikan tabel & scroll container tabel fit rapat ke data tanpa gap di bawah */
+            .overflow-x-auto,
+            .overflow-x-auto.custom-scroll,
+            table,
+            tbody {
+                padding-bottom: 0 !important;
+                margin-bottom: 0 !important;
+            }
+
+            /* Hilangkan off-canvas sidebar bawaan agar tidak bentrok dengan iOS nav */
+            #sidebar-backdrop {
+                display: none !important;
+            }
+            #app-sidebar {
+                display: none !important;
+            }
+
+            /* Nonaktifkan seluruh elemen shortcut di mobile */
+            .shortcut-header-btn,
+            #shortcut-helper-fab,
+            #shortcut-guide-modal,
+            #shortcut-feedback-toast,
+            .shortcut-btn-badge,
+            .shortcut-tab-badge,
+            .search-shortcut-badge,
+            .bon-kbd-badge,
+            .dp-kbd-badge,
+            .kbd-pay-hint,
+            .kbd-add-hint,
+            .kbd-val-hint,
+            #search-kbd-hint,
+            button[onclick*="toggleShortcutModal"],
+            button[onclick*="ShortcutModal"],
+            .keycap-badge,
+            kbd:not(.keep-mobile),
+            [id*="shortcut-"],
+            [class*="shortcut-"] {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+                position: absolute !important;
+                width: 0 !important;
+                height: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+                border: none !important;
+            }
+
+            /* Micro-interactions untuk tab bar iOS */
+            .ios-tab-btn {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .ios-tab-btn:active {
+                transform: scale(0.92);
+            }
+
+            /* iOS Menu Sheet Transitions & Refined Liquid Glass */
+            #ios-menu-backdrop {
+                transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                backdrop-filter: blur(12px) !important;
+                -webkit-backdrop-filter: blur(12px) !important;
+                background: rgba(15, 23, 42, 0.45) !important;
+                z-index: 85 !important;
+            }
+            #ios-menu-sheet {
+                transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+                backdrop-filter: blur(30px) saturate(190%) !important;
+                -webkit-backdrop-filter: blur(30px) saturate(190%) !important;
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(248, 250, 252, 0.76) 100%) !important;
+                border-top: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+                border-left: 1px solid rgba(255, 255, 255, 0.80) !important;
+                border-right: 1px solid rgba(255, 255, 255, 0.80) !important;
+                box-shadow: 0 -20px 48px -8px rgba(15, 23, 42, 0.20), inset 0 2px 2px 0 rgba(255, 255, 255, 1), inset 0 0 25px 0 rgba(255, 255, 255, 0.45) !important;
+                padding-bottom: calc(5rem + env(safe-area-inset-bottom, 24px)) !important;
+                z-index: 90 !important;
+            }
+
+            /* Liquid Glass Tiles untuk Modul Operasional (Elegan & Highlight Responsif) */
+            #ios-menu-sheet .grid a {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                align-items: center !important;
+                overflow: hidden !important;
+                backdrop-filter: blur(16px) saturate(170%) !important;
+                -webkit-backdrop-filter: blur(16px) saturate(170%) !important;
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(248, 250, 252, 0.52) 100%) !important;
+                border: 1px solid rgba(255, 255, 255, 0.85) !important;
+                box-shadow: 0 3px 12px -2px rgba(15, 23, 42, 0.04), inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95) !important;
+                transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            }
+            #ios-menu-sheet .grid a:hover {
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.82) 100%) !important;
+                border-color: rgba(255, 255, 255, 1) !important;
+                box-shadow: 0 8px 24px -3px rgba(15, 23, 42, 0.08), inset 0 1.5px 2px 0 rgba(255, 255, 255, 1) !important;
+                transform: translateY(-2px) !important;
+            }
+            #ios-menu-sheet .grid a:active {
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.80) 0%, rgba(248, 250, 252, 0.60) 100%) !important;
+                transform: scale(0.97) !important;
+                box-shadow: 0 2px 6px -1px rgba(15, 23, 42, 0.05), inset 0 1px 1px 0 rgba(255, 255, 255, 0.90) !important;
+            }
+
+            /* Icon badge container - Highlight membesar & bersinar tanpa memutihkan icon */
+            #ios-menu-sheet .grid a > div:first-child {
+                flex-shrink: 0 !important;
+                border: 1px solid rgba(255, 255, 255, 0.85) !important;
+                box-shadow: inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95), 0 2px 5px -1px rgba(15, 23, 42, 0.04) !important;
+                transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, filter 0.22s ease !important;
+            }
+            #ios-menu-sheet .grid a:hover > div:first-child {
+                transform: scale(1.10) !important;
+                filter: brightness(1.05) saturate(1.15) !important;
+                box-shadow: inset 0 1px 2px 0 rgba(255, 255, 255, 1), 0 5px 12px -2px rgba(15, 23, 42, 0.10) !important;
+            }
+
+            /* Pastikan icon FontAwesome tidak pernah berubah jadi putih */
+            #ios-menu-sheet .grid a i {
+                transition: transform 0.2s ease, filter 0.2s ease !important;
+            }
+            #ios-menu-sheet .grid a:hover i {
+                transform: scale(1.08) !important;
+            }
+
+            /* Typography modul */
+            #ios-menu-sheet .grid a span:first-child {
+                color: #0f172a !important;
+                font-weight: 750 !important;
+                font-size: 11.5px !important;
+                letter-spacing: -0.01em !important;
+            }
+            #ios-menu-sheet .grid a span:last-child {
+                color: #64748b !important;
+                font-weight: 500 !important;
+                font-size: 9.5px !important;
+            }
+
+            /* Glass Close Button */
+            #ios-menu-sheet button[title="Tutup Menu"] {
+                backdrop-filter: blur(16px) saturate(180%) !important;
+                -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+                background: rgba(255, 255, 255, 0.70) !important;
+                border: 1px solid rgba(255, 255, 255, 0.85) !important;
+                box-shadow: 0 2px 8px -1px rgba(15, 23, 42, 0.05), inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95) !important;
+                color: #475569 !important;
+            }
+            #ios-menu-sheet button[title="Tutup Menu"]:hover {
+                background: rgba(255, 255, 255, 0.90) !important;
+                color: #0f172a !important;
+            }
+
+            /* Glass Logout Button Styling */
+            #ios-menu-sheet button[onclick*="triggerMobileLogout"] {
+                backdrop-filter: blur(20px) saturate(180%) !important;
+                -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+                background: linear-gradient(135deg, rgba(255, 241, 242, 0.65) 0%, rgba(255, 228, 230, 0.45) 100%) !important;
+                border: 1.5px solid rgba(254, 205, 211, 0.75) !important;
+                color: #e11d48 !important;
+                box-shadow: 0 4px 16px -2px rgba(225, 29, 72, 0.08), inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.95) !important;
+                transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                margin-top: 0.75rem !important;
+                margin-bottom: 2.5rem !important;
+                padding-top: 0.95rem !important;
+                padding-bottom: 0.95rem !important;
+            }
+            #ios-menu-sheet button[onclick*="triggerMobileLogout"]:hover {
+                background: linear-gradient(135deg, rgba(255, 241, 242, 0.85) 0%, rgba(255, 228, 230, 0.65) 100%) !important;
+                border-color: rgba(254, 205, 211, 0.95) !important;
+                box-shadow: 0 6px 20px -2px rgba(225, 29, 72, 0.14), inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 1) !important;
+                transform: translateY(-1.5px) !important;
+            }
+            #ios-menu-sheet button[onclick*="triggerMobileLogout"]:active {
+                background: linear-gradient(135deg, rgba(255, 241, 242, 0.75) 0%, rgba(255, 228, 230, 0.55) 100%) !important;
+                transform: scale(0.98) !important;
+            }
+            #ios-menu-sheet .grid a > div:first-child {
+                flex-shrink: 0 !important;
+            }
+            #ios-menu-sheet .grid a > div:last-child {
+                min-width: 0 !important;
+                flex: 1 1 0% !important;
+                overflow: hidden !important;
+            }
+            #ios-menu-sheet .grid a span {
+                display: block !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+        }
+
+        /* Saat berjalan sebagai Standalone PWA di iPhone (< 1024px) */
+        @media (max-width: 1023px) and (display-mode: standalone) {
+            #ios-bottom-bar {
+                bottom: calc(env(safe-area-inset-bottom, 0px) + 0.85rem) !important;
+            }
+            #ios-menu-sheet {
+                padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5.5rem) !important;
+            }
+            body {
+                padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5.5rem) !important;
+            }
+            main:not(.overflow-hidden), #main-content:not(.overflow-hidden) {
+                padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4.75rem) !important;
+            }
+        }
+    `;
+  document.head.appendChild(style);
+
+  // 2. Identifikasi Tab Aktif
+  const isKasir = currentPage.includes("dashboard");
+  const isRiwayat = currentPage.includes("riwayat");
+  const isProduct = currentPage.includes("product");
+  const isReport = currentPage.includes("report");
+  const isOtherModule = !isKasir && !isRiwayat && !isProduct && !isReport;
+
+  // 3. Bangun Floating Glass Bottom Navbar (Instagram / iOS Style)
+  const nav = document.createElement("nav");
+  nav.id = "ios-bottom-bar";
+  nav.className =
+    "lg:hidden fixed inset-x-3 sm:inset-x-8 max-w-md mx-auto z-40 rounded-[2.2rem] px-2 py-1.5 flex items-center justify-between";
+
+  nav.innerHTML = `
+        <!-- TAB 1: KASIR (DASHBOARD) -->
+        <a
+            href="dashboard.html"
+            class="ios-tab-btn flex-1 flex flex-col items-center justify-center gap-1 py-1 px-1.5 rounded-2xl transition-all duration-200 select-none ${isKasir ? "bg-gradient-to-tr from-blue-600 to-blue-500 text-white shadow-md shadow-blue-500/35 scale-105" : "text-slate-600 hover:text-blue-600"}"
+        >
+            <i class="fas fa-cash-register text-base ${isKasir ? "text-white" : ""}"></i>
+            <span class="text-[9.5px] font-black tracking-tight leading-none">Kasir</span>
+        </a>
+
+        <!-- TAB 2: RIWAYAT -->
+        <a
+            href="riwayat.html"
+            class="ios-tab-btn flex-1 flex flex-col items-center justify-center gap-1 py-1 px-1.5 rounded-2xl transition-all duration-200 select-none ${isRiwayat ? "bg-gradient-to-tr from-blue-600 to-blue-500 text-white shadow-md shadow-blue-500/35 scale-105" : "text-slate-600 hover:text-blue-600"}"
+        >
+            <i class="fas fa-receipt text-base ${isRiwayat ? "text-white" : ""}"></i>
+            <span class="text-[9.5px] font-black tracking-tight leading-none">Riwayat</span>
+        </a>
+
+        <!-- TAB 3: PRODUK -->
+        <a
+            href="product.html"
+            class="ios-tab-btn flex-1 flex flex-col items-center justify-center gap-1 py-1 px-1.5 rounded-2xl transition-all duration-200 select-none ${isProduct ? "bg-gradient-to-tr from-blue-600 to-blue-500 text-white shadow-md shadow-blue-500/35 scale-105" : "text-slate-600 hover:text-blue-600"}"
+        >
+            <i class="fas fa-boxes-stacked text-base ${isProduct ? "text-white" : ""}"></i>
+            <span class="text-[9.5px] font-black tracking-tight leading-none">Produk</span>
+        </a>
+
+        <!-- TAB 4: LAPORAN -->
+        <a
+            href="report.html"
+            class="ios-tab-btn flex-1 flex flex-col items-center justify-center gap-1 py-1 px-1.5 rounded-2xl transition-all duration-200 select-none ${isReport ? "bg-gradient-to-tr from-blue-600 to-blue-500 text-white shadow-md shadow-blue-500/35 scale-105" : "text-slate-600 hover:text-blue-600"}"
+        >
+            <i class="fas fa-chart-pie text-base ${isReport ? "text-white" : ""}"></i>
+            <span class="text-[9.5px] font-black tracking-tight leading-none">Laporan</span>
+        </a>
+
+        <!-- TAB 5: MENU (LAINNYA / DRAWER SHEET) -->
+        <button
+            type="button"
+            onclick="window.toggleIosMenuSheet(true)"
+            class="ios-tab-btn flex-1 flex flex-col items-center justify-center gap-1 py-1 px-1.5 rounded-2xl transition-all duration-200 cursor-pointer select-none ${isOtherModule ? "bg-gradient-to-tr from-blue-600 to-blue-500 text-white shadow-md shadow-blue-500/35 scale-105" : "text-slate-600 hover:text-blue-600"}"
+            title="Buka Menu Lainnya"
+        >
+            <i class="fas fa-bars-staggered text-base ${isOtherModule ? "text-white" : ""}"></i>
+            <span class="text-[9.5px] font-black tracking-tight leading-none">Menu</span>
+        </button>
+    `;
+  document.body.appendChild(nav);
+
+  // 4. Bangun iOS Glass Bottom Sheet Menu (Drawer Sheet)
+  const sheetContainer = document.createElement("div");
+  sheetContainer.id = "ios-menu-wrapper";
+  sheetContainer.className = "lg:hidden";
+
+  // Ambil info nama staf jika ada
+  const userDisplay =
+    document.querySelector(".user-name-display")?.innerText?.trim() ||
+    "Pengguna";
+
+  sheetContainer.innerHTML = `
+        <!-- Dimmed Backdrop -->
+        <div
+            id="ios-menu-backdrop"
+            onclick="window.toggleIosMenuSheet(false)"
+            class="fixed inset-0 bg-slate-950/25 backdrop-blur-sm z-[85] opacity-0 pointer-events-none transition-opacity duration-300"
+        ></div>
+
+        <!-- Bottom Sheet Modal (Liquid Glass Semi-Transparent) -->
+        <div
+            id="ios-menu-sheet"
+            class="fixed inset-x-0 bottom-0 z-[90] rounded-t-[2.5rem] p-6 pb-20 max-h-[88vh] overflow-y-auto transform translate-y-full transition-transform duration-300 pointer-events-auto"
+        >
+            <!-- Grab Handle -->
+            <div class="w-12 h-1.5 bg-slate-300/80 rounded-full mx-auto mb-5"></div>
+
+            <!-- Profile & Header Section -->
+            <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-200/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-sky-400 text-white flex items-center justify-center font-black text-sm shadow-md shadow-blue-500/25 shrink-0">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-black text-slate-800 truncate user-name-display">${userDisplay}</p>
+                        <p class="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Langgeng POS &bull; Cabang Aktif</p>
+                    </div>
+                </div>
+                <button
+                    type="button"
+                    onclick="window.toggleIosMenuSheet(false)"
+                    class="w-8 h-8 rounded-full bg-white/70 hover:bg-white text-slate-500 border border-white/60 flex items-center justify-center transition-all cursor-pointer shadow-2xs"
+                    title="Tutup Menu"
+                >
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Grid Menu Modules (App Icons iOS Style) -->
+            <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400 mb-3 ml-1">Modul Operasional</p>
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <!-- Purchase -->
+                <a
+                    href="purchase.html"
+                    class="flex flex-row items-center flex-nowrap gap-2.5 p-3 rounded-2xl border border-slate-100/80 hover:border-amber-300/80 transition-all active:scale-95 group overflow-hidden"
+                >
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-600 flex items-center justify-center shrink-0 shadow-2xs">
+                        <i class="fas fa-cart-shopping text-sm text-amber-600"></i>
+                    </div>
+                    <div class="min-w-0 flex-1 overflow-hidden">
+                        <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-amber-700 transition-colors">Purchase</span>
+                        <span class="text-[10px] text-slate-400 block truncate">Nota Pembelian</span>
+                    </div>
+                </a>
+
+                <!-- Pengeluaran -->
+                <a
+                    href="expense.html"
+                    class="flex flex-row items-center flex-nowrap gap-2.5 p-3 rounded-2xl border border-slate-100/80 hover:border-rose-300/80 transition-all active:scale-95 group overflow-hidden"
+                >
+                    <div class="w-10 h-10 rounded-xl bg-rose-500/15 text-rose-600 flex items-center justify-center shrink-0 shadow-2xs">
+                        <i class="fas fa-wallet text-sm text-rose-600"></i>
+                    </div>
+                    <div class="min-w-0 flex-1 overflow-hidden">
+                        <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-rose-700 transition-colors">Pengeluaran</span>
+                        <span class="text-[10px] text-slate-400 block truncate">Biaya & Operasional</span>
+                    </div>
+                </a>
+
+                <!-- Retur -->
+                <a
+                    href="retur.html"
+                    class="flex flex-row items-center flex-nowrap gap-2.5 p-3 rounded-2xl border border-slate-100/80 hover:border-purple-300/80 transition-all active:scale-95 group overflow-hidden"
+                >
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-600 flex items-center justify-center shrink-0 shadow-2xs">
+                        <i class="fas fa-rotate-left text-sm text-purple-600"></i>
+                    </div>
+                    <div class="min-w-0 flex-1 overflow-hidden">
+                        <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-purple-700 transition-colors">Retur Barang</span>
+                        <span class="text-[10px] text-slate-400 block truncate">Pengembalian Stok</span>
+                    </div>
+                </a>
+
+                <!-- Akuntansi -->
+                <a
+                    href="akuntansi.html"
+                    class="flex flex-row items-center flex-nowrap gap-2.5 p-3 rounded-2xl border border-slate-100/80 hover:border-cyan-300/80 transition-all active:scale-95 group overflow-hidden"
+                >
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/15 text-cyan-600 flex items-center justify-center shrink-0 shadow-2xs">
+                        <i class="fas fa-book text-sm text-cyan-600"></i>
+                    </div>
+                    <div class="min-w-0 flex-1 overflow-hidden">
+                        <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-cyan-700 transition-colors">Akuntansi</span>
+                        <span class="text-[10px] text-slate-400 block truncate">Jurnal & Buku Besar</span>
+                    </div>
+                </a>
+
+                <!-- Absensi -->
+                <a
+                    href="absensi.html"
+                    class="flex flex-row items-center flex-nowrap gap-2.5 p-3 rounded-2xl border border-slate-100/80 hover:border-teal-300/80 transition-all active:scale-95 group overflow-hidden"
+                >
+                    <div class="w-10 h-10 rounded-xl bg-teal-500/15 text-teal-600 flex items-center justify-center shrink-0 shadow-2xs">
+                        <i class="fas fa-calendar-check text-sm text-teal-600"></i>
+                    </div>
+                    <div class="min-w-0 flex-1 overflow-hidden">
+                        <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-teal-700 transition-colors">Absensi</span>
+                        <span class="text-[10px] text-slate-400 block truncate">Kehadiran Karyawan</span>
+                    </div>
+                </a>
+
+                <!-- Opname -->
+                <a
+                    href="opname.html"
+                    class="flex flex-row items-center flex-nowrap gap-2.5 p-3 rounded-2xl border border-slate-100/80 hover:border-orange-300/80 transition-all active:scale-95 group overflow-hidden"
+                >
+                    <div class="w-10 h-10 rounded-xl bg-orange-500/15 text-orange-600 flex items-center justify-center shrink-0 shadow-2xs">
+                        <i class="fas fa-clipboard-check text-sm text-orange-600"></i>
+                    </div>
+                    <div class="min-w-0 flex-1 overflow-hidden">
+                        <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-orange-700 transition-colors">Stock Opname</span>
+                        <span class="text-[10px] text-slate-400 block truncate">Penyesuaian Fisik</span>
+                    </div>
+                </a>
+
+                <!-- Pengguna & Log -->
+                <a
+                    href="online-users.html"
+                    class="col-span-2 flex flex-row items-center flex-nowrap gap-2.5 p-3 rounded-2xl border border-slate-100/80 hover:border-violet-300/80 transition-all active:scale-95 group overflow-hidden"
+                >
+                    <div class="w-10 h-10 rounded-xl bg-violet-500/15 text-violet-600 flex items-center justify-center shrink-0 shadow-2xs">
+                        <i class="fas fa-users-gear text-sm text-violet-600"></i>
+                    </div>
+                    <div class="min-w-0 flex-1 overflow-hidden">
+                        <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-violet-700 transition-colors">Pengguna & Log Aktivitas</span>
+                        <span class="text-[10px] text-slate-400 block truncate">Manajemen Hak Akses & Monitoring Kasir</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Tombol Keluar (Logout) -->
+            <button
+                type="button"
+                onclick="triggerMobileLogout()"
+                class="w-full py-3.5 px-4 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold flex items-center justify-center gap-2.5 border border-rose-200/80 shadow-2xs active:scale-98 transition-all cursor-pointer"
+            >
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="text-xs font-extrabold uppercase tracking-wide">Keluar dari Akun (Logout)</span>
+            </button>
+        </div>
+    `;
+  document.body.appendChild(sheetContainer);
+
+  // 4b. Role-Based Navigation Filter (Sidebar Desktop, Mobile Bottom Bar, & Mobile Sheet)
+  function applyRoleNavFilters() {
+    try {
+      const userData = (typeof window.getUserDataFromToken === "function")
+        ? window.getUserDataFromToken()
+        : null;
+      if (!userData) return;
+
+      const userRole = (userData.role || "kasir").toLowerCase().trim();
+      const normalizedRole = userRole.replace(/[-_]/g, "");
+
+      const permissionsMap = (typeof window.ROLE_PERMISSIONS === "object" && window.ROLE_PERMISSIONS)
+        ? window.ROLE_PERMISSIONS
+        : {
+            "super-admin": [
+              "dashboard.html", "riwayat.html", "product.html", "purchase.html",
+              "expense.html", "retur.html", "akuntansi.html", "absensi.html",
+              "report.html", "opname.html", "online-users.html",
+            ],
+            superadmin: [
+              "dashboard.html", "riwayat.html", "product.html", "purchase.html",
+              "expense.html", "retur.html", "akuntansi.html", "absensi.html",
+              "report.html", "opname.html", "online-users.html",
+            ],
+            admin: [
+              "riwayat.html", "product.html", "purchase.html",
+              "expense.html", "retur.html", "akuntansi.html", "absensi.html",
+              "report.html", "opname.html", "online-users.html",
+            ],
+            "super-kasir": [
+              "dashboard.html", "riwayat.html", "product.html", "purchase.html",
+              "expense.html", "retur.html", "opname.html",
+            ],
+            superkasir: [
+              "dashboard.html", "riwayat.html", "product.html", "purchase.html",
+              "expense.html", "retur.html", "opname.html",
+            ],
+            super_kasir: [
+              "dashboard.html", "riwayat.html", "product.html", "purchase.html",
+              "expense.html", "retur.html", "opname.html",
+            ],
+            supersubkasir: [
+              "dashboard.html", "riwayat.html", "product.html", "purchase.html",
+              "expense.html", "retur.html", "opname.html",
+            ],
+            "super-subkasir": [
+              "dashboard.html", "riwayat.html", "product.html", "purchase.html",
+              "expense.html", "retur.html", "opname.html",
+            ],
+            super_subkasir: [
+              "dashboard.html", "riwayat.html", "product.html", "purchase.html",
+              "expense.html", "retur.html", "opname.html",
+            ],
+            "super-sub-kasir": [
+              "dashboard.html", "riwayat.html", "product.html", "purchase.html",
+              "expense.html", "retur.html", "opname.html",
+            ],
+            super_sub_kasir: [
+              "dashboard.html", "riwayat.html", "product.html", "purchase.html",
+              "expense.html", "retur.html", "opname.html",
+            ],
+            kasir: [
+              "dashboard.html", "riwayat.html", "expense.html", "opname.html",
+            ],
+            akuntan: [
+              "riwayat.html", "product.html", "purchase.html", "expense.html",
+            ],
+          };
+
+      const allowedPages = permissionsMap[userRole] || permissionsMap[normalizedRole] || ["dashboard.html"];
+
+      // 1. Filter Desktop Sidebar
+      document.querySelectorAll("aside nav a").forEach((link) => {
+        const rawHref = link.getAttribute("href") || "";
+        const href = rawHref.split("?")[0].split("#")[0].split("/").pop();
+        if (href && href !== "" && href !== "#" && href !== "index.html") {
+          if (!allowedPages.includes(href)) {
+            link.style.display = "none";
+          } else {
+            link.style.display = "";
+          }
+        }
+      });
+
+      // 2. Filter Mobile Bottom Bar
+      document.querySelectorAll("#ios-bottom-bar a.ios-tab-btn").forEach((link) => {
+        const rawHref = link.getAttribute("href") || "";
+        const href = rawHref.split("?")[0].split("#")[0].split("/").pop();
+        if (href && href !== "" && href !== "#" && href !== "index.html") {
+          if (!allowedPages.includes(href)) {
+            link.style.display = "none";
+          } else {
+            link.style.display = "";
+          }
+        }
+      });
+
+      // 3. Filter Mobile Drawer Sheet Modules
+      document.querySelectorAll("#ios-menu-sheet .grid a").forEach((link) => {
+        const rawHref = link.getAttribute("href") || "";
+        const href = rawHref.split("?")[0].split("#")[0].split("/").pop();
+        if (href && href !== "" && href !== "#" && href !== "index.html") {
+          if (!allowedPages.includes(href)) {
+            link.style.display = "none";
+          } else {
+            link.style.display = "";
+          }
+        }
+      });
+    } catch (e) {
+      console.warn("applyRoleNavFilters error:", e);
+    }
+  }
+  window.applyRoleNavFilters = applyRoleNavFilters;
+  applyRoleNavFilters();
+
+  // 5. Toggle Functionality untuk iOS Bottom Sheet (Auto-Hide Bottom Bar & Notice Banner agar Bebas Overlap)
+  window.toggleIosMenuSheet = function (show) {
+    const backdrop = document.getElementById("ios-menu-backdrop");
+    const sheet = document.getElementById("ios-menu-sheet");
+    const bottomBar = document.getElementById("ios-bottom-bar");
+    const desktopNotice = document.getElementById("mobile-desktop-notice");
+    if (!backdrop || !sheet) return;
+
+    const isVisible = !backdrop.classList.contains("opacity-0");
+    const nextState = typeof show === "boolean" ? show : !isVisible;
+
+    if (nextState) {
+      applyRoleNavFilters();
+      backdrop.classList.remove("opacity-0", "pointer-events-none");
+      backdrop.classList.add("opacity-100", "pointer-events-auto");
+      sheet.classList.remove("translate-y-full");
+      sheet.classList.add("translate-y-0");
+      document.body.classList.add("overflow-hidden");
+      if (desktopNotice) {
+        desktopNotice.style.visibility = "hidden";
+      }
+      if (bottomBar) {
+        bottomBar.style.transform = "translate3d(0, 200%, 0)";
+        bottomBar.style.opacity = "0";
+        bottomBar.style.pointerEvents = "none";
+        bottomBar.style.transition = "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease";
+      }
+    } else {
+      backdrop.classList.remove("opacity-100", "pointer-events-auto");
+      backdrop.classList.add("opacity-0", "pointer-events-none");
+      sheet.classList.remove("translate-y-0");
+      sheet.classList.add("translate-y-full");
+      document.body.classList.remove("overflow-hidden");
+      if (desktopNotice) {
+        desktopNotice.style.visibility = "";
+      }
+      if (bottomBar) {
+        bottomBar.style.transform = "translate3d(0, 0, 0)";
+        bottomBar.style.opacity = "1";
+        bottomBar.style.pointerEvents = "auto";
+        bottomBar.style.transition = "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease";
+      }
+    }
+  };
+
+  // Override toggleSidebar agar tombol hamburger di mobile top bar juga membuka iOS Bottom Sheet
+  window.toggleSidebar = function () {
+    if (window.innerWidth < 1024) {
+      window.toggleIosMenuSheet();
+    } else {
+      const sidebar = document.getElementById("app-sidebar");
+      if (sidebar) {
+        sidebar.classList.remove("desktop-collapsed", "lg:hidden", "hidden", "-translate-x-full");
+      }
+    }
+  };
+  window.toggleMobileSidebar = window.toggleSidebar;
+
+  // Jaminan Desktop: Pastikan sidebar selalu tampil utuh dan rapi di layar desktop (>= 1024px)
+  function ensureDesktopSidebarVisible() {
+    if (window.innerWidth >= 1024) {
+      const sidebar = document.getElementById("app-sidebar");
+      if (sidebar) {
+        sidebar.classList.remove("desktop-collapsed", "lg:hidden", "hidden", "-translate-x-full");
+      }
+      const backdrop = document.getElementById("sidebar-backdrop");
+      if (backdrop) {
+        backdrop.classList.add("hidden");
+      }
+    }
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", ensureDesktopSidebarVisible, { permanent: true });
+  } else {
+    ensureDesktopSidebarVisible();
+  }
+  window.addEventListener("resize", ensureDesktopSidebarVisible, { permanent: true });
+
+  window.triggerMobileLogout = function () {
+    if (typeof confirmLogout === "function") {
+      confirmLogout();
+    } else if (typeof logout === "function") {
+      logout();
+    } else {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = "index.html";
+    }
+  };
+
+  // ========================================================
+  // Unified Mobile Row Action Popup (Single Action Button)
+  // ========================================================
+  window.showRowActionMenu = function (config) {
+    if (!config) return;
+    const title = config.title || "Pilih Aksi";
+    const subtitle = config.subtitle
+      ? `<p class="text-xs text-slate-400 mt-1">${config.subtitle}</p>`
+      : "";
+    const actions = config.actions || [];
+
+    const actionsHTML = actions
+      .map((act, i) => {
+        let btnBg = "bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200";
+        let iconColor = "text-slate-600";
+        if (act.color === "blue") {
+          btnBg = "bg-blue-50/80 hover:bg-blue-100 text-blue-700 border-blue-200";
+          iconColor = "text-blue-600";
+        } else if (act.color === "rose" || act.color === "red") {
+          btnBg = "bg-rose-50/80 hover:bg-rose-100 text-rose-700 border-rose-200";
+          iconColor = "text-rose-600";
+        } else if (act.color === "amber" || act.color === "orange") {
+          btnBg = "bg-amber-50/80 hover:bg-amber-100 text-amber-700 border-amber-200";
+          iconColor = "text-amber-600";
+        } else if (act.color === "emerald" || act.color === "green") {
+          btnBg = "bg-emerald-50/80 hover:bg-emerald-100 text-emerald-700 border-emerald-200";
+          iconColor = "text-emerald-600";
+        } else if (act.color === "indigo") {
+          btnBg = "bg-indigo-50/80 hover:bg-indigo-100 text-indigo-700 border-indigo-200";
+          iconColor = "text-indigo-600";
+        }
+
+        return `
+          <button
+            type="button"
+            data-action-index="${i}"
+            class="row-action-popup-item w-full px-3.5 py-2.5 rounded-xl ${btnBg} border font-bold text-xs sm:text-sm flex items-center gap-3 transition-all active:scale-98 text-left cursor-pointer shadow-2xs"
+          >
+            <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center shrink-0 shadow-2xs ${iconColor}">
+              <i class="${act.icon || "fas fa-arrow-right"} text-sm"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <span class="block font-bold leading-tight truncate">${act.label}</span>
+              ${act.desc ? `<span class="block text-[10px] text-slate-400 font-normal leading-tight mt-0.5 truncate">${act.desc}</span>` : ""}
+            </div>
+            <i class="fas fa-chevron-right text-[10px] text-slate-300 ml-auto"></i>
+          </button>
+        `;
+      })
+      .join("");
+
+    if (window.Swal) {
+      Swal.fire({
+        title: title,
+        html: `
+          ${subtitle}
+          <div class="flex flex-col gap-2 pt-3 text-left">
+            ${actionsHTML}
+          </div>
+        `,
+        showConfirmButton: false,
+        showCancelButton: true,
+        cancelButtonText: '<i class="fas fa-times mr-1"></i> Batal',
+        cancelButtonColor: "#94a3b8",
+        customClass: {
+          popup: "rounded-2xl max-w-xs sm:max-w-sm",
+          title: "text-base font-extrabold text-slate-800",
+        },
+        didOpen: () => {
+          const popup = Swal.getPopup();
+          if (popup) {
+            popup.querySelectorAll(".row-action-popup-item").forEach((btn) => {
+              btn.onclick = () => {
+                const idx = parseInt(btn.getAttribute("data-action-index"), 10);
+                Swal.close();
+                if (actions[idx] && typeof actions[idx].onClick === "function") {
+                  actions[idx].onClick();
+                }
+              };
+            });
+          }
+        },
+      });
+    }
+  };
+
+  // 6. Sinkronisasi Tab Aktif & Animasi Seamless Bottom Bar saat Navigasi SPA
+  function updateIosBottomBarActiveTab(url) {
+    const bottomBar = document.getElementById("ios-bottom-bar");
+    if (!bottomBar) return;
+    const pageName = (url || window.location.pathname).split("/").pop() || "dashboard.html";
+
+    const isKasir = pageName.includes("dashboard");
+    const isRiwayat = pageName.includes("riwayat");
+    const isProduct = pageName.includes("product");
+    const isReport = pageName.includes("report");
+    const isOtherModule = !isKasir && !isRiwayat && !isProduct && !isReport;
+
+    const tabs = bottomBar.querySelectorAll(".ios-tab-btn");
+    if (tabs.length < 5) return;
+
+    const activeClasses = ["bg-gradient-to-tr", "from-blue-600", "to-blue-500", "text-white", "shadow-md", "shadow-blue-500/35", "scale-105"];
+    const inactiveClasses = ["text-slate-600", "hover:text-blue-600"];
+
+    const states = [isKasir, isRiwayat, isProduct, isReport, isOtherModule];
+    tabs.forEach((tab, idx) => {
+      const isActive = states[idx];
+      const icon = tab.querySelector("i");
+      if (isActive) {
+        tab.classList.remove(...inactiveClasses);
+        tab.classList.add(...activeClasses);
+        if (icon) icon.classList.add("text-white");
+      } else {
+        tab.classList.remove(...activeClasses);
+        tab.classList.add(...inactiveClasses);
+        if (icon) icon.classList.remove("text-white");
+      }
+    });
+
+    // Tutup drawer sheet menu mobile secara halus jika sedang terbuka
+    if (typeof window.toggleIosMenuSheet === "function") {
+      window.toggleIosMenuSheet(false);
+    }
+  }
+
+  window.addEventListener("spa:navigated", (e) => {
+    applyRoleNavFilters();
+    updateIosBottomBarActiveTab(e.detail?.targetUrl);
+  }, { permanent: true });
+
+})();

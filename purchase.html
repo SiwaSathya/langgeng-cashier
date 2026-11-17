@@ -2,14 +2,26 @@
 <html lang="id">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+                <!-- Progressive Web App (PWA) Meta & Icons -->
+        <link rel="manifest" href="manifest.json" />
+        <meta name="theme-color" content="#2563EB" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Langgeng POS" />
+        <link rel="apple-touch-icon" href="logo.svg" />
+        <link rel="icon" type="image/svg+xml" href="logo.svg" />
         <title>Purchase Order - SmartPOS</title>
-        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="vendor/tailwindcss.js"></script>
         <link
             rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        />
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+        <script src="vendor/sweetalert2.all.min.js"></script>
+        <script defer src="vendor/alpine.min.js"></script>
+        <script src="spa-router.js"></script>
+        <script src="env.js"></script>
+        <script src="shortcuts.js" defer></script>
+        <script src="mobile-nav.js" defer></script>
         <style>
             @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap");
 
@@ -69,6 +81,68 @@
             tbody tr {
                 cursor: pointer;
             }
+
+            /* Pastikan tabel fit rapat ke data tanpa gap di bawah */
+            .overflow-x-auto,
+            .overflow-x-auto.custom-scroll,
+            table,
+            tbody {
+                padding-bottom: 0 !important;
+                margin-bottom: 0 !important;
+            }
+
+            /* Placeholder Minimalis Global */
+            #searchInput::placeholder,
+            input::placeholder,
+            textarea::placeholder {
+                font-size: 0.68rem !important;
+                font-weight: 400 !important;
+                color: #94a3b8 !important;
+                opacity: 0.9 !important;
+            }
+
+            @media (max-width: 639px) {
+                /* Compact padding & sizing for mobile table */
+                table th {
+                    padding: 0.4rem 0.45rem !important;
+                    font-size: 0.65rem !important;
+                }
+                table td {
+                    padding: 0.45rem 0.45rem !important;
+                    font-size: 0.72rem !important;
+                    line-height: 1.25 !important;
+                }
+                /* Compact input & select on mobile */
+                #searchInput {
+                    height: 2.15rem !important;
+                    min-height: 2.15rem !important;
+                    font-size: 0.72rem !important;
+                }
+                #searchInput::placeholder {
+                    font-size: 0.68rem !important;
+                    font-weight: 400 !important;
+                    color: #94a3b8 !important;
+                }
+                #groupBySelect {
+                    height: 2.15rem !important;
+                    min-height: 2.15rem !important;
+                    font-size: 0.72rem !important;
+                }
+                #purchaseModal input,
+                #purchaseModal select {
+                    padding: 0.45rem 0.6rem !important;
+                    font-size: 0.72rem !important;
+                }
+                #purchaseModal input::placeholder {
+                    font-size: 0.68rem !important;
+                }
+                /* Detail sub-table on mobile */
+                .detail-sub-table th,
+                .detail-sub-table td {
+                    padding: 0.35rem 0.45rem !important;
+                    font-size: 0.68rem !important;
+                }
+            }
         </style>
     </head>
 
@@ -88,32 +162,25 @@
             id="app-sidebar"
             class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 sm:p-8 fixed inset-y-0 left-0 z-50 h-full lg:static lg:h-full lg:shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out"
         >
-            <div class="flex items-center justify-between mb-8 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div
-                        class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
-                    >
-                        <i class="fas fa-store"></i>
+                        <div class="flex items-center mb-8 shrink-0">
+                <a href="dashboard.html" class="flex items-center gap-3 group">
+                    <img
+                        src="logo.svg"
+                        alt="Logo Langgeng Elektronika"
+                        class="w-10 h-10 shrink-0 drop-shadow-md rounded-xl transition-transform group-hover:scale-105"
+                    />
+                    <div>
+                        <h1 class="text-base font-black text-slate-900 tracking-tight leading-tight">
+                            LANGGENG
+                        </h1>
+                        <span class="text-[10px] font-extrabold text-blue-600 tracking-widest uppercase block -mt-0.5">
+                            ELEKTRONIKA POS
+                        </span>
                     </div>
-                    <h1
-                        class="text-xl font-extrabold text-slate-800 tracking-tight"
-                    >
-                        SMARTPOS
-                    </h1>
-                </div>
-                <button
-                    type="button"
-                    onclick="toggleSidebar()"
-                    class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                    title="Tutup / Collapse Sidebar"
-                    aria-label="Toggle Sidebar"
-                >
-                    <i class="fas fa-times text-lg lg:hidden"></i>
-                    <i class="fas fa-angles-left text-lg hidden lg:block"></i>
-                </button>
+                </a>
             </div>
 
-            <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
+                        <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
                 <a
                     href="dashboard.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
@@ -124,8 +191,7 @@
                     href="riwayat.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-history"></i>
-                    <span>Riwayat Transaksi</span>
+                    <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
                 </a>
                 <a
                     href="product.html"
@@ -137,8 +203,7 @@
                     href="purchase.html"
                     class="flex items-center gap-4 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100"
                 >
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Riwayat Purchase</span>
+                    <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
                 </a>
                 <a
                     href="expense.html"
@@ -156,79 +221,66 @@
                     href="akuntansi.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-book-open"></i>
-                    <span>Jurnal & Keuangan</span>
+                    <i class="fas fa-book-open"></i> <span>Jurnal & Keuangan</span>
                 </a>
                 <a
                     href="absensi.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Absensi Karyawan</span>
+                    <i class="fas fa-calendar-check"></i> <span>Absensi Karyawan</span>
                 </a>
                 <a
                     href="report.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Laporan Analitik</span>
+                    <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
                 </a>
                 <a
                     href="opname.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Stock Opname</span>
+                    <i class="fas fa-clipboard-check"></i> <span>Stock Opname</span>
+                </a>
+                <a
+                    href="online-users.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-user-clock"></i> <span>Pengguna & Log</span>
                 </a>
             </nav>
 
-            <div class="pt-6 border-t border-slate-100 shrink-0">
-                <div class="bg-slate-50 p-4 rounded-2xl mb-4">
+                        <div class="pt-6 border-t border-slate-100 shrink-0">
+                <div class="bg-slate-50 p-4 rounded-2xl mb-4 border border-slate-100">
                     <p
                         class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"
                     >
-                        User Aktif
+                        Login Sebagai
                     </p>
-                    <p class="font-bold text-slate-700 user-name-display">
-                        Kasir
+                    <p class="font-bold text-slate-700 user-name-display truncate">
+                        Pengguna
                     </p>
                 </div>
-                <a
-                    href="#"
+                <button
+                    type="button"
                     onclick="confirmLogout()"
-                    class="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all"
+                    class="w-full flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all cursor-pointer"
                 >
                     <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
-                </a>
+                </button>
             </div>
         </aside>
 
-        <!-- Mobile Top Bar -->
+                <!-- Mobile Top Bar -->
         <div
-            class="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full"
+            class="lg:hidden bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full h-14"
         >
-            <div class="flex items-center gap-3">
-                <button
-                    type="button"
-                    onclick="toggleSidebar()"
-                    class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-xl focus:outline-none"
-                    aria-label="Buka Menu"
-                >
-                    <i class="fas fa-bars text-lg"></i>
-                </button>
-                <span
-                    class="font-extrabold text-slate-800 tracking-tight flex items-center gap-2"
-                >
-                    <span
-                        class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs shadow"
-                        ><i class="fas fa-store"></i
-                    ></span>
-                    SMARTPOS
-                </span>
+            <div class="flex items-center gap-2 shrink-0">
+                <img src="logo.svg" alt="Logo" class="w-7 h-7 rounded-lg shrink-0 drop-shadow-sm" />
+                <span class="font-extrabold text-slate-800 tracking-tight text-sm">LANGGENG POS</span>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 shrink-0 ml-auto min-w-0">
                 <span
-                    class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg user-name-display"
+                    class="text-[11px] font-bold text-slate-700 bg-slate-100 border border-slate-200/80 px-2.5 py-1 rounded-lg truncate max-w-[140px] user-name-display text-center leading-tight inline-block"
                     >Kasir</span
                 >
             </div>
@@ -237,76 +289,67 @@
         <!-- MAIN CONTENT -->
         <main
             id="main-content"
-            class="flex-1 p-4 sm:p-6 lg:p-10 min-w-0 w-full overflow-y-auto custom-scroll"
+            class="flex-1 p-3.5 sm:p-6 lg:p-10 min-w-0 w-full overflow-y-auto custom-scroll"
         >
             <!-- HEADER SECTION -->
             <div
-                class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8"
+                class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-8"
             >
                 <div class="flex items-center gap-3">
-                    <button
-                        type="button"
-                        onclick="toggleSidebar()"
-                        class="hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-blue-600 shadow-sm transition-all cursor-pointer shrink-0"
-                        title="Buka / Tutup Sidebar"
-                        aria-label="Toggle Sidebar"
-                    >
-                        <i class="fas fa-bars text-sm"></i>
-                    </button>
-                    <div>
+                    <div class="min-w-0">
                         <h1
-                            class="text-3xl font-800 text-slate-800 tracking-tight"
+                            class="text-lg sm:text-3xl font-extrabold text-slate-800 tracking-tight"
                         >
                             Purchase Order
                         </h1>
-                        <p class="text-slate-400 mt-1 font-medium">
+                        <p class="text-slate-400 mt-0.5 sm:mt-1 font-medium text-xs sm:text-sm">
                             Catat dan pantau transaksi pembelian stok barang per
                             nota & supplier.
                         </p>
                     </div>
                 </div>
-                <div>
+                <div class="w-full sm:w-auto">
                     <button
+                        type="button"
                         onclick="openModal()"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-blue-100"
+                        class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-7 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold flex items-center justify-center gap-2 sm:gap-3 transition-all shadow-md sm:shadow-xl shadow-blue-500/10 text-xs sm:text-sm cursor-pointer"
                     >
-                        <i class="fas fa-plus text-sm"></i> Tambah Purchase
-                        (Nota Baru)
+                        <i class="fas fa-plus text-xs sm:text-sm"></i> <span>Tambah Purchase (Nota Baru)</span>
                     </button>
                 </div>
             </div>
 
             <!-- TABLE CARD -->
             <div
-                class="bg-white rounded-2xl sm:rounded-[2.5rem] shadow-sm border border-slate-200 animate-fade-in flex flex-col overflow-hidden"
+                class="bg-white rounded-xl sm:rounded-[2.5rem] shadow-sm border border-slate-200 animate-fade-in flex flex-col overflow-hidden"
             >
                 <!-- Toolbar Filter -->
                 <div
-                    class="p-6 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4 bg-white"
+                    class="p-3 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 bg-white"
                 >
-                    <div class="relative flex-1 min-w-[280px]">
+                    <div class="relative w-full sm:flex-1 sm:min-w-[280px]">
                         <i
-                            class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"
+                            class="fas fa-search absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm"
                         ></i>
                         <input
                             type="text"
                             id="searchInput"
                             onkeyup="debounceSearch()"
-                            placeholder="Cari nota, barang, atau supplier..."
-                            class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 text-xs font-semibold text-slate-700 transition-all"
+                            placeholder="Cari nota, supplier, barang..."
+                            class="w-full pl-8 sm:pl-11 pr-3 sm:pr-4 py-1.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 text-xs font-semibold text-slate-700 transition-all placeholder:text-slate-400 placeholder:text-[10.5px] sm:placeholder:text-xs placeholder:font-normal"
                         />
                     </div>
 
-                    <div class="flex items-center gap-3">
-                        <div class="flex items-center gap-2">
+                    <div class="w-full sm:w-auto flex items-center gap-2">
+                        <div class="flex-1 sm:flex-initial flex items-center gap-2 min-w-0">
                             <span
-                                class="text-xs font-bold text-slate-400 uppercase tracking-wider"
+                                class="hidden sm:inline-block text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap"
                                 >Group By:</span
                             >
                             <select
                                 id="groupBySelect"
                                 onchange="onGroupByChanged()"
-                                class="bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl text-xs font-bold text-slate-700 outline-none cursor-pointer focus:border-blue-500"
+                                class="w-full sm:w-auto bg-slate-50 border border-slate-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-xs font-bold text-slate-700 outline-none cursor-pointer focus:border-blue-500 h-[2.15rem] sm:h-auto"
                             >
                                 <option value="nota">📋 Group by Nota</option>
                                 <option value="supplier">
@@ -316,10 +359,11 @@
                         </div>
 
                         <button
+                            type="button"
                             onclick="fetchPurchases(currentPage)"
-                            class="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-600 px-4 py-3 rounded-2xl font-bold border border-slate-200 text-xs transition-all"
+                            class="shrink-0 flex items-center justify-center gap-1.5 sm:gap-2 bg-slate-50 hover:bg-slate-100 text-slate-600 px-3.5 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl font-bold border border-slate-200 text-xs transition-all cursor-pointer h-[2.15rem] sm:h-auto shadow-2xs"
                         >
-                            <i class="fas fa-sync-alt"></i> Refresh
+                            <i class="fas fa-sync-alt text-xs"></i> <span>Refresh</span>
                         </button>
                     </div>
                 </div>
@@ -341,7 +385,8 @@
                 <!-- Table Content -->
                 <div class="overflow-x-auto custom-scroll">
                     <table
-                        class="w-full text-left border-collapse min-w-[780px]"
+                        id="purchaseTable"
+                        class="w-full text-left border-collapse min-w-full sm:min-w-[780px]"
                     >
                         <thead>
                             <tr
@@ -372,7 +417,7 @@
                 <!-- PAGINATION CONTROLS (10 Group Per Halaman) -->
                 <div
                     id="paginationContainer"
-                    class="p-6 px-8 bg-slate-50/50 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4"
+                    class="p-3.5 sm:p-6 px-4 sm:px-8 bg-slate-50/50 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4"
                 >
                     <p class="text-xs text-slate-500 font-medium">
                         Menampilkan
@@ -392,37 +437,38 @@
         <!-- MODAL FORM BATCH PURCHASE (LOKASI OTOMATIS SESUAI SESI LOGIN) -->
         <div
             id="purchaseModal"
-            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4"
+            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-2 sm:p-4"
         >
             <div
-                class="bg-white rounded-2xl sm:rounded-[2.5rem] w-full max-w-4xl shadow-2xl animate-fade-in overflow-hidden flex flex-col max-h-[92vh]"
+                class="bg-white rounded-2xl sm:rounded-[2.5rem] w-full max-w-4xl shadow-2xl animate-fade-in overflow-hidden flex flex-col max-h-[94vh] sm:max-h-[92vh]"
             >
                 <!-- Modal Header -->
                 <div
-                    class="p-6 px-8 border-b border-slate-100 flex justify-between items-center bg-white shrink-0"
+                    class="p-4 sm:p-6 px-4 sm:px-8 border-b border-slate-100 flex justify-between items-center bg-white shrink-0"
                 >
-                    <div>
-                        <h2 class="text-xl font-extrabold text-slate-800">
+                    <div class="min-w-0 pr-2">
+                        <h2 class="text-base sm:text-xl font-extrabold text-slate-800 truncate">
                             Input Purchase Order (Per Nota)
                         </h2>
-                        <p class="text-xs text-slate-400 mt-0.5">
-                            Satu nota untuk pembelian beberapa produk sekaligus
-                            dari supplier.
+                        <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5 truncate">
+                            Satu nota untuk pembelian beberapa produk sekaligus dari supplier.
                         </p>
                     </div>
                     <button
+                        type="button"
                         onclick="closeModal()"
-                        class="text-slate-300 hover:text-rose-500 text-xl transition-colors"
+                        class="w-8 h-8 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-500 flex items-center justify-center transition-colors shrink-0 cursor-pointer"
+                        aria-label="Tutup Modal"
                     >
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-times text-sm"></i>
                     </button>
                 </div>
 
                 <!-- Modal Body -->
-                <div class="p-4 sm:p-8 overflow-y-auto custom-scroll space-y-6">
+                <div class="p-3.5 sm:p-8 overflow-y-auto custom-scroll space-y-3.5 sm:space-y-6">
                     <!-- 1. Header Informasi Nota & Supplier -->
                     <div
-                        class="bg-slate-50 p-6 rounded-2xl border border-slate-200/70 space-y-4"
+                        class="bg-slate-50 p-3.5 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200/70 space-y-3 sm:space-y-4"
                     >
                         <p
                             class="text-[10px] font-black uppercase text-blue-600 tracking-wider flex items-center gap-1.5"
@@ -430,7 +476,7 @@
                             <i class="fas fa-file-invoice"></i> Informasi Nota &
                             Supplier
                         </p>
-                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2.5 sm:gap-4">
                             <div>
                                 <label
                                     class="block text-[10px] font-bold text-slate-400 uppercase mb-1"
@@ -438,7 +484,7 @@
                                 >
                                 <select
                                     id="doc_type"
-                                    class="w-full bg-white border border-slate-200 p-3 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-blue-500 cursor-pointer"
+                                    class="w-full bg-white border border-slate-200 p-2 sm:p-3 rounded-lg sm:rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-blue-500 cursor-pointer"
                                 >
                                     <option value="Nota Faktur">
                                         🧾 Nota / Faktur
@@ -458,7 +504,7 @@
                                     id="nota"
                                     required
                                     placeholder="Contoh: PBL-202610-001"
-                                    class="w-full bg-white border border-slate-200 p-3 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-blue-500"
+                                    class="w-full bg-white border border-slate-200 p-2 sm:p-3 rounded-lg sm:rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-blue-500"
                                 />
                             </div>
                             <div>
@@ -470,7 +516,7 @@
                                     type="date"
                                     id="tanggal"
                                     required
-                                    class="w-full bg-white border border-slate-200 p-3 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
+                                    class="w-full bg-white border border-slate-200 p-2 sm:p-3 rounded-lg sm:rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
                                 />
                             </div>
                             <div class="relative">
@@ -485,7 +531,7 @@
                                     oninput="searchSupplier()"
                                     autocomplete="off"
                                     placeholder="Pilih supplier..."
-                                    class="w-full bg-white border border-slate-200 p-3 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
+                                    class="w-full bg-white border border-slate-200 p-2 sm:p-3 rounded-lg sm:rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
                                 />
                                 <input type="hidden" id="supplier_id" />
                                 <div
@@ -494,13 +540,13 @@
                                 ></div>
                             </div>
                             <!-- Lokasi Toko: Readonly dari Session Akun Login -->
-                            <div>
+                            <div class="sm:col-span-2 md:col-span-1">
                                 <label
                                     class="block text-[10px] font-bold text-slate-400 uppercase mb-1"
                                     >Lokasi Toko (Sesi)</label
                                 >
                                 <div
-                                    class="w-full bg-slate-100 border border-slate-200 p-3 rounded-xl text-xs font-bold text-slate-700 flex items-center gap-2"
+                                    class="w-full bg-slate-100 border border-slate-200 p-2 sm:p-3 rounded-lg sm:rounded-xl text-xs font-bold text-slate-700 flex items-center gap-2"
                                 >
                                     <i class="fas fa-store text-blue-500"></i>
                                     <span id="displayUserLocation"
@@ -513,7 +559,7 @@
 
                     <!-- 2. Form Input Tambah Barang ke List -->
                     <div
-                        class="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 space-y-4"
+                        class="bg-blue-50/50 p-3.5 sm:p-6 rounded-xl sm:rounded-2xl border border-blue-100 space-y-3 sm:space-y-4"
                     >
                         <p
                             class="text-[10px] font-black uppercase text-blue-600 tracking-wider flex items-center gap-1.5"
@@ -522,7 +568,7 @@
                             Barang ke Nota
                         </p>
                         <div
-                            class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end"
+                            class="grid grid-cols-1 md:grid-cols-12 gap-2.5 sm:gap-3 items-end"
                         >
                             <div class="relative md:col-span-6">
                                 <label
@@ -540,7 +586,7 @@
                                         oninput="searchProduct()"
                                         autocomplete="off"
                                         placeholder="Ketik nama atau kode barang..."
-                                        class="w-full bg-white border border-slate-200 pl-9 pr-3 py-3 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-blue-500"
+                                        class="w-full bg-white border border-slate-200 pl-9 pr-3 py-2 sm:py-3 rounded-lg sm:rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-blue-500"
                                     />
                                 </div>
                                 <input type="hidden" id="product_id" />
@@ -551,38 +597,41 @@
                                     class="absolute bg-white border border-slate-200 rounded-xl shadow-xl w-full mt-1 hidden max-h-56 overflow-y-auto z-50 custom-scroll text-xs"
                                 ></div>
                             </div>
-                            <div class="md:col-span-2">
-                                <label
-                                    class="block text-[10px] font-bold text-slate-400 uppercase mb-1"
-                                    >Jumlah Qty *</label
-                                >
-                                <input
-                                    type="number"
-                                    id="inp_qty"
-                                    min="1"
-                                    value="1"
-                                    class="w-full bg-white border border-slate-200 p-3 rounded-xl text-xs font-bold text-center text-slate-700 outline-none focus:border-blue-500"
-                                />
-                            </div>
-                            <div class="md:col-span-3">
-                                <label
-                                    class="block text-[10px] font-bold text-slate-400 uppercase mb-1"
-                                    >Harga Beli Satuan (Rp) *</label
-                                >
-                                <input
-                                    type="number"
-                                    id="inp_h_beli"
-                                    placeholder="0"
-                                    class="w-full bg-white border border-slate-200 p-3 rounded-xl text-xs font-bold text-right text-blue-600 outline-none focus:border-blue-500"
-                                />
+                            <div class="grid grid-cols-2 md:contents gap-2 sm:gap-3">
+                                <div class="md:col-span-2">
+                                    <label
+                                        class="block text-[10px] font-bold text-slate-400 uppercase mb-1"
+                                        >Jumlah Qty *</label
+                                    >
+                                    <input
+                                        type="number"
+                                        id="inp_qty"
+                                        min="1"
+                                        value="1"
+                                        class="w-full bg-white border border-slate-200 p-2 sm:p-3 rounded-lg sm:rounded-xl text-xs font-bold text-center text-slate-700 outline-none focus:border-blue-500"
+                                    />
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label
+                                        class="block text-[10px] font-bold text-slate-400 uppercase mb-1"
+                                        >Harga Beli Satuan (Rp) *</label
+                                    >
+                                    <input
+                                        type="number"
+                                        id="inp_h_beli"
+                                        placeholder="0"
+                                        class="w-full bg-white border border-slate-200 p-2 sm:p-3 rounded-lg sm:rounded-xl text-xs font-bold text-right text-blue-600 outline-none focus:border-blue-500"
+                                    />
+                                </div>
                             </div>
                             <div class="md:col-span-1">
                                 <button
                                     type="button"
                                     onclick="addToPurchaseCart()"
-                                    class="w-full bg-emerald-500 hover:bg-emerald-600 text-white h-[42px] rounded-xl font-bold flex items-center justify-center transition-all shadow-sm"
+                                    class="w-full bg-emerald-500 hover:bg-emerald-600 text-white h-[38px] sm:h-[42px] rounded-lg sm:rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer"
                                 >
-                                    <i class="fas fa-plus"></i>
+                                    <i class="fas fa-plus text-xs"></i>
+                                    <span class="md:hidden text-xs">Tambah</span>
                                 </button>
                             </div>
                         </div>
@@ -590,10 +639,10 @@
 
                     <!-- 3. Tabel List Barang yang Ditambahkan -->
                     <div
-                        class="bg-white rounded-2xl border border-slate-200 overflow-hidden"
+                        class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden"
                     >
                         <div
-                            class="p-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center"
+                            class="p-3 sm:p-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center"
                         >
                             <span
                                 class="text-xs font-bold text-slate-700 uppercase tracking-wider"
@@ -611,17 +660,17 @@
                                     class="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase border-b border-slate-100 sticky top-0"
                                 >
                                     <tr>
-                                        <th class="p-3 pl-4">Barang</th>
-                                        <th class="p-3 text-center w-24">
+                                        <th class="p-2.5 sm:p-3 pl-3 sm:pl-4">Barang</th>
+                                        <th class="p-2.5 sm:p-3 text-center w-16 sm:w-24">
                                             Qty
                                         </th>
-                                        <th class="p-3 text-right w-36">
+                                        <th class="p-2.5 sm:p-3 text-right w-28 sm:w-36">
                                             Harga Beli
                                         </th>
-                                        <th class="p-3 text-right w-36">
+                                        <th class="p-2.5 sm:p-3 text-right w-28 sm:w-36">
                                             Subtotal
                                         </th>
-                                        <th class="p-3 text-center w-16"></th>
+                                        <th class="p-2.5 sm:p-3 text-center w-12 sm:w-16"></th>
                                     </tr>
                                 </thead>
                                 <tbody
@@ -631,24 +680,23 @@
                                     <tr>
                                         <td
                                             colspan="5"
-                                            class="py-10 text-center text-slate-300 italic"
+                                            class="py-8 sm:py-10 text-center text-slate-300 italic text-xs"
                                         >
-                                            Belum ada barang dimasukkan ke nota
-                                            ini
+                                            Belum ada barang dimasukkan ke nota ini
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div
-                            class="p-4 bg-slate-50/60 border-t border-slate-100 flex justify-between items-center"
+                            class="p-3 sm:p-4 bg-slate-50/60 border-t border-slate-100 flex justify-between items-center"
                         >
                             <span class="text-xs font-bold text-slate-500"
                                 >Total Pembelian Nota:</span
                             >
                             <span
                                 id="grandTotalPreview"
-                                class="text-base font-extrabold text-blue-600"
+                                class="text-sm sm:text-base font-extrabold text-blue-600"
                                 >Rp 0</span
                             >
                         </div>
@@ -657,21 +705,21 @@
 
                 <!-- Modal Footer -->
                 <div
-                    class="p-6 px-8 border-t border-slate-100 flex justify-end gap-3 bg-white shrink-0"
+                    class="p-3.5 sm:p-6 px-4 sm:px-8 border-t border-slate-100 flex items-center justify-end gap-2 sm:gap-3 bg-white shrink-0"
                 >
                     <button
                         type="button"
                         onclick="closeModal()"
-                        class="px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-all"
+                        class="px-4 sm:px-6 py-2 sm:py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-all cursor-pointer"
                     >
                         Batal
                     </button>
                     <button
                         type="button"
                         onclick="submitBatchPurchase()"
-                        class="px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-lg shadow-blue-100 flex items-center gap-2"
+                        class="flex-1 sm:flex-initial px-5 sm:px-8 py-2 sm:py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-md sm:shadow-lg shadow-blue-500/15 flex items-center justify-center gap-2 cursor-pointer"
                     >
-                        <i class="fas fa-save"></i> Simpan Transaksi Purchase
+                        <i class="fas fa-save"></i> <span>Simpan Transaksi Purchase</span>
                     </button>
                 </div>
             </div>
@@ -679,8 +727,8 @@
 
         <!-- JAVASCRIPT LOGIC -->
         <script>
-            const BASE_URL =
-                "https://langgeng-cashier-backend-production.up.railway.app";
+            var BASE_URL = window.BASE_URL || "http://127.0.0.1:4000";
+            var API_URL = window.API_URL || (BASE_URL + "/api");
             let localPurchaseData = [];
             let purchaseCart = [];
             let currentPage = 1;
@@ -781,26 +829,41 @@
 
                 if (groupBy === "supplier") {
                     tableHeaderRow.innerHTML = `
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4 whitespace-nowrap">Nama Supplier</th>
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4 text-center whitespace-nowrap">Jumlah Transaksi</th>
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4">Daftar Barang</th>
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4 text-center whitespace-nowrap">Total Qty</th>
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4 text-right whitespace-nowrap">DPP</th>
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4 text-right whitespace-nowrap">PPN (11%)</th>
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4 text-right whitespace-nowrap">Total Tagihan</th>
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4 text-center whitespace-nowrap w-24">Detail</th>
+                        <th class="px-2.5 py-2.5 sm:px-5 sm:py-4">
+                            <span class="sm:hidden">Supplier</span>
+                            <span class="hidden sm:inline">Nama Supplier</span>
+                        </th>
+                        <th class="hidden sm:table-cell px-3.5 py-3.5 sm:px-5 sm:py-4 text-center whitespace-nowrap">Jumlah Transaksi</th>
+                        <th class="px-2.5 py-2.5 sm:px-5 sm:py-4">
+                            <span class="sm:hidden">Barang & Qty</span>
+                            <span class="hidden sm:inline">Daftar Barang</span>
+                        </th>
+                        <th class="hidden sm:table-cell px-3.5 py-3.5 sm:px-5 sm:py-4 text-center whitespace-nowrap">Total Qty</th>
+                        <th class="hidden sm:table-cell px-3.5 py-3.5 sm:px-5 sm:py-4 text-right whitespace-nowrap">DPP</th>
+                        <th class="hidden sm:table-cell px-3.5 py-3.5 sm:px-5 sm:py-4 text-right whitespace-nowrap">PPN (11%)</th>
+                        <th class="px-2.5 py-2.5 sm:px-5 sm:py-4 text-right whitespace-nowrap">Total Tagihan</th>
+                        <th class="px-2 py-2.5 sm:px-5 sm:py-4 text-center whitespace-nowrap w-12 sm:w-24">Detail</th>
                     `;
                 } else {
                     tableHeaderRow.innerHTML = `
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4 whitespace-nowrap">No. Dokumen & Status</th>
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4 whitespace-nowrap">Tanggal</th>
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4 whitespace-nowrap">Supplier</th>
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4">Item Barang</th>
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4 text-center whitespace-nowrap">Total Qty</th>
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4 text-right whitespace-nowrap">DPP</th>
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4 text-right whitespace-nowrap">PPN (11%)</th>
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4 text-right whitespace-nowrap">Total Pembelian</th>
-                        <th class="px-3.5 py-3.5 sm:px-5 sm:py-4 text-center whitespace-nowrap w-28 sm:w-32">Aksi</th>
+                        <th class="px-2.5 py-2.5 sm:px-5 sm:py-4">
+                            <span class="sm:hidden">Dokumen & Toko</span>
+                            <span class="hidden sm:inline">No. Dokumen & Status</span>
+                        </th>
+                        <th class="hidden sm:table-cell px-3.5 py-3.5 sm:px-5 sm:py-4 whitespace-nowrap">Tanggal</th>
+                        <th class="hidden sm:table-cell px-3.5 py-3.5 sm:px-5 sm:py-4 whitespace-nowrap">Supplier</th>
+                        <th class="px-2.5 py-2.5 sm:px-5 sm:py-4">
+                            <span class="sm:hidden">Barang & Qty</span>
+                            <span class="hidden sm:inline">Item Barang</span>
+                        </th>
+                        <th class="hidden sm:table-cell px-3.5 py-3.5 sm:px-5 sm:py-4 text-center whitespace-nowrap">Total Qty</th>
+                        <th class="hidden sm:table-cell px-3.5 py-3.5 sm:px-5 sm:py-4 text-right whitespace-nowrap">DPP</th>
+                        <th class="hidden sm:table-cell px-3.5 py-3.5 sm:px-5 sm:py-4 text-right whitespace-nowrap">PPN (11%)</th>
+                        <th class="px-2.5 py-2.5 sm:px-5 sm:py-4 text-right whitespace-nowrap">
+                            <span class="sm:hidden">Total (Rp)</span>
+                            <span class="hidden sm:inline">Total Pembelian</span>
+                        </th>
+                        <th class="px-2 py-2.5 sm:px-5 sm:py-4 text-center whitespace-nowrap w-16 sm:w-32">Aksi</th>
                     `;
                 }
 
@@ -833,6 +896,10 @@
 
                     document.getElementById("countInfo").innerText =
                         meta.total || data.length;
+
+                    const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                    const curRole = (curUser.role || "").toLowerCase().replace(/[-_]/g, "");
+                    const canModifyPurchase = (curRole === "admin" || curRole === "superadmin");
 
                     if (data.length === 0) {
                         emptyState.classList.remove("hidden");
@@ -940,26 +1007,37 @@
 
                         if (groupBy === "supplier") {
                             mainRow.innerHTML = `
-                                <td class="px-3.5 py-3 sm:px-5 sm:py-4 whitespace-nowrap">
-                                    <div class="font-extrabold text-slate-800 flex items-center gap-2">
-                                        <i class="fas fa-building text-blue-500"></i> ${escapeHTML(group.group_key || supplierName)}
+                                <td class="px-2.5 py-2.5 sm:px-5 sm:py-4">
+                                    <div class="font-extrabold text-slate-800 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
+                                        <i class="fas fa-building text-blue-500 text-xs"></i> ${escapeHTML(group.group_key || supplierName)}
                                     </div>
-                                    <span class="text-[10px] text-slate-400 font-bold">${escapeHTML(group.location || "Toko Utama")}</span>
+                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                        <span class="sm:hidden text-[9px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-bold border border-blue-100">${items.length} Transaksi</span>
+                                        <span class="text-[9.5px] sm:text-[10px] text-slate-400 font-bold">${escapeHTML(group.location || "Toko Utama")}</span>
+                                    </div>
                                 </td>
-                                <td class="p-5 text-center">
+                                <td class="hidden sm:table-cell p-5 text-center">
                                     <span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg text-xs font-bold border border-blue-100">${items.length} Baris Pembelian</span>
                                 </td>
-                                <td class="px-3.5 py-3 sm:px-5 sm:py-4 min-w-[160px]">${productSummary}</td>
-                                <td class="px-3.5 py-3 sm:px-5 sm:py-4 text-center font-extrabold text-slate-700 whitespace-nowrap text-xs sm:text-sm">${totalQty} Unit</td>
-                                <td class="px-3.5 py-3 sm:px-5 sm:py-4 text-right font-mono font-bold text-slate-600 whitespace-nowrap text-xs sm:text-sm">Rp ${dppAmount.toLocaleString("id-ID")}</td>
-                                <td class="px-3.5 py-3 sm:px-5 sm:py-4 text-right font-mono font-bold text-emerald-600 whitespace-nowrap text-xs sm:text-sm">Rp ${ppnAmount.toLocaleString("id-ID")}</td>
-                                <td class="px-3.5 py-3 sm:px-5 sm:py-4 text-right font-mono font-black text-slate-900 whitespace-nowrap text-xs sm:text-sm">Rp ${totalAmount.toLocaleString("id-ID")}</td>
-                                <td class="p-5 text-center">
+                                <td class="px-2.5 py-2.5 sm:px-5 sm:py-4 sm:min-w-[160px]">
+                                    ${productSummary}
+                                    <div class="sm:hidden text-[10px] text-blue-600 font-bold mt-0.5">
+                                        ${totalQty} Unit
+                                    </div>
+                                </td>
+                                <td class="hidden sm:table-cell px-3.5 py-3 sm:px-5 sm:py-4 text-center font-extrabold text-slate-700 whitespace-nowrap text-xs sm:text-sm">${totalQty} Unit</td>
+                                <td class="hidden sm:table-cell px-3.5 py-3 sm:px-5 sm:py-4 text-right font-mono font-bold text-slate-600 whitespace-nowrap text-xs sm:text-sm">Rp ${dppAmount.toLocaleString("id-ID")}</td>
+                                <td class="hidden sm:table-cell px-3.5 py-3 sm:px-5 sm:py-4 text-right font-mono font-bold text-emerald-600 whitespace-nowrap text-xs sm:text-sm">Rp ${ppnAmount.toLocaleString("id-ID")}</td>
+                                <td class="px-2.5 py-2.5 sm:px-5 sm:py-4 text-right whitespace-nowrap">
+                                    <div class="font-mono font-black text-slate-900 text-[11px] sm:text-sm">Rp ${totalAmount.toLocaleString("id-ID")}</div>
+                                    <div class="sm:hidden text-[8.5px] text-slate-400 font-mono mt-0.5">DPP: ${dppAmount.toLocaleString("id-ID")}</div>
+                                </td>
+                                <td class="px-2 py-2.5 sm:px-5 sm:py-4 text-center whitespace-nowrap">
                                     ${
                                         items.length > 0
                                             ? `
-                                        <button onclick="toggleDetailRow(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2 rounded-xl transition-all" title="Buka Detail">
-                                            <i id="toggle-icon-${idx}" class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
+                                        <button onclick="toggleDetailRow(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-1.5 sm:p-2 rounded-lg sm:rounded-xl transition-all cursor-pointer" title="Buka Detail">
+                                            <i id="toggle-icon-${idx}" class="fas fa-chevron-down text-[10px] sm:text-xs transition-transform duration-200"></i>
                                         </button>
                                     `
                                             : "-"
@@ -984,39 +1062,61 @@
                                 userObj.name || userObj.Name || "Petugas";
 
                             mainRow.innerHTML = `
-                                <td class="px-3.5 py-3 sm:px-5 sm:py-4 whitespace-nowrap">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <span class="font-extrabold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100 inline-block">#${escapeHTML(notaNo)}</span>
-                                        <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${isSuratJalan ? "bg-amber-100 text-amber-800 border border-amber-200" : "bg-emerald-100 text-emerald-800 border border-emerald-200"}">
+                                <td class="px-2.5 py-2.5 sm:px-5 sm:py-4">
+                                    <div class="flex items-center gap-1.5 sm:gap-2 mb-1 flex-wrap">
+                                        <span class="font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md sm:rounded-lg border border-blue-100 inline-block text-[10px] sm:text-xs">#${escapeHTML(notaNo)}</span>
+                                        <span class="text-[8.5px] sm:text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full ${isSuratJalan ? "bg-amber-100 text-amber-800 border border-amber-200" : "bg-emerald-100 text-emerald-800 border border-emerald-200"}">
                                             ${escapeHTML(docType)}
                                         </span>
                                     </div>
-                                    <p class="text-[11px] text-slate-400 font-bold"><i class="fas fa-user-circle mr-1"></i>${escapeHTML(userName)} • ${escapeHTML(group.location || "Toko Utama")}</p>
+                                    <div class="sm:hidden font-bold text-slate-700 text-[10.5px] mt-0.5 truncate">
+                                        <i class="fas fa-building text-blue-500 mr-1"></i>${escapeHTML(supplierName)}
+                                    </div>
+                                    <p class="text-[9.5px] sm:text-[11px] text-slate-400 font-bold mt-0.5">
+                                        <span class="sm:hidden font-medium text-slate-500">${formattedDate} • </span><i class="fas fa-user-circle mr-1"></i>${escapeHTML(userName)} • ${escapeHTML(group.location || "Toko Utama")}
+                                    </p>
                                 </td>
-                                <td class="px-3.5 py-3 sm:px-5 sm:py-4 text-slate-500 font-bold text-xs whitespace-nowrap">${formattedDate}</td>
-                                <td class="px-3.5 py-3 sm:px-5 sm:py-4 whitespace-nowrap">
+                                <td class="hidden sm:table-cell px-3.5 py-3 sm:px-5 sm:py-4 text-slate-500 font-bold text-xs whitespace-nowrap">${formattedDate}</td>
+                                <td class="hidden sm:table-cell px-3.5 py-3 sm:px-5 sm:py-4 whitespace-nowrap">
                                     <span class="font-bold text-slate-700 text-xs sm:text-sm">${escapeHTML(supplierName)}</span>
                                 </td>
-                                <td class="px-3.5 py-3 sm:px-5 sm:py-4 min-w-[160px]">${productSummary}</td>
-                                <td class="px-3.5 py-3 sm:px-5 sm:py-4 text-center font-extrabold text-slate-700 whitespace-nowrap text-xs sm:text-sm">${totalQty} Unit</td>
-                                <td class="px-3.5 py-3 sm:px-5 sm:py-4 text-right font-mono font-bold text-slate-600 whitespace-nowrap text-xs sm:text-sm">Rp ${dppAmount.toLocaleString("id-ID")}</td>
-                                <td class="px-3.5 py-3 sm:px-5 sm:py-4 text-right font-mono font-bold text-emerald-600 whitespace-nowrap text-xs sm:text-sm">Rp ${ppnAmount.toLocaleString("id-ID")}</td>
-                                <td class="px-3.5 py-3 sm:px-5 sm:py-4 text-right font-mono font-black text-slate-900 whitespace-nowrap text-xs sm:text-sm">Rp ${totalAmount.toLocaleString("id-ID")}</td>
-                                <td class="px-3.5 py-3 sm:px-5 sm:py-4 text-center whitespace-nowrap">
-                                    <div class="flex items-center justify-center gap-1.5 flex-nowrap">
+                                <td class="px-2.5 py-2.5 sm:px-5 sm:py-4 sm:min-w-[160px]">
+                                    ${productSummary}
+                                    <div class="sm:hidden text-[10px] text-blue-600 font-bold mt-0.5">
+                                        ${totalQty} Unit
+                                    </div>
+                                </td>
+                                <td class="hidden sm:table-cell px-3.5 py-3 sm:px-5 sm:py-4 text-center font-extrabold text-slate-700 whitespace-nowrap text-xs sm:text-sm">${totalQty} Unit</td>
+                                <td class="hidden sm:table-cell px-3.5 py-3 sm:px-5 sm:py-4 text-right font-mono font-bold text-slate-600 whitespace-nowrap text-xs sm:text-sm">Rp ${dppAmount.toLocaleString("id-ID")}</td>
+                                <td class="hidden sm:table-cell px-3.5 py-3 sm:px-5 sm:py-4 text-right font-mono font-bold text-emerald-600 whitespace-nowrap text-xs sm:text-sm">Rp ${ppnAmount.toLocaleString("id-ID")}</td>
+                                <td class="px-2.5 py-2.5 sm:px-5 sm:py-4 text-right whitespace-nowrap">
+                                    <div class="font-mono font-black text-slate-900 text-[11px] sm:text-sm">Rp ${totalAmount.toLocaleString("id-ID")}</div>
+                                    <div class="sm:hidden text-[8.5px] text-slate-400 font-mono mt-0.5">DPP: ${dppAmount.toLocaleString("id-ID")}</div>
+                                </td>
+                                <td class="px-2 py-2.5 sm:px-5 sm:py-4 text-center whitespace-nowrap">
+                                    <div class="hidden sm:flex items-center justify-center gap-1 sm:gap-1.5 flex-nowrap">
                                         ${
                                             items.length > 0
                                                 ? `
-                                            <button onclick="toggleDetailRow(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2 rounded-xl transition-all" title="Lihat Item">
-                                                <i id="toggle-icon-${idx}" class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
+                                            <button onclick="toggleDetailRow(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-1.5 sm:p-2 rounded-lg sm:rounded-xl transition-all cursor-pointer" title="Lihat Item">
+                                                <i id="toggle-icon-${idx}" class="fas fa-chevron-down text-[10px] sm:text-xs transition-transform duration-200"></i>
                                             </button>
                                         `
                                                 : ""
                                         }
-                                        <button onclick="deletePurchaseNota('${escapeHTML(notaNo)}')" class="bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-500 border border-rose-200 p-2 rounded-xl transition-all shadow-sm" title="Batalkan Transaksi & Kembalikan Stok">
-                                            <i class="fas fa-trash-alt text-xs"></i>
+                                        ${
+                                            canModifyPurchase
+                                                ? `
+                                        <button onclick="deletePurchaseNota('${escapeHTML(notaNo)}')" class="bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-500 border border-rose-200 p-1.5 sm:p-2 rounded-lg sm:rounded-xl transition-all shadow-sm cursor-pointer" title="Batalkan Transaksi & Kembalikan Stok">
+                                            <i class="fas fa-trash-alt text-[10px] sm:text-xs"></i>
                                         </button>
+                                        `
+                                                : ""
+                                        }
                                     </div>
+                                    <button type="button" onclick="openPurchaseActionMenu(${idx}, '${escapeHTML(notaNo)}', ${items.length})" class="sm:hidden px-2 py-1 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold text-xs inline-flex items-center gap-1 border border-blue-200 cursor-pointer shadow-2xs">
+                                        <i class="fas fa-ellipsis-v text-[10px]"></i> Aksi
+                                    </button>
                                 </td>
                             `;
                         }
@@ -1050,35 +1150,41 @@
 
                                     return `
                                     <tr class="border-b border-slate-100 hover:bg-white/80 transition-colors text-xs">
-                                        ${groupBy === "supplier" ? `<td class="p-3 pl-4 font-bold text-blue-600">#${escapeHTML(itNota)}</td>` : ""}
-                                        <td class="p-3 ${groupBy === "supplier" ? "" : "pl-4"} font-mono font-bold text-slate-400">${escapeHTML(itCode)}</td>
-                                        <td class="p-3 font-bold text-slate-700">${escapeHTML(itName)}</td>
-                                        <td class="p-3 text-center font-bold text-slate-600">${itQty} Unit</td>
-                                        <td class="p-3 text-right font-semibold text-slate-600">Rp ${itHBeli.toLocaleString("id-ID")}</td>
-                                        <td class="p-3 text-right font-extrabold text-slate-800">Rp ${itTotal.toLocaleString("id-ID")}</td>
+                                        ${groupBy === "supplier" ? `<td class="p-2 sm:p-3 pl-3 sm:pl-4 font-bold text-blue-600 text-[10.5px] sm:text-xs">#${escapeHTML(itNota)}</td>` : ""}
+                                        <td class="hidden sm:table-cell p-3 ${groupBy === "supplier" ? "" : "pl-4"} font-mono font-bold text-slate-400">${escapeHTML(itCode)}</td>
+                                        <td class="p-2 sm:p-3 ${groupBy === "supplier" ? "" : "pl-3 sm:pl-4"}">
+                                            <div class="font-bold text-slate-700 text-[11px] sm:text-xs">${escapeHTML(itName)}</div>
+                                            <div class="sm:hidden font-mono text-[9px] text-slate-400">${escapeHTML(itCode)}</div>
+                                        </td>
+                                        <td class="p-2 sm:p-3 text-center font-bold text-slate-600 text-[10.5px] sm:text-xs">${itQty} Unit</td>
+                                        <td class="hidden sm:table-cell p-3 text-right font-semibold text-slate-600 text-xs">Rp ${itHBeli.toLocaleString("id-ID")}</td>
+                                        <td class="p-2 sm:p-3 text-right pr-3 sm:pr-4">
+                                            <div class="font-extrabold text-slate-800 text-[11px] sm:text-xs">Rp ${itTotal.toLocaleString("id-ID")}</div>
+                                            <div class="sm:hidden text-[8.5px] text-slate-400">@ Rp ${itHBeli.toLocaleString("id-ID")}</div>
+                                        </td>
                                     </tr>
                                 `;
                                 })
                                 .join("");
 
                             detailRow.innerHTML = `
-                                <td colspan="${colSpanTotal}" class="p-4 pl-12 pr-8">
-                                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                                        <div class="bg-slate-100/70 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
-                                            <span class="text-[11px] font-black uppercase text-slate-600 tracking-wider">
+                                <td colspan="${colSpanTotal}" class="p-2 sm:p-4 sm:pl-12 sm:pr-8">
+                                    <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+                                        <div class="bg-slate-100/70 px-3 sm:px-4 py-2 sm:py-2.5 border-b border-slate-200 flex justify-between items-center">
+                                            <span class="text-[10px] sm:text-[11px] font-black uppercase text-slate-600 tracking-wider">
                                                 <i class="fas fa-boxes text-blue-500 mr-1.5"></i> Rincian Barang Pembelian
                                             </span>
-                                            <span class="text-[11px] font-bold text-slate-400">${items.length} Macam Barang</span>
+                                            <span class="text-[10px] sm:text-[11px] font-bold text-slate-400">${items.length} Macam Barang</span>
                                         </div>
-                                        <table class="w-full text-left">
+                                        <table class="w-full text-left detail-sub-table">
                                             <thead class="bg-slate-50/50 text-[9px] font-bold text-slate-400 uppercase border-b border-slate-100">
                                                 <tr>
-                                                    ${groupBy === "supplier" ? `<th class="p-3 pl-4">No. Nota</th>` : ""}
-                                                    <th class="p-3 ${groupBy === "supplier" ? "" : "pl-4"}">Kode</th>
-                                                    <th class="p-3">Nama Produk</th>
-                                                    <th class="p-3 text-center">Qty</th>
-                                                    <th class="p-3 text-right">Harga Beli Satuan</th>
-                                                    <th class="p-3 text-right">Subtotal</th>
+                                                    ${groupBy === "supplier" ? `<th class="p-2 sm:p-3 pl-3 sm:pl-4">No. Nota</th>` : ""}
+                                                    <th class="hidden sm:table-cell p-3 ${groupBy === "supplier" ? "" : "pl-4"}">Kode</th>
+                                                    <th class="p-2 sm:p-3 ${groupBy === "supplier" ? "" : "pl-3 sm:pl-4"}">Nama Produk</th>
+                                                    <th class="p-2 sm:p-3 text-center">Qty</th>
+                                                    <th class="hidden sm:table-cell p-3 text-right">Harga Beli Satuan</th>
+                                                    <th class="p-2 sm:p-3 text-right pr-3 sm:pr-4">Subtotal</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="divide-y divide-slate-50">
@@ -1154,6 +1260,38 @@
                 if (page < 1) return;
                 fetchPurchases(page);
                 window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+
+            
+            function openPurchaseActionMenu(idx, notaNo, itemsCount) {
+                const actions = [];
+                if (itemsCount > 0) {
+                    actions.push({
+                        label: "Lihat Rincian Barang",
+                        icon: "fas fa-boxes",
+                        color: "blue",
+                        desc: `${itemsCount} macam produk dalam nota`,
+                        onClick: () => toggleDetailRow(idx),
+                    });
+                }
+                const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                const curRole = (curUser.role || "").toLowerCase().replace(/[-_]/g, "");
+                const canModifyPurchase = (curRole === "admin" || curRole === "superadmin");
+                if (canModifyPurchase) {
+                    actions.push({
+                        label: "Batalkan Transaksi (Hapus)",
+                        icon: "fas fa-trash-alt",
+                        color: "rose",
+                        desc: "Hapus nota & rollback mutasi stok",
+                        onClick: () => deletePurchaseNota(notaNo),
+                    });
+                }
+
+                window.showRowActionMenu({
+                    title: "Pilih Aksi Pembelian",
+                    subtitle: `Nota: #${notaNo}`,
+                    actions: actions,
+                });
             }
 
             function toggleDetailRow(idx) {
@@ -1425,6 +1563,12 @@
 
             // 5. DELETE NOTA (ROLLBACK STOK)
             async function deletePurchaseNota(nota) {
+                const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                const curRole = (curUser.role || "").toLowerCase().replace(/[-_]/g, "");
+                if (curRole !== "admin" && curRole !== "superadmin") {
+                    Swal.fire("Akses Ditolak", "Hanya Admin dan Super Admin yang berhak membatalkan atau menghapus transaksi pembelian.", "error");
+                    return;
+                }
                 const confirm = await Swal.fire({
                     title: "Hapus Transaksi Nota?",
                     html: `<p class="text-xs text-slate-600">Seluruh pembelian dalam nota <b>#${escapeHTML(nota)}</b> akan dihapus dan stok barang terkait akan <b>dikurangi kembali</b>.</p>`,
@@ -1677,88 +1821,6 @@
             }
 
             const ROLE_PERMISSIONS = {
-                admin: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "report.html",
-                    "opname.html",
-                ],
-                kasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                "super-kasir": [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                super_kasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                superkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                supersubkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                "super-subkasir": [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                super_subkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                "super-sub-kasir": [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                super_sub_kasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                akuntan: [
-                    "akuntansi.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "riwayat.html",
-                    "report.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
                 superadmin: [
                     "dashboard.html",
                     "riwayat.html",
@@ -1770,6 +1832,116 @@
                     "absensi.html",
                     "report.html",
                     "opname.html",
+                    "online-users.html",
+                ],
+                "super-admin": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "akuntansi.html",
+                    "absensi.html",
+                    "report.html",
+                    "opname.html",
+                    "online-users.html",
+                ],
+                admin: [
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "akuntansi.html",
+                    "absensi.html",
+                    "report.html",
+                    "opname.html",
+                    "online-users.html",
+                ],
+                "super-kasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                superkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                super_kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                supersubkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                "super-subkasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                super_subkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                "super-sub-kasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                super_sub_kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "expense.html",
+                    "opname.html",
+                ],
+                akuntan: [
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
                 ],
             };
 
@@ -1787,13 +1959,25 @@
                     ROLE_PERMISSIONS[normalizedRole] || ["dashboard.html"];
 
                 if (!allowedPages.includes(currentPage)) {
-                    if (userRole === "akuntan")
-                        window.location.href = "akuntansi.html";
-                    else if (userRole === "admin")
-                        window.location.href = "riwayat.html";
-                    else window.location.href = "dashboard.html";
+                    let fallback = "dashboard.html";
+                    if (!allowedPages.includes("dashboard.html")) {
+                        fallback = allowedPages[0] || "riwayat.html";
+                    }
+                    window.location.href = fallback;
                     return;
                 }
+
+                const navLinks = document.querySelectorAll("aside nav a");
+                navLinks.forEach((link) => {
+                    const href = link.getAttribute("href");
+                    if (href && href !== "#" && href !== "index.html") {
+                        if (!allowedPages.includes(href)) {
+                            link.style.display = "none";
+                        } else {
+                            link.style.display = "flex";
+                        }
+                    }
+                });
 
                 document
                     .querySelectorAll(".user-name-display")
@@ -1805,50 +1989,22 @@
             async function confirmLogout() {
                 const result = await Swal.fire({
                     title: "Konfirmasi Keluar",
-                    text: "Pilih tindakan logout yang ingin Anda lakukan:",
+                    text: "Apakah Anda yakin ingin keluar dari sistem kasir?",
                     icon: "question",
                     showCancelButton: true,
-                    showDenyButton: true,
-                    confirmButtonText:
-                        '<i class="fas fa-check-circle mr-1"></i> Logout & Selesaikan Shift',
-                    denyButtonText:
-                        '<i class="fas fa-sign-out-alt mr-1"></i> Logout Saja',
-                    cancelButtonText: "Batal",
-                    confirmButtonColor: "#2563EB",
-                    denyButtonColor: "#F59E0B",
+                    confirmButtonText: '<i class="fas fa-sign-out-alt mr-1.5"></i> Ya, Keluar',
+                    cancelButtonText: '<i class="fas fa-times mr-1.5"></i> Batal',
+                    confirmButtonColor: "#EF4444",
                     cancelButtonColor: "#64748B",
                     reverseButtons: true,
+                    focusCancel: true,
                 });
 
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        title: "Menutup Shift...",
-                        allowOutsideClick: false,
-                        didOpen: () => Swal.showLoading(),
-                    });
-                    try {
-                        const shiftRes = await fetch(
-                            `${BASE_URL}/api/shift/current`,
-                        );
-                        const shiftData = await shiftRes.json();
-                        const shift = shiftData.shift || 1;
-
-                        await fetch(`${BASE_URL}/api/sales/update/shift`, {
-                            method: "PUT",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ shift: shift }),
-                        });
-
-                        localStorage.removeItem("token");
-                        window.location.href = "index.html";
-                    } catch (e) {
-                        Swal.fire(
-                            "Error",
-                            "Server tidak dapat dihubungi",
-                            "error",
-                        );
+                    if (window.recordLogout) {
+                        const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                        await window.recordLogout("LOGOUT_ONLY", null, curUser.location || "", "Logout");
                     }
-                } else if (result.isDenied) {
                     localStorage.removeItem("token");
                     window.location.href = "index.html";
                 }
@@ -1911,17 +2067,13 @@
                         document.body.classList.remove("overflow-hidden");
                     }
                 } else {
-                    const isCollapsed =
-                        sidebar.classList.contains("desktop-collapsed") ||
-                        sidebar.classList.contains("lg:hidden");
-                    if (isCollapsed) {
-                        sidebar.classList.remove(
-                            "desktop-collapsed",
-                            "lg:hidden",
-                        );
-                    } else {
-                        sidebar.classList.add("desktop-collapsed", "lg:hidden");
-                    }
+                    // Desktop: Sidebar selalu permanen terbuka (fitur collapse ditiadakan sesuai instruksi)
+                    sidebar.classList.remove(
+                        "desktop-collapsed",
+                        "lg:hidden",
+                        "hidden",
+                        "-translate-x-full",
+                    );
                 }
             }
             window.toggleSidebar = toggleSidebar;
@@ -1931,12 +2083,12 @@
                 const sidebar = document.getElementById("app-sidebar");
                 const backdrop = document.getElementById("sidebar-backdrop");
                 if (window.innerWidth >= 1024) {
-                    if (!sidebar?.classList.contains("desktop-collapsed")) {
-                        sidebar?.classList.remove(
-                            "-translate-x-full",
-                            "lg:hidden",
-                        );
-                    }
+                    sidebar?.classList.remove(
+                        "-translate-x-full",
+                        "lg:hidden",
+                        "desktop-collapsed",
+                        "hidden",
+                    );
                     backdrop?.classList.add("hidden");
                     document.body.classList.remove("overflow-hidden");
                 } else {

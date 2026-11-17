@@ -1,0 +1,298 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <!-- Background Gradient (Deep Electric Sapphire) -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="40%" stop-color="#1e3a8a" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+
+    <!-- Infinity Body Gradient (Vibrant Cobalt to Royal Blue) -->
+    <linearGradient id="infinityBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1d4ed8" />
+      <stop offset="50%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+
+    <!-- Golden Yellow Outline Gradient (Warm Gold to Amber Glow) -->
+    <linearGradient id="goldOutline" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#fde047" />
+      <stop offset="30%" stop-color="#facc15" />
+      <stop offset="60%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.8" />
+    </linearGradient>
+
+    <!-- Neural Energy Gradient (Left creeping to center) -->
+    <linearGradient id="neuronFlow" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="25%" stop-color="#fef08a" />
+      <stop offset="65%" stop-color="#facc15" />
+      <stop offset="100%" stop-color="#fbbf24" />
+    </linearGradient>
+
+    <!-- Glass Reflection -->
+    <linearGradient id="glassShine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.32" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.0" />
+    </linearGradient>
+
+    <!-- Glow & Shadow Filters -->
+    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="145%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.55" />
+    </filter>
+    <filter id="goldGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="1.8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <style>
+    /* <![CDATA[ */
+      /* --- CONTINUOUS HIGH-TECH LIVING LOGO ANIMATIONS --- */
+      
+      /* 1. Breathing Outer Rim Accent */
+      .outer-rim {
+        animation: rimPulse 3.8s ease-in-out infinite alternate;
+      }
+      @keyframes rimPulse {
+        0% { stroke-opacity: 0.25; stroke-width: 1px; stroke: #38bdf8; }
+        50% { stroke-opacity: 0.75; stroke-width: 1.6px; stroke: #60a5fa; }
+        100% { stroke-opacity: 0.25; stroke-width: 1px; stroke: #38bdf8; }
+      }
+
+      /* 2. Specular Gloss Sweeping along Infinity Loop */
+      .infinity-gloss {
+        stroke-dasharray: 45 160;
+        animation: glossSweep 4.5s linear infinite;
+      }
+      @keyframes glossSweep {
+        0% { stroke-dashoffset: 205; opacity: 0.2; }
+        40% { opacity: 0.7; }
+        80% { opacity: 0.2; }
+        100% { stroke-dashoffset: 0; opacity: 0.2; }
+      }
+
+      /* 3. Neural Axon Energy Pulses */
+      .neural-axon-stem {
+        stroke-dasharray: 8 4;
+        animation: axonFlow 2.4s linear infinite;
+      }
+      @keyframes axonFlow {
+        0% { stroke-dashoffset: 24; }
+        100% { stroke-dashoffset: 0; }
+      }
+
+      .synapse-bridge {
+        stroke-dasharray: 2 2;
+        animation: bridgeSparkle 1.8s ease-in-out infinite alternate;
+      }
+      @keyframes bridgeSparkle {
+        0% { stroke-opacity: 0.25; stroke: #facc15; }
+        50% { stroke-opacity: 1; stroke: #ffffff; }
+        100% { stroke-opacity: 0.35; stroke: #facc15; }
+      }
+
+      /* 4. Sequential Synaptic Soma (Neuron) Firings */
+      .soma-node {
+        transform-origin: center;
+        transform-box: fill-box;
+      }
+      .soma-w1 {
+        animation: somaPulse 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        animation-delay: 0s;
+      }
+      .soma-w2 {
+        animation: somaPulse 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        animation-delay: 0.35s;
+      }
+      .soma-w3 {
+        animation: somaPulse 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        animation-delay: 0.7s;
+      }
+      .soma-w4 {
+        animation: somaPulse 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        animation-delay: 1.05s;
+      }
+      @keyframes somaPulse {
+        0%, 100% {
+          transform: scale(0.9);
+          opacity: 0.85;
+        }
+        25% {
+          transform: scale(1.4);
+          opacity: 1;
+          filter: drop-shadow(0 0 3px #fef08a);
+        }
+        50% {
+          transform: scale(0.9);
+          opacity: 0.85;
+        }
+      }
+
+      /* 5. Central Nexus Synapse Converging Shockwave & Heartbeat */
+      .nexus-core {
+        transform-origin: 50px 50px;
+        animation: nexusHeartbeat 2.8s ease-in-out infinite;
+        animation-delay: 1.2s;
+      }
+      @keyframes nexusHeartbeat {
+        0%, 100% {
+          transform: scale(0.95);
+          filter: drop-shadow(0 0 1px #f59e0b);
+        }
+        18% {
+          transform: scale(1.35);
+          fill: #ffffff;
+          filter: drop-shadow(0 0 6px #fde047);
+        }
+        36% {
+          transform: scale(1.05);
+          fill: #fef08a;
+        }
+        54% {
+          transform: scale(1.22);
+          fill: #ffffff;
+          filter: drop-shadow(0 0 4px #facc15);
+        }
+        70% {
+          transform: scale(0.95);
+        }
+      }
+
+      .nexus-ripple-1 {
+        transform-origin: 50px 50px;
+        animation: shockwavePulse 2.8s cubic-bezier(0.12, 0.8, 0.32, 1) infinite;
+        animation-delay: 1.28s;
+      }
+      .nexus-ripple-2 {
+        transform-origin: 50px 50px;
+        animation: shockwavePulse 2.8s cubic-bezier(0.12, 0.8, 0.32, 1) infinite;
+        animation-delay: 1.55s;
+      }
+      @keyframes shockwavePulse {
+        0% {
+          r: 5px;
+          stroke-width: 2px;
+          stroke-opacity: 0.95;
+        }
+        60% {
+          r: 20px;
+          stroke-width: 0.5px;
+          stroke-opacity: 0.15;
+        }
+        100% {
+          r: 25px;
+          stroke-width: 0px;
+          stroke-opacity: 0;
+        }
+      }
+
+      /* 6. Right Loop Electronic Data Orbitals */
+      .right-data-orbit {
+        animation: rightOrbit 3.5s ease-in-out infinite alternate;
+      }
+      @keyframes rightOrbit {
+        0% {
+          opacity: 0.5;
+          transform: translateY(0px);
+        }
+        50% {
+          opacity: 0.95;
+          transform: translateY(-1.2px);
+          filter: drop-shadow(0 0 2px #60a5fa);
+        }
+        100% {
+          opacity: 0.5;
+          transform: translateY(0px);
+        }
+      }
+        /* ]]> */
+    </style>
+  </defs>
+
+  <!-- Squircle Base Container -->
+  <rect x="6" y="6" width="88" height="88" rx="24" fill="url(#bgGrad)" filter="url(#dropShadow)" />
+  
+  <!-- Subtle Circuit Grid Backdrop (Neural Vibe) -->
+  <path d="M 14 30 H 86 M 14 50 H 86 M 14 70 H 86 M 30 14 V 86 M 50 14 V 86 M 70 14 V 86" fill="none" stroke="#38bdf8" stroke-width="0.5" stroke-opacity="0.12" />
+  
+  <!-- Top Glass Highlight -->
+  <rect x="8" y="8" width="84" height="42" rx="22" fill="url(#glassShine)" />
+  
+  <!-- Outer Rim Accent -->
+  <rect class="outer-rim" x="6.5" y="6.5" width="87" height="87" rx="23.5" fill="none" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.3" />
+
+  <!-- ================= INFINITY SYMBOL ================= -->
+  <!-- 1. Gold Outline Base (Thick outer stroke for golden rim) -->
+  <path d="M 50 50 C 58 35, 73 31, 81 39 C 89 47, 89 53, 81 61 C 73 69, 58 65, 50 50 C 42 35, 27 31, 19 39 C 11 47, 11 53, 19 61 C 27 69, 42 65, 50 50 Z" 
+        fill="none" stroke="url(#goldOutline)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" filter="url(#goldGlow)" opacity="0.92" />
+
+  <!-- 2. Blue Body Core (Vibrant Electric Blue Inside) -->
+  <path d="M 50 50 C 58 35, 73 31, 81 39 C 89 47, 89 53, 81 61 C 73 69, 58 65, 50 50 C 42 35, 27 31, 19 39 C 11 47, 11 53, 19 61 C 27 69, 42 65, 50 50 Z" 
+        fill="none" stroke="url(#infinityBlue)" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- 3. Inner Gloss Specular Line (Sweeping Shimmer) -->
+  <path class="infinity-gloss" d="M 50 50 C 58 35, 73 31, 81 39 C 89 47, 89 53, 81 61 C 73 69, 58 65, 50 50 C 42 35, 27 31, 19 39 C 11 47, 11 53, 19 61 C 27 69, 42 65, 50 50 Z" 
+        fill="none" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round" stroke-opacity="0.6" />
+
+  <!-- ================= NEURAL NETWORK (LEFT TO CENTER) ================= -->
+  <g filter="url(#goldGlow)">
+    <!-- Main Left-to-Center Neural Stem -->
+    <path class="neural-axon-stem" d="M 16 50 L 25 43 L 36 47 L 50 50" fill="none" stroke="url(#neuronFlow)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+    <path class="neural-axon-stem" d="M 16 50 L 25 57 L 36 53 L 50 50" fill="none" stroke="url(#neuronFlow)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Secondary Dendrite Branches (Upper Loop) -->
+    <path class="neural-axon-stem" d="M 21 41 L 28 35 L 37 38 L 44 44" fill="none" stroke="#fef08a" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 28 35 L 34 29" fill="none" stroke="#fde047" stroke-width="1" stroke-linecap="round" />
+
+    <!-- Secondary Dendrite Branches (Lower Loop) -->
+    <path class="neural-axon-stem" d="M 21 59 L 28 65 L 37 62 L 44 56" fill="none" stroke="#fef08a" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 28 65 L 34 71" fill="none" stroke="#fde047" stroke-width="1" stroke-linecap="round" />
+
+    <!-- Cross-Synapse Bridges -->
+    <path class="synapse-bridge" d="M 25 43 L 25 57" fill="none" stroke="#facc15" stroke-width="1.1" stroke-dasharray="1.5 2" />
+    <path class="synapse-bridge" d="M 36 47 L 36 53" fill="none" stroke="#facc15" stroke-width="1.3" stroke-dasharray="2 2" />
+
+    <!-- Neural Nodes / Synaptic Soma (Glowing Gold Dots) in Sequential Waves -->
+    <!-- Wave 1: Far Left -->
+    <circle class="soma-node soma-w1" cx="16" cy="50" r="3" fill="#ffffff" stroke="#facc15" stroke-width="1.5" />
+    <circle class="soma-node soma-w1" cx="21" cy="41" r="2.1" fill="#fef08a" />
+    <circle class="soma-node soma-w1" cx="21" cy="59" r="2.1" fill="#fef08a" />
+
+    <!-- Wave 2: Mid Branches -->
+    <circle class="soma-node soma-w2" cx="25" cy="43" r="2.4" fill="#ffffff" stroke="#facc15" stroke-width="1.2" />
+    <circle class="soma-node soma-w2" cx="25" cy="57" r="2.4" fill="#ffffff" stroke="#facc15" stroke-width="1.2" />
+    <circle class="soma-node soma-w2" cx="28" cy="35" r="2.2" fill="#ffffff" stroke="#f59e0b" stroke-width="1" />
+    <circle class="soma-node soma-w2" cx="28" cy="65" r="2.2" fill="#ffffff" stroke="#f59e0b" stroke-width="1" />
+
+    <!-- Wave 3: Deep Dendrites -->
+    <circle class="soma-node soma-w3" cx="34" cy="29" r="1.6" fill="#fde047" />
+    <circle class="soma-node soma-w3" cx="34" cy="71" r="1.6" fill="#fde047" />
+    <circle class="soma-node soma-w3" cx="36" cy="47" r="2.2" fill="#ffffff" stroke="#facc15" stroke-width="1" />
+    <circle class="soma-node soma-w3" cx="36" cy="53" r="2.2" fill="#ffffff" stroke="#facc15" stroke-width="1" />
+    <circle class="soma-node soma-w3" cx="37" cy="38" r="1.8" fill="#fef08a" />
+    <circle class="soma-node soma-w3" cx="37" cy="62" r="1.8" fill="#fef08a" />
+
+    <!-- Wave 4: Pre-Nexus Entry -->
+    <circle class="soma-node soma-w4" cx="44" cy="44" r="1.9" fill="#fef08a" />
+    <circle class="soma-node soma-w4" cx="44" cy="56" r="1.9" fill="#fef08a" />
+
+    <!-- Central Nexus Synapse Epicenter (Beating Heart of the POS) -->
+    <circle class="nexus-core" cx="50" cy="50" r="4.2" fill="#ffffff" stroke="#f59e0b" stroke-width="2" />
+    <circle cx="50" cy="50" r="1.8" fill="#fef08a" />
+
+    <!-- Radiating Nexus Shockwaves -->
+    <circle class="nexus-ripple-1" cx="50" cy="50" r="6" fill="none" stroke="#fde047" stroke-width="1.2" />
+    <circle class="nexus-ripple-2" cx="50" cy="50" r="6" fill="none" stroke="#38bdf8" stroke-width="1" />
+  </g>
+
+  <!-- Right Loop Balance: Subtle Electronic Data Nodes -->
+  <g class="right-data-orbit">
+    <circle cx="75" cy="38" r="1.8" fill="#93c5fd" />
+    <circle cx="84" cy="50" r="2.2" fill="#60a5fa" />
+    <circle cx="75" cy="62" r="1.8" fill="#93c5fd" />
+    <path d="M 65 44 L 75 38 M 75 38 L 84 50 M 84 50 L 75 62 M 75 62 L 65 56" fill="none" stroke="#60a5fa" stroke-width="0.8" stroke-dasharray="2 2" stroke-opacity="0.5" />
+  </g>
+</svg>

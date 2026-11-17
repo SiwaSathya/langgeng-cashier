@@ -2,14 +2,26 @@
 <html lang="id">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+                <!-- Progressive Web App (PWA) Meta & Icons -->
+        <link rel="manifest" href="manifest.json" />
+        <meta name="theme-color" content="#2563EB" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Langgeng POS" />
+        <link rel="apple-touch-icon" href="logo.svg" />
+        <link rel="icon" type="image/svg+xml" href="logo.svg" />
         <title>Stock Opname & Audit Fisik - SMARTPOS</title>
-        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="vendor/tailwindcss.js"></script>
         <link
             rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        />
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+        <script src="vendor/sweetalert2.all.min.js"></script>
+        <script defer src="vendor/alpine.min.js"></script>
+        <script src="spa-router.js"></script>
+        <script src="env.js"></script>
+        <script src="shortcuts.js" defer></script>
+        <script src="mobile-nav.js" defer></script>
         <style>
             @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap");
 
@@ -50,6 +62,54 @@
                 cursor: pointer;
             }
 
+            /* Placeholder Minimalis Global */
+            #opnameSearchInput::placeholder,
+            input::placeholder,
+            textarea::placeholder {
+                font-size: 0.68rem !important;
+                font-weight: 400 !important;
+                color: #94a3b8 !important;
+                opacity: 0.9 !important;
+            }
+
+            @media (max-width: 639px) {
+                /* Compact padding & sizing for mobile table */
+                table th {
+                    padding: 0.4rem 0.45rem !important;
+                    font-size: 0.65rem !important;
+                }
+                table td {
+                    padding: 0.45rem 0.45rem !important;
+                    font-size: 0.72rem !important;
+                    line-height: 1.25 !important;
+                }
+                /* Compact input & select on mobile */
+                #opnameSearchInput {
+                    height: 2.15rem !important;
+                    min-height: 2.15rem !important;
+                    font-size: 0.72rem !important;
+                }
+                #opnameStatusFilter,
+                #historyLocationFilter,
+                #historyStatusFilter {
+                    height: 2.15rem !important;
+                    min-height: 2.15rem !important;
+                    font-size: 0.72rem !important;
+                    padding-top: 0.25rem !important;
+                    padding-bottom: 0.25rem !important;
+                }
+            }
+
+            /* Pastikan tabel fit rapat ke data tanpa gap di bawah */
+            .overflow-x-auto,
+            .overflow-x-auto.custom-scroll,
+            table,
+            tbody {
+                padding-bottom: 0 !important;
+                margin-bottom: 0 !important;
+            }
+
+
             @media print {
                 aside,
                 #sidebar-backdrop,
@@ -87,32 +147,25 @@
             id="app-sidebar"
             class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 sm:p-8 fixed inset-y-0 left-0 z-50 h-full lg:static lg:h-full lg:shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out"
         >
-            <div class="flex items-center justify-between mb-8 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div
-                        class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200"
-                    >
-                        <i class="fas fa-store"></i>
+                        <div class="flex items-center mb-8 shrink-0">
+                <a href="dashboard.html" class="flex items-center gap-3 group">
+                    <img
+                        src="logo.svg"
+                        alt="Logo Langgeng Elektronika"
+                        class="w-10 h-10 shrink-0 drop-shadow-md rounded-xl transition-transform group-hover:scale-105"
+                    />
+                    <div>
+                        <h1 class="text-base font-black text-slate-900 tracking-tight leading-tight">
+                            LANGGENG
+                        </h1>
+                        <span class="text-[10px] font-extrabold text-blue-600 tracking-widest uppercase block -mt-0.5">
+                            ELEKTRONIKA POS
+                        </span>
                     </div>
-                    <h1
-                        class="text-xl font-extrabold text-slate-800 tracking-tight"
-                    >
-                        SMARTPOS
-                    </h1>
-                </div>
-                <button
-                    type="button"
-                    onclick="toggleSidebar()"
-                    class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                    title="Tutup / Collapse Sidebar"
-                    aria-label="Toggle Sidebar"
-                >
-                    <i class="fas fa-times text-lg lg:hidden"></i>
-                    <i class="fas fa-angles-left text-lg hidden lg:block"></i>
-                </button>
+                </a>
             </div>
 
-            <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
+                        <nav class="flex-1 space-y-1.5 overflow-y-auto custom-scroll pr-1">
                 <a
                     href="dashboard.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
@@ -123,8 +176,7 @@
                     href="riwayat.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-history"></i>
-                    <span>Riwayat Transaksi</span>
+                    <i class="fas fa-history"></i> <span>Riwayat Transaksi</span>
                 </a>
                 <a
                     href="product.html"
@@ -136,8 +188,7 @@
                     href="purchase.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Riwayat Purchase</span>
+                    <i class="fas fa-shopping-cart"></i> <span>Riwayat Purchase</span>
                 </a>
                 <a
                     href="expense.html"
@@ -155,78 +206,66 @@
                     href="akuntansi.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-book-open"></i>
-                    <span>Jurnal & Keuangan</span>
+                    <i class="fas fa-book-open"></i> <span>Jurnal & Keuangan</span>
                 </a>
                 <a
                     href="absensi.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Absensi Karyawan</span>
+                    <i class="fas fa-calendar-check"></i> <span>Absensi Karyawan</span>
                 </a>
                 <a
                     href="report.html"
                     class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
                 >
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Laporan Analitik</span>
+                    <i class="fas fa-chart-bar"></i> <span>Laporan Analitik</span>
                 </a>
                 <a
                     href="opname.html"
                     class="flex items-center gap-4 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold transition-all border border-blue-100"
                 >
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Stock Opname</span>
+                    <i class="fas fa-clipboard-check"></i> <span>Stock Opname</span>
+                </a>
+                <a
+                    href="online-users.html"
+                    class="flex items-center gap-4 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-semibold transition-all"
+                >
+                    <i class="fas fa-user-clock"></i> <span>Pengguna & Log</span>
                 </a>
             </nav>
 
-            <div class="pt-6 border-t border-slate-100 shrink-0">
-                <div class="bg-slate-50 p-4 rounded-2xl mb-4">
+                        <div class="pt-6 border-t border-slate-100 shrink-0">
+                <div class="bg-slate-50 p-4 rounded-2xl mb-4 border border-slate-100">
                     <p
                         class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"
                     >
-                        User Aktif
+                        Login Sebagai
                     </p>
-                    <p class="font-bold text-slate-700 user-name-display">
-                        Kasir
+                    <p class="font-bold text-slate-700 user-name-display truncate">
+                        Pengguna
                     </p>
                 </div>
                 <button
+                    type="button"
                     onclick="confirmLogout()"
-                    class="w-full flex items-center justify-center gap-2 p-3 text-red-500 hover:bg-red-50 rounded-xl font-bold text-xs transition-all"
+                    class="w-full flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-all cursor-pointer"
                 >
-                    <i class="fas fa-power-off"></i> <span>Keluar Sistem</span>
+                    <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
                 </button>
             </div>
         </aside>
 
-        <!-- Mobile Top Bar -->
+                <!-- Mobile Top Bar -->
         <div
-            class="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full"
+            class="lg:hidden bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between sticky top-0 z-30 shrink-0 w-full h-14"
         >
-            <div class="flex items-center gap-3">
-                <button
-                    type="button"
-                    onclick="toggleSidebar()"
-                    class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-xl focus:outline-none"
-                    aria-label="Buka Menu"
-                >
-                    <i class="fas fa-bars text-lg"></i>
-                </button>
-                <span
-                    class="font-extrabold text-slate-800 tracking-tight flex items-center gap-2"
-                >
-                    <span
-                        class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs shadow"
-                        ><i class="fas fa-clipboard-check"></i
-                    ></span>
-                    Stock Opname
-                </span>
+            <div class="flex items-center gap-2 shrink-0">
+                <img src="logo.svg" alt="Logo" class="w-7 h-7 rounded-lg shrink-0 drop-shadow-sm" />
+                <span class="font-extrabold text-slate-800 tracking-tight text-sm">LANGGENG POS</span>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 shrink-0 ml-auto min-w-0">
                 <span
-                    class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg user-name-display"
+                    class="text-[11px] font-bold text-slate-700 bg-slate-100 border border-slate-200/80 px-2.5 py-1 rounded-lg truncate max-w-[140px] user-name-display text-center leading-tight inline-block"
                     >Kasir</span
                 >
             </div>
@@ -238,18 +277,9 @@
         >
             <!-- TOP APP BAR -->
             <header
-                class="min-h-20 bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-10 py-3 sm:py-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shrink-0 no-print"
+                class="min-h-16 sm:min-h-20 bg-white border-b border-slate-200 px-3.5 sm:px-6 lg:px-10 py-2.5 sm:py-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 sm:gap-3 shrink-0 no-print"
             >
                 <div class="flex items-center gap-3">
-                    <button
-                        type="button"
-                        onclick="toggleSidebar()"
-                        class="hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-blue-600 shadow-sm transition-all cursor-pointer shrink-0"
-                        title="Buka / Tutup Sidebar"
-                        aria-label="Toggle Sidebar"
-                    >
-                        <i class="fas fa-bars text-sm"></i>
-                    </button>
                     <div class="flex flex-col">
                         <div class="flex items-center gap-2">
                             <h2 class="text-lg font-black text-slate-800">
@@ -305,7 +335,7 @@
 
             <!-- MAIN CONTAINER SCROLLABLE -->
             <div
-                class="flex-1 p-4 sm:p-6 lg:p-10 overflow-y-auto custom-scroll print-full-width"
+                class="flex-1 p-3.5 sm:p-6 lg:p-10 overflow-y-auto custom-scroll print-full-width"
             >
                 <!-- ============================================== -->
                 <!-- UNDER CONSTRUCTION VIEW (UNTUK NON-SUPERADMIN) -->
@@ -436,15 +466,15 @@
 
                         <!-- HEADER SESI AKTIF -->
                         <div
-                            class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 sm:p-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4"
+                            class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm p-3.5 sm:p-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3.5 sm:gap-4"
                         >
-                            <div class="space-y-1">
+                            <div class="space-y-1.5 w-full lg:w-auto">
                                 <div
-                                    class="flex items-center gap-2.5 flex-wrap"
+                                    class="flex items-center gap-2 flex-wrap"
                                 >
                                     <span
                                         id="sessionDocNo"
-                                        class="font-mono text-base font-black text-slate-800 tracking-tight"
+                                        class="font-mono text-sm sm:text-base font-black text-slate-800 tracking-tight"
                                     >
                                         OPN-SDR-20261110-001
                                     </span>
@@ -453,23 +483,31 @@
                                         onchange="
                                             onSelectSessionChange(this.value)
                                         "
-                                        class="hidden bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-bold text-slate-700 rounded-xl px-2.5 py-1 outline-none cursor-pointer"
+                                        class="hidden w-full sm:w-auto bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-bold text-slate-700 rounded-xl px-2.5 py-1.5 outline-none cursor-pointer max-w-full truncate"
                                         title="Pilih Sesi Opname Lain"
                                     ></select>
                                     <span
                                         id="sessionLocationBadge"
-                                        class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200"
+                                        class="px-2 sm:px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200"
                                     >
                                         Toko Sudirman
                                     </span>
                                     <span
                                         id="sessionStatusBadge"
-                                        class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200"
+                                        class="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-black uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200"
                                     >
                                         Draft
                                     </span>
+                                    <span
+                                        id="sseLiveBadge"
+                                        class="hidden inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs"
+                                        title="Sinkronisasi Live Real-time Aktif via SSE"
+                                    >
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        <span id="sseLiveText">Live SSE</span>
+                                    </span>
                                 </div>
-                                <p class="text-xs text-slate-400 font-medium">
+                                <p class="text-[11px] sm:text-xs text-slate-400 font-medium leading-relaxed">
                                     Dibuat pada:
                                     <span
                                         id="sessionCreatedAt"
@@ -491,42 +529,42 @@
                                 </p>
                                 <p
                                     id="sessionNotesDisplay"
-                                    class="text-xs text-slate-500 italic mt-1"
+                                    class="text-[11px] sm:text-xs text-slate-500 italic mt-0.5"
                                 ></p>
                             </div>
 
                             <!-- TOMBOL AKSI ALUR WORKFLOW -->
                             <div
                                 id="sessionActionButtons"
-                                class="flex items-center gap-2 flex-wrap self-stretch lg:self-auto no-print"
+                                class="flex items-center gap-2 w-full lg:w-auto no-print"
                             >
                                 <button
                                     id="btnCancelSession"
                                     onclick="cancelActiveSession()"
-                                    class="px-3.5 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-xl transition-all"
+                                    class="flex-1 sm:flex-none px-2.5 sm:px-3.5 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-xl transition-all inline-flex items-center justify-center gap-1 shrink-0"
                                 >
-                                    <i class="fas fa-times-circle mr-1"></i>
-                                    Batalkan Sesi
+                                    <i class="fas fa-times-circle"></i>
+                                    <span>Batalkan Sesi</span>
                                 </button>
                                 <button
                                     id="btnSubmitApproval"
                                     onclick="submitForApproval()"
-                                    class="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-200 rounded-xl transition-all"
+                                    class="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-200 rounded-xl transition-all inline-flex items-center justify-center gap-1.5 shrink-0"
                                 >
-                                    <i class="fas fa-paper-plane mr-1.5"></i>
-                                    Ajukan Approval
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span>Ajukan Approval</span>
                                 </button>
                                 <button
                                     id="btnApproveSession"
                                     onclick="approveSession()"
-                                    class="hidden px-4 py-2 text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-200 rounded-xl transition-all"
+                                    class="hidden flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-200 rounded-xl transition-all inline-flex items-center justify-center gap-1.5 shrink-0"
                                 >
-                                    <i class="fas fa-check-double mr-1.5"></i>
-                                    Setujui & Terapkan Penyesuaian
+                                    <i class="fas fa-check-double"></i>
+                                    <span>Setujui</span>
                                 </button>
                                 <button
                                     onclick="window.print()"
-                                    class="px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 rounded-xl transition-all"
+                                    class="w-9 h-9 sm:w-auto sm:h-auto sm:px-3 sm:py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 rounded-xl transition-all shrink-0 inline-flex items-center justify-center"
                                     title="Cetak Lembar Opname"
                                 >
                                     <i class="fas fa-print"></i>
@@ -580,7 +618,7 @@
                                 </p>
                             </div>
                             <div
-                                class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-rose-500"
+                                class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-rose-500"
                             >
                                 <p
                                     class="text-[10px] font-bold text-rose-500 uppercase tracking-wider mb-1"
@@ -600,7 +638,7 @@
                                 </p>
                             </div>
                             <div
-                                class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500"
+                                class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500"
                             >
                                 <p
                                     class="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-1"
@@ -620,7 +658,7 @@
                                 </p>
                             </div>
                             <div
-                                class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm col-span-2 sm:col-span-1"
+                                class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm col-span-2 sm:col-span-1"
                             >
                                 <p
                                     class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1"
@@ -644,7 +682,7 @@
 
                         <!-- SEARCH & QUICK FILTER BAR -->
                         <div
-                            class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 no-print"
+                            class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm p-3 sm:p-4 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 sm:gap-3 no-print"
                         >
                             <div class="relative flex-1">
                                 <i
@@ -682,7 +720,8 @@
                         <div
                             class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col"
                         >
-                            <div class="overflow-x-auto custom-scroll flex-1">
+                            <!-- DESKTOP TABLE VIEW (>= md: 768px) -->
+                            <div class="hidden md:block overflow-x-auto custom-scroll flex-1">
                                 <table class="w-full text-left border-collapse">
                                     <thead
                                         class="bg-slate-100 text-[10px] uppercase tracking-wider text-slate-500 font-bold sticky top-0 border-b border-slate-200 z-10"
@@ -754,6 +793,18 @@
                                     </tbody>
                                 </table>
                             </div>
+
+                            <!-- MOBILE CARD LIST (< md: 768px, KHUSUS LAYAR HP) -->
+                            <div
+                                id="countSheetMobileCards"
+                                class="md:hidden space-y-3 p-3 bg-slate-50/60"
+                            >
+                                <div class="py-16 text-center text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200 p-6">
+                                    <i class="fas fa-spinner fa-spin text-2xl text-blue-500 mb-2"></i>
+                                    <p class="text-xs font-medium">Memuat lembar hitung fisik...</p>
+                                </div>
+                            </div>
+
                             <div
                                 class="p-4 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-500"
                             >
@@ -788,7 +839,7 @@
                         class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex flex-col sm:flex-row justify-between items-center gap-3"
                     >
                         <div
-                            class="flex items-center gap-3 w-full sm:w-auto flex-wrap"
+                            class="flex items-center gap-2 w-full sm:w-auto flex-wrap"
                         >
                             <select
                                 id="historyLocationFilter"
@@ -831,7 +882,7 @@
                         class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col"
                     >
                         <div class="overflow-x-auto custom-scroll">
-                            <table class="w-full text-left border-collapse">
+                            <table class="w-full text-left border-collapse min-w-full sm:min-w-[750px]">
                                 <thead
                                     class="bg-slate-100 text-[10px] uppercase tracking-wider text-slate-500 font-bold sticky top-0 border-b border-slate-200"
                                 >
@@ -895,7 +946,7 @@
                 class="bg-white w-full max-w-lg rounded-3xl shadow-2xl animate-fade-in overflow-hidden flex flex-col"
             >
                 <div
-                    class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50"
+                    class="p-4 sm:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50"
                 >
                     <div class="flex items-center gap-2.5">
                         <span
@@ -903,7 +954,7 @@
                         >
                             <i class="fas fa-play text-sm"></i>
                         </span>
-                        <h3 class="text-xl font-black text-slate-800">
+                        <h3 class="text-base sm:text-xl font-black text-slate-800">
                             Buka Sesi Stock Opname
                         </h3>
                     </div>
@@ -1052,8 +1103,8 @@
         <!-- JAVASCRIPT LOGIC STOCK OPNAME                  -->
         <!-- ============================================== -->
         <script>
-            const BASE_URL =
-                "https://langgeng-cashier-backend-production.up.railway.app";
+            var BASE_URL = window.BASE_URL || "http://127.0.0.1:4000";
+            var API_URL = window.API_URL || (BASE_URL + "/api");
             let activeTab = "active"; // "active" | "history"
             let activeSession = null; // Object StockOpname
             let sessionItems = []; // Array of items
@@ -1061,6 +1112,202 @@
             let debounceTimers = {};
             let countSheetPage = 1;
             const countSheetLimit = 25;
+
+            // ==========================================
+            // REAL-TIME SYNCHRONIZATION VIA SSE (SERVER-SENT EVENTS)
+            // ==========================================
+            let opnameSSE = null;
+
+            function closeSSEConnection() {
+                if (opnameSSE) {
+                    try {
+                        opnameSSE.close();
+                    } catch (_) {}
+                    opnameSSE = null;
+                }
+                const badge = document.getElementById("sseLiveBadge");
+                if (badge) badge.classList.add("hidden");
+            }
+
+            function initSSEConnection(sessionId) {
+                if (!sessionId) return;
+                closeSSEConnection();
+
+                try {
+                    const sseUrl = `${BASE_URL}/api/stock-opnames/${sessionId}/live`;
+                    opnameSSE = typeof window.createSSEReader === "function"
+                        ? window.createSSEReader(sseUrl)
+                        : new EventSource(sseUrl);
+
+                    const badge = document.getElementById("sseLiveBadge");
+                    const badgeText = document.getElementById("sseLiveText");
+
+                    opnameSSE.onopen = function () {
+                        if (badge) {
+                            badge.className =
+                                "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs";
+                            badge.classList.remove("hidden");
+                        }
+                        if (badgeText) badgeText.innerText = "Live SSE";
+                    };
+
+                    opnameSSE.addEventListener("item_updated", function (e) {
+                        try {
+                            const data = JSON.parse(e.data);
+                            handleSSEItemUpdated(data);
+                        } catch (err) {
+                            console.error("Error parsing item_updated event:", err);
+                        }
+                    });
+
+                    opnameSSE.addEventListener("status_changed", function (e) {
+                        try {
+                            const data = JSON.parse(e.data);
+                            handleSSEStatusChanged(data);
+                        } catch (err) {
+                            console.error("Error parsing status_changed event:", err);
+                        }
+                    });
+
+                    opnameSSE.onerror = function () {
+                        if (badge) {
+                            badge.className =
+                                "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200";
+                        }
+                        if (badgeText) badgeText.innerText = "SSE Hubungkan Ulang...";
+                    };
+                } catch (err) {
+                    console.warn("Failed to initialize SSE connection:", err);
+                }
+            }
+
+            function handleSSEItemUpdated(data) {
+                if (!activeSession) return;
+                const sId = activeSession.id || activeSession.ID;
+                if (Number(data.stock_opname_id) !== Number(sId)) return;
+
+                const prodId = Number(data.product_id);
+                const itemIdx = sessionItems.findIndex(
+                    (it) => Number(it.ProductID || it.product_id) === prodId,
+                );
+                if (itemIdx === -1) return;
+
+                // Sinkronkan data objek item dalam memori
+                const item = sessionItems[itemIdx];
+                item.physical_qty = data.physical_qty;
+                item.PhysicalQty = data.physical_qty;
+                item.system_qty = data.system_qty;
+                item.SystemQty = data.system_qty;
+                if (data.reason !== undefined) {
+                    item.reason = data.reason;
+                    item.Reason = data.reason;
+                }
+                if (data.notes !== undefined) {
+                    item.notes = data.notes;
+                    item.Notes = data.notes;
+                }
+                if (data.photo_url !== undefined) {
+                    item.photo_url = data.photo_url;
+                    item.PhotoURL = data.photo_url;
+                }
+
+                const sys = Number(data.system_qty || 0);
+                const phys = Number(data.physical_qty || 0);
+                const diff = phys - sys;
+                const hbeli = Number(
+                    item.HBeli !== undefined ? item.HBeli : item.h_beli || 0,
+                );
+                const diffNominal = diff * hbeli;
+
+                // 1. Update Input Desktop jika pengguna tidak sedang fokus di input tsb
+                const inpDesk = document.getElementById(`inputPhys_${prodId}`);
+                if (inpDesk && document.activeElement !== inpDesk) {
+                    inpDesk.value = phys;
+                }
+
+                // 2. Update Input Mobile jika pengguna tidak sedang fokus di input tsb
+                const inpMob = document.getElementById(`inputPhys_m_${prodId}`);
+                if (inpMob && document.activeElement !== inpMob) {
+                    inpMob.value = phys;
+                }
+
+                // 3. Update Badge Selisih
+                let diffBadge = "";
+                if (diff === 0) {
+                    diffBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fas fa-check mr-1 text-[10px]"></i>Cocok (0)</span>`;
+                } else if (diff < 0) {
+                    diffBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-rose-50 text-rose-700 border border-rose-200"><i class="fas fa-arrow-down mr-1 text-[10px]"></i>Kurang (${diff})</span>`;
+                } else {
+                    diffBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-amber-50 text-amber-700 border border-amber-200"><i class="fas fa-arrow-up mr-1 text-[10px]"></i>Lebih (+${diff})</span>`;
+                }
+
+                const badgeEl = document.getElementById(`badgeDiff_${prodId}`);
+                if (badgeEl) badgeEl.innerHTML = diffBadge;
+
+                const badgeMob = document.getElementById(`badgeDiff_m_${prodId}`);
+                if (badgeMob) badgeMob.innerHTML = diffBadge;
+
+                // 4. Update Nominal Selisih
+                const nomDesk = document.getElementById(`nominalDiff_${prodId}`);
+                if (nomDesk) {
+                    nomDesk.className =
+                        diffNominal < 0
+                            ? "text-rose-600"
+                            : diffNominal > 0
+                              ? "text-amber-600"
+                              : "text-slate-400";
+                    nomDesk.innerText = `${diffNominal < 0 ? "-" : diffNominal > 0 ? "+" : ""} Rp ${Math.abs(diffNominal).toLocaleString("id-ID")}`;
+                }
+                const nomMob = document.getElementById(`nominalDiff_m_${prodId}`);
+                if (nomMob) {
+                    nomMob.className = `font-black text-xs ${diffNominal < 0 ? "text-rose-600" : diffNominal > 0 ? "text-amber-600" : "text-slate-400"}`;
+                    nomMob.innerText = `${diffNominal < 0 ? "-" : diffNominal > 0 ? "+" : ""} Rp ${Math.abs(diffNominal).toLocaleString("id-ID")}`;
+                }
+
+                // 5. Animasi Highlight Real-time (Flash Hijau Halus)
+                const trRow = document.querySelector(`tr[data-prod-id="${prodId}"]`);
+                if (trRow) {
+                    trRow.classList.add("bg-emerald-50");
+                    setTimeout(() => trRow.classList.remove("bg-emerald-50"), 1200);
+                }
+                const mCard = document.querySelector(`div[data-prod-id="${prodId}"]`);
+                if (mCard) {
+                    mCard.classList.add("ring-2", "ring-emerald-400");
+                    setTimeout(() => mCard.classList.remove("ring-2", "ring-emerald-400"), 1200);
+                }
+
+                // 6. Recalculate KPIs secara live
+                calculateKPIs();
+            }
+
+            function handleSSEStatusChanged(data) {
+                if (!activeSession) return;
+                const sId = activeSession.id || activeSession.ID;
+                if (Number(data.stock_opname_id) !== Number(sId)) return;
+
+                if (data.status) {
+                    activeSession.status = data.status;
+                    activeSession.Status = data.status;
+                    renderActiveSessionView();
+
+                    if (window.Swal) {
+                        Swal.fire({
+                            toast: true,
+                            position: "top-end",
+                            icon: "info",
+                            title: `Status Sesi Terkini: ${data.status}`,
+                            showConfirmButton: false,
+                            timer: 3500,
+                            timerProgressBar: true,
+                        });
+                    }
+                }
+            }
+
+            // Bersihkan koneksi SSE saat navigasi atau tutup tab
+            window.addEventListener("beforeunload", closeSSEConnection);
+            window.addEventListener("spa:before-navigate", closeSSEConnection);
+
 
             function checkSuperAdminAccess() {
                 const userData = getUserDataFromToken();
@@ -1089,13 +1336,19 @@
                 return true;
             }
 
-            window.onload = async () => {
+            async function initOpnamePage() {
                 startClock();
                 loadUserProfile();
                 if (!checkSuperAdminAccess()) return;
                 await loadMasterCategories();
                 await loadActiveSession();
-            };
+            }
+
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", initOpnamePage);
+            } else {
+                initOpnamePage();
+            }
 
             function startClock() {
                 const el = document.getElementById("clock");
@@ -1153,7 +1406,7 @@
                     .replace(/'/g, "&#039;");
             }
 
-            function switchTab(tab) {
+            function switchTab(tab, reloadActive = true) {
                 if (!checkSuperAdminAccess()) return;
                 activeTab = tab;
                 const activeView = document.getElementById("activeOpnameView");
@@ -1169,7 +1422,9 @@
                         "px-3.5 py-1.5 rounded-lg bg-white text-blue-600 shadow-sm transition-all";
                     tabHistoryBtn.className =
                         "px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all";
-                    loadActiveSession();
+                    if (reloadActive) {
+                        loadActiveSession();
+                    }
                 } else {
                     activeView.classList.add("hidden");
                     historyView.classList.remove("hidden");
@@ -1177,6 +1432,7 @@
                         "px-3.5 py-1.5 rounded-lg bg-white text-blue-600 shadow-sm transition-all";
                     tabActiveBtn.className =
                         "px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all";
+                    closeSSEConnection();
                     fetchOpnameHistory(1);
                 }
             }
@@ -1220,11 +1476,10 @@
                     const list = resJson.data || [];
 
                     // Kumpulkan semua sesi aktif (Draft atau Waiting Approval)
-                    const pendingSessions = list.filter(
-                        (s) =>
-                            s.Status === "Draft" ||
-                            s.Status === "Waiting Approval",
-                    );
+                    const pendingSessions = list.filter((s) => {
+                        const st = (s.status || s.Status || "").toLowerCase();
+                        return st === "draft" || st === "waiting approval";
+                    });
 
                     // Update session switcher dropdown jika ada beberapa sesi aktif
                     const sessionSelector = document.getElementById(
@@ -1235,8 +1490,12 @@
                             sessionSelector.classList.remove("hidden");
                             sessionSelector.innerHTML = pendingSessions
                                 .map((s) => {
-                                    const isDraft = s.Status === "Draft";
-                                    return `<option value="${s.ID}">${s.OpnameNo} (${s.Location} - ${isDraft ? "Draft" : "Approval"})</option>`;
+                                    const sId = s.id || s.ID;
+                                    const sNo = s.opname_no || s.OpnameNo;
+                                    const sLoc = s.location || s.Location;
+                                    const st = (s.status || s.Status || "").toLowerCase();
+                                    const isDraft = st === "draft";
+                                    return `<option value="${sId}">${sNo} (${sLoc} - ${isDraft ? "Draft" : "Approval"})</option>`;
                                 })
                                 .join("");
                         } else {
@@ -1249,36 +1508,48 @@
                     let chosenSession = null;
                     if (targetSessionId) {
                         chosenSession = list.find(
-                            (s) => s.ID == targetSessionId,
-                        ) || { ID: targetSessionId };
+                            (s) => (s.id || s.ID) == targetSessionId,
+                        ) || { ID: targetSessionId, id: targetSessionId };
                     } else if (pendingSessions.length > 0) {
                         chosenSession = pendingSessions[0];
                     }
 
                     if (chosenSession) {
+                        const chosenId = chosenSession.id || chosenSession.ID;
                         if (sessionSelector && pendingSessions.length > 1) {
-                            sessionSelector.value = chosenSession.ID;
+                            sessionSelector.value = chosenId;
+                        }
+
+                        const tbodyLoading = document.getElementById("countSheetTableBody");
+                        if (tbodyLoading) {
+                            tbodyLoading.innerHTML = `<tr><td colspan="9" class="py-16 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl text-blue-500 mb-2"></i><p>Memuat lembar hitung fisik...</p></td></tr>`;
+                        }
+                        const mobileCardsLoading = document.getElementById("countSheetMobileCards");
+                        if (mobileCardsLoading) {
+                            mobileCardsLoading.innerHTML = `<div class="py-16 text-center text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200 p-6"><i class="fas fa-spinner fa-spin text-2xl text-blue-500 mb-2"></i><p class="text-xs font-medium">Memuat lembar hitung fisik...</p></div>`;
                         }
 
                         // Ambil detail lengkap sesi beserta seluruh baris items
                         const detailRes = await fetch(
-                            `${BASE_URL}/api/stock-opnames/${chosenSession.ID}`,
+                            `${BASE_URL}/api/stock-opnames/${chosenId}`,
                             { headers },
                         );
                         if (detailRes.ok) {
                             const detailJson = await detailRes.json();
                             activeSession = detailJson.data || detailJson;
                             sessionItems =
-                                activeSession.Items ||
                                 activeSession.items ||
+                                activeSession.Items ||
                                 [];
                             countSheetPage = 1;
+                            initSSEConnection(chosenId);
                             renderActiveSessionView();
                             return;
                         }
                     }
 
                     // Jika benar-benar tidak ada sesi aktif
+                    closeSSEConnection();
                     activeSession = null;
                     sessionItems = [];
                     document
@@ -1314,43 +1585,44 @@
                     .classList.remove("hidden");
 
                 // Header Info
-                document.getElementById("sessionDocNo").innerText =
-                    activeSession.OpnameNo || activeSession.opname_no;
-                document.getElementById("sessionLocationBadge").innerText =
-                    activeSession.Location || activeSession.location;
-                document.getElementById("activeStoreBadge").innerText =
-                    activeSession.Location || activeSession.location;
+                const docNo = activeSession.opname_no || activeSession.OpnameNo || "-";
+                const location = activeSession.location || activeSession.Location || "Toko Sudirman";
+                const createdAt = activeSession.created_at || activeSession.CreatedAt;
+                const notes = activeSession.notes || activeSession.Notes || "";
+                const user = activeSession.user || activeSession.User || {};
+                const category = activeSession.category || activeSession.Category || {};
 
-                const dt = new Date(
-                    activeSession.CreatedAt || activeSession.created_at,
-                );
-                document.getElementById("sessionCreatedAt").innerText =
-                    dt.toLocaleDateString("id-ID", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    });
+                document.getElementById("sessionDocNo").innerText = docNo;
+                document.getElementById("sessionLocationBadge").innerText = location;
+                document.getElementById("activeStoreBadge").innerText = location;
 
-                const user = activeSession.User || {};
+                const dt = new Date(createdAt);
+                document.getElementById("sessionCreatedAt").innerText = !isNaN(dt)
+                    ? dt.toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                      })
+                    : "-";
+
                 document.getElementById("sessionUserName").innerText =
-                    user.Name || user.username || "Petugas";
+                    user.name || user.Name || user.username || "Petugas";
 
-                const category = activeSession.Category || {};
                 document.getElementById("sessionCategoryName").innerText =
-                    category.Nama || "Semua Barang";
+                    category.nama || category.Nama || "Semua Barang";
 
                 const notesEl = document.getElementById("sessionNotesDisplay");
-                if (activeSession.Notes) {
-                    notesEl.innerText = `Catatan: "${activeSession.Notes}"`;
+                if (notes) {
+                    notesEl.innerText = `Catatan: "${notes}"`;
                     notesEl.classList.remove("hidden");
                 } else {
                     notesEl.classList.add("hidden");
                 }
 
                 // Status Badge & Buttons
-                const status = activeSession.Status || "Draft";
+                const rawStatus = activeSession.status || activeSession.Status || "Draft";
                 const statusBadge =
                     document.getElementById("sessionStatusBadge");
                 const btnCancel = document.getElementById("btnCancelSession");
@@ -1370,14 +1642,14 @@
                     "akuntan",
                 ].includes(userRole);
 
-                if (status === "Draft") {
+                if (rawStatus === "Draft") {
                     statusBadge.className =
                         "px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200";
                     statusBadge.innerHTML = `<i class="fas fa-pencil-alt mr-1"></i>Draft (Sedang Dihitung)`;
                     btnCancel.classList.remove("hidden");
                     btnSubmit.classList.remove("hidden");
                     btnApprove.classList.add("hidden");
-                } else if (status === "Waiting Approval") {
+                } else if (rawStatus === "Waiting Approval") {
                     statusBadge.className =
                         "px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200";
                     statusBadge.innerHTML = `<i class="fas fa-clock mr-1"></i>Menunggu Persetujuan`;
@@ -1388,19 +1660,26 @@
                     } else {
                         btnApprove.classList.add("hidden");
                     }
-                } else if (status === "Completed") {
+                } else if (rawStatus === "Completed") {
                     statusBadge.className =
                         "px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200";
                     statusBadge.innerHTML = `<i class="fas fa-check-circle mr-1"></i>Selesai & Diterapkan`;
                     btnCancel.classList.add("hidden");
                     btnSubmit.classList.add("hidden");
                     btnApprove.classList.add("hidden");
-                } else {
+                } else if (rawStatus === "Cancelled") {
                     statusBadge.className =
                         "px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200";
                     statusBadge.innerHTML = `<i class="fas fa-ban mr-1"></i>Dibatalkan`;
                     btnCancel.classList.add("hidden");
                     btnSubmit.classList.add("hidden");
+                    btnApprove.classList.add("hidden");
+                } else {
+                    statusBadge.className =
+                        "px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200";
+                    statusBadge.innerHTML = `<i class="fas fa-pencil-alt mr-1"></i>${escapeHTML(rawStatus)}`;
+                    btnCancel.classList.remove("hidden");
+                    btnSubmit.classList.remove("hidden");
                     btnApprove.classList.add("hidden");
                 }
 
@@ -1421,26 +1700,24 @@
 
                 sessionItems.forEach((item) => {
                     const sys = Number(
-                        item.SystemQty !== undefined
-                            ? item.SystemQty
-                            : item.system_qty || 0,
+                        item.system_qty !== undefined
+                            ? item.system_qty
+                            : item.SystemQty || 0,
                     );
                     const phys = Number(
-                        item.PhysicalQty !== undefined
-                            ? item.PhysicalQty
-                            : item.physical_qty || 0,
+                        item.physical_qty !== undefined
+                            ? item.physical_qty
+                            : item.PhysicalQty || 0,
                     );
                     const diff = phys - sys;
                     const hbeli = Number(
-                        item.HBeli !== undefined
-                            ? item.HBeli
-                            : item.h_beli || 0,
+                        item.h_beli !== undefined
+                            ? item.h_beli
+                            : item.HBeli || 0,
                     );
 
-                    if (
-                        item.PhysicalQty !== null &&
-                        item.PhysicalQty !== undefined
-                    ) {
+                    const physVal = item.physical_qty !== undefined ? item.physical_qty : item.PhysicalQty;
+                    if (physVal !== null && physVal !== undefined) {
                         counted++;
                     }
 
@@ -1487,6 +1764,7 @@
             // ==========================================
             function renderCountSheetTable() {
                 const tbody = document.getElementById("countSheetTableBody");
+                const mobileContainer = document.getElementById("countSheetMobileCards");
                 const search = (
                     document.getElementById("opnameSearchInput").value || ""
                 )
@@ -1496,9 +1774,9 @@
                     document.getElementById("opnameStatusFilter").value;
 
                 const filtered = sessionItems.filter((item) => {
-                    const p = item.Product || {};
-                    const name = (p.Nama || p.nama || "").toLowerCase();
-                    const code = (p.Kode || p.kode || "").toLowerCase();
+                    const p = item.product || item.Product || {};
+                    const name = (p.Nama || p.nama || item.product_name || item.ProductName || "").toLowerCase();
+                    const code = (p.Kode || p.kode || item.product_code || item.ProductCode || "").toLowerCase();
                     const matchSearch =
                         !search ||
                         name.includes(search) ||
@@ -1529,7 +1807,18 @@
                     totalFiltered.toLocaleString("id-ID");
 
                 if (totalFiltered === 0) {
-                    tbody.innerHTML = `<tr><td colspan="9" class="py-16 text-center text-slate-400">Tidak ada produk yang cocok dengan pencarian / filter.</td></tr>`;
+                    if (tbody) {
+                        tbody.innerHTML = `<tr><td colspan="9" class="py-16 text-center text-slate-400">Tidak ada produk yang cocok dengan pencarian / filter.</td></tr>`;
+                    }
+                    if (mobileContainer) {
+                        mobileContainer.innerHTML = `
+                            <div class="py-16 text-center text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200 p-6">
+                                <i class="fas fa-search text-3xl mb-2 text-slate-300"></i>
+                                <p class="font-bold text-slate-700 text-sm">Tidak Ada Produk</p>
+                                <p class="text-xs text-slate-400 mt-1">Tidak ada produk yang cocok dengan pencarian / filter.</p>
+                            </div>
+                        `;
+                    }
                     document.getElementById(
                         "countSheetPaginationControls",
                     ).innerHTML = "";
@@ -1553,193 +1842,437 @@
                 document.getElementById("countSheetPageInfo").innerText =
                     `Halaman ${countSheetPage} dari ${totalPages} (Menampilkan baris ${startIdx + 1} - ${endIdx})`;
 
-                const isLocked =
-                    activeSession.Status === "Completed" ||
-                    activeSession.Status === "Cancelled";
+                const curStatus = (activeSession.status || activeSession.Status || "").toLowerCase();
+                const isLocked = curStatus === "completed" || curStatus === "cancelled";
 
-                tbody.innerHTML = pageItems
-                    .map((item) => {
-                        const p = item.Product || {};
-                        const prodId = item.ProductID || item.product_id;
-                        const sys = Number(
-                            item.SystemQty !== undefined
-                                ? item.SystemQty
-                                : item.system_qty || 0,
-                        );
-                        const phys = Number(
-                            item.PhysicalQty !== undefined
-                                ? item.PhysicalQty
-                                : item.physical_qty || 0,
-                        );
-                        const diff = phys - sys;
-                        const hbeli = Number(
-                            item.HBeli !== undefined
-                                ? item.HBeli
-                                : item.h_beli || 0,
-                        );
-                        const diffNominal = diff * hbeli;
-                        const photo = item.PhotoURL || item.photo_url || "";
-                        const reason =
-                            item.Reason ||
-                            item.reason ||
-                            (diff === 0 ? "Cocok" : "Lainnya");
-                        const notes = item.Notes || item.notes || "";
+                // --- 1. RENDER DESKTOP TABLE ROWS ---
+                if (tbody) {
+                    tbody.innerHTML = pageItems
+                        .map((item) => {
+                            const p = item.product || item.Product || {};
+                            const prodId = item.ProductID || item.product_id;
+                            const prodCode = p.Kode || p.kode || item.product_code || item.ProductCode || "-";
+                            let prodName = p.Nama || p.nama || item.product_name || item.ProductName || "";
+                            if (!prodName || prodName.trim() === "") {
+                                if (prodCode && prodCode !== "-") {
+                                    prodName = `[${prodCode}] (Nama belum diisi)`;
+                                } else {
+                                    prodName = `Produk #${prodId}`;
+                                }
+                            }
 
-                        let diffBadge = "";
-                        if (diff === 0) {
-                            diffBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fas fa-check mr-1 text-[10px]"></i>Cocok (0)</span>`;
-                        } else if (diff < 0) {
-                            diffBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-rose-50 text-rose-700 border border-rose-200"><i class="fas fa-arrow-down mr-1 text-[10px]"></i>Kurang (${diff})</span>`;
-                        } else {
-                            diffBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-amber-50 text-amber-700 border border-amber-200"><i class="fas fa-arrow-up mr-1 text-[10px]"></i>Lebih (+${diff})</span>`;
-                        }
+                            const sys = Number(
+                                item.SystemQty !== undefined
+                                    ? item.SystemQty
+                                    : item.system_qty || 0,
+                            );
+                            const phys = Number(
+                                item.PhysicalQty !== undefined
+                                    ? item.PhysicalQty
+                                    : item.physical_qty || 0,
+                            );
+                            const diff = phys - sys;
+                            const hbeli = Number(
+                                item.HBeli !== undefined
+                                    ? item.HBeli
+                                    : item.h_beli || 0,
+                            );
+                            const diffNominal = diff * hbeli;
+                            const photo = item.PhotoURL || item.photo_url || "";
+                            const reason =
+                                item.Reason ||
+                                item.reason ||
+                                (diff === 0 ? "Cocok" : "Lainnya");
+                            const notes = item.Notes || item.notes || "";
 
-                        let photoHTML = "";
-                        if (photo) {
-                            const fullPhotoUrl = photo.startsWith("http")
-                                ? photo
-                                : `${BASE_URL}${photo}`;
-                            photoHTML = `
-                            <div class="relative group inline-block">
-                                <img
-                                    src="${fullPhotoUrl}"
-                                    onclick="previewPhoto('${fullPhotoUrl}')"
-                                    class="w-10 h-10 object-cover rounded-xl border border-slate-200 cursor-pointer shadow-sm hover:opacity-90"
-                                    title="Klik untuk perbesar foto"
-                                />
-                                ${
-                                    !isLocked
-                                        ? `
+                            let diffBadge = "";
+                            if (diff === 0) {
+                                diffBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fas fa-check mr-1 text-[10px]"></i>Cocok (0)</span>`;
+                            } else if (diff < 0) {
+                                diffBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-rose-50 text-rose-700 border border-rose-200"><i class="fas fa-arrow-down mr-1 text-[10px]"></i>Kurang (${diff})</span>`;
+                            } else {
+                                diffBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-amber-50 text-amber-700 border border-amber-200"><i class="fas fa-arrow-up mr-1 text-[10px]"></i>Lebih (+${diff})</span>`;
+                            }
+
+                            let photoHTML = "";
+                            if (photo) {
+                                const fullPhotoUrl = photo.startsWith("http")
+                                    ? photo
+                                    : `${BASE_URL}${photo}`;
+                                photoHTML = `
+                                <div class="relative group inline-block">
+                                    <img
+                                        src="${fullPhotoUrl}"
+                                        onclick="previewPhoto('${fullPhotoUrl}')"
+                                        class="w-10 h-10 object-cover rounded-xl border border-slate-200 cursor-pointer shadow-sm hover:opacity-90"
+                                        title="Klik untuk perbesar foto"
+                                    />
+                                    ${
+                                        !isLocked
+                                            ? `
+                                    <button
+                                        onclick="triggerPhotoUpload('${prodId}')"
+                                        class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center text-[9px] shadow hover:bg-blue-700"
+                                        title="Ganti foto"
+                                    >
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    `
+                                            : ""
+                                    }
+                                </div>
+                            `;
+                            } else {
+                                photoHTML = !isLocked
+                                    ? `
                                 <button
                                     onclick="triggerPhotoUpload('${prodId}')"
-                                    class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center text-[9px] shadow hover:bg-blue-700"
-                                    title="Ganti foto"
+                                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-dashed border-slate-300 text-slate-500 hover:text-blue-600 hover:border-blue-400 bg-slate-50 text-[11px] font-bold transition-all"
+                                    title="Ambil/Unggah Foto Bukti"
                                 >
-                                    <i class="fas fa-pen"></i>
+                                    <i class="fas fa-camera"></i> Foto
                                 </button>
+                            `
+                                    : `<span class="text-slate-300 text-[11px]">-</span>`;
+                            }
+
+                            return `
+                            <tr class="hover:bg-slate-50/70 transition-colors" data-prod-id="${prodId}">
+                                <td class="p-3.5 pl-6 min-w-[200px]">
+                                    <div class="font-bold text-slate-800 text-xs sm:text-sm">${escapeHTML(prodName)}</div>
+                                    <div class="text-[10px] text-slate-400 font-mono font-bold uppercase tracking-tight">${escapeHTML(prodCode)}</div>
+                                </td>
+                                <td class="p-3.5 text-right font-mono font-semibold text-slate-600 whitespace-nowrap">
+                                    Rp ${hbeli.toLocaleString("id-ID")}
+                                </td>
+                                <td class="p-3.5 text-center font-mono font-black text-blue-700 bg-blue-50/30 whitespace-nowrap">
+                                    ${sys} Unit
+                                </td>
+                                <td class="p-3.5 text-center whitespace-nowrap bg-slate-50/50">
+                                    ${
+                                        !isLocked
+                                            ? `
+                                    <div class="inline-flex items-center border border-slate-200 rounded-xl bg-white shadow-sm overflow-hidden">
+                                        <button
+                                            onclick="stepPhysicalQty('${prodId}', -1)"
+                                            class="px-2.5 py-1 text-slate-500 hover:bg-slate-100 font-black text-sm"
+                                        >-</button>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            id="inputPhys_${prodId}"
+                                            value="${phys}"
+                                            oninput="onPhysicalQtyInput('${prodId}')"
+                                            class="w-16 text-center font-mono font-black text-slate-800 text-sm outline-none bg-transparent"
+                                        />
+                                        <button
+                                            onclick="stepPhysicalQty('${prodId}', 1)"
+                                            class="px-2.5 py-1 text-slate-500 hover:bg-slate-100 font-black text-sm"
+                                        >+</button>
+                                    </div>
+                                    `
+                                            : `
+                                    <span class="font-mono font-black text-slate-800 text-sm">${phys} Unit</span>
+                                    `
+                                    }
+                                </td>
+                                <td class="p-3.5 text-center whitespace-nowrap">
+                                    <span id="badgeDiff_${prodId}">${diffBadge}</span>
+                                </td>
+                                <td class="p-3.5 text-right font-mono font-bold whitespace-nowrap">
+                                    <span id="nominalDiff_${prodId}" class="${diffNominal < 0 ? "text-rose-600" : diffNominal > 0 ? "text-amber-600" : "text-slate-400"}">
+                                        ${diffNominal < 0 ? "-" : diffNominal > 0 ? "+" : ""} Rp ${Math.abs(diffNominal).toLocaleString("id-ID")}
+                                    </span>
+                                </td>
+                                <td class="p-3.5 min-w-[180px]">
+                                    ${
+                                        !isLocked
+                                            ? `
+                                    <div class="space-y-1">
+                                        <select
+                                            id="selectReason_${prodId}"
+                                            onchange="saveRowItem('${prodId}')"
+                                            class="w-full bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400"
+                                        >
+                                            <option value="Cocok" ${reason === "Cocok" ? "selected" : ""}>Cocok / Sesuai</option>
+                                            <option value="Barang Rusak / Pecah" ${reason === "Barang Rusak / Pecah" ? "selected" : ""}>Barang Rusak / Pecah</option>
+                                            <option value="Barang Hilang / Tak Ditemukan" ${reason === "Barang Hilang / Tak Ditemukan" ? "selected" : ""}>Barang Hilang / Hilang</option>
+                                            <option value="Salah Hitung Nota" ${reason === "Salah Hitung Nota" ? "selected" : ""}>Salah Hitung Nota / Adm</option>
+                                            <option value="Cacat Kemasan / Segel" ${reason === "Cacat Kemasan / Segel" ? "selected" : ""}>Cacat Kemasan / Segel</option>
+                                            <option value="Lainnya" ${reason === "Lainnya" ? "selected" : ""}>Lainnya</option>
+                                        </select>
+                                        <input
+                                            type="text"
+                                            id="inputNotes_${prodId}"
+                                            value="${escapeHTML(notes)}"
+                                            placeholder="Keterangan..."
+                                            onchange="saveRowItem('${prodId}')"
+                                            class="w-full bg-slate-50 border border-slate-200 rounded-lg p-1 text-[10px] text-slate-700 outline-none focus:border-blue-400"
+                                        />
+                                    </div>
+                                    `
+                                            : `
+                                    <div class="text-xs font-bold text-slate-700">${escapeHTML(reason)}</div>
+                                    <div class="text-[10px] text-slate-400 italic">${escapeHTML(notes || "-")}</div>
+                                    `
+                                    }
+                                </td>
+                                <td class="p-3.5 text-center">
+                                    ${photoHTML}
+                                </td>
+                                <td class="p-3.5 pr-6 text-right whitespace-nowrap no-print">
+                                    ${
+                                        !isLocked
+                                            ? `
+                                    <button
+                                        id="btnSaveRow_${prodId}"
+                                        onclick="saveRowItem('${prodId}')"
+                                        class="text-blue-600 hover:text-blue-800 p-2 transition-colors font-bold text-xs"
+                                        title="Simpan Baris Ini"
+                                    >
+                                        <i class="fas fa-save"></i>
+                                    </button>
+                                    `
+                                            : `<i class="fas fa-lock text-slate-300"></i>`
+                                    }
+                                </td>
+                            </tr>
+                        `;
+                        })
+                        .join("");
+                }
+
+                // --- 2. RENDER MOBILE CARDS (RESPONSIF SMARTPHONE) ---
+                if (mobileContainer) {
+                    mobileContainer.innerHTML = pageItems
+                        .map((item) => {
+                            const p = item.product || item.Product || {};
+                            const prodId = item.ProductID || item.product_id;
+                            const prodCode = p.Kode || p.kode || item.product_code || item.ProductCode || "-";
+                            let prodName = p.Nama || p.nama || item.product_name || item.ProductName || "";
+                            if (!prodName || prodName.trim() === "") {
+                                if (prodCode && prodCode !== "-") {
+                                    prodName = `[${prodCode}] (Nama belum diisi)`;
+                                } else {
+                                    prodName = `Produk #${prodId}`;
+                                }
+                            }
+
+                            const sys = Number(
+                                item.SystemQty !== undefined
+                                    ? item.SystemQty
+                                    : item.system_qty || 0,
+                            );
+                            const phys = Number(
+                                item.PhysicalQty !== undefined
+                                    ? item.PhysicalQty
+                                    : item.physical_qty || 0,
+                            );
+                            const diff = phys - sys;
+                            const hbeli = Number(
+                                item.HBeli !== undefined
+                                    ? item.HBeli
+                                    : item.h_beli || 0,
+                            );
+                            const diffNominal = diff * hbeli;
+                            const photo = item.PhotoURL || item.photo_url || "";
+                            const reason =
+                                item.Reason ||
+                                item.reason ||
+                                (diff === 0 ? "Cocok" : "Lainnya");
+                            const notes = item.Notes || item.notes || "";
+
+                            let diffBadge = "";
+                            if (diff === 0) {
+                                diffBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fas fa-check mr-1 text-[10px]"></i>Cocok (0)</span>`;
+                            } else if (diff < 0) {
+                                diffBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-black bg-rose-50 text-rose-700 border border-rose-200"><i class="fas fa-arrow-down mr-1 text-[10px]"></i>Kurang (${diff})</span>`;
+                            } else {
+                                diffBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-black bg-amber-50 text-amber-700 border border-amber-200"><i class="fas fa-arrow-up mr-1 text-[10px]"></i>Lebih (+${diff})</span>`;
+                            }
+
+                            let photoHTML_m = "";
+                            if (photo) {
+                                const fullPhotoUrl = photo.startsWith("http")
+                                    ? photo
+                                    : `${BASE_URL}${photo}`;
+                                photoHTML_m = `
+                                    <div class="relative group inline-block">
+                                        <img
+                                            src="${fullPhotoUrl}"
+                                            onclick="previewPhoto('${fullPhotoUrl}')"
+                                            class="w-11 h-11 object-cover rounded-xl border border-slate-200 cursor-pointer shadow-xs active:scale-95"
+                                            title="Lihat Foto Bukti"
+                                        />
+                                        ${
+                                            !isLocked
+                                                ? `
+                                        <button
+                                            onclick="triggerPhotoUpload('${prodId}')"
+                                            class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center text-[10px] shadow"
+                                            title="Ganti foto"
+                                        >
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                        `
+                                                : ""
+                                        }
+                                    </div>
+                                `;
+                            } else {
+                                photoHTML_m = !isLocked
+                                    ? `
+                                    <button
+                                        onclick="triggerPhotoUpload('${prodId}')"
+                                        class="h-10 px-3 rounded-xl border border-dashed border-slate-300 text-slate-600 active:bg-blue-50 active:text-blue-600 active:border-blue-400 bg-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs"
+                                        title="Ambil/Unggah Foto Bukti"
+                                    >
+                                        <i class="fas fa-camera text-blue-500"></i>
+                                        <span>Foto Bukti</span>
+                                    </button>
                                 `
-                                        : ""
+                                    : `<span class="text-slate-300 text-xs">-</span>`;
+                            }
+
+                            return `
+                            <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-3 relative" data-prod-id="${prodId}">
+                                <!-- Header: Nama Barang & Barcode & Badge Selisih -->
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="font-bold text-slate-800 text-sm leading-snug break-words">${escapeHTML(prodName)}</h4>
+                                        <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                            <span class="inline-flex items-center font-mono font-bold text-[11px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md">
+                                                <i class="fas fa-barcode mr-1 text-[10px] text-slate-400"></i>${escapeHTML(prodCode)}
+                                            </span>
+                                            <span class="text-[11px] font-mono text-slate-400 font-medium">
+                                                H.Beli: Rp ${hbeli.toLocaleString("id-ID")}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="shrink-0" id="badgeDiff_m_${prodId}">
+                                        ${diffBadge}
+                                    </div>
+                                </div>
+
+                                <!-- Box Stepper Hitung Fisik vs Saldo Sistem -->
+                                <div class="bg-slate-50/80 rounded-xl p-3 border border-slate-100 flex items-center justify-between gap-2">
+                                    <!-- Saldo Sistem -->
+                                    <div class="text-left">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Sistem</span>
+                                        <div class="text-sm font-black text-blue-700 font-mono mt-0.5">
+                                            ${sys} <span class="text-xs font-bold text-slate-500">Unit</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Separator Panah -->
+                                    <div class="text-slate-300 text-xs">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </div>
+
+                                    <!-- Stepper Fisik Nyata (Besar & Nyaman disentuh di HP) -->
+                                    <div class="text-right flex items-center gap-1">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mr-1 sm:hidden">Fisik:</span>
+                                        ${
+                                            !isLocked
+                                                ? `
+                                        <div class="inline-flex items-center border border-slate-200 rounded-xl bg-white shadow-2xs overflow-hidden">
+                                            <button
+                                                type="button"
+                                                onclick="stepPhysicalQty('${prodId}', -1)"
+                                                class="w-10 h-10 flex items-center justify-center text-slate-600 active:bg-slate-200 hover:bg-slate-100 font-black text-base select-none touch-manipulation"
+                                                aria-label="Kurangi 1"
+                                            >-</button>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                id="inputPhys_m_${prodId}"
+                                                value="${phys}"
+                                                oninput="onPhysicalQtyInput('${prodId}', true)"
+                                                class="w-14 h-10 text-center font-mono font-black text-slate-900 text-base outline-none bg-transparent"
+                                            />
+                                            <button
+                                                type="button"
+                                                onclick="stepPhysicalQty('${prodId}', 1)"
+                                                class="w-10 h-10 flex items-center justify-center text-blue-600 active:bg-blue-100 hover:bg-blue-50 font-black text-base select-none touch-manipulation"
+                                                aria-label="Tambah 1"
+                                            >+</button>
+                                        </div>
+                                        `
+                                                : `
+                                        <span class="font-mono font-black text-slate-800 text-base bg-white px-3 py-1.5 rounded-xl border border-slate-200">${phys} Unit</span>
+                                        `
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- Nilai Deviasi Nominal -->
+                                <div class="flex items-center justify-between text-xs pt-0.5">
+                                    <span class="text-slate-500 font-medium text-[11px]">Deviasi Nominal:</span>
+                                    <span id="nominalDiff_m_${prodId}" class="font-mono font-bold text-xs ${diffNominal < 0 ? "text-rose-600" : diffNominal > 0 ? "text-amber-600" : "text-slate-400"}">
+                                        ${diffNominal < 0 ? "-" : diffNominal > 0 ? "+" : ""} Rp ${Math.abs(diffNominal).toLocaleString("id-ID")}
+                                    </span>
+                                </div>
+
+                                <!-- Alasan, Catatan & Foto Bukti -->
+                                ${
+                                    !isLocked
+                                        ? `
+                                <div class="space-y-2 pt-2 border-t border-slate-100">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        <select
+                                            id="selectReason_m_${prodId}"
+                                            onchange="syncAndSaveReason('${prodId}')"
+                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-700 outline-none focus:border-blue-400"
+                                        >
+                                            <option value="Cocok" ${reason === "Cocok" ? "selected" : ""}>Cocok / Sesuai</option>
+                                            <option value="Barang Rusak / Pecah" ${reason === "Barang Rusak / Pecah" ? "selected" : ""}>Barang Rusak / Pecah</option>
+                                            <option value="Barang Hilang / Tak Ditemukan" ${reason === "Barang Hilang / Tak Ditemukan" ? "selected" : ""}>Barang Hilang / Hilang</option>
+                                            <option value="Salah Hitung Nota" ${reason === "Salah Hitung Nota" ? "selected" : ""}>Salah Hitung Nota / Adm</option>
+                                            <option value="Cacat Kemasan / Segel" ${reason === "Cacat Kemasan / Segel" ? "selected" : ""}>Cacat Kemasan / Segel</option>
+                                            <option value="Lainnya" ${reason === "Lainnya" ? "selected" : ""}>Lainnya</option>
+                                        </select>
+                                        <input
+                                            type="text"
+                                            id="inputNotes_m_${prodId}"
+                                            value="${escapeHTML(notes)}"
+                                            placeholder="Catatan alasan..."
+                                            onchange="syncAndSaveNotes('${prodId}')"
+                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs text-slate-700 outline-none focus:border-blue-400"
+                                        />
+                                    </div>
+                                    <div class="flex items-center justify-between gap-2 pt-1">
+                                        <div class="flex items-center gap-2">
+                                            ${photoHTML_m}
+                                            <span id="saveStatus_m_${prodId}" class="text-[10px] text-slate-400 font-medium"></span>
+                                        </div>
+                                        <button
+                                            id="btnSaveRow_m_${prodId}"
+                                            onclick="saveRowItem('${prodId}')"
+                                            class="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-50 active:bg-blue-100 text-blue-700 rounded-xl text-xs font-bold transition-all border border-blue-200 shadow-2xs"
+                                        >
+                                            <i class="fas fa-save"></i>
+                                            <span>Simpan</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                `
+                                        : `
+                                <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2 text-xs">
+                                    <div>
+                                        <span class="font-bold text-slate-700">${escapeHTML(reason)}</span>
+                                        ${notes ? `<p class="text-[11px] text-slate-400 italic">${escapeHTML(notes)}</p>` : ""}
+                                    </div>
+                                    <div>
+                                        ${photoHTML_m}
+                                    </div>
+                                </div>
+                                `
                                 }
                             </div>
-                        `;
-                        } else {
-                            photoHTML = !isLocked
-                                ? `
-                            <button
-                                onclick="triggerPhotoUpload('${prodId}')"
-                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-dashed border-slate-300 text-slate-500 hover:text-blue-600 hover:border-blue-400 bg-slate-50 text-[11px] font-bold transition-all"
-                                title="Ambil/Unggah Foto Bukti"
-                            >
-                                <i class="fas fa-camera"></i> Foto
-                            </button>
-                        `
-                                : `<span class="text-slate-300 text-[11px]">-</span>`;
-                        }
-
-                        return `
-                        <tr class="hover:bg-slate-50/70 transition-colors" data-prod-id="${prodId}">
-                            <td class="p-3.5 pl-6 min-w-[200px]">
-                                <div class="font-bold text-slate-800 text-xs sm:text-sm">${escapeHTML(p.Nama || p.nama || "-")}</div>
-                                <div class="text-[10px] text-slate-400 font-mono font-bold uppercase tracking-tight">${escapeHTML(p.Kode || p.kode || "-")}</div>
-                            </td>
-                            <td class="p-3.5 text-right font-mono font-semibold text-slate-600 whitespace-nowrap">
-                                Rp ${hbeli.toLocaleString("id-ID")}
-                            </td>
-                            <td class="p-3.5 text-center font-mono font-black text-blue-700 bg-blue-50/30 whitespace-nowrap">
-                                ${sys} Unit
-                            </td>
-                            <td class="p-3.5 text-center whitespace-nowrap bg-slate-50/50">
-                                ${
-                                    !isLocked
-                                        ? `
-                                <div class="inline-flex items-center border border-slate-200 rounded-xl bg-white shadow-sm overflow-hidden">
-                                    <button
-                                        onclick="stepPhysicalQty('${prodId}', -1)"
-                                        class="px-2.5 py-1 text-slate-500 hover:bg-slate-100 font-black text-sm"
-                                    >-</button>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        id="inputPhys_${prodId}"
-                                        value="${phys}"
-                                        oninput="onPhysicalQtyInput('${prodId}')"
-                                        class="w-16 text-center font-mono font-black text-slate-800 text-sm outline-none bg-transparent"
-                                    />
-                                    <button
-                                        onclick="stepPhysicalQty('${prodId}', 1)"
-                                        class="px-2.5 py-1 text-slate-500 hover:bg-slate-100 font-black text-sm"
-                                    >+</button>
-                                </div>
-                                `
-                                        : `
-                                <span class="font-mono font-black text-slate-800 text-sm">${phys} Unit</span>
-                                `
-                                }
-                            </td>
-                            <td class="p-3.5 text-center whitespace-nowrap">
-                                <span id="badgeDiff_${prodId}">${diffBadge}</span>
-                            </td>
-                            <td class="p-3.5 text-right font-mono font-bold whitespace-nowrap">
-                                <span id="nominalDiff_${prodId}" class="${diffNominal < 0 ? "text-rose-600" : diffNominal > 0 ? "text-amber-600" : "text-slate-400"}">
-                                    ${diffNominal < 0 ? "-" : diffNominal > 0 ? "+" : ""} Rp ${Math.abs(diffNominal).toLocaleString("id-ID")}
-                                </span>
-                            </td>
-                            <td class="p-3.5 min-w-[180px]">
-                                ${
-                                    !isLocked
-                                        ? `
-                                <div class="space-y-1">
-                                    <select
-                                        id="selectReason_${prodId}"
-                                        onchange="saveRowItem('${prodId}')"
-                                        class="w-full bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400"
-                                    >
-                                        <option value="Cocok" ${reason === "Cocok" ? "selected" : ""}>Cocok / Sesuai</option>
-                                        <option value="Barang Rusak / Pecah" ${reason === "Barang Rusak / Pecah" ? "selected" : ""}>Barang Rusak / Pecah</option>
-                                        <option value="Barang Hilang / Tak Ditemukan" ${reason === "Barang Hilang / Tak Ditemukan" ? "selected" : ""}>Barang Hilang / Hilang</option>
-                                        <option value="Salah Hitung Nota" ${reason === "Salah Hitung Nota" ? "selected" : ""}>Salah Hitung Nota / Adm</option>
-                                        <option value="Cacat Kemasan / Segel" ${reason === "Cacat Kemasan / Segel" ? "selected" : ""}>Cacat Kemasan / Segel</option>
-                                        <option value="Lainnya" ${reason === "Lainnya" ? "selected" : ""}>Lainnya</option>
-                                    </select>
-                                    <input
-                                        type="text"
-                                        id="inputNotes_${prodId}"
-                                        value="${escapeHTML(notes)}"
-                                        placeholder="Keterangan..."
-                                        onchange="saveRowItem('${prodId}')"
-                                        class="w-full bg-slate-50 border border-slate-200 rounded-lg p-1 text-[10px] text-slate-700 outline-none focus:border-blue-400"
-                                    />
-                                </div>
-                                `
-                                        : `
-                                <div class="text-xs font-bold text-slate-700">${escapeHTML(reason)}</div>
-                                <div class="text-[10px] text-slate-400 italic">${escapeHTML(notes || "-")}</div>
-                                `
-                                }
-                            </td>
-                            <td class="p-3.5 text-center">
-                                ${photoHTML}
-                            </td>
-                            <td class="p-3.5 pr-6 text-right whitespace-nowrap no-print">
-                                ${
-                                    !isLocked
-                                        ? `
-                                <button
-                                    id="btnSaveRow_${prodId}"
-                                    onclick="saveRowItem('${prodId}')"
-                                    class="text-blue-600 hover:text-blue-800 p-2 transition-colors font-bold text-xs"
-                                    title="Simpan Baris Ini"
-                                >
-                                    <i class="fas fa-save"></i>
-                                </button>
-                                `
-                                        : `<i class="fas fa-lock text-slate-300"></i>`
-                                }
-                            </td>
-                        </tr>
-                    `;
-                    })
-                    .join("");
+                            `;
+                        })
+                        .join("");
+                }
 
                 // Render pagination buttons
                 renderCountSheetPagination(totalPages);
@@ -1778,6 +2311,10 @@
                     "#activeSessionContainer .overflow-x-auto",
                 );
                 if (tableContainer) tableContainer.scrollTop = 0;
+                const mobileContainer = document.getElementById("countSheetMobileCards");
+                if (mobileContainer && window.innerWidth < 768) {
+                    mobileContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
             }
 
             function filterOpnameItems() {
@@ -1788,22 +2325,42 @@
             // INTERACTIVE LIVE COUNTING & AUTO-SAVE
             // ==========================================
             function stepPhysicalQty(productId, delta) {
-                const input = document.getElementById(`inputPhys_${productId}`);
-                if (!input) return;
-                let val = parseInt(input.value || "0") + delta;
+                const inputDesk = document.getElementById(`inputPhys_${productId}`);
+                const inputMob = document.getElementById(`inputPhys_m_${productId}`);
+                let curVal = 0;
+                if (inputDesk) curVal = parseInt(inputDesk.value || "0");
+                else if (inputMob) curVal = parseInt(inputMob.value || "0");
+                
+                let val = curVal + delta;
                 if (val < 0) val = 0;
-                input.value = val;
+                
+                if (inputDesk) inputDesk.value = val;
+                if (inputMob) inputMob.value = val;
+                
                 onPhysicalQtyInput(productId);
             }
 
-            function onPhysicalQtyInput(productId) {
+            function onPhysicalQtyInput(productId, isMobile = false) {
                 const item = sessionItems.find(
                     (i) => (i.ProductID || i.product_id) == productId,
                 );
                 if (!item) return;
 
-                const input = document.getElementById(`inputPhys_${productId}`);
-                const phys = parseInt(input.value || "0");
+                const inputDesk = document.getElementById(`inputPhys_${productId}`);
+                const inputMob = document.getElementById(`inputPhys_m_${productId}`);
+                
+                let phys = 0;
+                if (isMobile && inputMob) {
+                    phys = parseInt(inputMob.value || "0");
+                    if (inputDesk) inputDesk.value = phys;
+                } else if (inputDesk) {
+                    phys = parseInt(inputDesk.value || "0");
+                    if (inputMob) inputMob.value = phys;
+                } else if (inputMob) {
+                    phys = parseInt(inputMob.value || "0");
+                }
+                if (isNaN(phys) || phys < 0) phys = 0;
+
                 const sys = Number(
                     item.SystemQty !== undefined
                         ? item.SystemQty
@@ -1821,39 +2378,58 @@
                 item.DiscrepancyQty = diff;
                 item.discrepancy_qty = diff;
 
-                // Update UI badges
-                const badgeEl = document.getElementById(
-                    `badgeDiff_${productId}`,
-                );
-                if (badgeEl) {
-                    if (diff === 0) {
-                        badgeEl.innerHTML = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fas fa-check mr-1 text-[10px]"></i>Cocok (0)</span>`;
-                    } else if (diff < 0) {
-                        badgeEl.innerHTML = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-rose-50 text-rose-700 border border-rose-200"><i class="fas fa-arrow-down mr-1 text-[10px]"></i>Kurang (${diff})</span>`;
-                    } else {
-                        badgeEl.innerHTML = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-amber-50 text-amber-700 border border-amber-200"><i class="fas fa-arrow-up mr-1 text-[10px]"></i>Lebih (+${diff})</span>`;
-                    }
+                // Update UI badges (both desktop & mobile)
+                let diffBadgeHTML = "";
+                if (diff === 0) {
+                    diffBadgeHTML = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fas fa-check mr-1 text-[10px]"></i>Cocok (0)</span>`;
+                } else if (diff < 0) {
+                    diffBadgeHTML = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-rose-50 text-rose-700 border border-rose-200"><i class="fas fa-arrow-down mr-1 text-[10px]"></i>Kurang (${diff})</span>`;
+                } else {
+                    diffBadgeHTML = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-amber-50 text-amber-700 border border-amber-200"><i class="fas fa-arrow-up mr-1 text-[10px]"></i>Lebih (+${diff})</span>`;
                 }
 
-                const nomEl = document.getElementById(
-                    `nominalDiff_${productId}`,
-                );
-                if (nomEl) {
-                    nomEl.className =
+                const badgeDesk = document.getElementById(`badgeDiff_${productId}`);
+                if (badgeDesk) badgeDesk.innerHTML = diffBadgeHTML;
+                const badgeMob = document.getElementById(`badgeDiff_m_${productId}`);
+                if (badgeMob) badgeMob.innerHTML = diffBadgeHTML;
+
+                const nomDesk = document.getElementById(`nominalDiff_${productId}`);
+                if (nomDesk) {
+                    nomDesk.className =
                         diffNominal < 0
                             ? "text-rose-600"
                             : diffNominal > 0
                               ? "text-amber-600"
                               : "text-slate-400";
-                    nomEl.innerText = `${diffNominal < 0 ? "-" : diffNominal > 0 ? "+" : ""} Rp ${Math.abs(diffNominal).toLocaleString("id-ID")}`;
+                    nomDesk.innerText = `${diffNominal < 0 ? "-" : diffNominal > 0 ? "+" : ""} Rp ${Math.abs(diffNominal).toLocaleString("id-ID")}`;
+                }
+
+                const nomMob = document.getElementById(`nominalDiff_m_${productId}`);
+                if (nomMob) {
+                    nomMob.className =
+                        `font-mono font-bold text-xs ` +
+                        (diffNominal < 0
+                            ? "text-rose-600"
+                            : diffNominal > 0
+                              ? "text-amber-600"
+                              : "text-slate-400");
+                    nomMob.innerText = `${diffNominal < 0 ? "-" : diffNominal > 0 ? "+" : ""} Rp ${Math.abs(diffNominal).toLocaleString("id-ID")}`;
                 }
 
                 // Auto-suggest reason if 0
-                const reasonSelect = document.getElementById(
-                    `selectReason_${productId}`,
-                );
-                if (reasonSelect && diff === 0) {
-                    reasonSelect.value = "Cocok";
+                if (diff === 0) {
+                    const rDesk = document.getElementById(`selectReason_${productId}`);
+                    if (rDesk) rDesk.value = "Cocok";
+                    const rMob = document.getElementById(`selectReason_m_${productId}`);
+                    if (rMob) rMob.value = "Cocok";
+                    item.Reason = "Cocok";
+                    item.reason = "Cocok";
+                }
+
+                // Feedback status di mobile
+                const statusMob = document.getElementById(`saveStatus_m_${productId}`);
+                if (statusMob) {
+                    statusMob.innerHTML = `<span class="text-blue-500 font-semibold text-[10px]"><i class="fas fa-spinner fa-spin mr-1"></i>Menyimpan...</span>`;
                 }
 
                 calculateKPIs();
@@ -1865,6 +2441,22 @@
                 }, 800);
             }
 
+            function syncAndSaveReason(productId) {
+                const selMob = document.getElementById(`selectReason_m_${productId}`);
+                const selDesk = document.getElementById(`selectReason_${productId}`);
+                if (selMob && selDesk) selDesk.value = selMob.value;
+                else if (selDesk && selMob) selMob.value = selDesk.value;
+                saveRowItem(productId);
+            }
+
+            function syncAndSaveNotes(productId) {
+                const noteMob = document.getElementById(`inputNotes_m_${productId}`);
+                const noteDesk = document.getElementById(`inputNotes_${productId}`);
+                if (noteMob && noteDesk) noteDesk.value = noteMob.value;
+                else if (noteDesk && noteMob) noteMob.value = noteDesk.value;
+                saveRowItem(productId);
+            }
+
             async function saveRowItem(productId, silent = false) {
                 if (!activeSession) return;
                 const item = sessionItems.find(
@@ -1872,35 +2464,38 @@
                 );
                 if (!item) return;
 
-                const inputPhys = document.getElementById(
-                    `inputPhys_${productId}`,
-                );
-                const selectReason = document.getElementById(
-                    `selectReason_${productId}`,
-                );
-                const inputNotes = document.getElementById(
-                    `inputNotes_${productId}`,
-                );
-                const saveBtn = document.getElementById(
-                    `btnSaveRow_${productId}`,
-                );
+                const inputPhys = document.getElementById(`inputPhys_${productId}`) || document.getElementById(`inputPhys_m_${productId}`);
+                const selectReason = document.getElementById(`selectReason_${productId}`) || document.getElementById(`selectReason_m_${productId}`);
+                const inputNotes = document.getElementById(`inputNotes_${productId}`) || document.getElementById(`inputNotes_m_${productId}`);
+                const saveBtn = document.getElementById(`btnSaveRow_${productId}`);
+                const saveBtnMob = document.getElementById(`btnSaveRow_m_${productId}`);
+                const statusMob = document.getElementById(`saveStatus_m_${productId}`);
 
                 const physVal = inputPhys
                     ? parseInt(inputPhys.value || "0")
-                    : item.PhysicalQty || 0;
+                    : (item.PhysicalQty !== undefined ? item.PhysicalQty : (item.physical_qty || 0));
                 const reasonVal = selectReason
                     ? selectReason.value
-                    : item.Reason || "Cocok";
+                    : (item.Reason || item.reason || "Cocok");
                 const notesVal = inputNotes
                     ? inputNotes.value
-                    : item.Notes || "";
+                    : (item.Notes || item.notes || "");
 
                 item.PhysicalQty = physVal;
+                item.physical_qty = physVal;
                 item.Reason = reasonVal;
+                item.reason = reasonVal;
                 item.Notes = notesVal;
+                item.notes = notesVal;
 
                 if (saveBtn) {
                     saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin text-blue-500"></i>`;
+                }
+                if (saveBtnMob) {
+                    saveBtnMob.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i><span>Menyimpan...</span>`;
+                }
+                if (statusMob) {
+                    statusMob.innerHTML = `<span class="text-blue-500 font-semibold text-[10px]"><i class="fas fa-spinner fa-spin mr-1"></i>Menyimpan...</span>`;
                 }
 
                 try {
@@ -1909,7 +2504,7 @@
                     if (token) headers["Authorization"] = `Bearer ${token}`;
 
                     const res = await fetch(
-                        `${BASE_URL}/api/stock-opnames/${activeSession.ID}/items/${productId}`,
+                        `${BASE_URL}/api/stock-opnames/${activeSession.id || activeSession.ID}/items/${productId}`,
                         {
                             method: "PUT",
                             headers,
@@ -1937,9 +2532,29 @@
                                 saveBtn.innerHTML = `<i class="fas fa-save"></i>`;
                         }, 1500);
                     }
+                    if (saveBtnMob) {
+                        saveBtnMob.innerHTML = `<i class="fas fa-check text-emerald-600 mr-1"></i><span>Tersimpan</span>`;
+                        setTimeout(() => {
+                            if (saveBtnMob)
+                                saveBtnMob.innerHTML = `<i class="fas fa-save mr-1"></i><span>Simpan</span>`;
+                        }, 1500);
+                    }
+                    if (statusMob) {
+                        statusMob.innerHTML = `<span class="text-emerald-600 font-semibold text-[10px]"><i class="fas fa-check mr-1"></i>Tersimpan</span>`;
+                        setTimeout(() => {
+                            if (statusMob && statusMob.innerText.includes("Tersimpan")) {
+                                statusMob.innerHTML = ``;
+                            }
+                        }, 2000);
+                    }
                 } catch (err) {
+                    console.error("saveRowItem error:", err);
                     if (saveBtn)
                         saveBtn.innerHTML = `<i class="fas fa-exclamation-triangle text-rose-500"></i>`;
+                    if (saveBtnMob)
+                        saveBtnMob.innerHTML = `<i class="fas fa-exclamation-triangle text-rose-500 mr-1"></i><span>Gagal</span>`;
+                    if (statusMob)
+                        statusMob.innerHTML = `<span class="text-rose-500 font-semibold text-[10px]"><i class="fas fa-exclamation-circle mr-1"></i>Gagal simpan</span>`;
                     if (!silent) {
                         Swal.fire("Gagal Menyimpan", err.message, "error");
                     }
@@ -1984,7 +2599,7 @@
                         : {};
 
                     const res = await fetch(
-                        `${BASE_URL}/api/stock-opnames/${activeSession.ID}/upload-photo`,
+                        `${BASE_URL}/api/stock-opnames/${activeSession.id || activeSession.ID}/upload-photo`,
                         {
                             method: "POST",
                             headers,
@@ -2095,7 +2710,8 @@
                         "Dokumen opname berhasil dibuat dan snapshot saldo sistem telah dikunci.",
                         "success",
                     );
-                    await loadActiveSession();
+                    const newSessionId = resJson.data?.ID || resJson.data?.id;
+                    await loadActiveSession(newSessionId);
                 } catch (err) {
                     Swal.fire("Gagal Membuka Sesi", err.message, "error");
                 } finally {
@@ -2125,7 +2741,7 @@
                     if (token) headers["Authorization"] = `Bearer ${token}`;
 
                     const res = await fetch(
-                        `${BASE_URL}/api/stock-opnames/${activeSession.ID}/submit`,
+                        `${BASE_URL}/api/stock-opnames/${activeSession.id || activeSession.ID}/submit`,
                         {
                             method: "POST",
                             headers,
@@ -2159,11 +2775,11 @@
                     title: "Setujui & Terapkan Penyesuaian?",
                     html: `
                         <div class="text-left text-xs text-slate-600 space-y-2 p-2 bg-slate-50 rounded-xl border border-slate-200">
-                            <p><b>Dokumen:</b> ${escapeHTML(activeSession.OpnameNo)}</p>
-                            <p><b>Cabang:</b> ${escapeHTML(activeSession.Location)}</p>
+                            <p><b>Dokumen:</b> ${escapeHTML(activeSession.opname_no || activeSession.OpnameNo)}</p>
+                            <p><b>Cabang:</b> ${escapeHTML(activeSession.location || activeSession.Location)}</p>
                             <p class="text-rose-600 font-bold">Tindakan ini akan secara atomik:</p>
                             <ol class="list-decimal pl-4 space-y-1">
-                                <li>Memperbarui saldo fisik cabang <b>${escapeHTML(activeSession.Location)}</b> sesuai hasil hitung.</li>
+                                <li>Memperbarui saldo fisik cabang <b>${escapeHTML(activeSession.location || activeSession.Location)}</b> sesuai hasil hitung.</li>
                                 <li>Mencatat mutasi audit ke kartu stok (<b>OPNAME_ADJUST</b>).</li>
                                 <li>Menghitung ulang total stok produk secara global.</li>
                             </ol>
@@ -2184,7 +2800,7 @@
                     if (token) headers["Authorization"] = `Bearer ${token}`;
 
                     const res = await fetch(
-                        `${BASE_URL}/api/stock-opnames/${activeSession.ID}/approve`,
+                        `${BASE_URL}/api/stock-opnames/${activeSession.id || activeSession.ID}/approve`,
                         {
                             method: "POST",
                             headers,
@@ -2233,7 +2849,7 @@
                     if (token) headers["Authorization"] = `Bearer ${token}`;
 
                     const res = await fetch(
-                        `${BASE_URL}/api/stock-opnames/${activeSession.ID}/cancel`,
+                        `${BASE_URL}/api/stock-opnames/${activeSession.id || activeSession.ID}/cancel`,
                         {
                             method: "POST",
                             headers,
@@ -2305,34 +2921,42 @@
 
                     tbody.innerHTML = list
                         .map((item) => {
+                            const itemId = item.id || item.ID;
+                            const itemDocNo = item.opname_no || item.OpnameNo || "-";
+                            const itemLoc = item.location || item.Location || "-";
+                            const itemStatus = item.status || item.Status || "Draft";
                             const dt = new Date(
-                                item.CreatedAt || item.created_at,
+                                item.created_at || item.CreatedAt,
                             );
-                            const dateStr = dt.toLocaleDateString("id-ID", {
-                                day: "2-digit",
-                                month: "short",
-                                year: "numeric",
-                            });
-                            const timeStr = dt.toLocaleTimeString("id-ID", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                            });
+                            const dateStr = !isNaN(dt)
+                                ? dt.toLocaleDateString("id-ID", {
+                                      day: "2-digit",
+                                      month: "short",
+                                      year: "numeric",
+                                  })
+                                : "-";
+                            const timeStr = !isNaN(dt)
+                                ? dt.toLocaleTimeString("id-ID", {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                  })
+                                : "-";
 
                             let statusBadge = "";
                             let actionBtnText = "Buka Lembar";
                             let actionBtnClass =
                                 "bg-blue-50 hover:bg-blue-100 text-blue-600";
-                            if (item.Status === "Completed") {
+                            if (itemStatus === "Completed") {
                                 statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fas fa-check-double mr-1 text-[10px]"></i>Selesai & Diterapkan</span>`;
                                 actionBtnText = "Lihat Arsip";
                                 actionBtnClass =
                                     "bg-slate-100 hover:bg-slate-200 text-slate-700";
-                            } else if (item.Status === "Waiting Approval") {
+                            } else if (itemStatus === "Waiting Approval") {
                                 statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-black bg-blue-50 text-blue-700 border border-blue-200"><i class="fas fa-clock mr-1 text-[10px]"></i>Menunggu Approval</span>`;
                                 actionBtnText = "Review & Approve";
                                 actionBtnClass =
                                     "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200";
-                            } else if (item.Status === "Draft") {
+                            } else if (itemStatus === "Draft") {
                                 statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-black bg-amber-50 text-amber-700 border border-amber-200"><i class="fas fa-pencil-alt mr-1 text-[10px]"></i>Draft (Sedang Dihitung)</span>`;
                                 actionBtnText = "Lanjutkan Hitung";
                                 actionBtnClass =
@@ -2344,47 +2968,52 @@
                                     "bg-slate-100 hover:bg-slate-200 text-slate-500";
                             }
 
+                            const totalItemsCount = item.total_items ?? item.TotalItems ?? 0;
+                            const matchedCount = item.total_matched ?? item.TotalMatched ?? 0;
+                            const deficitCount = item.total_deficit ?? item.TotalDeficit ?? 0;
+                            const surplusCount = item.total_surplus ?? item.TotalSurplus ?? 0;
                             const diffNominal = Number(
-                                item.TotalDiffValue ||
-                                    item.total_diff_value ||
+                                item.total_diff_value ??
+                                    item.TotalDiffValue ??
                                     0,
                             );
-                            const user = item.User || {};
-                            const approver = item.Approver || {};
+                            const user = item.user || item.User || {};
+                            const approver = item.approver || item.Approver || {};
+                            const approverId = item.approver_id || item.ApproverID;
 
                             return `
-                            <tr class="hover:bg-slate-50 transition-colors" onclick="openHistoryDetail('${item.ID}')">
+                            <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="openHistoryDetail('${itemId}')">
                                 <td class="p-4 pl-6 font-mono font-bold text-blue-600">
-                                    ${escapeHTML(item.OpnameNo)}
+                                    ${escapeHTML(itemDocNo)}
                                 </td>
                                 <td class="p-4 whitespace-nowrap">
                                     <div class="font-bold text-slate-800">${dateStr}</div>
                                     <div class="text-[10px] text-slate-400 font-mono">${timeStr}</div>
                                 </td>
                                 <td class="p-4 whitespace-nowrap font-bold text-slate-700">
-                                    ${escapeHTML(item.Location)}
+                                    ${escapeHTML(itemLoc)}
                                 </td>
                                 <td class="p-4 whitespace-nowrap">
                                     ${statusBadge}
                                 </td>
                                 <td class="p-4 text-center whitespace-nowrap">
-                                    <span class="text-slate-800 font-bold">${item.TotalItems || 0}</span>
+                                    <span class="text-slate-800 font-bold">${totalItemsCount}</span>
                                     <span class="text-[11px] text-slate-400 ml-1">
-                                        (<span class="text-emerald-600 font-bold">${item.TotalMatched || 0}</span> /
-                                         <span class="text-rose-500 font-bold">${item.TotalDeficit || 0}</span> /
-                                         <span class="text-amber-500 font-bold">${item.TotalSurplus || 0}</span>)
+                                        (<span class="text-emerald-600 font-bold">${matchedCount}</span> /
+                                         <span class="text-rose-500 font-bold">${deficitCount}</span> /
+                                         <span class="text-amber-500 font-bold">${surplusCount}</span>)
                                     </span>
                                 </td>
                                 <td class="p-4 text-right font-mono font-bold whitespace-nowrap ${diffNominal < 0 ? "text-rose-600" : diffNominal > 0 ? "text-amber-600" : "text-slate-400"}">
                                     ${diffNominal < 0 ? "-" : diffNominal > 0 ? "+" : ""} Rp ${Math.abs(diffNominal).toLocaleString("id-ID")}
                                 </td>
                                 <td class="p-4 whitespace-nowrap text-xs text-slate-600">
-                                    <div><span class="text-[10px] text-slate-400">Petugas:</span> <b>${escapeHTML(user.Name || user.username || "-")}</b></div>
-                                    ${item.ApproverID ? `<div><span class="text-[10px] text-slate-400">Approver:</span> <b>${escapeHTML(approver.Name || approver.username || "-")}</b></div>` : ""}
+                                    <div><span class="text-[10px] text-slate-400">Petugas:</span> <b>${escapeHTML(user.name || user.Name || user.username || "-")}</b></div>
+                                    ${approverId ? `<div><span class="text-[10px] text-slate-400">Approver:</span> <b>${escapeHTML(approver.name || approver.Name || approver.username || "-")}</b></div>` : ""}
                                 </td>
                                 <td class="p-4 pr-6 text-right whitespace-nowrap">
                                     <button
-                                        onclick="event.stopPropagation(); openHistoryDetail('${item.ID}')"
+                                        onclick="event.stopPropagation(); openHistoryDetail('${itemId}')"
                                         class="px-3 py-1.5 ${actionBtnClass} rounded-xl font-black text-xs transition-colors"
                                     >
                                         ${actionBtnText}
@@ -2419,21 +3048,8 @@
 
             async function openHistoryDetail(sessionId) {
                 try {
-                    const token = localStorage.getItem("token");
-                    const headers = token
-                        ? { Authorization: `Bearer ${token}` }
-                        : {};
-                    const res = await fetch(
-                        `${BASE_URL}/api/stock-opnames/${sessionId}`,
-                        { headers },
-                    );
-                    if (!res.ok)
-                        throw new Error("Gagal mengambil detail sesi opname");
-                    const resJson = await res.json();
-                    activeSession = resJson.data || resJson;
-                    sessionItems =
-                        activeSession.Items || activeSession.items || [];
-                    switchTab("active");
+                    switchTab("active", false);
+                    await loadActiveSession(sessionId);
                 } catch (err) {
                     Swal.fire("Gagal", err.message, "error");
                 }
@@ -2443,88 +3059,6 @@
             // ROLE PERMISSIONS & LOGOUT
             // ==========================================
             const ROLE_PERMISSIONS = {
-                admin: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "report.html",
-                    "opname.html",
-                ],
-                kasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                "super-kasir": [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                super_kasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                superkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
-                supersubkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                "super-subkasir": [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                super_subkasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                "super-sub-kasir": [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                super_sub_kasir: [
-                    "dashboard.html",
-                    "riwayat.html",
-                    "product.html",
-                ],
-                akuntan: [
-                    "akuntansi.html",
-                    "purchase.html",
-                    "expense.html",
-                    "retur.html",
-                    "riwayat.html",
-                    "report.html",
-                    "absensi.html",
-                    "opname.html",
-                ],
                 superadmin: [
                     "dashboard.html",
                     "riwayat.html",
@@ -2536,6 +3070,116 @@
                     "absensi.html",
                     "report.html",
                     "opname.html",
+                    "online-users.html",
+                ],
+                "super-admin": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "akuntansi.html",
+                    "absensi.html",
+                    "report.html",
+                    "opname.html",
+                    "online-users.html",
+                ],
+                admin: [
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "akuntansi.html",
+                    "absensi.html",
+                    "report.html",
+                    "opname.html",
+                    "online-users.html",
+                ],
+                "super-kasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                superkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                super_kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                supersubkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                "super-subkasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                super_subkasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                "super-sub-kasir": [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                super_sub_kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
+                    "retur.html",
+                    "opname.html",
+                ],
+                kasir: [
+                    "dashboard.html",
+                    "riwayat.html",
+                    "expense.html",
+                    "opname.html",
+                ],
+                akuntan: [
+                    "riwayat.html",
+                    "product.html",
+                    "purchase.html",
+                    "expense.html",
                 ],
             };
 
@@ -2553,35 +3197,51 @@
                     ROLE_PERMISSIONS[normalizedRole] || ["dashboard.html"];
 
                 if (!allowedPages.includes(currentPage)) {
-                    if (userRole === "akuntan") {
-                        window.location.href = "akuntansi.html";
-                    } else if (
-                        userRole === "kasir" ||
-                        userRole.includes("subkasir")
-                    ) {
-                        window.location.href = "dashboard.html";
-                    } else {
-                        window.location.href = "dashboard.html";
+                    let fallback = "dashboard.html";
+                    if (!allowedPages.includes("dashboard.html")) {
+                        fallback = allowedPages[0] || "riwayat.html";
                     }
+                    window.location.href = fallback;
+                    return;
                 }
+
+                const navLinks = document.querySelectorAll("aside nav a");
+                navLinks.forEach((link) => {
+                    const href = link.getAttribute("href");
+                    if (href && href !== "#" && href !== "index.html") {
+                        if (!allowedPages.includes(href)) {
+                            link.style.display = "none";
+                        } else {
+                            link.style.display = "flex";
+                        }
+                    }
+                });
+
+                document.querySelectorAll(".user-name-display").forEach((el) => {
+                    el.innerText = `${userData.name || "User"} (${userRole.toUpperCase()})`;
+                });
             }
 
             async function confirmLogout() {
                 const result = await Swal.fire({
                     title: "Konfirmasi Keluar",
-                    text: "Apakah Anda yakin ingin keluar dari sistem SMARTPOS?",
+                    text: "Apakah Anda yakin ingin keluar dari sistem kasir?",
                     icon: "question",
                     showCancelButton: true,
-                    confirmButtonText:
-                        '<i class="fas fa-sign-out-alt mr-1"></i> Ya, Keluar',
-                    cancelButtonText: '<i class="fas fa-times mr-1"></i> Batal',
-                    confirmButtonColor: "#ef4444",
-                    cancelButtonColor: "#64748b",
+                    confirmButtonText: '<i class="fas fa-sign-out-alt mr-1.5"></i> Ya, Keluar',
+                    cancelButtonText: '<i class="fas fa-times mr-1.5"></i> Batal',
+                    confirmButtonColor: "#EF4444",
+                    cancelButtonColor: "#64748B",
+                    reverseButtons: true,
+                    focusCancel: true,
                 });
 
                 if (result.isConfirmed) {
+                    if (window.recordLogout) {
+                        const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                        await window.recordLogout("LOGOUT_ONLY", null, curUser.location || "", "Logout");
+                    }
                     localStorage.removeItem("token");
-                    localStorage.removeItem("userData");
                     window.location.href = "index.html";
                 }
             }
@@ -2642,17 +3302,13 @@
                         document.body.classList.remove("overflow-hidden");
                     }
                 } else {
-                    const isCollapsed =
-                        sidebar.classList.contains("desktop-collapsed") ||
-                        sidebar.classList.contains("lg:hidden");
-                    if (isCollapsed) {
-                        sidebar.classList.remove(
-                            "desktop-collapsed",
-                            "lg:hidden",
-                        );
-                    } else {
-                        sidebar.classList.add("desktop-collapsed", "lg:hidden");
-                    }
+                    // Desktop: Sidebar selalu permanen terbuka (fitur collapse ditiadakan sesuai instruksi)
+                    sidebar.classList.remove(
+                        "desktop-collapsed",
+                        "lg:hidden",
+                        "hidden",
+                        "-translate-x-full",
+                    );
                 }
             }
             window.toggleSidebar = toggleSidebar;
@@ -2662,12 +3318,12 @@
                 const sidebar = document.getElementById("app-sidebar");
                 const backdrop = document.getElementById("sidebar-backdrop");
                 if (window.innerWidth >= 1024) {
-                    if (!sidebar?.classList.contains("desktop-collapsed")) {
-                        sidebar?.classList.remove(
-                            "-translate-x-full",
-                            "lg:hidden",
-                        );
-                    }
+                    sidebar?.classList.remove(
+                        "-translate-x-full",
+                        "lg:hidden",
+                        "desktop-collapsed",
+                        "hidden",
+                    );
                     backdrop?.classList.add("hidden");
                     document.body.classList.remove("overflow-hidden");
                 } else {
