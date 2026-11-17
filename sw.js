@@ -3,7 +3,7 @@
  * Menyediakan caching aset offline, waktu muat super cepat, dan instalasi native di Windows, Mac, Android, dan iOS.
  */
 
-const CACHE_NAME = "langgeng-smartpos-v1";
+const CACHE_NAME = "langgeng-smartpos-v2";
 
 const STATIC_ASSETS = [
   "./",
@@ -23,6 +23,7 @@ const STATIC_ASSETS = [
   "./manifest.json",
   "./env.js",
   "./shortcuts.js",
+  "./mobile-nav.js",
   "./spa-router.js",
   "./vendor/tailwindcss.js",
   "./vendor/alpine.min.js",

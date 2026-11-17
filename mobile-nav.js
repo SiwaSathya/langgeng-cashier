@@ -40,26 +40,42 @@
 
         /* ATURAN EKSKLUSIF MOBILE (< 1024px) */
         @media (max-width: 1023px) {
-            /* Floating Glass Bottom Navbar Styling (iPhone Safari - Posisi Pas Mengambang Rapi) */
+            /* Dukungan Safe Area Penuh: Dynamic Island & Notch iPhone 14 Pro, 15 Pro, 15 Pro Max, 16 */
+            body {
+                padding-top: env(safe-area-inset-top, 0px) !important;
+                padding-bottom: calc(6rem + env(safe-area-inset-bottom, 16px)) !important;
+            }
+
+            /* Mobile Top Bar (Header Sticky) agar tidak tertabrak Dynamic Island */
+            .lg\:hidden.sticky.top-0,
+            div[class*="sticky top-0"],
+            .mobile-top-bar {
+                padding-top: max(0.5rem, env(safe-area-inset-top, 0px)) !important;
+                height: auto !important;
+                min-height: calc(3.5rem + env(safe-area-inset-top, 0px)) !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Header sekunder di halaman kasir/dashboard agar aman dari Dynamic Island */
+            main header:first-of-type {
+                padding-top: max(0.625rem, calc(0.25rem + env(safe-area-inset-top, 0px) / 2)) !important;
+            }
+
+            /* Floating Glass Bottom Navbar Styling (iPhone Retina Display Ready) */
             #ios-bottom-bar {
-                backdrop-filter: blur(24px) saturate(190%);
-                -webkit-backdrop-filter: blur(24px) saturate(190%);
-                background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.28) 100%);
-                border: 1px solid rgba(255, 255, 255, 0.55);
-                box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.16), 0 2px 10px rgba(0, 0, 0, 0.04), inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.85);
+                backdrop-filter: blur(28px) saturate(190%);
+                -webkit-backdrop-filter: blur(28px) saturate(190%);
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.74) 100%) !important;
+                border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+                box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.16), 0 2px 10px rgba(0, 0, 0, 0.04), inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
                 will-change: transform;
-                /* Diturunkan presisi agar pas mengambang dekat di atas bar Safari (~1.15rem) */
-                bottom: calc(env(safe-area-inset-bottom, 0px) + 1.15rem) !important;
+                bottom: calc(env(safe-area-inset-bottom, 12px) + 0.85rem) !important;
                 transform: translateZ(0);
                 -webkit-transform: translateZ(0);
             }
 
-            /* Safe padding bawah pada konten agar pas di mobile */
-            body {
-                padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)) !important;
-            }
             main:not(.overflow-hidden), #main-content:not(.overflow-hidden) {
-                padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)) !important;
+                padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 16px)) !important;
             }
             /* Pastikan tabel & scroll container tabel fit rapat ke data tanpa gap di bawah */
             .overflow-x-auto,
@@ -257,17 +273,18 @@
 
         /* Saat berjalan sebagai Standalone PWA di iPhone (< 1024px) */
         @media (max-width: 1023px) and (display-mode: standalone) {
+            body {
+                padding-top: env(safe-area-inset-top, 0px) !important;
+                padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 6.25rem) !important;
+            }
             #ios-bottom-bar {
-                bottom: calc(env(safe-area-inset-bottom, 0px) + 0.85rem) !important;
+                bottom: calc(env(safe-area-inset-bottom, 14px) + 0.75rem) !important;
             }
             #ios-menu-sheet {
-                padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5.5rem) !important;
-            }
-            body {
-                padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5.5rem) !important;
+                padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 6.5rem) !important;
             }
             main:not(.overflow-hidden), #main-content:not(.overflow-hidden) {
-                padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4.75rem) !important;
+                padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 5.5rem) !important;
             }
         }
     `;
@@ -292,7 +309,9 @@
             href="dashboard.html"
             class="ios-tab-btn flex-1 flex flex-col items-center justify-center gap-1 py-1 px-1.5 rounded-2xl transition-all duration-200 select-none ${isKasir ? "bg-gradient-to-tr from-blue-600 to-blue-500 text-white shadow-md shadow-blue-500/35 scale-105" : "text-slate-600 hover:text-blue-600"}"
         >
-            <i class="fas fa-cash-register text-base ${isKasir ? "text-white" : ""}"></i>
+            <svg class="w-5 h-5 shrink-0 transition-transform ${isKasir ? "text-white" : "text-slate-500"}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
             <span class="text-[9.5px] font-black tracking-tight leading-none">Kasir</span>
         </a>
 
@@ -301,7 +320,9 @@
             href="riwayat.html"
             class="ios-tab-btn flex-1 flex flex-col items-center justify-center gap-1 py-1 px-1.5 rounded-2xl transition-all duration-200 select-none ${isRiwayat ? "bg-gradient-to-tr from-blue-600 to-blue-500 text-white shadow-md shadow-blue-500/35 scale-105" : "text-slate-600 hover:text-blue-600"}"
         >
-            <i class="fas fa-receipt text-base ${isRiwayat ? "text-white" : ""}"></i>
+            <svg class="w-5 h-5 shrink-0 transition-transform ${isRiwayat ? "text-white" : "text-slate-500"}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
             <span class="text-[9.5px] font-black tracking-tight leading-none">Riwayat</span>
         </a>
 
@@ -310,7 +331,9 @@
             href="product.html"
             class="ios-tab-btn flex-1 flex flex-col items-center justify-center gap-1 py-1 px-1.5 rounded-2xl transition-all duration-200 select-none ${isProduct ? "bg-gradient-to-tr from-blue-600 to-blue-500 text-white shadow-md shadow-blue-500/35 scale-105" : "text-slate-600 hover:text-blue-600"}"
         >
-            <i class="fas fa-boxes-stacked text-base ${isProduct ? "text-white" : ""}"></i>
+            <svg class="w-5 h-5 shrink-0 transition-transform ${isProduct ? "text-white" : "text-slate-500"}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
             <span class="text-[9.5px] font-black tracking-tight leading-none">Produk</span>
         </a>
 
@@ -319,7 +342,10 @@
             href="report.html"
             class="ios-tab-btn flex-1 flex flex-col items-center justify-center gap-1 py-1 px-1.5 rounded-2xl transition-all duration-200 select-none ${isReport ? "bg-gradient-to-tr from-blue-600 to-blue-500 text-white shadow-md shadow-blue-500/35 scale-105" : "text-slate-600 hover:text-blue-600"}"
         >
-            <i class="fas fa-chart-pie text-base ${isReport ? "text-white" : ""}"></i>
+            <svg class="w-5 h-5 shrink-0 transition-transform ${isReport ? "text-white" : "text-slate-500"}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+            </svg>
             <span class="text-[9.5px] font-black tracking-tight leading-none">Laporan</span>
         </a>
 
@@ -330,7 +356,9 @@
             class="ios-tab-btn flex-1 flex flex-col items-center justify-center gap-1 py-1 px-1.5 rounded-2xl transition-all duration-200 cursor-pointer select-none ${isOtherModule ? "bg-gradient-to-tr from-blue-600 to-blue-500 text-white shadow-md shadow-blue-500/35 scale-105" : "text-slate-600 hover:text-blue-600"}"
             title="Buka Menu Lainnya"
         >
-            <i class="fas fa-bars-staggered text-base ${isOtherModule ? "text-white" : ""}"></i>
+            <svg class="w-5 h-5 shrink-0 transition-transform ${isOtherModule ? "text-white" : "text-slate-500"}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 6h16M4 12h16M4 18h7" />
+            </svg>
             <span class="text-[9.5px] font-black tracking-tight leading-none">Menu</span>
         </button>
     `;
@@ -366,7 +394,7 @@
             <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-200/50">
                 <div class="flex items-center gap-3">
                     <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-sky-400 text-white flex items-center justify-center font-black text-sm shadow-md shadow-blue-500/25 shrink-0">
-                        <i class="fas fa-user-shield"></i>
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                     </div>
                     <div class="min-w-0">
                         <p class="text-xs font-black text-slate-800 truncate user-name-display">${userDisplay}</p>
@@ -379,7 +407,7 @@
                     class="w-8 h-8 rounded-full bg-white/70 hover:bg-white text-slate-500 border border-white/60 flex items-center justify-center transition-all cursor-pointer shadow-2xs"
                     title="Tutup Menu"
                 >
-                    <i class="fas fa-times text-xs"></i>
+                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
 
@@ -392,7 +420,7 @@
                     class="flex flex-row items-center flex-nowrap gap-2.5 p-3 rounded-2xl border border-slate-100/80 hover:border-amber-300/80 transition-all active:scale-95 group overflow-hidden"
                 >
                     <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-600 flex items-center justify-center shrink-0 shadow-2xs">
-                        <i class="fas fa-cart-shopping text-sm text-amber-600"></i>
+                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
                     </div>
                     <div class="min-w-0 flex-1 overflow-hidden">
                         <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-amber-700 transition-colors">Purchase</span>
@@ -406,7 +434,7 @@
                     class="flex flex-row items-center flex-nowrap gap-2.5 p-3 rounded-2xl border border-slate-100/80 hover:border-rose-300/80 transition-all active:scale-95 group overflow-hidden"
                 >
                     <div class="w-10 h-10 rounded-xl bg-rose-500/15 text-rose-600 flex items-center justify-center shrink-0 shadow-2xs">
-                        <i class="fas fa-wallet text-sm text-rose-600"></i>
+                        <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
                     </div>
                     <div class="min-w-0 flex-1 overflow-hidden">
                         <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-rose-700 transition-colors">Pengeluaran</span>
@@ -420,7 +448,7 @@
                     class="flex flex-row items-center flex-nowrap gap-2.5 p-3 rounded-2xl border border-slate-100/80 hover:border-purple-300/80 transition-all active:scale-95 group overflow-hidden"
                 >
                     <div class="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-600 flex items-center justify-center shrink-0 shadow-2xs">
-                        <i class="fas fa-rotate-left text-sm text-purple-600"></i>
+                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
                     </div>
                     <div class="min-w-0 flex-1 overflow-hidden">
                         <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-purple-700 transition-colors">Retur Barang</span>
@@ -434,7 +462,7 @@
                     class="flex flex-row items-center flex-nowrap gap-2.5 p-3 rounded-2xl border border-slate-100/80 hover:border-cyan-300/80 transition-all active:scale-95 group overflow-hidden"
                 >
                     <div class="w-10 h-10 rounded-xl bg-cyan-500/15 text-cyan-600 flex items-center justify-center shrink-0 shadow-2xs">
-                        <i class="fas fa-book text-sm text-cyan-600"></i>
+                        <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                     </div>
                     <div class="min-w-0 flex-1 overflow-hidden">
                         <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-cyan-700 transition-colors">Akuntansi</span>
@@ -448,7 +476,7 @@
                     class="flex flex-row items-center flex-nowrap gap-2.5 p-3 rounded-2xl border border-slate-100/80 hover:border-teal-300/80 transition-all active:scale-95 group overflow-hidden"
                 >
                     <div class="w-10 h-10 rounded-xl bg-teal-500/15 text-teal-600 flex items-center justify-center shrink-0 shadow-2xs">
-                        <i class="fas fa-calendar-check text-sm text-teal-600"></i>
+                        <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     </div>
                     <div class="min-w-0 flex-1 overflow-hidden">
                         <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-teal-700 transition-colors">Absensi</span>
@@ -462,7 +490,7 @@
                     class="flex flex-row items-center flex-nowrap gap-2.5 p-3 rounded-2xl border border-slate-100/80 hover:border-orange-300/80 transition-all active:scale-95 group overflow-hidden"
                 >
                     <div class="w-10 h-10 rounded-xl bg-orange-500/15 text-orange-600 flex items-center justify-center shrink-0 shadow-2xs">
-                        <i class="fas fa-clipboard-check text-sm text-orange-600"></i>
+                        <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
                     </div>
                     <div class="min-w-0 flex-1 overflow-hidden">
                         <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-orange-700 transition-colors">Stock Opname</span>
@@ -476,7 +504,7 @@
                     class="col-span-2 flex flex-row items-center flex-nowrap gap-2.5 p-3 rounded-2xl border border-slate-100/80 hover:border-violet-300/80 transition-all active:scale-95 group overflow-hidden"
                 >
                     <div class="w-10 h-10 rounded-xl bg-violet-500/15 text-violet-600 flex items-center justify-center shrink-0 shadow-2xs">
-                        <i class="fas fa-users-gear text-sm text-violet-600"></i>
+                        <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                     </div>
                     <div class="min-w-0 flex-1 overflow-hidden">
                         <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-violet-700 transition-colors">Pengguna & Log Aktivitas</span>
@@ -491,7 +519,7 @@
                 onclick="triggerMobileLogout()"
                 class="w-full py-3.5 px-4 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold flex items-center justify-center gap-2.5 border border-rose-200/80 shadow-2xs active:scale-98 transition-all cursor-pointer"
             >
-                <i class="fas fa-sign-out-alt"></i>
+                <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                 <span class="text-xs font-extrabold uppercase tracking-wide">Keluar dari Akun (Logout)</span>
             </button>
         </div>
