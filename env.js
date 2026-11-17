@@ -57,6 +57,15 @@
     window.location.hostname === "127.0.0.1" ||
     window.location.protocol === "file:";
 
+  // Izinkan auto-set via query param ?backend=https://... untuk kemudahan switch URL
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramBackend = urlParams.get("backend") || urlParams.get("api");
+    if (paramBackend) {
+      localStorage.setItem("SMARTPOS_BACKEND_URL", paramBackend.trim().replace(/\/+$/, ""));
+    }
+  } catch (_) {}
+
   const manualOverride = localStorage.getItem("SMARTPOS_BACKEND_URL");
   const selectedBaseUrl =
     manualOverride || (isLocal ? LOCAL_BACKEND_URL : PRODUCTION_BACKEND_URL);
