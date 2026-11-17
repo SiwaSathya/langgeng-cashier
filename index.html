@@ -16,9 +16,6 @@
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-            integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
         />
         <script src="vendor/sweetalert2.all.min.js"></script>
         <script src="env.js"></script>
@@ -645,7 +642,9 @@
                             <div
                                 class="glass-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-3"
                             >
-                                <i class="fas fa-key text-[10px]"></i>
+                                <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                                </svg>
                                 <span>Akses Masuk Staf</span>
                             </div>
                             <h2
@@ -672,9 +671,11 @@
                                 </label>
                                 <div class="relative group">
                                     <div
-                                        class="glass-input-icon absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-400"
+                                        class="glass-input-icon absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-500"
                                     >
-                                        <i class="fas fa-user text-sm"></i>
+                                        <svg class="w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
                                     </div>
                                     <input
                                         type="text"
@@ -701,14 +702,19 @@
                                         id="capsWarning"
                                         class="hidden text-[10px] font-bold text-amber-400 lg:text-amber-600 items-center gap-1"
                                     >
-                                        <i class="fas fa-arrow-up"></i> Caps Lock Aktif
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                                        </svg>
+                                        Caps Lock Aktif
                                     </span>
                                 </div>
                                 <div class="relative group">
                                     <div
-                                        class="glass-input-icon absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-400"
+                                        class="glass-input-icon absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-500"
                                     >
-                                        <i class="fas fa-lock text-sm"></i>
+                                        <svg class="w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
                                     </div>
                                     <input
                                         type="password"
@@ -721,14 +727,17 @@
                                         type="button"
                                         id="btnTogglePassword"
                                         onclick="togglePasswordVisibility()"
-                                        class="glass-input-icon absolute inset-y-0 right-0 pr-3.5 flex items-center hover:opacity-100 transition-opacity cursor-pointer"
+                                        class="glass-input-icon absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-blue-500 transition-colors cursor-pointer"
                                         title="Tampilkan / Sembunyikan Kata Sandi"
                                         tabindex="-1"
                                     >
-                                        <i
-                                            class="fas fa-eye text-sm"
-                                            id="eyeIcon"
-                                        ></i>
+                                        <svg id="eyeOpenIcon" class="w-5 h-5 transition-transform hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        <svg id="eyeClosedIcon" class="w-5 h-5 transition-transform hover:scale-110 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
@@ -739,18 +748,18 @@
                                 class="w-full group bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold py-3.5 sm:py-4 px-6 rounded-xl shadow-lg shadow-blue-600/35 hover:shadow-blue-600/50 transition-all transform active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 mt-4 text-sm tracking-wide"
                             >
                                 <span>MASUK KE SISTEM</span>
-                                <i
-                                    class="fas fa-arrow-right text-xs transition-transform group-hover:translate-x-1"
-                                ></i>
+                                <svg class="w-4 h-4 text-white transition-transform group-hover:translate-x-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
                             </button>
                         </form>
 
                         <div
                             class="glass-footer-divider mt-6 pt-5 border-t flex items-center justify-center gap-2 text-xs font-medium"
                         >
-                            <i
-                                class="fas fa-shield-halved text-emerald-400 text-sm"
-                            ></i>
+                            <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
                             <span>Sesi terenkripsi & dilindungi otentikasi JWT</span>
                         </div>
                     </div>
@@ -802,16 +811,17 @@
             // Password Visibility Toggle
             function togglePasswordVisibility() {
                 const pass = document.getElementById("password");
-                const icon = document.getElementById("eyeIcon");
-                if (!pass || !icon) return;
+                const eyeOpen = document.getElementById("eyeOpenIcon");
+                const eyeClosed = document.getElementById("eyeClosedIcon");
+                if (!pass) return;
                 if (pass.type === "password") {
                     pass.type = "text";
-                    icon.classList.remove("fa-eye");
-                    icon.classList.add("fa-eye-slash");
+                    if (eyeOpen) eyeOpen.classList.add("hidden");
+                    if (eyeClosed) eyeClosed.classList.remove("hidden");
                 } else {
                     pass.type = "password";
-                    icon.classList.remove("fa-eye-slash");
-                    icon.classList.add("fa-eye");
+                    if (eyeOpen) eyeOpen.classList.remove("hidden");
+                    if (eyeClosed) eyeClosed.classList.add("hidden");
                 }
             }
 
@@ -939,7 +949,10 @@
                 if (submitBtn) {
                     submitBtn.disabled = true;
                     submitBtn.innerHTML = `
-                        <i class="fas fa-spinner fa-spin text-sm"></i>
+                        <svg class="animate-spin w-4 h-4 text-white shrink-0" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                        </svg>
                         <span>Memproses Autentikasi...</span>
                     `;
                 }
@@ -997,7 +1010,9 @@
                             submitBtn.disabled = false;
                             submitBtn.innerHTML = `
                                 <span>MASUK KE SISTEM</span>
-                                <i class="fas fa-arrow-right text-xs"></i>
+                                <svg class="w-4 h-4 text-white transition-transform group-hover:translate-x-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
                             `;
                         }
                     }

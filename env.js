@@ -18,7 +18,9 @@
         window.top.location = window.self.location;
       }
     } catch (_) {
-      console.warn("[SmartPOS Security] Embedded iframe detected from external untrusted domain.");
+      console.warn(
+        "[SmartPOS Security] Embedded iframe detected from external untrusted domain.",
+      );
       window.location = "about:blank";
     }
   }
@@ -32,7 +34,10 @@
           console.log("[SmartPOS PWA] Service Worker aktif:", reg.scope);
         })
         .catch(function (err) {
-          console.warn("[SmartPOS PWA] Registrasi Service Worker dilewati:", err.message);
+          console.warn(
+            "[SmartPOS PWA] Registrasi Service Worker dilewati:",
+            err.message,
+          );
         });
     });
   }
@@ -50,7 +55,7 @@
   // 1. URL Default Configuration
   const LOCAL_BACKEND_URL = "http://127.0.0.1:4000";
   const PRODUCTION_BACKEND_URL =
-    "https://backend-cashier-production.up.railway.app";
+    "https://langgeng-cashier-backend-production.up.railway.app";
 
   const isLocal =
     window.location.hostname === "localhost" ||
@@ -62,7 +67,10 @@
     const urlParams = new URLSearchParams(window.location.search);
     const paramBackend = urlParams.get("backend") || urlParams.get("api");
     if (paramBackend) {
-      localStorage.setItem("SMARTPOS_BACKEND_URL", paramBackend.trim().replace(/\/+$/, ""));
+      localStorage.setItem(
+        "SMARTPOS_BACKEND_URL",
+        paramBackend.trim().replace(/\/+$/, ""),
+      );
     }
   } catch (_) {}
 
@@ -354,7 +362,10 @@
       window.addEventListener("DOMContentLoaded", sendPresencePing);
     }
 
-    const pingTimer = (window.setPermanentInterval || window.setInterval)(sendPresencePing, 25000);
+    const pingTimer = (window.setPermanentInterval || window.setInterval)(
+      sendPresencePing,
+      25000,
+    );
 
     window.addEventListener("beforeunload", function () {
       clearInterval(pingTimer);
@@ -369,143 +380,143 @@
         );
       }
     });
-  // 10. Memory-Safe Header-based SSE Reader (Menggantikan EventSource bawaan untuk mencegah Token Leak di URL)
-  window.__ACTIVE_SSE_READERS__ = window.__ACTIVE_SSE_READERS__ || [];
-  window.createSSEReader = function (url, options = {}) {
-    const controller = new AbortController();
-    const token = localStorage.getItem("token");
-    const headers = {
-      Accept: "text/event-stream",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
-    };
+    // 10. Memory-Safe Header-based SSE Reader (Menggantikan EventSource bawaan untuk mencegah Token Leak di URL)
+    window.__ACTIVE_SSE_READERS__ = window.__ACTIVE_SSE_READERS__ || [];
+    window.createSSEReader = function (url, options = {}) {
+      const controller = new AbortController();
+      const token = localStorage.getItem("token");
+      const headers = {
+        Accept: "text/event-stream",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options.headers || {}),
+      };
 
-    let listeners = {};
-    let isClosed = false;
-    let activeReader = null;
+      let listeners = {};
+      let isClosed = false;
+      let activeReader = null;
 
-    const instance = {
-      onopen: null,
-      onerror: null,
-      onmessage: null,
-      addEventListener(event, handler) {
-        if (!listeners[event]) listeners[event] = [];
-        listeners[event].push(handler);
-      },
-      removeEventListener(event, handler) {
-        if (!listeners[event]) return;
-        listeners[event] = listeners[event].filter((cb) => cb !== handler);
-      },
-      close() {
-        if (isClosed) return;
-        isClosed = true;
-        try {
-          controller.abort();
-        } catch (_) {}
-        if (activeReader) {
+      const instance = {
+        onopen: null,
+        onerror: null,
+        onmessage: null,
+        addEventListener(event, handler) {
+          if (!listeners[event]) listeners[event] = [];
+          listeners[event].push(handler);
+        },
+        removeEventListener(event, handler) {
+          if (!listeners[event]) return;
+          listeners[event] = listeners[event].filter((cb) => cb !== handler);
+        },
+        close() {
+          if (isClosed) return;
+          isClosed = true;
           try {
-            activeReader.cancel().catch(() => {});
+            controller.abort();
           } catch (_) {}
-          activeReader = null;
-        }
-        listeners = {};
-        instance.onopen = null;
-        instance.onerror = null;
-        instance.onmessage = null;
-        const idx = (window.__ACTIVE_SSE_READERS__ || []).indexOf(instance);
-        if (idx > -1) {
-          window.__ACTIVE_SSE_READERS__.splice(idx, 1);
-        }
-      },
-    };
-
-    window.__ACTIVE_SSE_READERS__.push(instance);
-
-    function emit(event, dataObj) {
-      if (isClosed) return;
-      if (event === "open" && typeof instance.onopen === "function") {
-        instance.onopen(dataObj);
-      }
-      if (event === "error" && typeof instance.onerror === "function") {
-        instance.onerror(dataObj);
-      }
-      if (event === "message" && typeof instance.onmessage === "function") {
-        instance.onmessage(dataObj);
-      }
-      if (listeners[event]) {
-        listeners[event].forEach((cb) => {
-          try {
-            cb(dataObj);
-          } catch (err) {
-            console.error("[SSEReader] Listener error:", err);
+          if (activeReader) {
+            try {
+              activeReader.cancel().catch(() => {});
+            } catch (_) {}
+            activeReader = null;
           }
-        });
-      }
-    }
+          listeners = {};
+          instance.onopen = null;
+          instance.onerror = null;
+          instance.onmessage = null;
+          const idx = (window.__ACTIVE_SSE_READERS__ || []).indexOf(instance);
+          if (idx > -1) {
+            window.__ACTIVE_SSE_READERS__.splice(idx, 1);
+          }
+        },
+      };
 
-    (async function startStreaming() {
-      try {
-        const response = await fetch(url, {
-          method: "GET",
-          headers,
-          signal: controller.signal,
-        });
+      window.__ACTIVE_SSE_READERS__.push(instance);
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
+      function emit(event, dataObj) {
+        if (isClosed) return;
+        if (event === "open" && typeof instance.onopen === "function") {
+          instance.onopen(dataObj);
         }
+        if (event === "error" && typeof instance.onerror === "function") {
+          instance.onerror(dataObj);
+        }
+        if (event === "message" && typeof instance.onmessage === "function") {
+          instance.onmessage(dataObj);
+        }
+        if (listeners[event]) {
+          listeners[event].forEach((cb) => {
+            try {
+              cb(dataObj);
+            } catch (err) {
+              console.error("[SSEReader] Listener error:", err);
+            }
+          });
+        }
+      }
 
-        emit("open", { type: "open" });
+      (async function startStreaming() {
+        try {
+          const response = await fetch(url, {
+            method: "GET",
+            headers,
+            signal: controller.signal,
+          });
 
-        const reader = response.body.getReader();
-        activeReader = reader;
-        const decoder = new TextDecoder("utf-8");
-        let buffer = "";
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
 
-        while (!isClosed) {
-          const { value, done } = await reader.read();
-          if (done || isClosed) break;
+          emit("open", { type: "open" });
 
-          buffer += decoder.decode(value, { stream: true });
-          if (buffer.length > 65536) buffer = ""; // safety cap against memory runaway
-          const blocks = buffer.split("\n\n");
-          buffer = blocks.pop() || "";
+          const reader = response.body.getReader();
+          activeReader = reader;
+          const decoder = new TextDecoder("utf-8");
+          let buffer = "";
 
-          for (const block of blocks) {
-            if (!block.trim() || isClosed) continue;
-            let eventName = "message";
-            let dataStr = "";
+          while (!isClosed) {
+            const { value, done } = await reader.read();
+            if (done || isClosed) break;
 
-            const lines = block.split("\n");
-            for (const line of lines) {
-              if (line.startsWith(":")) continue; // Comment / heartbeat
-              if (line.startsWith("event:")) {
-                eventName = line.slice(6).trim();
-              } else if (line.startsWith("data:")) {
-                const part = line.slice(5).trim();
-                dataStr = dataStr ? dataStr + "\n" + part : part;
+            buffer += decoder.decode(value, { stream: true });
+            if (buffer.length > 65536) buffer = ""; // safety cap against memory runaway
+            const blocks = buffer.split("\n\n");
+            buffer = blocks.pop() || "";
+
+            for (const block of blocks) {
+              if (!block.trim() || isClosed) continue;
+              let eventName = "message";
+              let dataStr = "";
+
+              const lines = block.split("\n");
+              for (const line of lines) {
+                if (line.startsWith(":")) continue; // Comment / heartbeat
+                if (line.startsWith("event:")) {
+                  eventName = line.slice(6).trim();
+                } else if (line.startsWith("data:")) {
+                  const part = line.slice(5).trim();
+                  dataStr = dataStr ? dataStr + "\n" + part : part;
+                }
+              }
+
+              if (eventName && !isClosed) {
+                emit(eventName, { type: eventName, data: dataStr });
               }
             }
-
-            if (eventName && !isClosed) {
-              emit(eventName, { type: eventName, data: dataStr });
-            }
+          }
+        } catch (err) {
+          if (!isClosed && err.name !== "AbortError") {
+            emit("error", { type: "error", error: err });
+          }
+        } finally {
+          if (!isClosed) {
+            instance.close();
           }
         }
-      } catch (err) {
-        if (!isClosed && err.name !== "AbortError") {
-          emit("error", { type: "error", error: err });
-        }
-      } finally {
-        if (!isClosed) {
-          instance.close();
-        }
-      }
-    })();
+      })();
 
-    return instance;
-  };
-})();
+      return instance;
+    };
+  })();
 
   // 8. Global Logout Logger Helper
   window.recordLogout = async function (logoutType, shift, location, notes) {
