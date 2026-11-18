@@ -3,7 +3,7 @@
  * Menyediakan caching aset offline, waktu muat super cepat, dan instalasi native di Windows, Mac, Android, dan iOS.
  */
 
-const CACHE_NAME = "langgeng-smartpos-v7";
+const CACHE_NAME = "langgeng-smartpos-v10";
 
 const STATIC_ASSETS = [
   "./",
@@ -27,7 +27,7 @@ const STATIC_ASSETS = [
   "./spa-router.js",
   "./vendor/tailwindcss.js",
   "./vendor/alpine.min.js",
-  "./vendor/sweetalert2.all.min.js"
+  "./vendor/sweetalert2.all.min.js",
 ];
 
 // 1. Install Event: Cache Aset Inti Aplikasi
@@ -37,25 +37,31 @@ self.addEventListener("install", (event) => {
     caches.open(CACHE_NAME).then((cache) => {
       console.log("[SmartPOS SW] Pre-caching aset aplikasi offline...");
       return cache.addAll(STATIC_ASSETS).catch((err) => {
-        console.warn("[SmartPOS SW] Sebagian aset gagal di-cache saat install:", err);
+        console.warn(
+          "[SmartPOS SW] Sebagian aset gagal di-cache saat install:",
+          err,
+        );
       });
-    })
+    }),
   );
 });
 
 // 2. Activate Event: Bersihkan Cache Versi Lama
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            console.log("[SmartPOS SW] Menghapus cache versi lama:", key);
-            return caches.delete(key);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
+    caches
+      .keys()
+      .then((keys) => {
+        return Promise.all(
+          keys.map((key) => {
+            if (key !== CACHE_NAME) {
+              console.log("[SmartPOS SW] Menghapus cache versi lama:", key);
+              return caches.delete(key);
+            }
+          }),
+        );
+      })
+      .then(() => self.clients.claim()),
   );
 });
 
@@ -92,6 +98,6 @@ self.addEventListener("fetch", (event) => {
 
         return cachedResponse || fetchPromise;
       });
-    })
+    }),
   );
 });
