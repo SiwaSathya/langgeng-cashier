@@ -532,21 +532,23 @@
     });
 
     try {
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon(
-          `${apiUrl}/auth/logout`,
-          new Blob([payload], { type: "application/json" }),
-        );
-      } else {
-        await fetch(`${apiUrl}/auth/logout`, {
+      const tokenParam = token ? `?token=${encodeURIComponent(token)}` : "";
+      // Prioritaskan fetch with keepalive agar Authorization header JWT terkirim lengkap ke backend
+      if (window.fetch) {
+        await fetch(`${apiUrl}/auth/logout${tokenParam}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           body: payload,
           keepalive: true,
         });
+      } else if (navigator.sendBeacon) {
+        navigator.sendBeacon(
+          `${apiUrl}/auth/logout${tokenParam}`,
+          new Blob([payload], { type: "application/json" }),
+        );
       }
     } catch (e) {
       console.warn("[SmartPOS] Gagal mencatat log logout:", e);
