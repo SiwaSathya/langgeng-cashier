@@ -1429,6 +1429,7 @@
             }
 
             function getGeoLocationBadgeHtml(ip, username, role, badgeId) {
+                const safeBadgeId = badgeId || ('geo-' + Math.random().toString(36).substring(2, 9));
                 // Sembunyikan lokasi HANYA untuk akun dengan username 'super-admin'
                 if (isHiddenLocationUsername(username)) {
                     return `
@@ -1685,7 +1686,7 @@
                     return;
                 }
 
-                logs.forEach((item) => {
+                logs.forEach((item, idx) => {
                     const tr = document.createElement("tr");
                     tr.className = "hover:bg-slate-50/80 transition-colors";
 
