@@ -591,7 +591,7 @@
                                             Halaman Yang Diakses
                                         </th>
                                         <th class="py-4 px-5">
-                                            Perangkat & IP
+                                            Perangkat, IP & Lokasi
                                         </th>
                                         <th class="py-4 px-5">
                                             Terakhir Aktif
@@ -873,7 +873,7 @@
                                         <th class="py-4 px-5">Skema Logout</th>
                                         <th class="py-4 px-5">Durasi Sesi</th>
                                         <th class="py-4 px-6">
-                                            Perangkat & Catatan
+                                            Perangkat, IP & Lokasi
                                         </th>
                                     </tr>
                                 </thead>
@@ -1330,11 +1330,216 @@
                 }
             }
 
+            // ===============================================
+            // IP GEOLOCATION DETECTOR & SUPER ADMIN PRIVACY
+            // ===============================================
+            const ipGeoCache = JSON.parse(
+                sessionStorage.getItem("ip_geo_cache") || "{}",
+            );
+
+            function isSuperAdminUser(username, role) {
+                const u = String(username || "").toLowerCase().trim();
+                const r = String(role || "")
+                    .toLowerCase()
+                    .trim()
+                    .replace(/[-_]/g, "");
+                return (
+                    u === "super-admin" ||
+                    u === "superadmin" ||
+                    r === "superadmin"
+                );
+            }
+
+            function isPrivateOrLocalIP(ip) {
+                if (!ip) return true;
+                const clean = String(ip).trim();
+                if (
+                    clean === "127.0.0.1" ||
+                    clean === "::1" ||
+                    clean === "localhost"
+                )
+                    return true;
+                if (clean.startsWith("10.") || clean.startsWith("192.168."))
+                    return true;
+                if (/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(clean)) return true;
+                return false;
+            }
+
+            async function fetchIpGeo(ip) {
+                if (!ip || isPrivateOrLocalIP(ip)) {
+                    return {
+                        success: true,
+                        isLocal: true,
+                        label: "Jaringan Lokal (LAN / Server)",
+                    };
+                }
+
+                if (ipGeoCache[ip]) {
+                    return ipGeoCache[ip];
+                }
+
+                try {
+                    const res = await fetch(
+                        `https://ipwho.is/${encodeURIComponent(ip)}`,
+                        {
+                            headers: { Accept: "application/json" },
+                        },
+                    );
+                    if (!res.ok) throw new Error("GeoIP fetch error");
+                    const data = await res.json();
+                    if (data && data.success) {
+                        const city = data.city || "";
+                        const region = data.region || "";
+                        const label =
+                            [city, region].filter(Boolean).join(", ") ||
+                            data.country ||
+                            "Online";
+                        const mapsUrl =
+                            data.latitude && data.longitude
+                                ? `https://www.google.com/maps?q=${data.latitude},${data.longitude}`
+                                : null;
+                        const isp =
+                            data.connection?.isp ||
+                            data.connection?.org ||
+                            "";
+
+                        const geoInfo = {
+                            success: true,
+                            isLocal: false,
+                            city,
+                            region,
+                            country: data.country || "Indonesia",
+                            isp,
+                            mapsUrl,
+                            label,
+                        };
+                        ipGeoCache[ip] = geoInfo;
+                        try {
+                            sessionStorage.setItem(
+                                "ip_geo_cache",
+                                JSON.stringify(ipGeoCache),
+                            );
+                        } catch (_) {}
+                        return geoInfo;
+                    }
+                } catch (err) {
+                    console.warn("GeoIP error for IP", ip, err);
+                }
+
+                const fallback = {
+                    success: false,
+                    isLocal: false,
+                    label: "Lokasi Tidak Terdeteksi",
+                };
+                ipGeoCache[ip] = fallback;
+                return fallback;
+            }
+
+            function getGeoLocationBadgeHtml(ip, username, role, badgeId) {
+                // Sembunyikan lokasi mutlak untuk username super-admin atau role superadmin
+                if (isSuperAdminUser(username, role)) {
+                    return `
+                        <div class="mt-1">
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200/80 shadow-2xs" title="Lokasi disembunyikan untuk privasi dan perlindungan akun Super Admin">
+                                <i class="fas fa-shield-halved text-amber-500 text-[9px]"></i>
+                                <span>Lokasi Tersembunyi (Super Admin)</span>
+                            </span>
+                        </div>
+                    `;
+                }
+
+                if (!ip || isPrivateOrLocalIP(ip)) {
+                    return `
+                        <div class="mt-1">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                <i class="fas fa-network-wired text-slate-400 text-[9px]"></i>
+                                <span>Jaringan Lokal (LAN / Server)</span>
+                            </span>
+                        </div>
+                    `;
+                }
+
+                const cached = ipGeoCache[ip];
+                if (cached && cached.success) {
+                    return renderResolvedGeoBadgeHtml(cached);
+                }
+
+                return `
+                    <div id="${badgeId}" class="geo-badge-pending mt-1 text-[10px] text-slate-400 font-medium flex items-center gap-1.5" data-ip="${escapeHTML(ip)}">
+                        <i class="fas fa-spinner fa-spin text-[9px] text-blue-500"></i>
+                        <span>Mendeteksi lokasi...</span>
+                    </div>
+                `;
+            }
+
+            function renderResolvedGeoBadgeHtml(geo) {
+                if (!geo || !geo.success) {
+                    return `
+                        <div class="mt-1">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] text-slate-400 bg-slate-50 border border-slate-200">
+                                <i class="fas fa-location-crosshairs text-[9px]"></i>
+                                <span>${escapeHTML(geo?.label || "Lokasi Publik")}</span>
+                            </span>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="mt-1 flex flex-col gap-0.5">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs">
+                                <i class="fas fa-location-dot text-rose-500 text-[9px]"></i>
+                                <span>${escapeHTML(geo.label)}</span>
+                            </span>
+                            ${
+                                geo.mapsUrl
+                                    ? `
+                                <a href="${geo.mapsUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[10px] text-blue-600 hover:text-blue-800 underline font-bold transition-colors ml-0.5" title="Buka estimasi titik kota di Google Maps">
+                                    <i class="fas fa-arrow-up-right-from-square text-[8.5px]"></i> Peta
+                                </a>
+                            `
+                                    : ""
+                            }
+                        </div>
+                        ${
+                            geo.isp
+                                ? `
+                            <p class="text-[9.5px] text-slate-400 font-medium truncate max-w-[220px]" title="Penyedia Internet: ${escapeHTML(geo.isp)}">
+                                <i class="fas fa-wifi text-[8px] mr-1 text-slate-300"></i>${escapeHTML(geo.isp)}
+                            </p>
+                        `
+                                : ""
+                        }
+                    </div>
+                `;
+            }
+
+            function resolvePendingGeoBadges() {
+                const pendings = document.querySelectorAll(".geo-badge-pending");
+                if (pendings.length === 0) return;
+
+                const ips = new Set();
+                pendings.forEach((el) => {
+                    const ip = el.getAttribute("data-ip");
+                    if (ip) ips.add(ip);
+                });
+
+                ips.forEach(async (ip) => {
+                    const geo = await fetchIpGeo(ip);
+                    const targets = document.querySelectorAll(
+                        `.geo-badge-pending[data-ip="${CSS.escape(ip)}"]`,
+                    );
+                    targets.forEach((target) => {
+                        target.outerHTML = renderResolvedGeoBadgeHtml(geo);
+                    });
+                });
+            }
+
             function renderTableView(users) {
                 const tbody = document.getElementById("userTableBody");
                 tbody.innerHTML = "";
 
-                users.forEach((u) => {
+                users.forEach((u, idx) => {
                     const tr = document.createElement("tr");
                     tr.className = "hover:bg-slate-50/80 transition-colors";
 
@@ -1363,6 +1568,7 @@
                                     <span>${escapeHTML(u.device || "Browser")}</span>
                                 </p>
                                 <p class="text-slate-400 font-mono text-[11px]">${escapeHTML(u.ip_address || "127.0.0.1")}</p>
+                                ${getGeoLocationBadgeHtml(u.ip_address, u.username, u.role, 'tab1-geo-' + idx)}
                             </div>
                         </td>
                         <td class="py-4 px-5 whitespace-nowrap text-xs text-slate-500 font-semibold" data-lastseen="${u.last_seen || ""}">
@@ -1377,6 +1583,7 @@
                     `;
                     tbody.appendChild(tr);
                 });
+                resolvePendingGeoBadges();
             }
 
             // ===============================================
@@ -1598,17 +1805,20 @@
                             ${durationText}
                         </td>
 
-                        <!-- Perangkat & Catatan -->
-                        <td class="py-4 px-6 text-xs">
+                        <!-- Perangkat, IP & Lokasi -->
+                        <td class="py-4 px-6 text-xs space-y-0.5">
                             <p class="font-semibold text-slate-700 flex items-center gap-1.5">
                                 <i class="fas fa-display text-slate-400 text-[10px]"></i>
-                                <span>${escapeHTML(item.device || "Browser")} (${escapeHTML(item.ip_address || "127.0.0.1")})</span>
+                                <span>${escapeHTML(item.device || "Browser")}</span>
                             </p>
-                            ${item.notes ? `<p class="text-[11px] text-slate-500 italic mt-0.5">${escapeHTML(item.notes)}</p>` : ""}
+                            <p class="text-slate-400 font-mono text-[11px]">${escapeHTML(item.ip_address || "127.0.0.1")}</p>
+                            ${getGeoLocationBadgeHtml(item.ip_address, item.username, item.role, 'tab2-geo-' + idx)}
+                            ${item.notes ? `<p class="text-[11px] text-slate-500 italic mt-1 border-t border-slate-100 pt-0.5">${escapeHTML(item.notes)}</p>` : ""}
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
+                resolvePendingGeoBadges();
             }
 
             function applyLogFilters(page = 1) {
