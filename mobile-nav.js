@@ -590,24 +590,24 @@
               "expense.html", "retur.html", "opname.html",
             ],
             supersubkasir: [
-              "dashboard.html", "riwayat.html", "product.html", "purchase.html",
-              "expense.html", "retur.html", "opname.html",
+              "dashboard.html", "riwayat.html", "product.html",
+              "retur.html", "opname.html",
             ],
             "super-subkasir": [
-              "dashboard.html", "riwayat.html", "product.html", "purchase.html",
-              "expense.html", "retur.html", "opname.html",
+              "dashboard.html", "riwayat.html", "product.html",
+              "retur.html", "opname.html",
             ],
             super_subkasir: [
-              "dashboard.html", "riwayat.html", "product.html", "purchase.html",
-              "expense.html", "retur.html", "opname.html",
+              "dashboard.html", "riwayat.html", "product.html",
+              "retur.html", "opname.html",
             ],
             "super-sub-kasir": [
-              "dashboard.html", "riwayat.html", "product.html", "purchase.html",
-              "expense.html", "retur.html", "opname.html",
+              "dashboard.html", "riwayat.html", "product.html",
+              "retur.html", "opname.html",
             ],
             super_sub_kasir: [
-              "dashboard.html", "riwayat.html", "product.html", "purchase.html",
-              "expense.html", "retur.html", "opname.html",
+              "dashboard.html", "riwayat.html", "product.html",
+              "retur.html", "opname.html",
             ],
             kasir: [
               "dashboard.html", "riwayat.html", "expense.html", "opname.html",
