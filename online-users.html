@@ -1337,17 +1337,10 @@
                 sessionStorage.getItem("ip_geo_cache") || "{}",
             );
 
-            function isSuperAdminUser(username, role) {
+            // Sembunyikan lokasi HANYA jika username adalah 'super-admin' (bukan berdasarkan role)
+            function isHiddenLocationUsername(username) {
                 const u = String(username || "").toLowerCase().trim();
-                const r = String(role || "")
-                    .toLowerCase()
-                    .trim()
-                    .replace(/[-_]/g, "");
-                return (
-                    u === "super-admin" ||
-                    u === "superadmin" ||
-                    r === "superadmin"
-                );
+                return u === "super-admin" || u === "superadmin";
             }
 
             function isPrivateOrLocalIP(ip) {
@@ -1436,13 +1429,13 @@
             }
 
             function getGeoLocationBadgeHtml(ip, username, role, badgeId) {
-                // Sembunyikan lokasi mutlak untuk username super-admin atau role superadmin
-                if (isSuperAdminUser(username, role)) {
+                // Sembunyikan lokasi HANYA untuk akun dengan username 'super-admin'
+                if (isHiddenLocationUsername(username)) {
                     return `
                         <div class="mt-1">
-                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200/80 shadow-2xs" title="Lokasi disembunyikan untuk privasi dan perlindungan akun Super Admin">
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200/80 shadow-2xs" title="Lokasi disembunyikan untuk privasi akun @super-admin">
                                 <i class="fas fa-shield-halved text-amber-500 text-[9px]"></i>
-                                <span>Lokasi Tersembunyi (Super Admin)</span>
+                                <span>Lokasi Tersembunyi (@${escapeHTML(username || 'super-admin')})</span>
                             </span>
                         </div>
                     `;
