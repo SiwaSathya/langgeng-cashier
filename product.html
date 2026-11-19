@@ -1358,42 +1358,99 @@
                     ? `${BASE_URL}/api/products/${id}`
                     : `${BASE_URL}/api/products`;
 
+                const categoryId = parseInt(document.getElementById("category_id").value) || 0;
+                const brandId = parseInt(document.getElementById("brand_id").value) || 0;
+                const supplierId = (document.getElementById("supplier_id").value || "").trim();
+
+                if (!categoryId) {
+                    if (typeof Swal !== "undefined") {
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Kategori Belum Dipilih",
+                            text: "Mohon pilih kategori produk terlebih dahulu.",
+                            confirmButtonColor: "#2563eb",
+                        });
+                    } else {
+                        alert("Mohon pilih kategori produk terlebih dahulu.");
+                    }
+                    return;
+                }
+
                 const payload = {
-                    Kode: document.getElementById("kode").value,
-                    Nama: document.getElementById("nama").value,
-                    Satuan: document.getElementById("satuan").value, // Baru
+                    kode: document.getElementById("kode").value.trim(),
+                    nama: document.getElementById("nama").value.trim(),
+                    satuan: document.getElementById("satuan").value.trim(),
+                    saldo: parseFloat(
+                        document.getElementById("saldo").value || 0,
+                    ),
+                    h_beli: parseFloat(
+                        document.getElementById("hbeli").value || 0,
+                    ),
+                    h_pokok: parseFloat(
+                        document.getElementById("hpokok").value || 0,
+                    ),
+                    h_jual: parseFloat(
+                        document.getElementById("hjual").value || 0,
+                    ),
+                    category_id: categoryId,
+                    brand_id: brandId,
+                    supplier_id: supplierId,
+                    // Sertakan juga PascalCase untuk backward-compatibility
+                    Kode: document.getElementById("kode").value.trim(),
+                    Nama: document.getElementById("nama").value.trim(),
+                    Satuan: document.getElementById("satuan").value.trim(),
                     Saldo: parseFloat(
                         document.getElementById("saldo").value || 0,
-                    ), // Baru
+                    ),
                     HBeli: parseFloat(
                         document.getElementById("hbeli").value || 0,
                     ),
                     HPokok: parseFloat(
                         document.getElementById("hpokok").value || 0,
-                    ), // Baru
+                    ),
                     HJual: parseFloat(
                         document.getElementById("hjual").value || 0,
                     ),
-                    CategoryID: parseInt(
-                        document.getElementById("category_id").value,
-                    ),
-                    BrandID: parseInt(
-                        document.getElementById("brand_id").value,
-                    ),
-                    SupplierID: document.getElementById("supplier_id").value, // SupplierID di struct adalah string
+                    CategoryID: categoryId,
+                    BrandID: brandId,
+                    SupplierID: supplierId,
                 };
 
-                const res = await fetch(url, {
-                    method: method,
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload),
-                });
+                try {
+                    const res = await fetch(url, {
+                        method: method,
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload),
+                    });
 
-                if (res.ok) {
-                    closeModal();
-                    fetchProducts();
-                } else {
-                    alert("Gagal menyimpan data");
+                    if (res.ok) {
+                        closeModal();
+                        fetchProducts();
+                        if (typeof Swal !== "undefined") {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Berhasil",
+                                text: id ? "Data produk berhasil diperbarui" : "Produk baru berhasil ditambahkan",
+                                timer: 1500,
+                                showConfirmButton: false,
+                            });
+                        }
+                    } else {
+                        const errData = await res.json().catch(() => ({}));
+                        const errMsg = errData.message || errData.error || res.statusText || "Gagal menyimpan data";
+                        if (typeof Swal !== "undefined") {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Gagal Menyimpan Produk",
+                                text: errMsg,
+                                confirmButtonColor: "#2563eb",
+                            });
+                        } else {
+                            alert("Gagal menyimpan data: " + errMsg);
+                        }
+                    }
+                } catch (err) {
+                    alert("Koneksi Error: " + err.message);
                 }
             };
 
