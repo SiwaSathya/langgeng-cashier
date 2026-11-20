@@ -1405,13 +1405,20 @@
                 `;
                         }
 
+                        const userRole = (userData.role || "")
+                            .toLowerCase()
+                            .trim();
+                        const normRole = userRole.replace(/[-_]/g, "");
+                        const isAkuntan = normRole === "akuntan";
+
                         let actionButtons = "";
-                        // 1. Tombol Pelunasan (Hanya muncul jika belum lunas)
+                        // 1. Tombol Pelunasan (Hanya muncul jika belum lunas dan bukan role akuntan)
                         if (
-                            isDp ||
+                            !isAkuntan &&
+                            (isDp ||
                             isBon ||
                             txStatus === "DP" ||
-                            txStatus === "Bon"
+                            txStatus === "Bon")
                         ) {
                             actionButtons += `
     <button onclick="openPelunasanModal(${idx})" class="bg-blue-600 hover:bg-blue-700 text-white px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold transition-all shadow-sm" title="Pelunasan Nota">
@@ -1436,12 +1443,14 @@
 </button>
 `;
 
-                        // 4. Tombol Retur Barang
-                        actionButtons += `
+                        // 4. Tombol Retur Barang (Hanya jika bukan role akuntan)
+                        if (!isAkuntan) {
+                            actionButtons += `
 <button onclick="openReturModal(${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold transition-all shadow-sm" title="Retur Barang">
     <i class="fas fa-undo"></i>
 </button>
 `;
+                        }
 
                         // 5. Tombol Expand Rincian Item
                         if (saleItems.length > 0) {
@@ -1452,10 +1461,6 @@
 `;
                         }
 
-                        const userRole = (userData.role || "")
-                            .toLowerCase()
-                            .trim();
-                        const normRole = userRole.replace(/[-_]/g, "");
                         if (normRole === "admin" || normRole === "superadmin") {
                             actionButtons += `
                             <button onclick="deleteTransaction('${escapeHTML(invoice)}')" class="bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 border border-rose-200 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold transition-all shadow-sm" title="Hapus & Batalkan Transaksi (Rollback Stok)">
@@ -1590,9 +1595,11 @@
                             <td class="py-2.5 px-4 text-right text-slate-400 font-semibold">${itDiscount > 0 ? `IDR ${itDiscount.toLocaleString("id-ID")}` : "-"}</td>
                             <td class="py-2.5 px-4 text-right font-bold text-slate-800">IDR ${itSubtotal.toLocaleString("id-ID")}</td>
                             <td class="py-2.5 px-4 text-center">
+                                ${isAkuntan ? '<span class="text-slate-400 text-[10px] italic">-</span>' : `
                                 <button onclick="openReturModal(${idx}, ${itemIdx})" class="bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 px-2.5 py-1 rounded-md text-[10px] font-bold transition-all shadow-sm">
                                     <i class="fas fa-undo mr-1"></i> Retur
                                 </button>
+                                `}
                             </td>
                         </tr>
                     `;
@@ -1823,6 +1830,17 @@
             let modalPaymentList = [];
 
             function openPelunasanModal(idx) {
+                const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                const normRole = (curUser.role || "").toLowerCase().replace(/[-_]/g, "");
+                if (normRole === "akuntan") {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Akses Ditolak",
+                        text: "Role Akuntan tidak memiliki izin untuk mengedit atau melunasi transaksi.",
+                        confirmButtonColor: "#2563EB",
+                    });
+                    return;
+                }
                 const group = localSalesData[idx];
                 if (!group) return;
 
@@ -2189,6 +2207,12 @@
                 groupData,
                 pelunasanPaid,
             ) {
+                const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                const normRole = (curUser.role || "").toLowerCase().replace(/[-_]/g, "");
+                if (normRole === "akuntan") {
+                    Swal.fire("Akses Ditolak", "Role Akuntan tidak memiliki izin untuk mengedit atau melunasi transaksi.", "warning");
+                    return;
+                }
                 Swal.fire({
                     title: "Menyimpan Pelunasan...",
                     didOpen: () => Swal.showLoading(),
@@ -2241,6 +2265,17 @@
 
             // --- 2. POPUP MODAL RETUR BARANG (PER ITEM DALAM NOTA) ---
             function openReturModal(groupIdx, itemIdx = null) {
+                const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                const normRole = (curUser.role || "").toLowerCase().replace(/[-_]/g, "");
+                if (normRole === "akuntan") {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Akses Ditolak",
+                        text: "Role Akuntan tidak memiliki izin untuk melakukan retur transaksi.",
+                        confirmButtonColor: "#2563EB",
+                    });
+                    return;
+                }
                 const group = localSalesData[groupIdx];
                 if (!group) return;
 
@@ -2329,9 +2364,13 @@
                 const hasPelunasan = paymentMethod.includes("[Pelunasan:") || (txStatus === "Lunas" && (isBon || isDp || customerName));
 
                 const actions = [];
+                const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                const userRole = (curUser.role || "").toLowerCase().trim();
+                const normRole = userRole.replace(/[-_]/g, "");
+                const isAkuntan = normRole === "akuntan";
 
-                // 1. Pelunasan Nota jika belum lunas
-                if (isDp || isBon || txStatus === "DP" || txStatus === "Bon") {
+                // 1. Pelunasan Nota jika belum lunas (hanya jika bukan role akuntan)
+                if (!isAkuntan && (isDp || isBon || txStatus === "DP" || txStatus === "Bon")) {
                     actions.push({
                         label: "Pelunasan Nota",
                         icon: "fas fa-money-bill-wave",
@@ -2361,14 +2400,16 @@
                     onClick: () => reprintSaleReceipt(idx),
                 });
 
-                // 4. Retur Barang
-                actions.push({
-                    label: "Retur Barang",
-                    icon: "fas fa-undo",
-                    color: "amber",
-                    desc: "Pengembalian barang & tukar uang/stok",
-                    onClick: () => openReturModal(idx),
-                });
+                // 4. Retur Barang (hanya jika bukan role akuntan)
+                if (!isAkuntan) {
+                    actions.push({
+                        label: "Retur Barang",
+                        icon: "fas fa-undo",
+                        color: "amber",
+                        desc: "Pengembalian barang & tukar uang/stok",
+                        onClick: () => openReturModal(idx),
+                    });
+                }
 
                 // 5. Rincian Item Belanja
                 if (saleItems.length > 0) {
@@ -2382,10 +2423,7 @@
                 }
 
                 // 6. Hapus & Batalkan Transaksi (Admin/Superadmin)
-                const userData = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
-                const userRole = (userData.role || "").toLowerCase().trim();
-                const normRole = userRole.replace(/[-_]/g, "");
-                        if (normRole === "admin" || normRole === "superadmin") {
+                if (normRole === "admin" || normRole === "superadmin") {
                     actions.push({
                         label: "Hapus & Batalkan Transaksi",
                         icon: "fas fa-trash",
@@ -2985,6 +3023,12 @@
             }
 
             async function processReturAPI(payload) {
+                const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                const normRole = (curUser.role || "").toLowerCase().replace(/[-_]/g, "");
+                if (normRole === "akuntan") {
+                    Swal.fire("Akses Ditolak", "Role Akuntan tidak memiliki izin untuk melakukan retur transaksi.", "warning");
+                    return;
+                }
                 Swal.fire({
                     title: "Memproses Retur...",
                     didOpen: () => Swal.showLoading(),
@@ -3192,6 +3236,8 @@
                     "product.html",
                     "purchase.html",
                     "expense.html",
+                    "retur.html",
+                    "akuntansi.html",
                 ],
             };
 

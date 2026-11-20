@@ -613,7 +613,7 @@
               "dashboard.html", "riwayat.html", "expense.html", "opname.html",
             ],
             akuntan: [
-              "riwayat.html", "product.html", "purchase.html", "expense.html",
+              "riwayat.html", "product.html", "purchase.html", "expense.html", "retur.html", "akuntansi.html",
             ],
           };
 
