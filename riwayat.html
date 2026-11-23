@@ -894,8 +894,21 @@
             });
 
 
-            const RECEIPT_BASE_CSS = `
-            @page { size: 80mm auto; margin: 0; }
+            function getReceiptCSS(loc) {
+                const userData = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                const location = (loc || userData.location || "").trim();
+                const isPaye = location.toLowerCase().includes("paye");
+
+                // Konfigurasi kertas cetak: Toko Paye disesuaikan agar tidak terpotong (format 58mm / 50mm printable)
+                const pageSize = isPaye ? "58mm auto" : "80mm auto";
+                const receiptWidth = isPaye ? "50mm" : "72mm";
+                const baseFontSize = isPaye ? "9.5px" : "11.5px";
+                const storeNameSize = isPaye ? "12px" : "14px";
+                const lineMargin = isPaye ? "3px 0" : "6px 0";
+                const padding = isPaye ? "1mm 0.5mm" : "2mm 2.5mm";
+
+                return `
+            @page { size: ${pageSize}; margin: 0; }
             * {
                 -webkit-font-smoothing: none !important;
                 -moz-osx-font-smoothing: grayscale !important;
@@ -906,30 +919,34 @@
             body {
                 margin: 0; padding: 0; background: #fff !important; color: #000 !important;
                 font-family: "Consolas", "Courier Prime", "Lucida Console", "Courier New", monospace;
-                font-size: 11.5px; font-weight: 600; line-height: 1.25;
+                font-size: ${baseFontSize}; font-weight: 600; line-height: 1.25;
                 -webkit-font-smoothing: none !important;
                 -moz-osx-font-smoothing: grayscale !important;
                 text-rendering: geometricPrecision !important;
             }
             .receipt, .shift-receipt {
-                box-sizing: border-box; width: 72mm; max-width: 72mm; padding: 2mm 2.5mm; margin: 0 auto; color: #000 !important;
+                box-sizing: border-box; width: ${receiptWidth}; max-width: ${receiptWidth};
+                padding: ${padding}; margin: 0 auto; color: #000 !important;
+                word-break: break-word; overflow-wrap: break-word;
             }
-            table { width: 100%; border-collapse: collapse; font-size: inherit; color: #000 !important; }
-            td, th { vertical-align: top; padding: 1px 0; color: #000 !important; }
+            table { width: 100%; border-collapse: collapse; font-size: inherit; color: #000 !important; table-layout: auto; }
+            td, th { vertical-align: top; padding: 1px 0; color: #000 !important; word-break: break-word; }
             .center { text-align: center; }
-            .right { text-align: right; }
+            .right { text-align: right; white-space: nowrap; }
             .bold, b, strong, .font-bold { font-weight: 800 !important; }
-            .line { border-top: 1.5px dashed #000 !important; margin: 6px 0; }
-            .store-name { font-size: 14px; font-weight: 800 !important; text-transform: uppercase; letter-spacing: 0.5px; }
+            .line { border-top: 1.5px dashed #000 !important; margin: ${lineMargin}; }
+            .store-name { font-size: ${storeNameSize}; font-weight: 800 !important; text-transform: uppercase; letter-spacing: 0.5px; }
             .copy-badge {
-                text-align: center; font-weight: 800 !important; font-size: 10px;
-                border: 1.5px solid #000 !important; padding: 2px; margin-bottom: 6px; letter-spacing: 0.5px;
+                text-align: center; font-weight: 800 !important; font-size: ${isPaye ? "8.5px" : "10px"};
+                border: 1.5px solid #000 !important; padding: 2px; margin-bottom: 4px; letter-spacing: 0.5px;
             }
             @media print {
                 body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                 * { -webkit-font-smoothing: none !important; text-rendering: geometricPrecision !important; }
             }
         `;
+            }
+            const RECEIPT_BASE_CSS = getReceiptCSS();
 
             function printHTML(html) {
                 return new Promise((resolve, reject) => {
@@ -998,9 +1015,9 @@
             }
 
             // Master data header toko berdasarkan lokasi user login
-            function getStoreInfo() {
+            function getStoreInfo(customLocation) {
                 const userData = getUserDataFromToken() || {};
-                const location = (userData.location || "Toko Utama").trim();
+                const location = (customLocation || userData.location || "Toko Utama").trim();
 
                 const stores = {
                     "Toko Utama": {
@@ -2087,7 +2104,9 @@
 
             function printPelunasanReceipt(group, newPaidAmount) {
                 const userData = getUserDataFromToken() || {};
-                const store = getStoreInfo();
+                const groupLoc = (group.location || group.Location || userData.location || "Toko Utama").trim();
+                const isPaye = groupLoc.toLowerCase().includes("paye");
+                const store = getStoreInfo(groupLoc);
                 const totalBill = Number(group.total_netto || 0);
                 const initialPaid = Number(group.amount_paid || 0);
                 const totalPaid = initialPaid + Number(newPaidAmount || 0);
@@ -2149,20 +2168,20 @@
         <title>Nota Pelunasan ${escapeHTML(invoiceNo)}</title>
                     <style>
 
-                        ${RECEIPT_BASE_CSS}
+                        ${getReceiptCSS(groupLoc)}
                         .receipt .center { text-align: center; }
-                        .receipt .right { text-align: right; }
+                        .receipt .right { text-align: right; white-space: nowrap; }
                         .receipt .bold { font-weight: 800 !important; }
                         .receipt .line {
                             border-top: 1.5px dashed #000 !important;
-                            margin: 8px 0;
+                            margin: ${isPaye ? "4px 0" : "8px 0"};
                         }
                         .receipt .item-name {
                             font-weight: 800 !important;
-                            padding-top: 4px;
+                            padding-top: ${isPaye ? "2px" : "4px"};
                         }
                         .receipt .store-name {
-                            font-size: 14px;
+                            font-size: ${isPaye ? "12px" : "14px"};
                             font-weight: 800 !important;
                             text-transform: uppercase;
                             letter-spacing: 0.5px;
@@ -2472,7 +2491,10 @@
                 const group = localSalesData[idx];
                 if (!group) return;
 
-                const storeHeader = getStoreInfo();
+                const userData = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                const groupLoc = (group.location || group.Location || userData.location || "Toko Utama").trim();
+                const isPaye = groupLoc.toLowerCase().includes("paye");
+                const storeHeader = getStoreInfo(groupLoc);
                 const rawItems = group.items || group.Items || [];
 
                 // 1. FILTER: Kecualikan barang yang sudah diretur
@@ -2595,9 +2617,9 @@
                         <td colspan="3" class="item-name">${escapeHTML(pName)}</td>
                     </tr>
                     <tr>
-                        <td>${escapeHTML(pCode)}</td>
-                        <td class="center">${itQty} x ${itPrice.toLocaleString("id-ID")}</td>
-                        <td class="right">${itSubtotal.toLocaleString("id-ID")}</td>
+                        <td style="font-size: ${isPaye ? "8.5px" : "inherit"};">${escapeHTML(pCode)}</td>
+                        <td class="center" style="font-size: ${isPaye ? "9px" : "inherit"};">${itQty} x ${itPrice.toLocaleString("id-ID")}</td>
+                        <td class="right" style="font-size: ${isPaye ? "9.5px" : "inherit"};">${itSubtotal.toLocaleString("id-ID")}</td>
                     </tr>
                     `;
                     })
@@ -2646,10 +2668,10 @@
 
                         <div class="center">
                             <div class="store-name">LANGGENG ELEKTRONIKA</div>
-                            <div style="font-size: 10px; margin-top: 2px;">${escapeHTML(storeHeader.address)}</div>
-                            <div style="font-size: 10px;">Telp: ${escapeHTML(storeHeader.phone)}</div>
-                            <div style="font-size: 10px;">Email: langgengtemaja8888@gmail.com</div>
-                            <div style="margin-top: 6px; font-weight: bold; font-size: 12px;">
+                            <div style="font-size: ${isPaye ? "8.5px" : "10px"}; margin-top: 2px;">${escapeHTML(storeHeader.address)}</div>
+                            <div style="font-size: ${isPaye ? "8.5px" : "10px"};">Telp: ${escapeHTML(storeHeader.phone)}</div>
+                            <div style="font-size: ${isPaye ? "8.5px" : "10px"};">Email: langgengtemaja8888@gmail.com</div>
+                            <div style="margin-top: ${isPaye ? "4px" : "6px"}; font-weight: bold; font-size: ${isPaye ? "10.5px" : "12px"};">
                                 ${isBon ? "NOTA BON / TAGIHAN UTANG" : "NOTA TRANSAKSI"}
                             </div>
                         </div>
@@ -2750,19 +2772,15 @@
         <title>Nota ${escapeHTML(invoiceNo)}</title>
                         <style>
 
-                            ${RECEIPT_BASE_CSS}
+                            ${getReceiptCSS(groupLoc)}
                             .center { text-align: center; }
-                            .right { text-align: right; }
+                            .right { text-align: right; white-space: nowrap; }
                             .bold { font-weight: 800 !important; }
-                            .line { border-top: 1.5px dashed #000 !important; margin: 6px 0; }
-                            .item-name { font-weight: 800 !important; padding-top: 4px; }
-                            .store-name { font-size: 14px; font-weight: 800 !important; text-transform: uppercase; letter-spacing: 0.5px; }
-                            .thanks { margin-top: 8px; text-align: center; font-weight: 800 !important; }
-                            .copy-badge {
-                                text-align: center; font-weight: 800 !important; font-size: 10px;
-                                border: 1.5px solid #000 !important; padding: 2px; margin-bottom: 6px; letter-spacing: 0.5px;
-                            }
-                            .receipt { page-break-after: always; break-after: page; margin-bottom: 20px; }
+                            .line { border-top: 1.5px dashed #000 !important; margin: ${isPaye ? "4px 0" : "6px 0"}; }
+                            .item-name { font-weight: 800 !important; padding-top: ${isPaye ? "2px" : "4px"}; }
+                            .store-name { font-size: ${isPaye ? "12px" : "14px"}; font-weight: 800 !important; text-transform: uppercase; letter-spacing: 0.5px; }
+                            .thanks { margin-top: ${isPaye ? "6px" : "8px"}; text-align: center; font-weight: 800 !important; }
+                            .receipt { page-break-after: always; break-after: page; margin-bottom: ${isPaye ? "12px" : "20px"}; }
                             .receipt:last-child { page-break-after: auto; break-after: auto; margin-bottom: 0; }
                             @media print {
                                 body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -2789,7 +2807,9 @@
 
             function printPelunasanReceipt(group, newPaidAmount = null) {
                 const userData = getUserDataFromToken() || {};
-                const store = getStoreInfo();
+                const groupLoc = (group.location || group.Location || userData.location || "Toko Utama").trim();
+                const isPaye = groupLoc.toLowerCase().includes("paye");
+                const store = getStoreInfo(groupLoc);
                 const totalBill = Number(
                     group.total_netto ?? group.TotalNetto ?? 0,
                 );
@@ -2877,14 +2897,14 @@
         <title>Nota Pelunasan ${escapeHTML(invoiceNo)}</title>
             <style>
 
-                ${RECEIPT_BASE_CSS}
+                ${getReceiptCSS(groupLoc)}
                 .receipt .center { text-align: center; }
-                .receipt .right { text-align: right; }
+                .receipt .right { text-align: right; white-space: nowrap; }
                 .receipt .bold { font-weight: 800 !important; }
-                .receipt .line { border-top: 1.5px dashed #000 !important; margin: 8px 0; }
-                .receipt .item-name { font-weight: 800 !important; padding-top: 4px; }
-                .receipt .store-name { font-size: 14px; font-weight: 800 !important; text-transform: uppercase; letter-spacing: 0.5px; }
-                .receipt .thanks { margin-top: 10px; text-align: center; font-weight: 800 !important; }
+                .receipt .line { border-top: 1.5px dashed #000 !important; margin: ${isPaye ? "4px 0" : "8px 0"}; }
+                .receipt .item-name { font-weight: 800 !important; padding-top: ${isPaye ? "2px" : "4px"}; }
+                .receipt .store-name { font-size: ${isPaye ? "12px" : "14px"}; font-weight: 800 !important; text-transform: uppercase; letter-spacing: 0.5px; }
+                .receipt .thanks { margin-top: ${isPaye ? "6px" : "10px"}; text-align: center; font-weight: 800 !important; }
 
         </style>
         </head>
