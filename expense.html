@@ -737,20 +737,34 @@
 
             const RECEIPT_BASE_CSS = `
                 @page { size: 80mm auto; margin: 0; }
+                * {
+                    -webkit-font-smoothing: none !important;
+                    -moz-osx-font-smoothing: grayscale !important;
+                    font-smooth: never !important;
+                    text-rendering: geometricPrecision !important;
+                    box-sizing: border-box;
+                }
                 body {
-                    margin: 0; padding: 0; background: #fff; color: #000;
-                    font-family: "Courier New", monospace; font-size: 11px; line-height: normal;
+                    margin: 0; padding: 0; background: #fff !important; color: #000 !important;
+                    font-family: "Consolas", "Courier Prime", "Lucida Console", "Courier New", monospace;
+                    font-size: 11.5px; font-weight: 600; line-height: 1.25;
+                    -webkit-font-smoothing: none !important;
+                    -moz-osx-font-smoothing: grayscale !important;
+                    text-rendering: geometricPrecision !important;
                 }
                 .receipt {
-                    box-sizing: content-box; width: 72mm; padding: 4mm; margin: 0;
+                    box-sizing: border-box; width: 72mm; max-width: 72mm; padding: 2mm 2.5mm; margin: 0 auto; color: #000 !important;
                 }
-                table { width: 100%; border-collapse: collapse; font-size: inherit; }
-                td { vertical-align: top; padding: 1px 0; }
+                table { width: 100%; border-collapse: collapse; font-size: inherit; color: #000 !important; }
+                td, th { vertical-align: top; padding: 1px 0; color: #000 !important; }
                 .center { text-align: center; }
                 .right { text-align: right; }
-                .bold { font-weight: bold; }
-                .line { border-top: 1px dashed #000; margin: 6px 0; }
-                @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+                .bold, b, strong, .font-bold { font-weight: 800 !important; }
+                .line { border-top: 1.5px dashed #000 !important; margin: 6px 0; }
+                @media print {
+                    body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    * { -webkit-font-smoothing: none !important; text-rendering: geometricPrecision !important; }
+                }
             `;
 
             function printHTML(html) {
