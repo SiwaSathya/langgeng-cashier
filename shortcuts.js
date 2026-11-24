@@ -747,7 +747,7 @@
                 z-index: 50 !important;
             }
             #shortcut-helper-fab {
-                z-index: 30 !important;
+                z-index: 40 !important;
             }
 
             /* Sembunyikan SEMUA tombol shortcut secara mutlak pada mobile & tablet (< 1024px) */
@@ -870,34 +870,35 @@
             cleanupMobileShortcuts();
             return;
         }
-        if (document.getElementById("shortcut-helper-fab")) return;
 
-        // B. Inject Floating Action Button (FAB)
-        const isDashboard = currentPage.includes("dashboard");
-        const fab = document.createElement("div");
-        fab.id = "shortcut-helper-fab";
-        // Pada layar desktop (>= 1024px), posisikan selalu di pojok kanan bawah (bottom-5 right-5)
-        // agar bersih, rapi, dan tidak pernah menabrak tombol sidebar maupun tombol aksi di tengah.
-        fab.className = "hidden lg:flex fixed bottom-5 right-5 z-30 items-center gap-2";
-
-        fab.innerHTML = `
-            <button
-                type="button"
-                id="btn-open-shortcut-modal"
-                onclick="window.toggleShortcutModal()"
-                class="group flex items-center gap-2.5 bg-white/95 hover:bg-blue-600 text-slate-700 hover:text-white px-3.5 py-2.5 rounded-2xl border border-slate-200 hover:border-blue-500 shadow-lg hover:shadow-blue-500/25 transition-all duration-200 active:scale-95 cursor-pointer backdrop-blur-sm shortcut-hover-card"
-                title="Panduan Pintasan Keyboard (Tekan ? atau Alt + H)"
-            >
-                <div class="w-6 h-6 rounded-lg bg-blue-50 group-hover:bg-white/20 flex items-center justify-center text-blue-600 group-hover:text-white transition-colors">
-                    <i class="fas fa-keyboard text-xs"></i>
-                </div>
-                <div class="text-left hidden sm:block">
-                    <span class="text-[11px] font-black uppercase tracking-wider block leading-none">Shortcut</span>
-                    <span class="text-[9px] text-slate-400 group-hover:text-blue-100 font-mono font-bold">Tekan ? / Alt + H</span>
-                </div>
-            </button>
-        `;
-        document.body.appendChild(fab);
+        // B. Inject Floating Action Button (FAB) Konsisten di Pojok Kanan Bawah
+        let fab = document.getElementById("shortcut-helper-fab");
+        if (!fab) {
+            fab = document.createElement("div");
+            fab.id = "shortcut-helper-fab";
+            fab.className = "hidden lg:flex fixed bottom-5 right-5 z-40 items-center gap-2 select-none";
+            fab.innerHTML = `
+                <button
+                    type="button"
+                    id="btn-open-shortcut-modal"
+                    onclick="window.toggleShortcutModal()"
+                    class="group flex items-center gap-2.5 bg-white/95 hover:bg-blue-600 text-slate-700 hover:text-white px-3.5 py-2.5 rounded-2xl border border-slate-200/90 hover:border-blue-500 shadow-lg hover:shadow-blue-500/25 transition-all duration-200 active:scale-95 cursor-pointer backdrop-blur-md shortcut-hover-card"
+                    title="Panduan Pintasan Keyboard (Tekan ? atau Alt + H)"
+                >
+                    <div class="w-6 h-6 rounded-lg bg-blue-50 group-hover:bg-white/20 flex items-center justify-center text-blue-600 group-hover:text-white transition-colors">
+                        <i class="fas fa-keyboard text-xs"></i>
+                    </div>
+                    <div class="text-left hidden sm:block">
+                        <span class="text-[11px] font-black uppercase tracking-wider block leading-none">Shortcut</span>
+                        <span class="text-[9px] text-slate-400 group-hover:text-blue-100 font-mono font-bold">Tekan ? / Alt + H</span>
+                    </div>
+                </button>
+            `;
+            document.body.appendChild(fab);
+        } else {
+            fab.className = "hidden lg:flex fixed bottom-5 right-5 z-40 items-center gap-2 select-none";
+            fab.style.display = "";
+        }
 
         // D. Inject Shortcut Guide Modal
         const modalContainer = document.createElement("div");
@@ -1069,36 +1070,9 @@
         document.body.appendChild(modalContainer);
     }
 
-    // 10. Pasang Tombol Shortcut Kecil di Header / Topbar Halaman
-    function injectHeaderShortcutButton() {
-        if (isMobile()) {
-            document.querySelectorAll('.shortcut-header-btn').forEach(el => el.style.display = 'none');
-            return;
-        }
-        document.querySelectorAll('.shortcut-header-btn').forEach(el => el.style.display = '');
-        if (document.querySelector(".shortcut-header-btn")) return;
-        const header = document.querySelector("header, .header-section, #main-content > div:first-child");
-        if (!header) return;
-
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "shortcut-header-btn hidden lg:inline-flex group items-center gap-2 px-3 py-1.5 bg-blue-50/90 hover:bg-blue-600 text-blue-700 hover:text-white rounded-xl text-xs font-bold transition-all duration-200 border border-blue-200 hover:border-blue-600 shadow-2xs hover:shadow-md hover:scale-105 active:scale-95 cursor-pointer shrink-0";
-        btn.title = "Panduan Pintasan Keyboard (Tekan ? atau Alt + H)";
-        btn.onclick = () => window.toggleShortcutModal();
-        btn.innerHTML = `
-            <div class="w-4 h-4 rounded bg-blue-100 group-hover:bg-white/20 flex items-center justify-center transition-colors">
-                <i class="fas fa-keyboard text-[10px] text-blue-600 group-hover:text-white"></i>
-            </div>
-            <span class="hidden md:inline font-bold">Shortcut</span>
-            <kbd class="px-1.5 py-0.5 bg-white group-hover:bg-blue-700 text-blue-700 group-hover:text-white rounded text-[10px] font-mono font-black shadow-2xs border border-blue-200 group-hover:border-blue-500 transition-colors">?</kbd>
-        `;
-
-        const actionContainer = header.querySelector(".flex.items-center.gap-3, .flex.items-center.gap-4, .flex.items-center.gap-2") || header;
-        if (actionContainer !== header) {
-            actionContainer.appendChild(btn);
-        } else {
-            header.appendChild(btn);
-        }
+    // 10. Hapus Tombol Shortcut di Header agar Konsisten Floating di Pojok Kanan Bawah
+    function removeHeaderShortcutButtons() {
+        document.querySelectorAll('.shortcut-header-btn').forEach(el => el.remove());
     }
 
     // 10. Global Modal Toggle
@@ -1577,10 +1551,10 @@
             if (isMobile()) {
                 cleanupMobileShortcuts();
             } else {
-                document.querySelectorAll('.shortcut-header-btn').forEach(el => el.style.display = '');
+                removeHeaderShortcutButtons();
                 injectShortcutStyles();
                 injectShortcutHelperUI();
-                injectHeaderShortcutButton();
+                removeHeaderShortcutButtons();
                 injectAllShortcutBadges();
             }
         }, 150);
@@ -1593,18 +1567,18 @@
             return;
         }
         injectShortcutHelperUI();
-        injectHeaderShortcutButton();
+        removeHeaderShortcutButtons();
         injectAllShortcutBadges();
         // Retry injections in case of dynamic DOM loads
         setTimeout(() => {
             if (!isMobile()) {
-                injectHeaderShortcutButton();
+                removeHeaderShortcutButtons();
                 injectAllShortcutBadges();
             }
         }, 350);
         setTimeout(() => {
             if (!isMobile()) {
-                injectHeaderShortcutButton();
+                removeHeaderShortcutButtons();
                 injectAllShortcutBadges();
             }
         }, 1200);
