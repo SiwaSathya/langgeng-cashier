@@ -1521,19 +1521,31 @@
 
                 // Group per invoice agar perhitungan bon, dp, dan kembalian tunai akurat
                 const invMap = {};
+                const pelunasansList = receiptData.pelunasans ?? [];
                 sales.forEach((item) => {
                     const inv = item.invoice || item.Invoice || `PJL-${item.id || Math.random()}`;
                     if (!invMap[inv]) {
                         invMap[inv] = {
+                            invoice: inv,
                             status: item.status || item.Status || "",
                             isDp: Boolean(item.is_dp ?? item.IsDp),
                             isBon: Boolean(item.is_bon ?? item.IsBon),
                             totalNetto: 0,
                             amountPaid: money(item.amount_paid ?? item.AmountPaid ?? 0),
                             paymentMethod: String(item.payment_method ?? item.PaymentMethod ?? "Tunai").trim(),
+                            paymentMethods: [],
                         };
                     }
                     invMap[inv].totalNetto += money(item.total_netto ?? item.TotalNetto ?? 0);
+                    const pms = item.payment_methods || item.PaymentMethods || [];
+                    if (Array.isArray(pms) && pms.length > 0) {
+                        pms.forEach((pm) => {
+                            const pmId = pm.id || pm.ID;
+                            if (!pmId || !invMap[inv].paymentMethods.some((x) => (x.id || x.ID) === pmId)) {
+                                invMap[inv].paymentMethods.push(pm);
+                            }
+                        });
+                    }
                 });
 
                 Object.values(invMap).forEach((inv) => {
@@ -1554,11 +1566,48 @@
                     }
 
                     if (received > 0) {
-                        const m = inv.paymentMethod || "Tunai";
-                        paymentSummary[m] = (paymentSummary[m] ?? 0) + received;
-                        if (cashMethod(m)) totalTunai += received;
-                        else totalKredit += received;
+                        const activePms = (inv.paymentMethods || []).filter(
+                            (pm) => String(pm.status || pm.Status || "").toLowerCase() !== "pelunasan"
+                        );
+                        const hasPelunasan = (inv.paymentMethods || []).some(
+                            (pm) => String(pm.status || pm.Status || "").toLowerCase() === "pelunasan"
+                        ) || pelunasansList.some((p) => (p.invoice || p.Invoice || "") === inv.invoice);
+
+                        if (activePms.length === 1) {
+                            const m = (activePms[0].type || activePms[0].Type || inv.paymentMethod || "Tunai").trim();
+                            const pmAmt = money(activePms[0].amount || activePms[0].Amount || 0);
+                            const amt = (hasPelunasan && pmAmt > 0 && pmAmt < received) ? pmAmt : received;
+                            paymentSummary[m] = (paymentSummary[m] ?? 0) + amt;
+                            if (cashMethod(m)) totalTunai += amt;
+                            else totalKredit += amt;
+                        } else if (activePms.length > 1) {
+                            activePms.forEach((pm) => {
+                                const m = (pm.type || pm.Type || "Lainnya").trim();
+                                const amt = money(pm.amount || pm.Amount || 0);
+                                if (amt > 0) {
+                                    paymentSummary[m] = (paymentSummary[m] ?? 0) + amt;
+                                    if (cashMethod(m)) totalTunai += amt;
+                                    else totalKredit += amt;
+                                }
+                            });
+                        } else {
+                            const m = inv.paymentMethod || "Tunai";
+                            paymentSummary[m] = (paymentSummary[m] ?? 0) + received;
+                            if (cashMethod(m)) totalTunai += received;
+                            else totalKredit += received;
+                        }
                     }
+                });
+
+                // Hitung penerimaan dari pelunasan shift ini
+                pelunasansList.forEach((p) => {
+                    const m = (p.payment_method || p.type || p.Type || "Tunai").trim();
+                    const amt = money(p.amount || p.Amount || 0);
+                    if (amt <= 0) return;
+                    const key = `${m} (Pelunasan)`;
+                    paymentSummary[key] = (paymentSummary[key] ?? 0) + amt;
+                    if (cashMethod(m)) totalTunai += amt;
+                    else totalKredit += amt;
                 });
 
                 expenses.forEach((item) => {
@@ -1579,7 +1628,7 @@
 
             async function printShiftReceipt(receiptData = {}) {
                 const userData = getUserDataFromToken() || {};
-                const userLoc = (userData.location || "").trim();
+                const userLoc = (receiptData.location || userData.location || "").trim();
                 const isPaye = userLoc.toLowerCase().includes("paye");
                 const storeHeader = getStoreHeaderByLocation(userLoc);
 
@@ -1742,7 +1791,14 @@
                                 inv.paymentMethod ||
                                 "Tunai"
                             ).trim();
-                            recordPayment(type, realReceived);
+                            const pmAmt = parseFloat(activePms[0].amount || activePms[0].Amount || 0) || 0;
+                            const hasPelunasan = (inv.paymentMethods || []).some(
+                                (pm) => String(pm.status || pm.Status || "").toLowerCase() === "pelunasan"
+                            ) || (receiptData.pelunasans || []).some(
+                                (p) => (p.invoice || p.Invoice || "") === inv.invoice
+                            );
+                            const amtToRecord = (hasPelunasan && pmAmt > 0 && pmAmt < realReceived) ? pmAmt : realReceived;
+                            recordPayment(type, amtToRecord);
                         } else if (totalPmAmt > realReceived) {
                             // Ada kelebihan pembayaran (kembalian uang tunai), potong dari metode Tunai
                             let excess = totalPmAmt - realReceived;
@@ -1792,7 +1848,7 @@
                 let totalPelunasan = 0;
 
                 pelunasans.forEach((p) => {
-                    const method = (p.payment_method || "Tunai").trim();
+                    const method = (p.payment_method || p.type || p.Type || "Tunai").trim();
                     const amount = parseFloat(p.amount || 0);
                     if (!Number.isFinite(amount) || amount <= 0) return;
 
@@ -1821,7 +1877,7 @@
                 const pelunasanRows = pelunasans.length > 0
                     ? pelunasans.map((p) => `
                 <div class="flex" style="font-size: 10px; margin-bottom: 2px;">
-                    <span>${escapeHTML(p.invoice || "-")} - ${escapeHTML(p.customer_name || "Pelanggan")} (${escapeHTML(p.payment_method || "Tunai")})</span>
+                    <span>${escapeHTML(p.invoice || "-")} - ${escapeHTML(p.customer_name || "Pelanggan")} (${escapeHTML(p.payment_method || p.type || p.Type || "Tunai")})</span>
                     <span>${formatIDR(parseFloat(p.amount || 0))}</span>
                 </div>
             `).join("")
@@ -1850,9 +1906,9 @@
                 // =====================================
                 const paymentDetailRows = Object.entries(paymentGroups)
                     .map(([method, data]) => {
-                        // Jika metode adalah Tunai, gunakan tunaiBersih
+                        // Jika metode adalah Tunai reguler, kurangkan dengan pengeluaran operasional
                         const displayTotal = isCash(method)
-                            ? tunaiBersih
+                            ? Math.max(data.total - pengeluaran, 0)
                             : data.total;
 
                         let html = `
@@ -2093,48 +2149,29 @@ ${
                     // Ambil ringkasan setoran shift saat ini
                     const receiptRes = await apiFetch(`${API_URL}/receipt?location=${encodeURIComponent(userLoc)}`);
                     let countSales = 0;
-                    let totalSales = 0;
                     let countPelunasan = 0;
                     let totalPelunasan = 0;
+                    let totalSetoranTunai = 0;
+                    let totalNonTunai = 0;
+                    let totalPengeluaran = 0;
+                    let estimasiTotalSetoran = 0;
+
                     if (receiptRes.ok) {
                         const receiptJson = await receiptRes.json();
                         const sales = receiptJson.sales || [];
                         const pelunasans = receiptJson.pelunasans || [];
 
-                        const invMap = {};
-                        sales.forEach((item) => {
-                            const inv = item.invoice || item.Invoice || `PJL-${item.id || Math.random()}`;
-                            if (!invMap[inv]) {
-                                invMap[inv] = {
-                                    status: item.status || item.Status || "",
-                                    isDp: Boolean(item.is_dp ?? item.IsDp),
-                                    isBon: Boolean(item.is_bon ?? item.IsBon),
-                                    totalNetto: 0,
-                                    amountPaid: Number(item.amount_paid ?? item.AmountPaid ?? 0),
-                                };
-                            }
-                            invMap[inv].totalNetto += Number(item.total_netto ?? item.TotalNetto ?? 0);
-                        });
+                        const summary = calculateShiftSummary(receiptJson);
 
-                        countSales = Object.keys(invMap).length;
+                        const invSet = new Set(sales.map((item) => item.invoice || item.Invoice || item.id));
+                        countSales = invSet.size;
                         countPelunasan = pelunasans.length;
-
-                        totalSales = Object.values(invMap).reduce((acc, inv) => {
-                            const st = String(inv.status || "").trim().toLowerCase();
-                            const isBon = inv.isBon || st === "bon" || st.includes("bon") || st.includes("utang");
-                            const isDp = !isBon && (inv.isDp || st === "dp");
-                            if (isBon) return acc;
-                            if (isDp) {
-                                const dp = inv.amountPaid > 0 ? Math.min(inv.amountPaid, inv.totalNetto) : 0;
-                                return acc + dp;
-                            }
-                            const paid = (inv.amountPaid > inv.totalNetto && inv.totalNetto > 0)
-                                ? inv.totalNetto
-                                : (inv.amountPaid > 0 ? inv.amountPaid : inv.totalNetto);
-                            return acc + paid;
-                        }, 0);
-
                         totalPelunasan = pelunasans.reduce((acc, p) => acc + Number(p.amount || 0), 0);
+
+                        totalPengeluaran = summary.totalExpense || 0;
+                        totalSetoranTunai = Math.max((summary.totalTunai || 0) - totalPengeluaran, 0);
+                        totalNonTunai = summary.totalKredit || 0;
+                        estimasiTotalSetoran = totalSetoranTunai + totalNonTunai;
                     }
 
                     Swal.close();
@@ -2161,9 +2198,25 @@ ${
                                     <span class="font-bold text-emerald-600">${countPelunasan} Transaksi (${formatIDR(totalPelunasan)})</span>
                                 </div>
                                 ` : ""}
-                                <div class="flex justify-between items-center">
-                                    <span class="text-slate-500 font-medium">Estimasi Total Setoran:</span>
-                                    <span class="font-black text-blue-600 text-base font-mono">Rp ${(totalSales + totalPelunasan).toLocaleString("id-ID")}</span>
+                                ${totalPengeluaran > 0 ? `
+                                <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+                                    <span class="text-slate-500 font-medium">Pengeluaran Kas:</span>
+                                    <span class="font-bold text-rose-600">-${formatIDR(totalPengeluaran)}</span>
+                                </div>
+                                ` : ""}
+                                <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+                                    <span class="text-slate-500 font-medium">Setoran Tunai Bersih:</span>
+                                    <span class="font-bold text-slate-800 font-mono">${formatIDR(totalSetoranTunai)}</span>
+                                </div>
+                                ${totalNonTunai > 0 ? `
+                                <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+                                    <span class="text-slate-500 font-medium">Non-Tunai (EDC/Transfer):</span>
+                                    <span class="font-bold text-indigo-600 font-mono">${formatIDR(totalNonTunai)}</span>
+                                </div>
+                                ` : ""}
+                                <div class="flex justify-between items-center pt-1">
+                                    <span class="text-slate-700 font-bold">Estimasi Total Setoran:</span>
+                                    <span class="font-black text-blue-600 text-base font-mono">${formatIDR(estimasiTotalSetoran)}</span>
                                 </div>
                             </div>
                             <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 leading-relaxed text-left flex gap-2.5 items-start">

@@ -381,7 +381,7 @@
                     class="bg-white rounded-xl sm:rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden"
                 >
                     <div
-                        class="p-3.5 sm:p-6 lg:p-8 border-b border-slate-100 flex justify-between items-center"
+                        class="p-3.5 sm:p-6 lg:p-8 border-b border-slate-100 flex flex-wrap justify-between items-center gap-2.5"
                     >
                         <div>
                             <h3 class="font-bold text-slate-800 text-sm sm:text-base">
@@ -390,6 +390,17 @@
                             <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5 sm:mt-1">
                                 Data penjualan dikelompokkan berdasarkan nomor invoice.
                             </p>
+                        </div>
+                        <div id="superadminShiftActions" class="hidden">
+                            <button
+                                type="button"
+                                onclick="openBatchUndoShiftModal()"
+                                class="flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 active:bg-amber-200 text-amber-700 border border-amber-300 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-bold text-xs shadow-2xs transition-all cursor-pointer"
+                                title="Batalkan Tutup Shift Massal per Shift (Khusus Super Admin)"
+                            >
+                                <i class="fas fa-rotate-left text-amber-600"></i>
+                                <span>Undo Tutup Shift</span>
+                            </button>
                         </div>
                     </div>
 
@@ -602,9 +613,10 @@
                                     onchange="fetchRiwayat(1)"
                                     class="w-full bg-slate-50 border border-slate-200 px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs rounded-lg sm:rounded-xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
                                 >
-                                    <option value="">Semua Shift</option>
-                                    <option value="1">Shift 1</option>
-                                    <option value="2">Shift 2</option>
+                                    <option value="">Semua Status Shift</option>
+                                    <option value="unclosed">⏳ Belum Tutup Shift</option>
+                                    <option value="1">✓ Shift 1</option>
+                                    <option value="2">✓ Shift 2</option>
                                 </select>
                             </div>
 
@@ -1300,7 +1312,9 @@
                     // 7. Filter Shift Kasir
                     const shift =
                         document.getElementById("filterShift")?.value || "";
-                    if (shift) {
+                    if (shift === "unclosed") {
+                        params.append("shift_status", "unclosed");
+                    } else if (shift) {
                         params.append("shift", shift);
                     }
 
@@ -1428,6 +1442,42 @@
                             (txStatus === "Lunas" &&
                                 (isBon || isDp || customerName));
 
+                        // Visualisasi Shift Status Badge (Warna dibedakan: Shift 1 = Hijau Emerald, Shift 2 = Indigo / Ungu, Belum Tutup = Amber / Kuning)
+                        const shiftVal = s.shift ?? s.Shift;
+                        const sNum = (shiftVal !== null && shiftVal !== undefined) ? Number(shiftVal) : null;
+                        const isClosedShift = sNum !== null && !isNaN(sNum) && sNum > 0;
+
+                        let shiftBadge = "";
+                        let mobileBadgeClass = "";
+                        let mobileBadgeIcon = "";
+                        let mobileBadgeText = "";
+
+                        if (sNum === 1) {
+                            // Shift 1: Emerald / Hijau Segar
+                            shiftBadge = `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider whitespace-nowrap shadow-2xs" title="Transaksi ditutup pada Shift 1"><i class="fas fa-sun text-emerald-600"></i> Shift 1</span>`;
+                            mobileBadgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                            mobileBadgeIcon = "fa-sun text-emerald-600";
+                            mobileBadgeText = "Shift 1";
+                        } else if (sNum === 2) {
+                            // Shift 2: Indigo / Ungu Elegan
+                            shiftBadge = `<span class="inline-flex items-center gap-1 bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider whitespace-nowrap shadow-2xs" title="Transaksi ditutup pada Shift 2"><i class="fas fa-moon text-indigo-600"></i> Shift 2</span>`;
+                            mobileBadgeClass = "bg-indigo-50 text-indigo-700 border-indigo-200";
+                            mobileBadgeIcon = "fa-moon text-indigo-600";
+                            mobileBadgeText = "Shift 2";
+                        } else if (isClosedShift) {
+                            // Shift lainnya (> 2 jika ada)
+                            shiftBadge = `<span class="inline-flex items-center gap-1 bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider whitespace-nowrap shadow-2xs" title="Transaksi ditutup pada Shift ${sNum}"><i class="fas fa-check-circle text-purple-600"></i> Shift ${sNum}</span>`;
+                            mobileBadgeClass = "bg-purple-50 text-purple-700 border-purple-200";
+                            mobileBadgeIcon = "fa-check-circle text-purple-600";
+                            mobileBadgeText = `Shift ${sNum}`;
+                        } else {
+                            // Belum Tutup Shift: Amber / Kuning-Oranye
+                            shiftBadge = `<span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider whitespace-nowrap shadow-2xs" title="Transaksi ini belum di-close shift (Aktif)"><i class="fas fa-clock text-amber-500 animate-pulse"></i> Belum Tutup</span>`;
+                            mobileBadgeClass = "bg-amber-50 text-amber-700 border-amber-200";
+                            mobileBadgeIcon = "fa-clock text-amber-500";
+                            mobileBadgeText = "Belum Tutup";
+                        }
+
                         let statusBadge = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase">Lunas</span>`;
                         if (isBon || txStatus === "Bon") {
                             statusBadge = `
@@ -1509,6 +1559,55 @@
                         `;
                         }
 
+                        // Tombol Undo Shift Transaksi (Khusus Superadmin jika transaksi sudah pernah tutup shift)
+                        if (normRole === "superadmin" && isClosedShift) {
+                            actionButtons += `
+                            <button onclick="undoShiftTransaction('${escapeHTML(invoice)}')" class="bg-amber-50 hover:bg-amber-500 hover:text-white text-amber-600 border border-amber-300 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold transition-all shadow-sm" title="Undo / Batalkan Tutup Shift Transaksi #${escapeHTML(invoice)}">
+                                <i class="fas fa-rotate-left"></i>
+                            </button>
+                        `;
+                        }
+
+                        // Render metode pembayaran (dukungan multi-metode pembayaran DP + Pelunasan / Split)
+                        const rawPms = s.payment_methods || s.PaymentMethods || [];
+                        const pms = [];
+                        const seenPmIds = new Set();
+                        rawPms.forEach((pm) => {
+                            const pid = pm.id || pm.ID;
+                            if (!pid || !seenPmIds.has(pid)) {
+                                if (pid) seenPmIds.add(pid);
+                                pms.push(pm);
+                            }
+                        });
+
+                        let paymentMethodHTML = "";
+                        if (pms.length > 1) {
+                            paymentMethodHTML =
+                                '<div class="flex flex-col gap-1 items-start">' +
+                                pms
+                                    .map((pm) => {
+                                        const mType = escapeHTML(pm.type || pm.Type || "Tunai");
+                                        const mAmt = Number(pm.amount || pm.Amount || 0);
+                                        const mStatus = pm.status || pm.Status || "";
+                                        const isDpPm = /dp/i.test(mStatus);
+                                        const isPelunasanPm = /pelunasan/i.test(mStatus);
+                                        const badgeBg = isPelunasanPm
+                                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                            : isDpPm
+                                            ? "bg-amber-50 text-amber-700 border-amber-200"
+                                            : "bg-blue-50 text-blue-700 border-blue-200";
+                                        return `<span class="inline-flex items-center gap-1 ${badgeBg} border px-1.5 py-0.5 rounded text-[9px] font-bold whitespace-nowrap shadow-2xs" title="${mType}: IDR ${mAmt.toLocaleString("id-ID")} (${mStatus || "Bayar"})">
+                                            <span>${mType}</span>
+                                            ${mAmt > 0 ? `<span class="opacity-75 font-mono">(${mAmt >= 1000 ? (mAmt / 1000).toLocaleString("id-ID") + "rb" : mAmt})</span>` : ""}
+                                        </span>`;
+                                    })
+                                    .join("") +
+                                '</div>';
+                        } else {
+                            let displayMethod = paymentMethod.replace(/\[Pelunasan:\s*([^\]]+)\]/g, "+ $1");
+                            paymentMethodHTML = `<span class="text-[10px] sm:text-xs text-slate-700 font-bold block truncate max-w-[120px]" title="${escapeHTML(paymentMethod)}">${escapeHTML(displayMethod)}</span>`;
+                        }
+
                         let productSummaryHTML = "";
                         if (saleItems.length === 0) {
                             productSummaryHTML = `<p class="text-slate-400 italic text-xs">Tidak ada item</p>`;
@@ -1555,6 +1654,9 @@
                         <span class="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-bold border border-slate-200">
                             <i class="fas fa-store mr-0.5 sm:mr-1 text-blue-500"></i>${escapeHTML(storeLocation)}
                         </span>
+                        <span class="sm:hidden ${mobileBadgeClass} border px-1.5 py-0.5 rounded text-[9px] font-bold inline-flex items-center gap-0.5">
+                            <i class="fas ${mobileBadgeIcon} text-[8px]"></i>${mobileBadgeText}
+                        </span>
                     </div>
                     <p class="text-[10px] sm:text-[11px] text-slate-400 font-bold"><i class="fas fa-user-circle mr-1"></i>${escapeHTML(cashierName)}</p>
                     ${
@@ -1568,14 +1670,19 @@
                     }
                 </td>
                 <td class="px-2 py-1.5 sm:px-2.5 sm:py-2.5 text-[10px] sm:text-xs text-slate-500 font-bold whitespace-nowrap">
-                    ${escapeHTML(formattedDate)}
+                    <div class="mb-1">
+                        ${shiftBadge}
+                    </div>
+                    <div class="text-slate-600 font-bold text-[10px] sm:text-[11px]">
+                        ${escapeHTML(formattedDate)}
+                    </div>
                 </td>
                 <td class="px-2 py-1.5 sm:px-2.5 sm:py-2.5 min-w-[120px] sm:min-w-[150px]">
                     ${productSummaryHTML}
                 </td>
                 <td class="px-2 py-1.5 sm:px-2.5 sm:py-2.5 text-center whitespace-nowrap">${statusBadge}</td>
-                <td class="px-2 py-1.5 sm:px-2.5 sm:py-2.5 text-[10px] sm:text-xs text-slate-500 max-w-[90px] sm:max-w-[120px] truncate whitespace-nowrap" title="${escapeHTML(paymentMethod)}">
-                    ${escapeHTML(paymentMethod)}
+                <td class="px-2 py-1.5 sm:px-2.5 sm:py-2.5 whitespace-nowrap">
+                    ${paymentMethodHTML}
                 </td>
                 <td class="px-2 py-1.5 sm:px-2.5 sm:py-2.5 text-center font-bold text-slate-700 whitespace-nowrap text-xs sm:text-sm">${totalQty}</td>
                 <td class="px-2 py-1.5 sm:px-2.5 sm:py-2.5 text-right font-extrabold text-slate-800 whitespace-nowrap font-mono text-xs sm:text-sm">IDR ${totalNetto.toLocaleString("id-ID")}</td>
@@ -2476,10 +2583,27 @@
                     });
                 }
 
+                // Opsi Undo Shift untuk Super Admin di menu aksi mobile
+                const shiftValCurrent = sale.shift ?? sale.Shift;
+                const isClosedCurrent = shiftValCurrent !== null && shiftValCurrent !== undefined && Number(shiftValCurrent) > 0;
+                if (normRole === "superadmin" && isClosedCurrent) {
+                    actions.push({
+                        label: "Batalkan Tutup Shift (Undo)",
+                        icon: "fas fa-rotate-left",
+                        color: "amber",
+                        desc: `Kembalikan status nota #${invoice} menjadi Belum Tutup Shift`,
+                        onClick: () => undoShiftTransaction(invoice),
+                    });
+                }
+
+                const shiftVal = sale.shift ?? sale.Shift;
+                const isClosedShift = shiftVal !== null && shiftVal !== undefined && Number(shiftVal) > 0;
+                const shiftText = isClosedShift ? `Shift ${shiftVal} (Sudah Tutup Shift)` : 'Belum Tutup Shift';
+
                 if (typeof window.showRowActionMenu === "function") {
                     window.showRowActionMenu({
                         title: "Pilih Aksi Transaksi",
-                        subtitle: `Nota: #${invoice}`,
+                        subtitle: `Nota: #${invoice} • ${shiftText}`,
                         actions: actions,
                     });
                 } else {
@@ -3168,6 +3292,273 @@
                 }
             }
 
+            // --- 4. FITUR UNDO TUTUP SHIFT (SUPER ADMIN ONLY) ---
+
+            // A. Undo Shift Per Transaksi
+            async function undoShiftTransaction(invoice) {
+                const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                const normRole = (curUser.role || "").toLowerCase().replace(/[-_]/g, "");
+                if (normRole !== "superadmin") {
+                    Swal.fire("Akses Ditolak", "Hanya Super Admin yang berhak membatalkan tutup shift.", "error");
+                    return;
+                }
+
+                const confirm = await Swal.fire({
+                    title: "Batalkan Tutup Shift Transaksi?",
+                    html: `
+                        <div class="text-left text-xs text-slate-600 bg-amber-50 p-3.5 rounded-xl border border-amber-200">
+                            <p class="font-bold text-amber-800 mb-1 flex items-center gap-1.5"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Super Admin:</p>
+                            <p>Nota: <b>#${escapeHTML(invoice)}</b> akan dikembalikan statusnya menjadi <span class="text-amber-700 font-extrabold uppercase bg-amber-100 px-1.5 py-0.5 rounded">Belum Tutup Shift</span>.</p>
+                            <p class="mt-2 text-slate-500">Transaksi ini akan kembali terhitung dalam penutupan shift kasir berikutnya.</p>
+                        </div>
+                    `,
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="fas fa-rotate-left mr-1"></i> Ya, Batalkan Tutup Shift',
+                    cancelButtonText: "Batal",
+                    confirmButtonColor: "#D97706",
+                });
+
+                if (!confirm.isConfirmed) return;
+
+                Swal.fire({
+                    title: "Membatalkan Tutup Shift...",
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading(),
+                });
+
+                try {
+                    const token = localStorage.getItem("token");
+                    const headers = { "Content-Type": "application/json" };
+                    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+                    const res = await fetch(`${API_URL}/sales/undo-shift/transaction/${encodeURIComponent(invoice)}`, {
+                        method: "PUT",
+                        headers: headers,
+                    });
+                    const data = await res.json().catch(() => ({}));
+
+                    if (res.ok) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Berhasil!",
+                            text: data.message || "Tutup shift transaksi berhasil dibatalkan.",
+                            confirmButtonColor: "#2563EB",
+                        }).then(() => fetchRiwayat());
+                    } else {
+                        Swal.fire("Gagal", data.error || "Gagal membatalkan tutup shift.", "error");
+                    }
+                } catch (e) {
+                    Swal.fire("Error", "Gagal terhubung ke server.", "error");
+                }
+            }
+
+            // B. Undo Shift Massal Per Shift (Modal Khusus)
+            async function openBatchUndoShiftModal() {
+                const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
+                const normRole = (curUser.role || "").toLowerCase().replace(/[-_]/g, "");
+                if (normRole !== "superadmin") {
+                    Swal.fire("Akses Ditolak", "Hanya Super Admin yang berhak membatalkan tutup shift.", "error");
+                    return;
+                }
+
+                // Default ke tanggal hari ini (format YYYY-MM-DD lokal)
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, "0");
+                const day = String(now.getDate()).padStart(2, "0");
+                const todayStr = `${year}-${month}-${day}`;
+                const userLoc = (curUser.location || "Toko Utama").trim();
+
+                await Swal.fire({
+                    title: `<div class="flex items-center gap-2.5 text-slate-800 font-extrabold text-base sm:text-lg">
+                        <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-sm shadow-xs shrink-0"><i class="fas fa-rotate-left"></i></span>
+                        <span>Batalkan Tutup Shift (Super Admin)</span>
+                    </div>`,
+                    html: `
+                        <div class="text-left text-xs space-y-3 p-1">
+                            <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-amber-800">
+                                <p class="font-bold mb-1 flex items-center gap-1.5"><i class="fas fa-info-circle text-amber-600"></i> Mode Pembatalan Massal Per Shift</p>
+                                <p class="text-[11px] text-amber-700 leading-relaxed">Pilih tanggal dan lokasi untuk mengecek shift yang telah ditutup. Seluruh transaksi penjualan, pengeluaran, dan pelunasan pada shift yang dipilih akan dikembalikan menjadi <b>Belum Tutup Shift</b>.</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Pilih Tanggal</label>
+                                    <input type="date" id="undoShiftDate" value="${todayStr}" onchange="loadShiftsForUndo()" class="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all cursor-pointer">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Lokasi Toko</label>
+                                    <select id="undoShiftLocation" onchange="loadShiftsForUndo()" class="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all cursor-pointer">
+                                        <option value="Semua Toko">Semua Toko</option>
+                                        <option value="Toko Utama" ${userLoc === "Toko Utama" ? "selected" : ""}>Toko Utama</option>
+                                        <option value="Toko Sudirman" ${userLoc === "Toko Sudirman" ? "selected" : ""}>Toko Sudirman</option>
+                                        <option value="Toko Paye" ${userLoc === "Toko Paye" ? "selected" : ""}>Toko Paye</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Daftar Shift yang Tersedia</label>
+                                <div id="undoShiftListContainer" class="min-h-[100px] border border-slate-200 bg-slate-50/70 rounded-xl p-3 flex flex-col justify-center">
+                                    <p class="text-center text-slate-400"><i class="fas fa-spinner fa-spin mr-1.5"></i> Mengecek data shift...</p>
+                                </div>
+                            </div>
+
+                            <div id="undoShiftWarning" class="hidden bg-rose-50 border border-rose-200 text-rose-700 p-2.5 rounded-xl text-[11px] font-medium">
+                                <i class="fas fa-exclamation-triangle text-rose-500 mr-1"></i> Setelah dibatalkan, kasir dapat membuka dan menutup shift kembali dengan data yang disesuaikan.
+                            </div>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="fas fa-rotate-left mr-1"></i> Batalkan Shift Ini',
+                    cancelButtonText: "Batal",
+                    confirmButtonColor: "#D97706",
+                    didOpen: () => {
+                        const confirmBtn = Swal.getConfirmButton();
+                        if (confirmBtn) confirmBtn.disabled = true;
+                        loadShiftsForUndo();
+                    },
+                    preConfirm: () => {
+                        const shiftRadio = document.querySelector('input[name="batchShiftOption"]:checked');
+                        if (!shiftRadio) {
+                            Swal.showValidationMessage("Silakan pilih shift yang ingin dibatalkan!");
+                            return false;
+                        }
+                        const shiftVal = Number(shiftRadio.value);
+                        const dateVal = document.getElementById("undoShiftDate")?.value;
+                        const locVal = document.getElementById("undoShiftLocation")?.value || "Semua Toko";
+
+                        if (!dateVal || !shiftVal) {
+                            Swal.showValidationMessage("Tanggal atau Shift tidak valid.");
+                            return false;
+                        }
+
+                        return { shift: shiftVal, date: dateVal, location: locVal };
+                    },
+                }).then(async (result) => {
+                    if (result.isConfirmed && result.value) {
+                        await executeBatchUndoShift(result.value);
+                    }
+                });
+            }
+
+            async function loadShiftsForUndo() {
+                const dateInput = document.getElementById("undoShiftDate");
+                const locInput = document.getElementById("undoShiftLocation");
+                const container = document.getElementById("undoShiftListContainer");
+                const warning = document.getElementById("undoShiftWarning");
+                const confirmBtn = Swal.getConfirmButton();
+
+                if (!container) return;
+                if (confirmBtn) confirmBtn.disabled = true;
+                if (warning) warning.classList.add("hidden");
+
+                const dateVal = dateInput?.value || "";
+                const locVal = locInput?.value || "Semua Toko";
+
+                container.innerHTML = `<p class="text-center text-slate-400 py-4 text-xs"><i class="fas fa-spinner fa-spin mr-1.5 text-amber-500"></i> Mengecek shift pada tanggal ${escapeHTML(dateVal)}...</p>`;
+
+                try {
+                    const token = localStorage.getItem("token");
+                    const headers = { "Content-Type": "application/json" };
+                    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+                    const params = new URLSearchParams({ date: dateVal });
+                    if (locVal && locVal !== "Semua Toko") params.append("location", locVal);
+
+                    const res = await fetch(`${API_URL}/sales/shift-summary?${params.toString()}`, { headers });
+                    const data = await res.json().catch(() => ({}));
+
+                    const shifts = data.shifts || [];
+                    if (!shifts || shifts.length === 0) {
+                        container.innerHTML = `
+                            <div class="text-center py-4 text-slate-400">
+                                <i class="fas fa-calendar-times text-slate-300 text-3xl mb-1.5 block"></i>
+                                <p class="font-bold text-xs text-slate-600">Tidak Ada Shift Ditutup</p>
+                                <p class="text-[10px] text-slate-400 mt-0.5">Tidak ditemukan transaksi yang telah tutup shift pada tanggal dan lokasi ini.</p>
+                            </div>
+                        `;
+                        if (confirmBtn) confirmBtn.disabled = true;
+                        return;
+                    }
+
+                    let html = '<div class="space-y-2">';
+                    shifts.forEach((s) => {
+                        const shiftColor = s.shift === 1 ? 'emerald' : s.shift === 2 ? 'indigo' : 'purple';
+                        const shiftIcon = s.shift === 1 ? 'fa-sun' : s.shift === 2 ? 'fa-moon' : 'fa-check-circle';
+                        html += `
+                            <label class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 bg-white hover:border-${shiftColor}-300 hover:bg-slate-50/80 cursor-pointer transition-all shadow-2xs">
+                                <div class="flex items-center gap-2.5">
+                                    <input type="radio" name="batchShiftOption" value="${s.shift}" onchange="onBatchShiftSelected(${s.shift})" class="accent-amber-600 w-4 h-4 cursor-pointer">
+                                    <div>
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="inline-flex items-center gap-1 bg-${shiftColor}-50 text-${shiftColor}-700 border border-${shiftColor}-200 px-2 py-0.5 rounded text-[10px] font-black uppercase">
+                                                <i class="fas ${shiftIcon}"></i> Shift ${s.shift}
+                                            </span>
+                                            <span class="font-bold text-slate-700 text-xs">${s.total_sales} Transaksi</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="font-mono font-extrabold text-slate-800 text-xs">IDR ${Number(s.total_netto || 0).toLocaleString("id-ID")}</span>
+                                    ${s.total_expense > 0 ? `<p class="text-[9px] text-rose-500 font-bold">Biaya: IDR ${Number(s.total_expense).toLocaleString("id-ID")}</p>` : ""}
+                                </div>
+                            </label>
+                        `;
+                    });
+                    html += "</div>";
+                    container.innerHTML = html;
+                } catch (e) {
+                    container.innerHTML = `<p class="text-center text-red-500 py-4 text-xs"><i class="fas fa-exclamation-circle mr-1"></i> Gagal memuat data shift dari server</p>`;
+                }
+            }
+
+            function onBatchShiftSelected(shiftNum) {
+                const confirmBtn = Swal.getConfirmButton();
+                const warning = document.getElementById("undoShiftWarning");
+                if (confirmBtn) {
+                    confirmBtn.disabled = false;
+                    confirmBtn.innerHTML = `<i class="fas fa-rotate-left mr-1"></i> Batalkan Tutup Shift ${shiftNum}`;
+                }
+                if (warning) warning.classList.remove("hidden");
+            }
+
+            async function executeBatchUndoShift({ shift, date, location }) {
+                Swal.fire({
+                    title: `Membatalkan Tutup Shift ${shift}...`,
+                    html: `<p class="text-xs text-slate-500">Mereset transaksi pada tanggal <b>${date}</b> (${location})...</p>`,
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading(),
+                });
+
+                try {
+                    const token = localStorage.getItem("token");
+                    const headers = { "Content-Type": "application/json" };
+                    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+                    const res = await fetch(`${API_URL}/sales/undo-shift/batch`, {
+                        method: "PUT",
+                        headers: headers,
+                        body: JSON.stringify({ shift, date, location }),
+                    });
+                    const data = await res.json().catch(() => ({}));
+
+                    if (res.ok) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Shift Berhasil Di-Undo!",
+                            html: `<p class="text-xs text-slate-600">${data.message || `Shift ${shift} berhasil dibatalkan.`}</p>`,
+                            confirmButtonColor: "#2563EB",
+                        }).then(() => fetchRiwayat());
+                    } else {
+                        Swal.fire("Gagal", data.error || "Gagal membatalkan tutup shift.", "error");
+                    }
+                } catch (e) {
+                    Swal.fire("Error", "Gagal terhubung ke server.", "error");
+                }
+            }
+
             const ROLE_PERMISSIONS = {
                 superadmin: [
                     "dashboard.html",
@@ -3352,6 +3743,15 @@
                 userEls.forEach((el) => {
                     el.innerText = `${userData.name || "User"} (${userRole.toUpperCase()})`;
                 });
+
+                const undoShiftTopBtn = document.getElementById("superadminShiftActions");
+                if (undoShiftTopBtn) {
+                    if (normalizedRole === "superadmin") {
+                        undoShiftTopBtn.classList.remove("hidden");
+                    } else {
+                        undoShiftTopBtn.classList.add("hidden");
+                    }
+                }
             }
 
             // Global Enter Handler: Prioritize SweetAlert confirm & Active modal buttons
