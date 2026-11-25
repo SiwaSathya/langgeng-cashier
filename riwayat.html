@@ -81,19 +81,80 @@
                 cursor: pointer;
             }
 
-            /* Tampilan Tabel & Kontrol Khusus Mobile (< 640px) */
+            /* Tampilan Tabel & Kontrol Minimalis Khusus Mobile (< 640px) — Diselaraskan dengan Master Produk, Purchase & Pengeluaran */
             @media (max-width: 639px) {
                 #riwayat-body td {
-                    padding-top: 0.75rem;
-                    padding-bottom: 0.75rem;
-                    padding-left: 0.75rem;
-                    padding-right: 0.75rem;
+                    padding-top: 0.45rem !important;
+                    padding-bottom: 0.45rem !important;
+                    padding-left: 0.5rem !important;
+                    padding-right: 0.5rem !important;
+                    font-size: 0.72rem !important;
+                    line-height: 1.25 !important;
                 }
                 table thead th {
-                    padding-top: 0.75rem;
-                    padding-bottom: 0.75rem;
-                    padding-left: 0.75rem;
-                    padding-right: 0.75rem;
+                    padding-top: 0.4rem !important;
+                    padding-bottom: 0.4rem !important;
+                    padding-left: 0.5rem !important;
+                    padding-right: 0.5rem !important;
+                    font-size: 0.65rem !important;
+                    letter-spacing: 0.02em !important;
+                }
+                #riwayat-body tr[id^="detail-row-"] table th,
+                #riwayat-body tr[id^="detail-row-"] table td {
+                    padding: 0.35rem 0.45rem !important;
+                    font-size: 0.68rem !important;
+                    line-height: 1.25 !important;
+                }
+                #filterStore,
+                #filterSearch,
+                #filterStartDate,
+                #filterEndDate,
+                #filterStatus,
+                #filterMethod,
+                #filterShift,
+                #filterProduct {
+                    height: 2.05rem !important;
+                    min-height: 2.05rem !important;
+                    font-size: 0.72rem !important;
+                    padding-top: 0.2rem !important;
+                    padding-bottom: 0.2rem !important;
+                    border-radius: 0.5rem !important;
+                }
+                #filterSearch {
+                    padding-left: 1.95rem !important;
+                    padding-right: 1.95rem !important;
+                }
+                #filterProduct {
+                    padding-left: 1.85rem !important;
+                    padding-right: 0.5rem !important;
+                }
+                #filterStore,
+                #filterStartDate,
+                #filterEndDate,
+                #filterStatus,
+                #filterMethod,
+                #filterShift {
+                    padding-left: 0.5rem !important;
+                    padding-right: 0.5rem !important;
+                }
+                #filterStartDate::-webkit-date-and-time-value,
+                #filterEndDate::-webkit-date-and-time-value,
+                #filterStartDate::-webkit-datetime-edit,
+                #filterEndDate::-webkit-datetime-edit {
+                    font-size: 0.72rem !important;
+                    font-weight: 600 !important;
+                    color: #334155 !important;
+                }
+                #filterSearch::placeholder,
+                #filterProduct::placeholder {
+                    font-size: 0.68rem !important;
+                    font-weight: 400 !important;
+                    color: #94a3b8 !important;
+                }
+                .preset-btn {
+                    padding: 0.28rem 0.55rem !important;
+                    font-size: 0.68rem !important;
+                    border-radius: 0.5rem !important;
                 }
             }
 
@@ -252,15 +313,15 @@
             class="flex-1 flex flex-col min-w-0 w-full overflow-hidden"
         >
             <header
-                class="min-h-16 sm:min-h-20 bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-10 py-3 sm:py-0 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 sm:gap-3 shrink-0"
+                class="min-h-0 sm:min-h-20 bg-white border-b border-slate-200 px-3 sm:px-6 lg:px-10 py-2 sm:py-0 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 sm:gap-3 shrink-0"
             >
-                <div class="flex items-center justify-between sm:justify-start gap-3 min-w-0">
+                <div class="flex items-center justify-between sm:justify-start gap-2 sm:gap-3 min-w-0">
                     <div class="flex flex-col min-w-0">
                         <div class="flex items-center gap-2">
-                            <h2 class="text-base sm:text-lg font-bold text-slate-800 truncate">Riwayat Penjualan</h2>
+                            <h2 class="text-sm sm:text-lg font-extrabold sm:font-bold text-slate-800 truncate">Riwayat Penjualan</h2>
                             <span
                                 id="sseLiveBadge"
-                                class="hidden inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs shrink-0"
+                                class="hidden inline-flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs shrink-0"
                                 title="Live Real-time Sinkronisasi Penjualan via SSE"
                             >
                                 <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -269,16 +330,16 @@
                         </div>
                         <p
                             id="clock"
-                            class="text-[11px] sm:text-xs text-slate-400 font-medium truncate"
+                            class="text-[10px] sm:text-xs text-slate-400 font-medium truncate"
                         ></p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                <div class="flex items-center gap-1.5 sm:gap-3 w-full sm:w-auto">
                     <div id="storeFilterContainer" class="flex-1 sm:flex-initial">
                         <select
                             id="filterStore"
                             onchange="fetchRiwayat(1)"
-                            class="w-full sm:w-auto bg-slate-50 border border-slate-200 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs text-slate-700 outline-none cursor-pointer transition-all"
+                            class="w-full sm:w-auto bg-slate-50 border border-slate-200 px-2.5 sm:px-4 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl font-bold text-[11px] sm:text-xs text-slate-700 outline-none cursor-pointer transition-all"
                         >
                             <option value="Semua Toko">
                                 Semua Toko (Ketiganya)
@@ -290,17 +351,17 @@
                     </div>
                     <div
                         id="storeStaticBadge"
-                        class="hidden bg-blue-50 text-blue-700 border border-blue-200 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0"
+                        class="hidden bg-blue-50 text-blue-700 border border-blue-200 px-2.5 sm:px-4 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold flex items-center gap-1.5 shrink-0"
                     >
-                        <i class="fas fa-store"></i>
+                        <i class="fas fa-store text-[11px] sm:text-xs"></i>
                         <span id="storeNameText">Toko Sudirman</span>
                     </div>
                     <button
                         onclick="fetchRiwayat()"
-                        class="flex items-center justify-center gap-1.5 sm:gap-2 bg-slate-50 hover:bg-slate-100 active:bg-slate-200 text-slate-700 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs border border-slate-200 transition-all shrink-0 cursor-pointer shadow-2xs"
+                        class="flex items-center justify-center gap-1.5 sm:gap-2 bg-slate-50 hover:bg-slate-100 active:bg-slate-200 text-slate-700 px-2.5 sm:px-5 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl font-bold text-[11px] sm:text-xs border border-slate-200 transition-all shrink-0 cursor-pointer shadow-2xs"
                         title="Perbarui Data Riwayat Transaksi"
                     >
-                        <i class="fas fa-sync-alt text-xs text-blue-600"></i>
+                        <i class="fas fa-sync-alt text-[11px] sm:text-xs text-blue-600"></i>
                         <span class="inline sm:hidden">Refresh</span>
                         <span class="hidden sm:inline">Refresh Data</span>
                     </button>
@@ -309,39 +370,39 @@
 
             <div
                 id="riwayatScrollContainer"
-                class="flex-1 p-2.5 sm:p-6 lg:p-10 overflow-y-auto custom-scroll"
+                class="flex-1 p-2 sm:p-6 lg:p-10 overflow-y-auto custom-scroll"
             >
                 <div
                     class="bg-white rounded-xl sm:rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden"
                 >
                     <div
-                        class="p-4 sm:p-6 lg:p-8 border-b border-slate-100 flex flex-wrap justify-between items-center gap-3.5 bg-white"
+                        class="p-3 sm:p-6 lg:p-8 border-b border-slate-100 flex flex-wrap justify-between items-center gap-2 sm:gap-3.5 bg-white"
                     >
                         <div>
-                            <h3 class="font-extrabold text-slate-800 text-base sm:text-xl tracking-tight">
+                            <h3 class="font-extrabold text-slate-800 text-sm sm:text-xl tracking-tight">
                                 Semua Transaksi (Per Nota)
                             </h3>
-                            <p class="text-xs sm:text-sm text-slate-400 mt-1 font-medium">
+                            <p class="text-[11px] sm:text-sm text-slate-400 mt-0.5 sm:mt-1 font-medium">
                                 Data penjualan dikelompokkan berdasarkan nomor invoice.
                             </p>
                         </div>
-                        <div id="superadminShiftActions" class="hidden flex items-center gap-2.5 flex-wrap">
+                        <div id="superadminShiftActions" class="hidden flex items-center gap-1.5 sm:gap-2.5 flex-wrap">
                             <button
                                 type="button"
                                 onclick="openBulkCloseShiftModal()"
-                                class="flex items-center gap-2 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-700 border border-emerald-300 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-2xs transition-all cursor-pointer"
+                                class="flex items-center gap-1.5 sm:gap-2 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-700 border border-emerald-300 px-2.5 sm:px-4 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl font-bold text-[11px] sm:text-sm shadow-2xs transition-all cursor-pointer"
                                 title="Close Shift Manual untuk Transaksi Belum Tutup Shift (Khusus Super Admin)"
                             >
-                                <i class="fas fa-calendar-check text-emerald-600 text-sm"></i>
+                                <i class="fas fa-calendar-check text-emerald-600 text-xs sm:text-sm"></i>
                                 <span>Close Shift Manual</span>
                             </button>
                             <button
                                 type="button"
                                 onclick="openBatchUndoShiftModal()"
-                                class="flex items-center gap-2 bg-amber-50 hover:bg-amber-100 active:bg-amber-200 text-amber-700 border border-amber-300 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-2xs transition-all cursor-pointer"
+                                class="flex items-center gap-1.5 sm:gap-2 bg-amber-50 hover:bg-amber-100 active:bg-amber-200 text-amber-700 border border-amber-300 px-2.5 sm:px-4 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl font-bold text-[11px] sm:text-sm shadow-2xs transition-all cursor-pointer"
                                 title="Batalkan Tutup Shift Massal per Shift (Khusus Super Admin)"
                             >
-                                <i class="fas fa-rotate-left text-amber-600 text-sm"></i>
+                                <i class="fas fa-rotate-left text-amber-600 text-xs sm:text-sm"></i>
                                 <span>Undo Tutup Shift</span>
                             </button>
                         </div>
@@ -349,20 +410,20 @@
 
                     <!-- FILTER TOOLBAR -->
                     <div
-                        class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 shadow-xs border border-slate-200"
+                        class="bg-white sm:rounded-2xl p-2.5 sm:p-6 mb-0 sm:mb-6 sm:shadow-xs border-b sm:border border-slate-100 sm:border-slate-200"
                     >
                         <div
-                            class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 mb-3 sm:mb-5 pb-3 sm:pb-4 border-b border-slate-100"
+                            class="flex flex-col lg:flex-row lg:items-center justify-between gap-2 sm:gap-4 mb-2.5 sm:mb-5 pb-2 sm:pb-4 border-b border-slate-100"
                         >
-                            <div class="flex items-center gap-2.5 sm:gap-3">
+                            <div class="flex items-center gap-2 sm:gap-3">
                                 <span
-                                    class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm sm:text-base shadow-xs shrink-0"
+                                    class="w-6 h-6 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xs sm:text-base shadow-xs shrink-0"
                                 >
                                     <i class="fas fa-filter"></i>
                                 </span>
                                 <div>
                                     <h4
-                                        class="font-extrabold text-slate-800 text-sm sm:text-base tracking-tight"
+                                        class="font-extrabold text-slate-800 text-xs sm:text-base tracking-tight"
                                     >
                                         Filter & Pencarian Riwayat Transaksi
                                     </h4>
@@ -375,14 +436,14 @@
                             </div>
 
                             <!-- PRESET TANGGAL CEPAT -->
-                            <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-1 sm:pb-0 sm:flex-wrap w-full lg:w-auto shrink-0 -mx-0.5 px-0.5 sm:mx-0 sm:px-0">
+                            <div class="flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar pb-0.5 sm:pb-0 sm:flex-wrap w-full lg:w-auto shrink-0 -mx-0.5 px-0.5 sm:mx-0 sm:px-0">
                                 <span
-                                    class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1 shrink-0"
-                                ><i class="fas fa-bolt text-amber-500 mr-1"></i>Preset:</span>
+                                    class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider mr-0.5 sm:mr-1 shrink-0"
+                                ><i class="fas fa-bolt text-amber-500 mr-0.5 sm:mr-1"></i>Preset:</span>
                                 <button
                                     type="button"
                                     onclick="setPresetDate('all')"
-                                    class="preset-btn shrink-0 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-blue-600 text-white shadow-2xs"
+                                    class="preset-btn shrink-0 px-2 sm:px-3.5 py-1 sm:py-2 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-bold transition-all bg-blue-600 text-white shadow-2xs"
                                     data-preset="all"
                                 >
                                     Semua
@@ -390,7 +451,7 @@
                                 <button
                                     type="button"
                                     onclick="setPresetDate('today')"
-                                    class="preset-btn shrink-0 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                    class="preset-btn shrink-0 px-2 sm:px-3.5 py-1 sm:py-2 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
                                     data-preset="today"
                                 >
                                     Hari Ini
@@ -398,7 +459,7 @@
                                 <button
                                     type="button"
                                     onclick="setPresetDate('yesterday')"
-                                    class="preset-btn shrink-0 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                    class="preset-btn shrink-0 px-2 sm:px-3.5 py-1 sm:py-2 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
                                     data-preset="yesterday"
                                 >
                                     Kemarin
@@ -406,7 +467,7 @@
                                 <button
                                     type="button"
                                     onclick="setPresetDate('last7days')"
-                                    class="preset-btn shrink-0 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                    class="preset-btn shrink-0 px-2 sm:px-3.5 py-1 sm:py-2 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
                                     data-preset="last7days"
                                 >
                                     7 Hari
@@ -414,7 +475,7 @@
                                 <button
                                     type="button"
                                     onclick="setPresetDate('thismonth')"
-                                    class="preset-btn shrink-0 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                    class="preset-btn shrink-0 px-2 sm:px-3.5 py-1 sm:py-2 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
                                     data-preset="thismonth"
                                 >
                                     Bulan Ini
@@ -422,7 +483,7 @@
                                 <button
                                     type="button"
                                     onclick="setPresetDate('lastmonth')"
-                                    class="preset-btn shrink-0 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                    class="preset-btn shrink-0 px-2 sm:px-3.5 py-1 sm:py-2 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
                                     data-preset="lastmonth"
                                 >
                                     Bulan Lalu
@@ -430,7 +491,7 @@
                                 <button
                                     type="button"
                                     onclick="resetFilters()"
-                                    class="shrink-0 ml-1 sm:ml-2 text-xs sm:text-sm font-bold text-rose-500 hover:text-rose-700 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-rose-50 cursor-pointer"
+                                    class="shrink-0 ml-0.5 sm:ml-2 text-[11px] sm:text-sm font-bold text-rose-500 hover:text-rose-700 transition-colors flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl hover:bg-rose-50 cursor-pointer"
                                     title="Bersihkan Seluruh Filter"
                                 >
                                     <i class="fas fa-undo-alt"></i> Reset
@@ -439,77 +500,77 @@
                         </div>
 
                         <!-- BARIS 1: PENCARIAN CEPAT GLOBAL -->
-                        <div class="mb-3 sm:mb-4">
+                        <div class="mb-2 sm:mb-4">
                             <label
-                                class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5"
+                                class="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 sm:mb-1.5"
                             >
                                 Pencarian Cepat Multi-Kriteria
                             </label>
                             <div class="relative">
                                 <i
-                                    class="fas fa-search absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"
+                                    class="fas fa-search absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm"
                                 ></i>
                                 <input
                                     type="text"
                                     id="filterSearch"
                                     placeholder="Cari invoice, pelanggan, produk..."
                                     onkeyup="handleSearchKeyup(event)"
-                                    class="w-full bg-slate-50 border border-slate-200 pl-10 sm:pl-11 pr-10 py-2 sm:py-2.5 text-xs sm:text-sm rounded-xl font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all placeholder:text-slate-400 placeholder:font-normal"
+                                    class="w-full bg-slate-50 border border-slate-200 pl-8 sm:pl-11 pr-8 sm:pr-10 py-1.5 sm:py-2.5 text-xs sm:text-sm rounded-lg sm:rounded-xl font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all placeholder:text-slate-400 placeholder:font-normal"
                                 />
                                 <button
                                     type="button"
                                     id="clearSearchBtn"
                                     onclick="clearSearchInput()"
-                                    class="hidden absolute right-3 sm:right-3.5 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500 p-1"
+                                    class="hidden absolute right-2 sm:right-3.5 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500 p-1"
                                     title="Hapus pencarian"
                                 >
-                                    <i class="fas fa-times-circle text-sm"></i>
+                                    <i class="fas fa-times-circle text-xs sm:text-sm"></i>
                                 </button>
                             </div>
                         </div>
 
                         <!-- BARIS 2: FILTER GRID RINCI -->
                         <div
-                            class="grid grid-cols-2 lg:grid-cols-6 gap-2.5 sm:gap-3.5"
+                            class="grid grid-cols-2 lg:grid-cols-6 gap-2 sm:gap-3.5"
                         >
                             <!-- 1. Dari Tanggal -->
                             <div>
                                 <label
-                                    class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5"
+                                    class="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 sm:mb-1.5"
                                     >Dari Tanggal</label
                                 >
                                 <input
                                     type="date"
                                     id="filterStartDate"
                                     onchange="onDateInputChange()"
-                                    class="w-full bg-slate-50 border border-slate-200 px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+                                    class="w-full bg-slate-50 border border-slate-200 px-2 sm:px-3.5 py-1.5 sm:py-2.5 text-xs sm:text-sm rounded-lg sm:rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
                                 />
                             </div>
 
                             <!-- 2. Sampai Tanggal -->
                             <div>
                                 <label
-                                    class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5"
+                                    class="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 sm:mb-1.5"
                                     >Sampai Tanggal</label
                                 >
                                 <input
                                     type="date"
                                     id="filterEndDate"
                                     onchange="onDateInputChange()"
-                                    class="w-full bg-slate-50 border border-slate-200 px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+                                    class="w-full bg-slate-50 border border-slate-200 px-2 sm:px-3.5 py-1.5 sm:py-2.5 text-xs sm:text-sm rounded-lg sm:rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
                                 />
                             </div>
 
                             <!-- 3. Status Pembayaran -->
                             <div>
                                 <label
-                                    class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5"
+                                    class="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 sm:mb-1.5"
                                     >Status Bayar</label
                                 >
                                 <select
                                     id="filterStatus"
                                     onchange="fetchRiwayat(1)"
-                                    class="w-full bg-slate-50 border border-slate-200 px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm rounded-xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+                                    class="w-full bg-slate-50 border border-slate-200 px-2 sm:px-3.5 py-1.5 sm:py-2.5 text-xs sm:text-sm rounded-lg sm:rounded-xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
                                 >
                                     <option value="">Semua Status</option>
                                     <option value="Lunas">✅ Lunas</option>
@@ -525,13 +586,13 @@
                             <!-- 4. Metode Bayar -->
                             <div>
                                 <label
-                                    class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5"
+                                    class="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 sm:mb-1.5"
                                     >Metode Bayar</label
                                 >
                                 <select
                                     id="filterMethod"
                                     onchange="fetchRiwayat(1)"
-                                    class="w-full bg-slate-50 border border-slate-200 px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm rounded-xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+                                    class="w-full bg-slate-50 border border-slate-200 px-2 sm:px-3.5 py-1.5 sm:py-2.5 text-xs sm:text-sm rounded-lg sm:rounded-xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
                                 >
                                     <option value="">Semua Metode</option>
                                     <option value="Tunai">💵 Tunai</option>
@@ -548,13 +609,13 @@
                             <!-- 5. Shift Kasir -->
                             <div>
                                 <label
-                                    class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5"
+                                    class="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 sm:mb-1.5"
                                     >Shift Kasir</label
                                 >
                                 <select
                                     id="filterShift"
                                     onchange="fetchRiwayat(1)"
-                                    class="w-full bg-slate-50 border border-slate-200 px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm rounded-xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+                                    class="w-full bg-slate-50 border border-slate-200 px-2 sm:px-3.5 py-1.5 sm:py-2.5 text-xs sm:text-sm rounded-lg sm:rounded-xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
                                 >
                                     <option value="">Semua Status Shift</option>
                                     <option value="unclosed">⏳ Belum Tutup Shift</option>
@@ -566,19 +627,19 @@
                             <!-- 6. Filter Barang / Produk Spesifik -->
                             <div>
                                 <label
-                                    class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5"
+                                    class="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 sm:mb-1.5"
                                     >Produk Dibeli</label
                                 >
                                 <div class="relative">
                                     <i
-                                        class="fas fa-box absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm"
+                                        class="fas fa-box absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[11px] sm:text-sm"
                                     ></i>
                                     <input
                                         type="text"
                                         id="filterProduct"
                                         placeholder="Nama / kode..."
                                         onkeyup="handleSearchKeyup(event)"
-                                        class="w-full bg-slate-50 border border-slate-200 pl-9 sm:pl-10 pr-3 py-2 sm:py-2.5 text-xs sm:text-sm rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+                                        class="w-full bg-slate-50 border border-slate-200 pl-7 sm:pl-10 pr-2 sm:pr-3 py-1.5 sm:py-2.5 text-xs sm:text-sm rounded-lg sm:rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
                                     />
                                 </div>
                             </div>
@@ -587,41 +648,41 @@
 
                     <!-- Table Quick Scroll Navigation Bar (Opsi B: Tombol Geser Cepat untuk Pengguna Mouse) -->
                     <div
-                        class="flex items-center justify-between text-xs sm:text-sm text-slate-500 font-medium px-4 sm:px-6 py-2.5 sm:py-3 bg-slate-50/95 border-b border-slate-100 shrink-0 select-none"
+                        class="flex items-center justify-between text-[11px] sm:text-sm text-slate-500 font-medium px-2.5 sm:px-6 py-1.5 sm:py-3 bg-slate-50/95 border-b border-slate-100 shrink-0 select-none overflow-x-auto no-scrollbar"
                     >
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-1 sm:gap-2 shrink-0">
                             <span class="text-slate-400 font-bold hidden sm:inline"><i class="fas fa-arrows-left-right text-blue-500 mr-1"></i> Geser Tabel:</span>
                             <button
                                 type="button"
                                 onclick="scrollTableHorizontal('start')"
-                                class="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95"
+                                class="px-2 py-1 sm:px-3 sm:py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer active:scale-95 whitespace-nowrap"
                                 title="Kembali ke awal (Invoice & Kasir)"
                             >
-                                <i class="fas fa-angles-left text-xs"></i> Awal
+                                <i class="fas fa-angles-left text-[10px] sm:text-xs"></i> Awal
                             </button>
                             <button
                                 type="button"
                                 onclick="scrollTableHorizontal('left')"
-                                class="px-3 py-1.5 sm:px-3.5 sm:py-2 bg-white hover:bg-blue-600 hover:text-white text-slate-700 border border-slate-200 rounded-xl shadow-2xs font-bold text-xs inline-flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+                                class="px-2 py-1 sm:px-3.5 sm:py-2 bg-white hover:bg-blue-600 hover:text-white text-slate-700 border border-slate-200 rounded-lg sm:rounded-xl shadow-2xs font-bold text-[10px] sm:text-xs inline-flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer active:scale-95 whitespace-nowrap"
                                 title="Geser ke Kiri"
                             >
-                                <i class="fas fa-chevron-left text-xs"></i> Kiri
+                                <i class="fas fa-chevron-left text-[10px] sm:text-xs"></i> Kiri
                             </button>
                             <button
                                 type="button"
                                 onclick="scrollTableHorizontal('right')"
-                                class="px-3 py-1.5 sm:px-3.5 sm:py-2 bg-white hover:bg-blue-600 hover:text-white text-slate-700 border border-slate-200 rounded-xl shadow-2xs font-bold text-xs inline-flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+                                class="px-2 py-1 sm:px-3.5 sm:py-2 bg-white hover:bg-blue-600 hover:text-white text-slate-700 border border-slate-200 rounded-lg sm:rounded-xl shadow-2xs font-bold text-[10px] sm:text-xs inline-flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer active:scale-95 whitespace-nowrap"
                                 title="Geser ke Kanan"
                             >
-                                Kanan <i class="fas fa-chevron-right text-xs"></i>
+                                Kanan <i class="fas fa-chevron-right text-[10px] sm:text-xs"></i>
                             </button>
                             <button
                                 type="button"
                                 onclick="scrollTableHorizontal('end')"
-                                class="px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-600 border border-blue-200 rounded-xl shadow-2xs font-bold text-xs inline-flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+                                class="px-2 py-1 sm:px-4 sm:py-2 bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-600 border border-blue-200 rounded-lg sm:rounded-xl shadow-2xs font-bold text-[10px] sm:text-xs inline-flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer active:scale-95 whitespace-nowrap"
                                 title="Langsung geser ke kolom Aksi (Cetak, Retur, dll.)"
                             >
-                                <i class="fas fa-bolt text-amber-500 text-xs"></i> Lihat Aksi <i class="fas fa-angles-right text-xs"></i>
+                                <i class="fas fa-bolt text-amber-500 text-[10px] sm:text-xs"></i> Aksi <i class="fas fa-angles-right text-[10px] sm:text-xs"></i>
                             </button>
                         </div>
                         <div class="flex items-center gap-2">
@@ -630,53 +691,53 @@
                     </div>
 
                     <div id="tableScrollContainer" class="overflow-x-auto custom-scroll cursor-grab active:cursor-grabbing">
-                        <table class="w-full min-w-[850px] sm:min-w-[1100px] text-left border-collapse">
+                        <table class="w-full min-w-[680px] sm:min-w-[1100px] text-left border-collapse">
                             <thead>
                                 <tr
-                                    class="text-xs uppercase tracking-wider text-slate-400 font-bold border-b border-slate-100 bg-slate-50/50"
+                                    class="text-[10px] sm:text-xs uppercase tracking-wider text-slate-400 font-bold border-b border-slate-100 bg-slate-50/50"
                                 >
                                     <th
-                                        class="px-4 sm:px-6 py-3.5 sm:py-4 text-left whitespace-nowrap"
+                                        class="px-2.5 sm:px-6 py-2 sm:py-4 text-left whitespace-nowrap"
                                     >
                                         Invoice & Kasir
                                     </th>
                                     <th
-                                        class="px-4 sm:px-6 py-3.5 sm:py-4 text-left whitespace-nowrap"
+                                        class="px-2.5 sm:px-6 py-2 sm:py-4 text-left whitespace-nowrap"
                                     >
                                         Tanggal & Shift
                                     </th>
                                     <th
-                                        class="px-4 sm:px-6 py-3.5 sm:py-4 text-left"
+                                        class="px-2.5 sm:px-6 py-2 sm:py-4 text-left"
                                     >
                                         Item Belanja
                                     </th>
                                     <th
-                                        class="px-4 sm:px-6 py-3.5 sm:py-4 text-center whitespace-nowrap"
+                                        class="px-2.5 sm:px-6 py-2 sm:py-4 text-center whitespace-nowrap"
                                     >
                                         Status
                                     </th>
                                     <th
-                                        class="px-4 sm:px-6 py-3.5 sm:py-4 text-left whitespace-nowrap"
+                                        class="px-2.5 sm:px-6 py-2 sm:py-4 text-left whitespace-nowrap"
                                     >
                                         Metode
                                     </th>
                                     <th
-                                        class="px-4 sm:px-6 py-3.5 sm:py-4 text-center whitespace-nowrap"
+                                        class="px-2.5 sm:px-6 py-2 sm:py-4 text-center whitespace-nowrap"
                                     >
                                         Total Qty
                                     </th>
                                     <th
-                                        class="px-4 sm:px-6 py-3.5 sm:py-4 text-right whitespace-nowrap"
+                                        class="px-2.5 sm:px-6 py-2 sm:py-4 text-right whitespace-nowrap"
                                     >
                                         Total Netto
                                     </th>
                                     <th
-                                        class="px-4 sm:px-6 py-3.5 sm:py-4 text-right whitespace-nowrap"
+                                        class="px-2.5 sm:px-6 py-2 sm:py-4 text-right whitespace-nowrap"
                                     >
                                         Bayar
                                     </th>
                                     <th
-                                        class="px-4 sm:px-6 py-3.5 sm:py-4 text-center whitespace-nowrap"
+                                        class="px-2.5 sm:px-6 py-2 sm:py-4 text-center whitespace-nowrap"
                                     >
                                         Aksi
                                     </th>
@@ -691,12 +752,12 @@
 
                     <div
                         id="empty-state"
-                        class="hidden py-32 flex flex-col items-center justify-center text-slate-300"
+                        class="hidden py-16 sm:py-32 flex flex-col items-center justify-center text-slate-300"
                     >
                         <i
-                            class="fas fa-folder-open text-6xl mb-4 opacity-20"
+                            class="fas fa-folder-open text-4xl sm:text-6xl mb-3 sm:mb-4 opacity-20"
                         ></i>
-                        <p class="font-semibold italic">
+                        <p class="font-semibold italic text-xs sm:text-base">
                             Belum ada data transaksi tersimpan
                         </p>
                     </div>
@@ -704,10 +765,10 @@
                     <!-- INFINITE SCROLL FOOTER -->
                     <div
                         id="infiniteScrollFooter"
-                        class="p-4 sm:p-5 px-6 sm:px-8 bg-slate-50/80 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3"
+                        class="p-3 sm:p-5 px-3.5 sm:px-8 bg-slate-50/80 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3"
                     >
                         <div
-                            class="flex items-center gap-2 text-xs text-slate-500 font-medium"
+                            class="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-slate-500 font-medium"
                         >
                             <span>Menampilkan</span>
                             <span
@@ -774,7 +835,7 @@
 
                     salesSSE.onopen = function () {
                         if (badge) {
-                            badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs";
+                            badge.className = "inline-flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs shrink-0";
                             badge.classList.remove("hidden");
                         }
                         if (badgeText) badgeText.innerText = "Live SSE";
@@ -800,7 +861,7 @@
 
                     salesSSE.onerror = function () {
                         if (badge) {
-                            badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200";
+                            badge.className = "inline-flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200 shrink-0";
                         }
                         if (badgeText) badgeText.innerText = "SSE Reconnecting...";
                     };
@@ -1040,10 +1101,10 @@
                 buttons.forEach((btn) => {
                     if (btn.getAttribute("data-preset") === presetName) {
                         btn.className =
-                            "preset-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white shadow-sm";
+                            "preset-btn shrink-0 px-2 sm:px-3.5 py-1 sm:py-2 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-bold transition-all bg-blue-600 text-white shadow-2xs";
                     } else {
                         btn.className =
-                            "preset-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200";
+                            "preset-btn shrink-0 px-2 sm:px-3.5 py-1 sm:py-2 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200";
                     }
                 });
             }
@@ -1397,43 +1458,43 @@
 
                         if (sNum === 1) {
                             // Shift 1: Emerald / Hijau Segar
-                            shiftBadge = `<span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider whitespace-nowrap shadow-2xs" title="Transaksi ditutup pada Shift 1"><i class="fas fa-sun text-emerald-600"></i> Shift 1</span>`;
+                            shiftBadge = `<span class="inline-flex items-center gap-1 sm:gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap shadow-2xs" title="Transaksi ditutup pada Shift 1"><i class="fas fa-sun text-emerald-600"></i> Shift 1</span>`;
                             mobileBadgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
                             mobileBadgeIcon = "fa-sun text-emerald-600";
                             mobileBadgeText = "Shift 1";
                         } else if (sNum === 2) {
                             // Shift 2: Indigo / Ungu Elegan
-                            shiftBadge = `<span class="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider whitespace-nowrap shadow-2xs" title="Transaksi ditutup pada Shift 2"><i class="fas fa-moon text-indigo-600"></i> Shift 2</span>`;
+                            shiftBadge = `<span class="inline-flex items-center gap-1 sm:gap-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap shadow-2xs" title="Transaksi ditutup pada Shift 2"><i class="fas fa-moon text-indigo-600"></i> Shift 2</span>`;
                             mobileBadgeClass = "bg-indigo-50 text-indigo-700 border-indigo-200";
                             mobileBadgeIcon = "fa-moon text-indigo-600";
                             mobileBadgeText = "Shift 2";
                         } else if (isClosedShift) {
                             // Shift lainnya (> 2 jika ada)
-                            shiftBadge = `<span class="inline-flex items-center gap-1.5 bg-purple-50 text-purple-700 border border-purple-200 px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider whitespace-nowrap shadow-2xs" title="Transaksi ditutup pada Shift ${sNum}"><i class="fas fa-check-circle text-purple-600"></i> Shift ${sNum}</span>`;
+                            shiftBadge = `<span class="inline-flex items-center gap-1 sm:gap-1.5 bg-purple-50 text-purple-700 border border-purple-200 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap shadow-2xs" title="Transaksi ditutup pada Shift ${sNum}"><i class="fas fa-check-circle text-purple-600"></i> Shift ${sNum}</span>`;
                             mobileBadgeClass = "bg-purple-50 text-purple-700 border-purple-200";
                             mobileBadgeIcon = "fa-check-circle text-purple-600";
                             mobileBadgeText = `Shift ${sNum}`;
                         } else {
                             // Belum Tutup Shift: Amber / Kuning-Oranye
-                            shiftBadge = `<span class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider whitespace-nowrap shadow-2xs" title="Transaksi ini belum di-close shift (Aktif)"><i class="fas fa-clock text-amber-500 animate-pulse"></i> Belum Tutup</span>`;
+                            shiftBadge = `<span class="inline-flex items-center gap-1 sm:gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap shadow-2xs" title="Transaksi ini belum di-close shift (Aktif)"><i class="fas fa-clock text-amber-500 animate-pulse"></i> Belum Tutup</span>`;
                             mobileBadgeClass = "bg-amber-50 text-amber-700 border-amber-200";
                             mobileBadgeIcon = "fa-clock text-amber-500";
                             mobileBadgeText = "Belum Tutup";
                         }
 
-                        let statusBadge = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-3 py-1.5 rounded-lg text-xs font-black uppercase">Lunas</span>`;
+                        let statusBadge = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-2 sm:px-3 py-0.5 sm:py-1.5 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-black uppercase">Lunas</span>`;
                         if (isBon || txStatus === "Bon") {
                             statusBadge = `
                     <div class="inline-flex flex-col items-center">
-                        <span class="bg-rose-50 text-rose-600 border border-rose-200 px-3 py-1.5 rounded-lg text-xs font-black uppercase">BON / UTANG</span>
-                        <span class="text-xs text-rose-500 font-bold mt-1">Sisa: IDR ${remainingAmount.toLocaleString("id-ID")}</span>
+                        <span class="bg-rose-50 text-rose-600 border border-rose-200 px-2 sm:px-3 py-0.5 sm:py-1.5 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-black uppercase">BON / UTANG</span>
+                        <span class="text-[10px] sm:text-xs text-rose-500 font-bold mt-0.5 sm:mt-1">Sisa: IDR ${remainingAmount.toLocaleString("id-ID")}</span>
                     </div>
                 `;
                         } else if (isDp || txStatus === "DP") {
                             statusBadge = `
                     <div class="inline-flex flex-col items-center">
-                        <span class="bg-amber-50 text-amber-600 border border-amber-200 px-3 py-1.5 rounded-lg text-xs font-black uppercase">DP / Belum Lunas</span>
-                        ${remainingAmount > 0 ? `<span class="text-xs text-rose-500 font-bold mt-1">Sisa: IDR ${remainingAmount.toLocaleString("id-ID")}</span>` : ""}
+                        <span class="bg-amber-50 text-amber-600 border border-amber-200 px-2 sm:px-3 py-0.5 sm:py-1.5 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-black uppercase">DP / Belum Lunas</span>
+                        ${remainingAmount > 0 ? `<span class="text-[10px] sm:text-xs text-rose-500 font-bold mt-0.5 sm:mt-1">Sisa: IDR ${remainingAmount.toLocaleString("id-ID")}</span>` : ""}
                     </div>
                 `;
                         }
@@ -1548,7 +1609,7 @@
                                             : isDpPm
                                             ? "bg-amber-50 text-amber-700 border-amber-200"
                                             : "bg-blue-50 text-blue-700 border-blue-200";
-                                        return `<span class="inline-flex items-center gap-1.5 ${badgeBg} border px-2 py-0.5 rounded-lg text-xs font-bold whitespace-nowrap shadow-2xs" title="${mType}: IDR ${mAmt.toLocaleString("id-ID")} (${mStatus || "Bayar"})">
+                                        return `<span class="inline-flex items-center gap-1 sm:gap-1.5 ${badgeBg} border px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold whitespace-nowrap shadow-2xs" title="${mType}: IDR ${mAmt.toLocaleString("id-ID")} (${mStatus || "Bayar"})">
                                             <span>${mType}</span>
                                             ${mAmt > 0 ? `<span class="opacity-75 font-mono">(${mAmt >= 1000 ? (mAmt / 1000).toLocaleString("id-ID") + "rb" : mAmt})</span>` : ""}
                                         </span>`;
@@ -1557,12 +1618,12 @@
                                 '</div>';
                         } else {
                             let displayMethod = paymentMethod.replace(/\[Pelunasan:\s*([^\]]+)\]/g, "+ $1");
-                            paymentMethodHTML = `<span class="text-xs sm:text-sm text-slate-700 font-bold block truncate max-w-[140px]" title="${escapeHTML(paymentMethod)}">${escapeHTML(displayMethod)}</span>`;
+                            paymentMethodHTML = `<span class="text-[11px] sm:text-sm text-slate-700 font-bold block truncate max-w-[110px] sm:max-w-[140px]" title="${escapeHTML(paymentMethod)}">${escapeHTML(displayMethod)}</span>`;
                         }
 
                         let productSummaryHTML = "";
                         if (saleItems.length === 0) {
-                            productSummaryHTML = `<p class="text-slate-400 italic text-xs sm:text-sm">Tidak ada item</p>`;
+                            productSummaryHTML = `<p class="text-slate-400 italic text-[11px] sm:text-sm">Tidak ada item</p>`;
                         } else if (saleItems.length === 1) {
                             const firstItem = saleItems[0];
                             const pName =
@@ -1575,8 +1636,8 @@
                                 firstItem.Product?.Kode ||
                                 "-";
                             productSummaryHTML = `
-                    <p class="text-slate-800 font-bold text-xs sm:text-sm">${escapeHTML(pName)}</p>
-                    <p class="text-xs text-slate-400 uppercase font-bold mt-0.5">${escapeHTML(pCode)} • ${firstItem.qty || firstItem.Qty || 1} pcs</p>
+                    <p class="text-slate-800 font-bold text-[11px] sm:text-sm leading-snug">${escapeHTML(pName)}</p>
+                    <p class="text-[10px] sm:text-xs text-slate-400 uppercase font-bold mt-0.5">${escapeHTML(pCode)} • ${firstItem.qty || firstItem.Qty || 1} pcs</p>
                 `;
                         } else {
                             const firstItem = saleItems[0];
@@ -1586,10 +1647,10 @@
                                 firstItem.product_search ||
                                 "Produk";
                             productSummaryHTML = `
-                    <p class="text-slate-800 font-bold text-xs sm:text-sm">${escapeHTML(pName)}</p>
-                    <div class="flex items-center gap-2 mt-1">
-                        <span class="bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-lg text-xs font-bold">+${saleItems.length - 1} item lainnya</span>
-                        <button onclick="toggleDetailRow(${idx})" class="text-xs text-blue-600 hover:text-blue-800 font-bold underline cursor-pointer">Lihat Detail</button>
+                    <p class="text-slate-800 font-bold text-[11px] sm:text-sm leading-snug">${escapeHTML(pName)}</p>
+                    <div class="flex items-center gap-1.5 sm:gap-2 mt-0.5 sm:mt-1">
+                        <span class="bg-blue-50 text-blue-600 border border-blue-100 px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold">+${saleItems.length - 1} item</span>
+                        <button onclick="toggleDetailRow(${idx})" class="text-[10px] sm:text-xs text-blue-600 hover:text-blue-800 font-bold underline cursor-pointer">Detail</button>
                     </div>
                 `;
                         }
@@ -1598,53 +1659,53 @@
                         row.className = "hover:bg-slate-50/70 transition-all";
                         row.id = `group-row-${idx}`;
                         row.innerHTML = `
-                <td class="px-4 sm:px-6 py-3.5 sm:py-4 whitespace-nowrap">
-                    <div class="flex items-center gap-1.5 flex-wrap mb-1">
-                        <span class="bg-blue-50 text-blue-600 px-2 sm:px-2.5 py-0.5 rounded-lg text-xs font-bold border border-blue-100 inline-block font-mono">
+                <td class="px-2.5 sm:px-6 py-2 sm:py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-1 sm:gap-1.5 flex-wrap mb-0.5 sm:mb-1">
+                        <span class="bg-blue-50 text-blue-600 px-1.5 sm:px-2.5 py-0.5 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold border border-blue-100 inline-block font-mono">
                             #${escapeHTML(invoice)}
                         </span>
-                        <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-lg text-xs font-bold border border-slate-200">
-                            <i class="fas fa-store mr-1 text-blue-500"></i>${escapeHTML(storeLocation)}
+                        <span class="bg-slate-100 text-slate-600 px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold border border-slate-200">
+                            <i class="fas fa-store mr-0.5 sm:mr-1 text-blue-500"></i>${escapeHTML(storeLocation)}
                         </span>
-                        <span class="sm:hidden ${mobileBadgeClass} border px-2 py-0.5 rounded-lg text-xs font-bold inline-flex items-center gap-1">
-                            <i class="fas ${mobileBadgeIcon} text-[10px]"></i>${mobileBadgeText}
+                        <span class="sm:hidden ${mobileBadgeClass} border px-1.5 py-0.5 rounded-md text-[10px] font-bold inline-flex items-center gap-1">
+                            <i class="fas ${mobileBadgeIcon} text-[9px]"></i>${mobileBadgeText}
                         </span>
                     </div>
-                    <p class="text-xs sm:text-sm text-slate-500 font-semibold"><i class="fas fa-user-circle mr-1 text-slate-400"></i>${escapeHTML(cashierName)}</p>
+                    <p class="text-[11px] sm:text-sm text-slate-500 font-semibold"><i class="fas fa-user-circle mr-1 text-slate-400"></i>${escapeHTML(cashierName)}</p>
                     ${
                         customerName
                             ? `
-                        <p class="text-xs text-emerald-600 font-bold mt-0.5">
+                        <p class="text-[10px] sm:text-xs text-emerald-600 font-bold mt-0.5">
                             <i class="fas fa-user mr-1"></i>${escapeHTML(customerName)} ${customerPhone ? `(${escapeHTML(customerPhone)})` : ""}
                         </p>
                     `
                             : ""
                     }
                 </td>
-                <td class="px-4 sm:px-6 py-3.5 sm:py-4 text-xs sm:text-sm text-slate-600 font-bold whitespace-nowrap">
-                    <div class="mb-1.5">
+                <td class="px-2.5 sm:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-slate-600 font-bold whitespace-nowrap">
+                    <div class="mb-1 sm:mb-1.5">
                         ${shiftBadge}
                     </div>
-                    <div class="text-slate-500 font-semibold text-xs">
+                    <div class="text-slate-500 font-semibold text-[10px] sm:text-xs">
                         ${escapeHTML(formattedDate)}
                     </div>
                 </td>
-                <td class="px-4 sm:px-6 py-3.5 sm:py-4 min-w-[150px] sm:min-w-[200px]">
+                <td class="px-2.5 sm:px-6 py-2 sm:py-4 min-w-[130px] sm:min-w-[200px]">
                     ${productSummaryHTML}
                 </td>
-                <td class="px-4 sm:px-6 py-3.5 sm:py-4 text-center whitespace-nowrap">${statusBadge}</td>
-                <td class="px-4 sm:px-6 py-3.5 sm:py-4 whitespace-nowrap">
+                <td class="px-2.5 sm:px-6 py-2 sm:py-4 text-center whitespace-nowrap">${statusBadge}</td>
+                <td class="px-2.5 sm:px-6 py-2 sm:py-4 whitespace-nowrap">
                     ${paymentMethodHTML}
                 </td>
-                <td class="px-4 sm:px-6 py-3.5 sm:py-4 text-center font-bold text-slate-700 whitespace-nowrap text-xs sm:text-sm">${totalQty}</td>
-                <td class="px-4 sm:px-6 py-3.5 sm:py-4 text-right font-extrabold text-slate-800 whitespace-nowrap font-mono text-xs sm:text-sm">IDR ${totalNetto.toLocaleString("id-ID")}</td>
-                <td class="px-4 sm:px-6 py-3.5 sm:py-4 text-right text-emerald-600 font-bold whitespace-nowrap font-mono text-xs sm:text-sm">IDR ${amountPaid.toLocaleString("id-ID")}</td>
-                <td class="px-4 sm:px-6 py-3.5 sm:py-4 text-center whitespace-nowrap">
+                <td class="px-2.5 sm:px-6 py-2 sm:py-4 text-center font-bold text-slate-700 whitespace-nowrap text-[11px] sm:text-sm">${totalQty}</td>
+                <td class="px-2.5 sm:px-6 py-2 sm:py-4 text-right font-extrabold text-slate-800 whitespace-nowrap font-mono text-[11px] sm:text-sm">IDR ${totalNetto.toLocaleString("id-ID")}</td>
+                <td class="px-2.5 sm:px-6 py-2 sm:py-4 text-right text-emerald-600 font-bold whitespace-nowrap font-mono text-[11px] sm:text-sm">IDR ${amountPaid.toLocaleString("id-ID")}</td>
+                <td class="px-2.5 sm:px-6 py-2 sm:py-4 text-center whitespace-nowrap">
                     <div class="hidden sm:flex items-center justify-center gap-1.5 flex-nowrap">
                         ${actionButtons}
                     </div>
-                    <button type="button" onclick="openSaleActionMenu(${idx}, '${escapeHTML(invoice)}')" class="sm:hidden px-3 py-1.5 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold text-xs inline-flex items-center gap-1.5 border border-blue-200 cursor-pointer shadow-2xs">
-                        <i class="fas fa-ellipsis-v text-xs"></i> Aksi
+                    <button type="button" onclick="openSaleActionMenu(${idx}, '${escapeHTML(invoice)}')" class="sm:hidden px-2 py-1 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold text-[11px] inline-flex items-center gap-1 border border-blue-200 cursor-pointer shadow-2xs">
+                        <i class="fas fa-ellipsis-v text-[10px]"></i> Aksi
                     </button>
                 </td>
             `;
@@ -1686,17 +1747,17 @@
                                     );
 
                                     return `
-                        <tr class="border-b border-slate-100 hover:bg-slate-50/80 text-xs sm:text-sm transition-all cursor-pointer font-semibold text-slate-700">
-                            <td class="py-3 px-4 font-mono font-bold text-slate-500">${escapeHTML(itCode)}</td>
-                            <td class="py-3 px-4 font-bold text-slate-800">${escapeHTML(itName)}</td>
-                            <td class="py-3 px-4 text-center font-bold text-slate-600">${itQty} ${escapeHTML(itSatuan)}</td>
-                            <td class="py-3 px-4 text-right font-semibold text-slate-600 font-mono">IDR ${itPrice.toLocaleString("id-ID")}</td>
-                            <td class="py-3 px-4 text-right text-slate-400 font-semibold font-mono">${itDiscount > 0 ? `IDR ${itDiscount.toLocaleString("id-ID")}` : "-"}</td>
-                            <td class="py-3 px-4 text-right font-bold text-slate-800 font-mono">IDR ${itSubtotal.toLocaleString("id-ID")}</td>
-                            <td class="py-3 px-4 text-center">
-                                ${isAkuntan ? '<span class="text-slate-400 text-xs italic">-</span>' : `
-                                <button onclick="openReturModal(${idx}, ${itemIdx})" class="bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs">
-                                    <i class="fas fa-undo mr-1"></i> Retur
+                        <tr class="border-b border-slate-100 hover:bg-slate-50/80 text-[11px] sm:text-sm transition-all cursor-pointer font-semibold text-slate-700">
+                            <td class="py-2 px-2.5 sm:py-3 sm:px-4 font-mono font-bold text-slate-500">${escapeHTML(itCode)}</td>
+                            <td class="py-2 px-2.5 sm:py-3 sm:px-4 font-bold text-slate-800">${escapeHTML(itName)}</td>
+                            <td class="py-2 px-2.5 sm:py-3 sm:px-4 text-center font-bold text-slate-600">${itQty} ${escapeHTML(itSatuan)}</td>
+                            <td class="py-2 px-2.5 sm:py-3 sm:px-4 text-right font-semibold text-slate-600 font-mono">IDR ${itPrice.toLocaleString("id-ID")}</td>
+                            <td class="py-2 px-2.5 sm:py-3 sm:px-4 text-right text-slate-400 font-semibold font-mono">${itDiscount > 0 ? `IDR ${itDiscount.toLocaleString("id-ID")}` : "-"}</td>
+                            <td class="py-2 px-2.5 sm:py-3 sm:px-4 text-right font-bold text-slate-800 font-mono">IDR ${itSubtotal.toLocaleString("id-ID")}</td>
+                            <td class="py-2 px-2.5 sm:py-3 sm:px-4 text-center">
+                                ${isAkuntan ? '<span class="text-slate-400 text-[10px] sm:text-xs italic">-</span>' : `
+                                <button onclick="openReturModal(${idx}, ${itemIdx})" class="bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all shadow-xs">
+                                    <i class="fas fa-undo mr-0.5 sm:mr-1"></i> Retur
                                 </button>
                                 `}
                             </td>
@@ -1706,31 +1767,33 @@
                                 .join("");
 
                             detailRow.innerHTML = `
-                    <td colspan="9" class="p-3 sm:p-5 sm:pl-10 sm:pr-6">
-                        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-                            <div class="bg-slate-100/70 px-5 py-3 border-b border-slate-200 flex justify-between items-center">
-                                <span class="text-xs font-black uppercase text-slate-600 tracking-wider">
-                                    <i class="fas fa-boxes text-blue-500 mr-2"></i> Rincian Barang (#${escapeHTML(invoice)})
+                    <td colspan="9" class="p-2 sm:p-5 sm:pl-10 sm:pr-6">
+                        <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+                            <div class="bg-slate-100/70 px-3 sm:px-5 py-2 sm:py-3 border-b border-slate-200 flex justify-between items-center">
+                                <span class="text-[10px] sm:text-xs font-black uppercase text-slate-600 tracking-wider">
+                                    <i class="fas fa-boxes text-blue-500 mr-1.5 sm:mr-2"></i> Rincian Barang (#${escapeHTML(invoice)})
                                 </span>
-                                <span class="text-xs font-bold text-slate-400">${saleItems.length} Macam Barang</span>
+                                <span class="text-[10px] sm:text-xs font-bold text-slate-400">${saleItems.length} Macam Barang</span>
                             </div>
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="text-xs font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50 border-b border-slate-100">
-                                        <th class="py-3 px-4 text-left">Kode</th>
-                                        <th class="py-3 px-4 text-left">Nama Produk</th>
-                                        <th class="py-3 px-4 text-center">Qty</th>
-                                        <th class="py-3 px-4 text-right">Harga Satuan</th>
-                                        <th class="py-3 px-4 text-right">Diskon</th>
-                                        <th class="py-3 px-4 text-right">Subtotal</th>
-                                        <th class="py-3 px-4 text-center w-32">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${itemRowsHTML}
-                                </tbody>
-                            </table>
-                            <div class="bg-slate-50 px-4 py-2.5 border-t border-slate-200 flex flex-wrap justify-end gap-4 sm:gap-6 text-xs font-mono">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50 border-b border-slate-100">
+                                            <th class="py-2 px-2.5 sm:py-3 sm:px-4 text-left">Kode</th>
+                                            <th class="py-2 px-2.5 sm:py-3 sm:px-4 text-left">Nama Produk</th>
+                                            <th class="py-2 px-2.5 sm:py-3 sm:px-4 text-center">Qty</th>
+                                            <th class="py-2 px-2.5 sm:py-3 sm:px-4 text-right">Harga Satuan</th>
+                                            <th class="py-2 px-2.5 sm:py-3 sm:px-4 text-right">Diskon</th>
+                                            <th class="py-2 px-2.5 sm:py-3 sm:px-4 text-right">Subtotal</th>
+                                            <th class="py-2 px-2.5 sm:py-3 sm:px-4 text-center w-24 sm:w-32">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${itemRowsHTML}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="bg-slate-50 px-3 sm:px-4 py-2 sm:py-2.5 border-t border-slate-200 flex flex-wrap justify-end gap-2.5 sm:gap-6 text-[10px] sm:text-xs font-mono">
                                 <div class="text-slate-600">Total Netto: <span class="font-bold text-slate-800">IDR ${totalNetto.toLocaleString("id-ID")}</span></div>
                                 <div class="text-slate-600">Total Dibayar: <span class="font-bold text-emerald-600">IDR ${amountPaid.toLocaleString("id-ID")}</span></div>
                                 <div class="text-slate-600 font-bold">Kembalian: <span class="${changeAmount > 0 ? "text-emerald-700 font-extrabold bg-emerald-100/70 border border-emerald-300 px-2 py-0.5 rounded" : "text-slate-700 font-bold"}">IDR ${changeAmount.toLocaleString("id-ID")}</span></div>
@@ -1788,7 +1851,7 @@
 
                 if (loading) {
                     statusEl.innerHTML = `
-                        <div class="flex items-center gap-2 text-xs text-blue-600 font-bold bg-blue-50 px-3.5 py-1.5 rounded-xl border border-blue-100">
+                        <div class="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-blue-600 font-bold bg-blue-50 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border border-blue-100">
                             <i class="fas fa-spinner fa-spin"></i>
                             <span>Memuat transaksi...</span>
                         </div>
@@ -1797,13 +1860,13 @@
                 }
 
                 if (totalTransactions === 0) {
-                    statusEl.innerHTML = `<span class="text-slate-400 italic text-xs">Tidak ada data transaksi</span>`;
+                    statusEl.innerHTML = `<span class="text-slate-400 italic text-[10px] sm:text-xs">Tidak ada data transaksi</span>`;
                 } else if (
                     !hasMoreData ||
                     localSalesData.length >= totalTransactions
                 ) {
                     statusEl.innerHTML = `
-                        <span class="text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                        <span class="text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold flex items-center gap-1.5">
                             <i class="fas fa-check-circle text-emerald-500"></i> Semua ${totalTransactions.toLocaleString("id-ID")} transaksi telah dimuat
                         </span>
                     `;
@@ -1812,7 +1875,7 @@
                         <button
                             type="button"
                             onclick="loadMoreRiwayat()"
-                            class="px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 rounded-xl font-bold transition-all flex items-center gap-1.5 shadow-sm text-xs cursor-pointer"
+                            class="px-2.5 sm:px-4 py-1.5 sm:py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 rounded-lg sm:rounded-xl font-bold transition-all flex items-center gap-1.5 shadow-2xs text-[11px] sm:text-xs cursor-pointer"
                         >
                             <i class="fas fa-arrow-down text-xs"></i> Muat Lebih Banyak (${localSalesData.length}/${totalTransactions})
                         </button>

@@ -847,10 +847,12 @@
                             onchange="loadStockCard(1)"
                             class="flex-1 sm:flex-initial bg-white border border-slate-200 text-[11px] sm:text-xs font-bold text-slate-700 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:py-2 outline-none cursor-pointer focus:border-blue-400 h-[2.1rem] sm:h-auto"
                         >
-                            <option value="">Semua Lokasi Toko</option>
+                            <option value="">Semua Lokasi (5 Titik)</option>
+                            <option value="Toko Utama">Toko Utama</option>
                             <option value="Toko Sudirman">Toko Sudirman</option>
                             <option value="Toko Paye">Toko Paye</option>
-                            <option value="Toko Kota">Toko Kota</option>
+                            <option value="Gudang Karangsokong">Gudang Karangsokong</option>
+                            <option value="Gudang BTN">Gudang BTN</option>
                         </select>
                         <button
                             type="button"
@@ -1058,12 +1060,16 @@
 
             function handleStockChanged(data) {
                 if (!data || !data.product_id) return;
-                const locClean = (data.location || "").replace(/^Toko\s+/i, "");
-                const span = document.querySelector(`span[data-loc-prod="${data.product_id}_${locClean}"]`);
+                const rawLoc = data.location || "";
+                const locClean = rawLoc.replace(/^Toko\s+/i, "");
+                const span =
+                    document.querySelector(`span[data-loc-prod="${data.product_id}_${rawLoc}"]`) ||
+                    document.querySelector(`span[data-loc-prod="${data.product_id}_${locClean}"]`);
                 if (span) {
-                    const newQty = Number(data.new_saldo || 0);
+                    const newQty = Number(data.saldo_after ?? data.new_saldo ?? 0);
+                    const isGudang = rawLoc.toLowerCase().includes("gudang");
                     span.innerText = newQty;
-                    span.className = `ml-1 ${newQty > 0 ? "text-blue-600 font-extrabold" : "text-slate-400"}`;
+                    span.className = `ml-1 ${newQty > 0 ? (isGudang ? "text-purple-700 font-black" : "text-blue-600 font-black") : "text-slate-400"}`;
                 }
             }
 
@@ -1160,22 +1166,24 @@
                             const pName = p.Nama || p.nama || "-";
                             const pKode = p.Kode || p.kode || "-";
                             const stocks = p.Stocks || p.stocks || [];
+                            const images = p.Images || p.images || [];
                             let badgesHTML = "";
                             if (stocks.length > 0) {
                                 badgesHTML = `<div class="flex flex-wrap gap-1 mt-1.5">${stocks
                                     .map((s) => {
-                                        const locName = (
-                                            s.Location ||
-                                            s.location ||
-                                            ""
-                                        ).replace(/^Toko\s+/i, "");
+                                        const rawLoc = s.Location || s.location || "";
+                                        const isGudang = rawLoc.toLowerCase().includes("gudang");
+                                        const shortLoc = rawLoc.replace(/^Toko\s+/i, "").replace(/^Gudang\s+/i, "GDG ");
                                         const qty =
                                             s.Saldo !== undefined
                                                 ? s.Saldo
                                                 : s.saldo !== undefined
                                                   ? s.saldo
                                                   : 0;
-                                        return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">${escapeHTML(locName)}: <span data-loc-prod="${pId}_${escapeHTML(locName)}" class="ml-1 ${qty > 0 ? "text-blue-600 font-extrabold" : "text-slate-400"}">${qty}</span></span>`;
+                                        const badgeStyle = isGudang
+                                            ? "bg-purple-50 text-purple-700 border-purple-200"
+                                            : "bg-slate-50 text-slate-700 border-slate-200";
+                                        return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold border ${badgeStyle}" title="${escapeHTML(rawLoc)}">${escapeHTML(shortLoc)}: <span data-loc-prod="${pId}_${escapeHTML(rawLoc)}" class="ml-1 ${qty > 0 ? (isGudang ? "text-purple-700 font-black" : "text-blue-600 font-black") : "text-slate-400"}">${qty}</span></span>`;
                                     })
                                     .join("")}</div>`;
                             }
@@ -1197,6 +1205,7 @@
                 </td>
                 <td class="px-3.5 py-3 sm:px-6 sm:py-4 text-right whitespace-nowrap">
                     <div class="hidden sm:inline-flex items-center gap-1.5 justify-end">
+                        <button onclick="openProductGalleryModal('${pId}', '${encodeURIComponent(pName)}', '${encodeURIComponent(pKode)}')" class="text-blue-500 hover:text-blue-700 mx-1.5 transition-colors" title="Kelola & Lihat Galeri Foto Produk (Multi-Foto per Lokasi)"><i class="fas fa-camera"></i></button>
                         <button onclick="openStockCardModal('${pId}', '${encodeURIComponent(pName)}', '${encodeURIComponent(pKode)}')" class="text-amber-500 hover:text-amber-700 mx-1.5 transition-colors" title="Lihat Kartu Stok / Audit Trail"><i class="fas fa-history"></i></button>
                         ${
                             canEditProduct
@@ -1448,6 +1457,13 @@
                 const pName = decodeURIComponent(encName);
                 const pKode = decodeURIComponent(encKode);
                 const actions = [
+                    {
+                        label: "Galeri Foto & Stok 5 Lokasi",
+                        icon: "fas fa-camera",
+                        color: "blue",
+                        desc: "Lihat foto produk, bukti Stock Opname, & rincian stok",
+                        onClick: () => openProductGalleryModal(pId, encName, encKode),
+                    },
                     {
                         label: "Kartu Stok / Audit Trail",
                         icon: "fas fa-history",
@@ -2366,6 +2382,619 @@
                     document.body.classList.remove("overflow-hidden");
                 }
             });
-        </script>
-    </body>
+        
+            // ==========================================
+            // LOGIKA DETAIL PERSEBARAN STOK & MULTI-FOTO PRODUK
+            // ==========================================
+            let currentGalleryProductId = null;
+            let currentGalleryImages = [];
+            let currentGallerySelectedLoc = "";
+
+            const ALL_LOCATIONS_LIST = [
+                { name: "Toko Utama", type: "toko", icon: "fas fa-store", label: "Toko Utama" },
+                { name: "Toko Sudirman", type: "toko", icon: "fas fa-shop", label: "Toko Sudirman" },
+                { name: "Toko Paye", type: "toko", icon: "fas fa-store-alt", label: "Toko Paye" },
+                { name: "Gudang Karangsokong", type: "gudang", icon: "fas fa-warehouse", label: "Gudang Karangsokong" },
+                { name: "Gudang BTN", type: "gudang", icon: "fas fa-boxes-packing", label: "Gudang BTN" },
+            ];
+
+            // Image Compression Helper Max 2MB
+            async function compressProductImageToMax2MB(file, maxBytes = 2 * 1024 * 1024) {
+                if (!file || !file.type.startsWith("image/")) return file;
+                if (file.size <= maxBytes) return file;
+
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.src = event.target.result;
+                        img.onload = () => {
+                            let width = img.width;
+                            let height = img.height;
+                            const maxDim = 1920;
+                            if (width > maxDim || height > maxDim) {
+                                if (width > height) {
+                                    height = Math.round((height * maxDim) / width);
+                                    width = maxDim;
+                                } else {
+                                    width = Math.round((width * maxDim) / height);
+                                    height = maxDim;
+                                }
+                            }
+
+                            const canvas = document.createElement("canvas");
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext("2d");
+                            ctx.drawImage(img, 0, 0, width, height);
+
+                            let quality = 0.85;
+                            function tryCompress() {
+                                canvas.toBlob(
+                                    (blob) => {
+                                        if (!blob) {
+                                            resolve(file);
+                                            return;
+                                        }
+                                        if (blob.size <= maxBytes || quality <= 0.3) {
+                                            const cleanName = (file.name || "photo.jpg").replace(/\.[^/.]+$/, "") + ".jpg";
+                                            const compressedFile = new File([blob], cleanName, {
+                                                type: "image/jpeg",
+                                                lastModified: Date.now(),
+                                            });
+                                            console.log(`[COMPRESS] Asli: ${(file.size / 1024 / 1024).toFixed(2)} MB -> Terkompresi: ${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`);
+                                            resolve(compressedFile);
+                                        } else {
+                                            quality -= 0.15;
+                                            tryCompress();
+                                        }
+                                    },
+                                    "image/jpeg",
+                                    quality
+                                );
+                            }
+                            tryCompress();
+                        };
+                        img.onerror = () => resolve(file);
+                    };
+                    reader.onerror = () => resolve(file);
+                });
+            }
+
+            async function openProductGalleryModal(productId, encodedName, encodedKode) {
+                currentGalleryProductId = productId;
+                currentGallerySelectedLoc = "";
+                const pName = decodeURIComponent(encodedName || "");
+                const pKode = decodeURIComponent(encodedKode || "");
+
+                document.getElementById("galleryModalTitle").innerText = pName;
+                document.getElementById("galleryModalSubtitle").innerText = `#${pKode} • ID: ${productId}`;
+                document.getElementById("productGalleryModal").classList.remove("hidden");
+                document.body.classList.add("modal-active");
+
+                // Render placeholder
+                const gridStock = document.getElementById("galleryStockBreakdownGrid");
+                gridStock.innerHTML = `<div class="col-span-full py-6 text-center text-slate-400 text-xs"><i class="fas fa-spinner fa-spin mr-1"></i> Memuat persebaran stok...</div>`;
+                const gridImg = document.getElementById("productGalleryGrid");
+                gridImg.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 text-xs"><i class="fas fa-spinner fa-spin mr-1"></i> Memuat foto produk...</div>`;
+
+                // Update filter tombol aktif
+                document.querySelectorAll(".gallery-loc-btn").forEach((btn) => {
+                    if (btn.getAttribute("data-loc") === "") {
+                        btn.className = "gallery-loc-btn active px-3 py-1.5 rounded-xl font-bold bg-blue-600 text-white transition-all shrink-0";
+                    } else {
+                        btn.className = "gallery-loc-btn px-3 py-1.5 rounded-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all shrink-0";
+                    }
+                });
+
+                await loadProductGalleryData(productId);
+            }
+
+            function closeProductGalleryModal() {
+                document.getElementById("productGalleryModal").classList.add("hidden");
+                document.body.classList.remove("modal-active");
+                currentGalleryProductId = null;
+            }
+
+            async function loadProductGalleryData(productId) {
+                try {
+                    const token = localStorage.getItem("token");
+                    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+                    // 1. Ambil data stok per cabang via API breakdown
+                    const resStock = await fetch(`${BASE_URL}/api/products/${productId}/stocks`, { headers });
+                    let stockList = [];
+                    if (resStock.ok) {
+                        const dataStock = await resStock.json();
+                        stockList = dataStock.data || [];
+                    }
+
+                    // Map saldo per lokasi
+                    const stockMap = {};
+                    let totalSemuaLokasi = 0;
+                    stockList.forEach((s) => {
+                        const loc = s.Location || s.location || "";
+                        const qty = Number(s.Saldo !== undefined ? s.Saldo : s.saldo || 0);
+                        stockMap[loc] = qty;
+                        totalSemuaLokasi += qty;
+                    });
+
+                    // Render Kartu 5 Titik Lokasi
+                    const gridStock = document.getElementById("galleryStockBreakdownGrid");
+                    gridStock.innerHTML = ALL_LOCATIONS_LIST.map((loc) => {
+                        const saldo = stockMap[loc.name] || 0;
+                        const isGudang = loc.type === "gudang";
+                        const cardBg = isGudang ? "bg-purple-50/60 border-purple-200" : "bg-blue-50/60 border-blue-200";
+                        const iconColor = isGudang ? "text-purple-600" : "text-blue-600";
+                        const badgeType = isGudang ? "GUDANG" : "TOKO";
+                        const badgeBg = isGudang ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700";
+
+                        return `
+                            <div class="p-3.5 rounded-2xl border ${cardBg} flex flex-col justify-between">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded ${badgeBg}">
+                                        ${badgeType}
+                                    </span>
+                                    <i class="${loc.icon} ${iconColor} text-sm"></i>
+                                </div>
+                                <div>
+                                    <h5 class="text-xs font-bold text-slate-700 truncate" title="${loc.label}">${loc.label}</h5>
+                                    <div class="flex items-baseline gap-1 mt-1">
+                                        <span class="text-xl font-black ${saldo > 0 ? (isGudang ? "text-purple-700" : "text-blue-700") : "text-slate-400"}">${saldo.toLocaleString("id-ID")}</span>
+                                        <span class="text-[10px] text-slate-400 font-bold uppercase">Unit</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join("");
+
+                    document.getElementById("galleryTotalStockBadge").innerText = `Total: ${totalSemuaLokasi.toLocaleString("id-ID")} Unit`;
+
+                    // 2. Ambil Galeri Foto Produk
+                    const resImages = await fetch(`${BASE_URL}/api/products/${productId}/images`, { headers });
+                    if (resImages.ok) {
+                        const dataImages = await resImages.json();
+                        currentGalleryImages = dataImages.data || [];
+                    } else {
+                        currentGalleryImages = [];
+                    }
+                    renderGalleryImagesGrid();
+                } catch (err) {
+                    console.error("loadProductGalleryData error:", err);
+                }
+            }
+
+            function filterGalleryByLocation(location) {
+                currentGallerySelectedLoc = location;
+                document.querySelectorAll(".gallery-loc-btn").forEach((btn) => {
+                    const btnLoc = btn.getAttribute("data-loc");
+                    if (btnLoc === location) {
+                        btn.className = "gallery-loc-btn active px-3 py-1.5 rounded-xl font-bold bg-blue-600 text-white transition-all shrink-0";
+                    } else {
+                        btn.className = "gallery-loc-btn px-3 py-1.5 rounded-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all shrink-0";
+                    }
+                });
+                renderGalleryImagesGrid();
+            }
+
+            let currentRenderedGalleryList = [];
+
+            function resolveGalleryPhotoUrl(rawUrl) {
+                if (!rawUrl) return "";
+                let fullUrl = rawUrl.startsWith("http") ? rawUrl : `${BASE_URL}${rawUrl}`;
+                try {
+                    const host = window.location.hostname;
+                    if (host && host !== "localhost" && host !== "127.0.0.1") {
+                        fullUrl = fullUrl.replace(/^http:\/\/(127\.0\.0\.1|localhost):9000/i, `http://${host}:9000`);
+                    }
+                } catch (_) {}
+                return fullUrl;
+            }
+
+            function formatGalleryDateTime(isoStr) {
+                if (!isoStr) return "-";
+                const d = new Date(isoStr);
+                if (isNaN(d.getTime())) return String(isoStr);
+                return d.toLocaleString("id-ID", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                });
+            }
+
+            function openProductPhotoPreviewByIndex(idx) {
+                const item = currentRenderedGalleryList[idx];
+                if (!item) return;
+                openProductPhotoPreview(item.fullUrl, item.previewCaption);
+            }
+
+            function renderGalleryImagesGrid() {
+                const grid = document.getElementById("productGalleryGrid");
+                let list = currentGalleryImages;
+                if (currentGallerySelectedLoc) {
+                    list = list.filter((img) => (img.Location || img.location || "") === currentGallerySelectedLoc);
+                }
+
+                if (list.length === 0) {
+                    currentRenderedGalleryList = [];
+                    grid.innerHTML = `
+                        <div class="col-span-full py-12 text-center text-slate-400">
+                            <i class="fas fa-images text-3xl mb-2 text-slate-300"></i>
+                            <p class="text-xs font-semibold">Belum ada foto untuk ${currentGallerySelectedLoc || "semua lokasi"}.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                currentRenderedGalleryList = list.map((img) => {
+                    const url = img.ImageURL || img.image_url || "";
+                    const loc = img.Location || img.location || "Toko Utama";
+                    const source = img.Source || img.source || (img.opname_no || img.OpnameNo ? "opname" : "manual");
+                    const opnameId = img.OpnameID || img.opname_id || 0;
+                    const opnameNo = img.OpnameNo || img.opname_no || "";
+                    const opnameStatus = img.OpnameStatus || img.opname_status || "";
+                    const opnameCreatedAt = img.OpnameCreatedAt || img.opname_created_at || img.CreatedAt || img.created_at || "";
+                    const createdAt = img.CreatedAt || img.created_at || "";
+                    const fullUrl = resolveGalleryPhotoUrl(url);
+                    const previewCaption =
+                        source === "opname"
+                            ? `${loc} • SO #${opnameId} (${opnameNo}${opnameStatus ? " - " + opnameStatus : ""}) • Dibuat: ${formatGalleryDateTime(opnameCreatedAt)}`
+                            : `${loc}${createdAt ? " • Diunggah: " + formatGalleryDateTime(createdAt) : ""}`;
+                    return {
+                        img,
+                        imgId: img.ID || img.id,
+                        loc,
+                        source,
+                        opnameId,
+                        opnameNo,
+                        opnameStatus,
+                        opnameCreatedAt,
+                        createdAt,
+                        fullUrl,
+                        previewCaption,
+                    };
+                });
+
+                grid.innerHTML = currentRenderedGalleryList.map((entry, idx) => {
+                    const { imgId, loc, source, opnameId, opnameNo, opnameStatus, opnameCreatedAt, createdAt, fullUrl } = entry;
+                    const isGudang = loc.toLowerCase().includes("gudang");
+                    const isOpname = source === "opname";
+
+                    const statusBadgeClass =
+                        opnameStatus === "Completed"
+                            ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                            : opnameStatus === "Waiting Approval"
+                              ? "bg-amber-100 text-amber-700 border-amber-200"
+                              : "bg-slate-100 text-slate-600 border-slate-200";
+
+                    const metaHtml = isOpname
+                        ? `
+                            <div class="px-2.5 pb-2.5 pt-1.5 bg-emerald-50/50 border-t border-emerald-100/80 space-y-1 text-[10px]">
+                                <div class="flex items-center justify-between gap-1">
+                                    <span class="font-black text-emerald-700 font-mono truncate" title="ID SO #${opnameId} (${escapeHTML(opnameNo)})">
+                                        <i class="fas fa-clipboard-check mr-1"></i>SO #${opnameId}
+                                    </span>
+                                    ${opnameStatus ? `<span class="px-1.5 py-0.2 rounded text-[9px] font-bold border ${statusBadgeClass} shrink-0">${escapeHTML(opnameStatus)}</span>` : ""}
+                                </div>
+                                <div class="font-mono font-bold text-slate-700 truncate text-[10px]" title="${escapeHTML(opnameNo)}">
+                                    ${escapeHTML(opnameNo)}
+                                </div>
+                                <div class="text-[10px] text-slate-500 flex items-center gap-1">
+                                    <i class="far fa-clock text-slate-400"></i>
+                                    <span>${escapeHTML(formatGalleryDateTime(opnameCreatedAt))}</span>
+                                </div>
+                            </div>
+                        `
+                        : `
+                            <div class="px-2.5 pb-2 pt-0.5 text-[10px] text-slate-400 flex items-center gap-1">
+                                <i class="far fa-clock"></i>
+                                <span>${escapeHTML(formatGalleryDateTime(createdAt))}</span>
+                            </div>
+                        `;
+
+                    return `
+                        <div class="group relative bg-white border ${isOpname ? "border-emerald-200" : "border-slate-200"} rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col">
+                            <div class="relative aspect-square bg-slate-100 overflow-hidden cursor-pointer" onclick="openProductPhotoPreviewByIndex(${idx})">
+                                <img src="${fullUrl}" alt="Foto Produk" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                ${isOpname ? `<span class="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-600/90 text-white shadow-xs backdrop-blur-xs">Foto SO</span>` : ""}
+                            </div>
+                            <div class="p-2 flex items-center justify-between gap-1 bg-white border-t border-slate-100">
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${isGudang ? "bg-purple-50 text-purple-700 border border-purple-200" : "bg-blue-50 text-blue-700 border border-blue-200"} truncate max-w-[130px]">
+                                    ${escapeHTML(loc)}
+                                </span>
+                                ${
+                                    isOpname
+                                        ? `<span class="text-[10px] text-emerald-600 font-bold" title="Foto bukti audit Stock Opname"><i class="fas fa-shield-halved"></i></span>`
+                                        : `<button
+                                            type="button"
+                                            onclick="deleteProductGalleryImage(${imgId})"
+                                            class="text-slate-400 hover:text-rose-600 p-1 transition-colors"
+                                            title="Hapus foto"
+                                        >
+                                            <i class="fas fa-trash-alt text-xs"></i>
+                                        </button>`
+                                }
+                            </div>
+                            ${metaHtml}
+                        </div>
+                    `;
+                }).join("");
+            }
+
+            function triggerUploadProductImage() {
+                const input = document.getElementById("productImageFileInput");
+                input.value = "";
+                input.click();
+            }
+
+            async function handleProductImageFileSelected(e) {
+                const rawFile = e.target.files && e.target.files[0];
+                if (!rawFile || !currentGalleryProductId) return;
+
+                const location = document.getElementById("galleryUploadLocation").value;
+
+                Swal.fire({
+                    title: "Mengunggah Foto Produk...",
+                    text: rawFile.size > 2 * 1024 * 1024 ? "Mengompresi foto ke maks 2MB sebelum dikirim..." : "Mengunggah foto ke MinIO...",
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading(),
+                });
+
+                try {
+                    const compressedFile = await compressProductImageToMax2MB(rawFile);
+                    const formData = new FormData();
+                    formData.append("photo", compressedFile);
+                    formData.append("location", location);
+                    formData.append("caption", `Foto produk di ${location}`);
+
+                    const token = localStorage.getItem("token");
+                    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+                    const res = await fetch(`${BASE_URL}/api/products/${currentGalleryProductId}/images`, {
+                        method: "POST",
+                        headers,
+                        body: formData,
+                    });
+
+                    if (!res.ok) {
+                        const err = await res.json().catch(() => ({}));
+                        throw new Error(err.error || "Gagal mengunggah foto produk");
+                    }
+
+                    Swal.fire("Berhasil", "Foto produk berhasil diunggah ke MinIO!", "success");
+                    await loadProductGalleryData(currentGalleryProductId);
+                    fetchProducts(); // Refresh list master produk
+                } catch (err) {
+                    Swal.fire("Unggah Gagal", err.message, "error");
+                }
+            }
+
+            async function deleteProductGalleryImage(imageId) {
+                const conf = await Swal.fire({
+                    title: "Hapus Foto Ini?",
+                    text: "Foto produk akan dihapus secara permanen.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, Hapus",
+                    cancelButtonText: "Batal",
+                    confirmButtonColor: "#ef4444",
+                });
+                if (!conf.isConfirmed) return;
+
+                try {
+                    const token = localStorage.getItem("token");
+                    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+                    const res = await fetch(`${BASE_URL}/api/products/images/${imageId}`, {
+                        method: "DELETE",
+                        headers,
+                    });
+                    if (res.ok) {
+                        Swal.fire("Terhapus", "Foto produk telah dihapus.", "success");
+                        await loadProductGalleryData(currentGalleryProductId);
+                        fetchProducts();
+                    } else {
+                        Swal.fire("Gagal", "Gagal menghapus foto produk.", "error");
+                    }
+                } catch (err) {
+                    Swal.fire("Error", err.message, "error");
+                }
+            }
+
+            function openProductPhotoPreview(url, caption) {
+                document.getElementById("productPhotoPreviewImg").src = url;
+                document.getElementById("productPhotoPreviewCaption").innerText = caption || "";
+                document.getElementById("productPhotoPreviewModal").classList.remove("hidden");
+            }
+
+            function closeProductPhotoPreview() {
+                document.getElementById("productPhotoPreviewModal").classList.add("hidden");
+                document.getElementById("productPhotoPreviewImg").src = "";
+            }
+
+</script>
+    
+        <!-- MODAL DETAIL PERSEBARAN STOK & GALERI FOTO PRODUK (MULTI-FOTO PER CABANG) -->
+        <div
+            id="productGalleryModal"
+            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2.5 sm:p-4"
+        >
+            <div
+                class="bg-white w-full max-w-4xl rounded-2xl sm:rounded-[2.5rem] shadow-2xl animate-fade-in overflow-hidden max-h-[92vh] flex flex-col"
+            >
+                <!-- MODAL HEADER -->
+                <div
+                    class="p-4 sm:p-6 border-b border-slate-100 flex justify-between items-center shrink-0 bg-slate-50/50"
+                >
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg font-bold"
+                        >
+                            <i class="fas fa-boxes-stacked"></i>
+                        </div>
+                        <div>
+                            <h3
+                                id="galleryModalTitle"
+                                class="text-base sm:text-xl font-black text-slate-800 leading-tight"
+                            >
+                                Detail Produk & Galeri Foto
+                            </h3>
+                            <p
+                                id="galleryModalSubtitle"
+                                class="text-xs text-slate-400 font-mono font-bold mt-0.5"
+                            >
+                                PROD-001 • Kulkas Sharp 2 Pintu
+                            </p>
+                        </div>
+                    </div>
+                    <button
+                        onclick="closeProductGalleryModal()"
+                        class="w-8 h-8 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors flex items-center justify-center"
+                    >
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="p-4 sm:p-6 overflow-y-auto custom-scroll space-y-6">
+                    <!-- 1. KARTU PERSEBARAN STOK 5 TITIK LOKASI -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                                <i class="fas fa-map-marker-alt text-blue-500"></i>
+                                Persebaran Stok Fisik di 5 Titik Lokasi
+                            </h4>
+                            <span id="galleryTotalStockBadge" class="px-2.5 py-1 bg-blue-50 text-blue-700 font-black text-xs rounded-xl border border-blue-200">
+                                Total: 0 Unit
+                            </span>
+                        </div>
+                        <div id="galleryStockBreakdownGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
+                            <!-- Diisi dinamis -->
+                        </div>
+                    </div>
+
+                    <!-- 2. GALERI FOTO BUKTI PRODUK PER CABANG (MINIO STORAGE) -->
+                    <div class="pt-4 border-t border-slate-100">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                            <div>
+                                <h4 class="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                                    <i class="fas fa-images text-emerald-500"></i>
+                                    Galeri Foto Produk di Toko & Gudang
+                                </h4>
+                                <p class="text-[11px] text-slate-400 mt-0.5">
+                                    Dapat mengunggah lebih dari 1 foto untuk masing-masing cabang toko & gudang (terkompresi otomatis maks 2MB).
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <select
+                                    id="galleryUploadLocation"
+                                    class="bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 rounded-xl px-3 py-2 outline-none cursor-pointer"
+                                >
+                                    <option value="Toko Utama">🏬 Toko Utama</option>
+                                    <option value="Toko Sudirman">🏬 Toko Sudirman</option>
+                                    <option value="Toko Paye">🏬 Toko Paye</option>
+                                    <option value="Gudang Karangsokong">🏭 Gudang Karangsokong</option>
+                                    <option value="Gudang BTN">🏭 Gudang BTN</option>
+                                </select>
+                                <button
+                                    type="button"
+                                    onclick="triggerUploadProductImage()"
+                                    class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-200 transition-all flex items-center gap-1.5 cursor-pointer"
+                                >
+                                    <i class="fas fa-upload"></i>
+                                    <span>Upload Foto</span>
+                                </button>
+                                <input
+                                    type="file"
+                                    id="productImageFileInput"
+                                    accept="image/*"
+                                    class="hidden"
+                                    onchange="handleProductImageFileSelected(event)"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- FILTER FOTO PER CABANG -->
+                        <div class="flex items-center gap-1.5 overflow-x-auto pb-2 text-xs">
+                            <button
+                                onclick="filterGalleryByLocation('')"
+                                class="gallery-loc-btn active px-3 py-1.5 rounded-xl font-bold bg-blue-600 text-white transition-all shrink-0"
+                                data-loc=""
+                            >
+                                Semua Lokasi
+                            </button>
+                            <button
+                                onclick="filterGalleryByLocation('Toko Utama')"
+                                class="gallery-loc-btn px-3 py-1.5 rounded-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all shrink-0"
+                                data-loc="Toko Utama"
+                            >
+                                Toko Utama
+                            </button>
+                            <button
+                                onclick="filterGalleryByLocation('Toko Sudirman')"
+                                class="gallery-loc-btn px-3 py-1.5 rounded-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all shrink-0"
+                                data-loc="Toko Sudirman"
+                            >
+                                Toko Sudirman
+                            </button>
+                            <button
+                                onclick="filterGalleryByLocation('Toko Paye')"
+                                class="gallery-loc-btn px-3 py-1.5 rounded-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all shrink-0"
+                                data-loc="Toko Paye"
+                            >
+                                Toko Paye
+                            </button>
+                            <button
+                                onclick="filterGalleryByLocation('Gudang Karangsokong')"
+                                class="gallery-loc-btn px-3 py-1.5 rounded-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all shrink-0"
+                                data-loc="Gudang Karangsokong"
+                            >
+                                Gudang Karangsokong
+                            </button>
+                            <button
+                                onclick="filterGalleryByLocation('Gudang BTN')"
+                                class="gallery-loc-btn px-3 py-1.5 rounded-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all shrink-0"
+                                data-loc="Gudang BTN"
+                            >
+                                Gudang BTN
+                            </button>
+                        </div>
+
+                        <!-- GRID GAMBAR -->
+                        <div id="productGalleryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 mt-3">
+                            <div class="col-span-full py-12 text-center text-slate-400">
+                                <i class="fas fa-images text-3xl mb-2 text-slate-300"></i>
+                                <p class="text-xs font-semibold">Belum ada foto yang diunggah untuk produk ini.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL PREVIEW FOTO BESAR -->
+        <div
+            id="productPhotoPreviewModal"
+            class="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4 cursor-pointer"
+            onclick="closeProductPhotoPreview()"
+        >
+            <div class="relative max-w-4xl max-h-[90vh] flex flex-col items-center" onclick="event.stopPropagation()">
+                <button
+                    onclick="closeProductPhotoPreview()"
+                    class="absolute -top-10 right-0 text-white/80 hover:text-white text-2xl font-bold"
+                >
+                    <i class="fas fa-times"></i>
+                </button>
+                <img
+                    id="productPhotoPreviewImg"
+                    src=""
+                    alt="Preview Foto Produk"
+                    class="max-w-full max-h-[82vh] object-contain rounded-2xl shadow-2xl"
+                />
+                <p id="productPhotoPreviewCaption" class="text-white text-xs font-bold mt-2.5 text-center"></p>
+            </div>
+        </div>
+
+</body>
 </html>

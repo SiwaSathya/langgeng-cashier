@@ -287,7 +287,7 @@
                                 id="activeStoreBadge"
                                 class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700 border border-blue-200"
                             >
-                                Toko Sudirman
+                                Semua Lokasi
                             </span>
                         </div>
                         <p
@@ -323,6 +323,15 @@
                     </div>
 
                     <button
+                        id="btnSyncGlobalStock"
+                        onclick="openSyncGlobalStockModal()"
+                        class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl font-bold shadow-lg shadow-emerald-200 transition-all text-xs"
+                        title="Finalisasi & sinkronkan stok global produk berdasarkan total hasil Stock Opname 5 lokasi"
+                    >
+                        <i class="fas fa-arrows-rotate"></i> Sinkron Stok Global
+                    </button>
+
+                    <button
                         onclick="openStartOpnameModal()"
                         class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold shadow-lg shadow-blue-200 transition-all text-xs"
                     >
@@ -343,26 +352,24 @@
                     class="hidden flex flex-col items-center justify-center p-8 sm:p-16 text-center max-w-xl mx-auto my-12 bg-white rounded-3xl border border-slate-200 shadow-sm animate-fade-in"
                 >
                     <div
-                        class="w-20 h-20 bg-amber-50 text-amber-500 rounded-3xl flex items-center justify-center text-3xl mb-5 shadow-sm border border-amber-100 animate-pulse"
+                        class="w-20 h-20 bg-rose-50 text-rose-500 rounded-3xl flex items-center justify-center text-3xl mb-5 shadow-sm border border-rose-100"
                     >
-                        <i class="fas fa-tools"></i>
+                        <i class="fas fa-shield-halved"></i>
                     </div>
                     <span
-                        class="px-3.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 mb-3"
+                        class="px-3.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 mb-3"
                     >
-                        Under Construction
+                        Akses Dibatasi
                     </span>
                     <h2
                         class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight mb-2"
                     >
-                        Fitur Sedang Dalam Pengembangan
+                        Fitur ini masih belum bisa diakses oleh Anda
                     </h2>
                     <p
                         class="text-slate-500 text-xs sm:text-sm max-w-md mx-auto mb-6 font-medium leading-relaxed"
                     >
-                        Fitur <b>Stock Opname & Audit Fisik</b> saat ini masih
-                        dalam tahap pengujian sistem khusus dan dibatasi hanya
-                        untuk <b>Super Admin</b>.
+                        Halaman <b>Stock Opname & Audit Fisik</b> adalah fitur khusus yang hanya memiliki hak akses untuk akun <b>Super Admin</b>.
                     </p>
                     <a
                         href="dashboard.html"
@@ -844,12 +851,12 @@
                                 onchange="fetchOpnameHistory(1)"
                                 class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 outline-none cursor-pointer focus:border-blue-400"
                             >
-                                <option value="">Semua Lokasi Toko</option>
-                                <option value="Toko Sudirman">
-                                    Toko Sudirman
-                                </option>
+                                <option value="">Semua Lokasi (Toko & Gudang)</option>
+                                <option value="Toko Utama">Toko Utama</option>
+                                <option value="Toko Sudirman">Toko Sudirman</option>
                                 <option value="Toko Paye">Toko Paye</option>
-                                <option value="Toko Kota">Toko Kota</option>
+                                <option value="Gudang Karangsokong">Gudang Karangsokong</option>
+                                <option value="Gudang BTN">Gudang BTN</option>
                             </select>
                             <select
                                 id="historyStatusFilter"
@@ -979,9 +986,15 @@
                             required
                             class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl font-bold text-slate-800 outline-none focus:border-blue-500"
                         >
-                            <option value="Toko Sudirman">Toko Sudirman</option>
-                            <option value="Toko Paye">Toko Paye</option>
-                            <option value="Toko Kota">Toko Kota</option>
+                            <optgroup label="🏬 Toko Fisik">
+                                <option value="Toko Utama">Toko Utama</option>
+                                <option value="Toko Sudirman">Toko Sudirman</option>
+                                <option value="Toko Paye">Toko Paye</option>
+                            </optgroup>
+                            <optgroup label="🏭 Gudang Penyimpanan (Warehouse)">
+                                <option value="Gudang Karangsokong">Gudang Karangsokong</option>
+                                <option value="Gudang BTN">Gudang BTN</option>
+                            </optgroup>
                         </select>
                     </div>
 
@@ -1315,20 +1328,23 @@
                     .trim();
                 const isSuperAdmin = role === "superadmin";
                 if (!isSuperAdmin) {
-                    const headerControls =
-                        document.getElementById("soHeaderControls");
-                    const activeView =
-                        document.getElementById("activeOpnameView");
-                    const historyView =
-                        document.getElementById("historyOpnameView");
-                    const underConstruction = document.getElementById(
-                        "underConstructionView",
-                    );
+                    const headerControls = document.getElementById("soHeaderControls");
+                    const activeView = document.getElementById("activeOpnameView");
+                    const historyView = document.getElementById("historyOpnameView");
+                    const underConstruction = document.getElementById("underConstructionView");
                     if (headerControls) headerControls.classList.add("hidden");
                     if (activeView) activeView.classList.add("hidden");
                     if (historyView) historyView.classList.add("hidden");
-                    if (underConstruction)
-                        underConstruction.classList.remove("hidden");
+                    if (underConstruction) underConstruction.classList.remove("hidden");
+
+                    if (typeof Swal !== "undefined") {
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Akses Ditolak",
+                            text: "Fitur ini masih belum bisa diakses oleh Anda. Hanya Super Admin yang berhak mengakses Stock Opname.",
+                            confirmButtonColor: "#2563eb",
+                        });
+                    }
                     return false;
                 }
                 return true;
@@ -2569,9 +2585,76 @@
                 fileInput.click();
             }
 
+
+            // ==========================================
+            // IMAGE COMPRESSION HELPER (MAX 2MB)
+            // ==========================================
+            async function compressImageToMax2MB(file, maxBytes = 2 * 1024 * 1024) {
+                if (!file || !file.type.startsWith("image/")) return file;
+                if (file.size <= maxBytes) return file; // Jika sudah <= 2MB, langsung kirim
+
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.src = event.target.result;
+                        img.onload = () => {
+                            let width = img.width;
+                            let height = img.height;
+                            const maxDim = 1920; // Max Full HD
+                            if (width > maxDim || height > maxDim) {
+                                if (width > height) {
+                                    height = Math.round((height * maxDim) / width);
+                                    width = maxDim;
+                                } else {
+                                    width = Math.round((width * maxDim) / height);
+                                    height = maxDim;
+                                }
+                            }
+
+                            const canvas = document.createElement("canvas");
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext("2d");
+                            ctx.drawImage(img, 0, 0, width, height);
+
+                            let quality = 0.85;
+                            function tryCompress() {
+                                canvas.toBlob(
+                                    (blob) => {
+                                        if (!blob) {
+                                            resolve(file);
+                                            return;
+                                        }
+                                        if (blob.size <= maxBytes || quality <= 0.3) {
+                                            const cleanName = (file.name || "photo.jpg").replace(/\.[^/.]+$/, "") + ".jpg";
+                                            const compressedFile = new File([blob], cleanName, {
+                                                type: "image/jpeg",
+                                                lastModified: Date.now(),
+                                            });
+                                            console.log(`[COMPRESS] Ukuran asli: ${(file.size / 1024 / 1024).toFixed(2)} MB -> Terkompresi: ${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`);
+                                            resolve(compressedFile);
+                                        } else {
+                                            quality -= 0.15;
+                                            tryCompress();
+                                        }
+                                    },
+                                    "image/jpeg",
+                                    quality
+                                );
+                            }
+                            tryCompress();
+                        };
+                        img.onerror = () => resolve(file);
+                    };
+                    reader.onerror = () => resolve(file);
+                });
+            }
+
             async function handlePhotoUploadSelected(e) {
-                const file = e.target.files && e.target.files[0];
-                if (!file || !activePhotoTargetProductId || !activeSession)
+                const rawFile = e.target.files && e.target.files[0];
+                if (!rawFile || !activePhotoTargetProductId || !activeSession)
                     return;
 
                 const productId = activePhotoTargetProductId;
@@ -2582,10 +2665,12 @@
 
                 Swal.fire({
                     title: "Mengunggah Foto...",
-                    text: "Mohon tunggu, bukti foto sedang dikirim ke penyimpanan",
+                    text: rawFile.size > 2 * 1024 * 1024 ? "Mengompresi foto ke maks 2MB sebelum diunggah..." : "Mohon tunggu, bukti foto sedang dikirim ke MinIO",
                     allowOutsideClick: false,
                     didOpen: () => Swal.showLoading(),
                 });
+
+                const file = await compressImageToMax2MB(rawFile);
 
                 try {
                     const formData = new FormData();
@@ -2733,6 +2818,18 @@
 
                 if (!result.isConfirmed) return;
 
+                const btnSubmit = document.getElementById("btnSubmitApproval");
+                if (btnSubmit) btnSubmit.disabled = true;
+
+                Swal.fire({
+                    title: "Mengajukan Approval...",
+                    text: "Mohon tunggu, dokumen Stock Opname sedang dikunci untuk persetujuan.",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => Swal.showLoading(),
+                });
+
                 try {
                     const token = localStorage.getItem("token");
                     const headers = { "Content-Type": "application/json" };
@@ -2744,7 +2841,7 @@
                             method: "POST",
                             headers,
                             body: JSON.stringify({
-                                notes: activeSession.Notes || "",
+                                notes: activeSession.Notes || activeSession.notes || "",
                             }),
                         },
                     );
@@ -2763,23 +2860,29 @@
                     await loadActiveSession();
                 } catch (err) {
                     Swal.fire("Gagal", err.message, "error");
+                } finally {
+                    if (btnSubmit) btnSubmit.disabled = false;
                 }
             }
 
             async function approveSession() {
                 if (!activeSession) return;
 
+                const docNo = activeSession.opname_no || activeSession.OpnameNo || "-";
+                const locName = activeSession.location || activeSession.Location || "-";
+                const totalItems = activeSession.total_items || activeSession.TotalItems || (activeSession.items || activeSession.Items || []).length || 0;
+
                 const result = await Swal.fire({
                     title: "Setujui & Terapkan Penyesuaian?",
                     html: `
-                        <div class="text-left text-xs text-slate-600 space-y-2 p-2 bg-slate-50 rounded-xl border border-slate-200">
-                            <p><b>Dokumen:</b> ${escapeHTML(activeSession.opname_no || activeSession.OpnameNo)}</p>
-                            <p><b>Cabang:</b> ${escapeHTML(activeSession.location || activeSession.Location)}</p>
+                        <div class="text-left text-xs text-slate-600 space-y-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <p><b>Dokumen:</b> ${escapeHTML(docNo)}</p>
+                            <p><b>Lokasi:</b> ${escapeHTML(locName)} (${totalItems} produk)</p>
                             <p class="text-rose-600 font-bold">Tindakan ini akan secara atomik:</p>
                             <ol class="list-decimal pl-4 space-y-1">
-                                <li>Memperbarui saldo fisik cabang <b>${escapeHTML(activeSession.location || activeSession.Location)}</b> sesuai hasil hitung.</li>
+                                <li>Memperbarui saldo fisik lokasi <b>${escapeHTML(locName)}</b> (dikurangi penjualan kasir setelah waktu hitung).</li>
                                 <li>Mencatat mutasi audit ke kartu stok (<b>OPNAME_ADJUST</b>).</li>
-                                <li>Menghitung ulang total stok produk secara global.</li>
+                                <li>Menyinkronkan stok global secara aman (otomatis <b>naik</b> bila total fisik cabang melebihi stok global, dan <b>sinkron penuh</b> otomatis setelah ke-5 lokasi selesai di-SO).</li>
                             </ol>
                         </div>
                     `,
@@ -2791,6 +2894,23 @@
                 });
 
                 if (!result.isConfirmed) return;
+
+                const btnApprove = document.getElementById("btnApproveSession");
+                if (btnApprove) btnApprove.disabled = true;
+
+                Swal.fire({
+                    title: "Sedang Memproses Persetujuan SO...",
+                    html: `
+                        <div class="text-xs text-slate-600 space-y-2 mt-1">
+                            <p>Menyimpan hasil hitung fisik <b>${escapeHTML(locName)}</b> (${totalItems} produk), mencatat kartu stok (<b>OPNAME_ADJUST</b>), dan menyinkronkan stok global...</p>
+                            <p class="text-amber-600 font-bold">Mohon tunggu dan jangan tutup atau muat ulang halaman sampai proses selesai.</p>
+                        </div>
+                    `,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => Swal.showLoading(),
+                });
 
                 try {
                     const token = localStorage.getItem("token");
@@ -2811,14 +2931,30 @@
                             resJson.error || "Gagal menyetujui opname",
                         );
 
-                    await Swal.fire(
-                        "Sukses Diterapkan!",
-                        "Penyesuaian stok per cabang berhasil dieksekusi dan kartu stok telah dimutasi.",
-                        "success",
-                    );
+                    const approvedData = resJson.data || {};
+                    const gUpdated = approvedData.global_stock_updated_count || 0;
+                    const gRaised = approvedData.global_stock_raised_count || 0;
+                    const gFull = approvedData.global_stock_full_sync_count || 0;
+
+                    let syncNote = "Stok cabang & kartu stok telah dimutasi. Saldo global tetap dijaga aman hingga 5 lokasi selesai SO.";
+                    if (gUpdated > 0) {
+                        const parts = [];
+                        if (gRaised > 0) parts.push(`${gRaised} produk dinaikkan sesuai total fisik cabang`);
+                        if (gFull > 0) parts.push(`${gFull} produk disinkronkan penuh (5 lokasi lengkap)`);
+                        syncNote = `Stok cabang & kartu stok berhasil dimutasi. <b>${gUpdated} produk</b> ikut diperbarui stok globalnya (${parts.join(", ")}).`;
+                    }
+
+                    await Swal.fire({
+                        title: "Sukses Diterapkan!",
+                        html: `<p class="text-xs text-slate-600 leading-relaxed">${syncNote}</p>`,
+                        icon: "success",
+                        confirmButtonColor: "#059669",
+                    });
                     await loadActiveSession();
                 } catch (err) {
                     Swal.fire("Gagal Eksekusi", err.message, "error");
+                } finally {
+                    if (btnApprove) btnApprove.disabled = false;
                 }
             }
 
@@ -2840,6 +2976,18 @@
                 });
 
                 if (!reason) return;
+
+                const btnCancel = document.getElementById("btnCancelSession");
+                if (btnCancel) btnCancel.disabled = true;
+
+                Swal.fire({
+                    title: "Membatalkan Sesi...",
+                    text: "Mohon tunggu sebentar.",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => Swal.showLoading(),
+                });
 
                 try {
                     const token = localStorage.getItem("token");
@@ -2869,6 +3017,135 @@
                     await loadActiveSession();
                 } catch (err) {
                     Swal.fire("Gagal", err.message, "error");
+                } finally {
+                    if (btnCancel) btnCancel.disabled = false;
+                }
+            }
+
+            async function openSyncGlobalStockModal() {
+                Swal.fire({
+                    title: "Memeriksa Status SO 5 Lokasi...",
+                    text: "Menghitung perbandingan stok global dengan total fisik hasil SO...",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => Swal.showLoading(),
+                });
+
+                try {
+                    const token = localStorage.getItem("token");
+                    const headers = { "Content-Type": "application/json" };
+                    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+                    const prevRes = await fetch(`${BASE_URL}/api/stock-opnames/sync-global-preview`, {
+                        headers,
+                    });
+                    const prevJson = await prevRes.json();
+                    if (!prevRes.ok) {
+                        throw new Error(prevJson.error || "Gagal memuat preview sinkronisasi");
+                    }
+
+                    const data = prevJson.data || {};
+                    const locs = data.location_statuses || [];
+                    const locRowsHtml = locs
+                        .map((l) => {
+                            const done = !!l.has_completed_so;
+                            const badge = done
+                                ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-700"><i class="fas fa-check-circle mr-1"></i>Sudah SO (${l.completed_sessions}x)</span>`
+                                : `<span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700"><i class="fas fa-clock mr-1"></i>Belum SO</span>`;
+                            return `<div class="flex items-center justify-between py-1 border-b border-slate-100 last:border-0"><span class="font-bold text-slate-700">${escapeHTML(l.location)}</span>${badge}</div>`;
+                        })
+                        .join("");
+
+                    if ((data.total_products_with_so || 0) === 0) {
+                        await Swal.fire({
+                            title: "Belum Ada SO yang Disetujui",
+                            html: `
+                                <div class="text-left text-xs text-slate-600 space-y-3">
+                                    <p>Belum ada sesi Stock Opname berstatus <b>Completed</b> untuk disinkronkan ke stok global.</p>
+                                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">${locRowsHtml}</div>
+                                </div>
+                            `,
+                            icon: "info",
+                            confirmButtonColor: "#2563eb",
+                        });
+                        return;
+                    }
+
+                    const warnPartial = !data.all_5_locations_done
+                        ? `<div class="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-800 font-medium">
+                               <i class="fas fa-triangle-exclamation mr-1 text-amber-600"></i>
+                               <b>Perhatian:</b> Belum semua dari 5 lokasi memiliki sesi SO <b>Completed</b>. Jika Anda melanjutkan sekarang, stok global akan disamakan persis dengan total stok cabang yang sudah tercatat saat ini (lokasi yang belum SO dihitung 0).
+                           </div>`
+                        : `<div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-[11px] text-emerald-800 font-medium">
+                               <i class="fas fa-check-double mr-1 text-emerald-600"></i>
+                               Seluruh 5 titik lokasi sudah memiliki sesi SO <b>Completed</b>. Aman untuk disinkronkan!
+                           </div>`;
+
+                    const conf = await Swal.fire({
+                        title: "Sinkronkan Stok Global dari Hasil SO?",
+                        html: `
+                            <div class="text-left text-xs text-slate-600 space-y-3">
+                                ${warnPartial}
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                    <p class="font-black text-slate-700 text-[11px] uppercase tracking-wider mb-1.5">Status 5 Titik Lokasi</p>
+                                    ${locRowsHtml}
+                                </div>
+                                <div class="grid grid-cols-3 gap-2 text-center">
+                                    <div class="p-2 bg-emerald-50 rounded-xl border border-emerald-200">
+                                        <div class="text-base font-black text-emerald-700">${data.total_raised || 0}</div>
+                                        <div class="text-[10px] font-bold text-emerald-600">Stok Naik</div>
+                                    </div>
+                                    <div class="p-2 bg-rose-50 rounded-xl border border-rose-200">
+                                        <div class="text-base font-black text-rose-700">${data.total_lowered || 0}</div>
+                                        <div class="text-[10px] font-bold text-rose-600">Stok Turun</div>
+                                    </div>
+                                    <div class="p-2 bg-slate-100 rounded-xl border border-slate-200">
+                                        <div class="text-base font-black text-slate-700">${data.total_unchanged || 0}</div>
+                                        <div class="text-[10px] font-bold text-slate-500">Sudah Cocok</div>
+                                    </div>
+                                </div>
+                                ${(data.total_changed || 0) === 0
+                                    ? `<p class="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl p-2 font-medium"><i class="fas fa-circle-check mr-1"></i>Seluruh <b>${data.total_products_with_so || 0} produk</b> hasil SO sudah sinkron dengan stok global (penambahan stok saat Approve otomatis langsung menaikkan stok global).</p>`
+                                    : `<p class="text-[11px] text-slate-500">Total <b>${data.total_changed || 0}</b> dari ${data.total_products_with_so || 0} produk akan diperbarui saldo globalnya agar sesuai total fisik ke-5 lokasi.</p>`}
+                            </div>
+                        `,
+                        icon: "question",
+                        showCancelButton: true,
+                        confirmButtonText: '<i class="fas fa-arrows-rotate mr-1"></i> Ya, Sinkronkan Sekarang',
+                        cancelButtonText: "Batal",
+                        confirmButtonColor: "#059669",
+                    });
+
+                    if (!conf.isConfirmed) return;
+
+                    Swal.fire({
+                        title: "Menyinkronkan Stok Global...",
+                        html: `<p class="text-xs text-slate-600">Sedang memperbarui saldo global produk berdasarkan total stok cabang & gudang. Mohon tunggu...</p>`,
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false,
+                        didOpen: () => Swal.showLoading(),
+                    });
+
+                    const execRes = await fetch(`${BASE_URL}/api/stock-opnames/sync-global-stock`, {
+                        method: "POST",
+                        headers,
+                    });
+                    const execJson = await execRes.json();
+                    if (!execRes.ok) {
+                        throw new Error(execJson.error || "Gagal menyinkronkan stok global");
+                    }
+
+                    await Swal.fire({
+                        title: "Sinkronisasi Berhasil!",
+                        text: execJson.message || "Stok global produk berhasil disinkronkan dengan total hasil Stock Opname.",
+                        icon: "success",
+                        confirmButtonColor: "#059669",
+                    });
+                    await loadActiveSession();
+                } catch (err) {
+                    Swal.fire("Gagal Sinkronisasi", err.message, "error");
                 }
             }
 

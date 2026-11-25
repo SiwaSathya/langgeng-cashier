@@ -474,7 +474,7 @@
                             <i class="fas fa-file-invoice"></i> Informasi Nota &
                             Supplier
                         </p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2.5 sm:gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-2.5 sm:gap-4">
                             <div>
                                 <label
                                     class="block text-[10px] font-bold text-slate-400 uppercase mb-1"
@@ -537,20 +537,40 @@
                                     class="absolute bg-white border border-slate-200 rounded-xl shadow-xl w-full mt-1 hidden max-h-56 overflow-y-auto z-50 custom-scroll text-xs"
                                 ></div>
                             </div>
-                            <!-- Lokasi Toko: Readonly dari Session Akun Login -->
-                            <div class="sm:col-span-2 md:col-span-1">
+                            <!-- Pilihan Lokasi Tujuan Barang (5 Titik: 3 Toko + 2 Gudang) -->
+                            <div>
                                 <label
                                     class="block text-[10px] font-bold text-slate-400 uppercase mb-1"
-                                    >Lokasi Toko (Sesi)</label
+                                    >Tujuan Barang (Lokasi) *</label
                                 >
-                                <div
-                                    class="w-full bg-slate-100 border border-slate-200 p-2 sm:p-3 rounded-lg sm:rounded-xl text-xs font-bold text-slate-700 flex items-center gap-2"
+                                <select
+                                    id="purchaseLocationSelect"
+                                    class="w-full bg-white border border-slate-200 p-2 sm:p-3 rounded-lg sm:rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-blue-500 cursor-pointer"
                                 >
-                                    <i class="fas fa-store text-blue-500"></i>
-                                    <span id="displayUserLocation"
-                                        >Toko Utama</span
-                                    >
-                                </div>
+                                    <optgroup label="🏬 Toko Cabang">
+                                        <option value="Toko Utama">Toko Utama</option>
+                                        <option value="Toko Sudirman">Toko Sudirman</option>
+                                        <option value="Toko Paye">Toko Paye</option>
+                                    </optgroup>
+                                    <optgroup label="🏭 Gudang (Warehouse)">
+                                        <option value="Gudang Karangsokong">Gudang Karangsokong</option>
+                                        <option value="Gudang BTN">Gudang BTN</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <!-- Status Penerimaan: Received (Normal) vs Transit (On-Hold saat SO) -->
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold text-slate-400 uppercase mb-1"
+                                    >Status Stok *</label
+                                >
+                                <select
+                                    id="purchaseStatusSelect"
+                                    class="w-full bg-white border border-slate-200 p-2 sm:p-3 rounded-lg sm:rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-blue-500 cursor-pointer"
+                                >
+                                    <option value="Received">📦 Diterima (Langsung Tambah Stok)</option>
+                                    <option value="Transit">⏳ Transit / On-Hold (Sedang SO)</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -787,6 +807,7 @@
                                 p.CreatedAt,
                             supplier: suppObj,
                             location: p.location || p.Location || "Toko Utama",
+                            status: p.status || p.Status || "Received",
                             user: p.user || p.User || {},
                             total_qty: 0,
                             total_amount: 0,
@@ -803,6 +824,9 @@
 
                     grp.total_qty += itQty;
                     grp.total_amount += itTotal;
+                    if ((p.status || p.Status) === "Transit") {
+                        grp.status = "Transit";
+                    }
                     grp.items.push(p);
                 });
 
@@ -1070,9 +1094,16 @@
                                     <div class="sm:hidden font-bold text-slate-700 text-[10.5px] mt-0.5 truncate">
                                         <i class="fas fa-building text-blue-500 mr-1"></i>${escapeHTML(supplierName)}
                                     </div>
-                                    <p class="text-[9.5px] sm:text-[11px] text-slate-400 font-bold mt-0.5">
-                                        <span class="sm:hidden font-medium text-slate-500">${formattedDate} • </span><i class="fas fa-user-circle mr-1"></i>${escapeHTML(userName)} • ${escapeHTML(group.location || "Toko Utama")}
-                                    </p>
+                                    <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                                        <span class="text-[9.5px] sm:text-[11px] text-slate-400 font-bold">
+                                            <span class="sm:hidden font-medium text-slate-500">${formattedDate} • </span><i class="fas fa-user-circle mr-1"></i>${escapeHTML(userName)} • <span class="text-slate-600 font-black">${escapeHTML(group.location || "Toko Utama")}</span>
+                                        </span>
+                                        ${
+                                            (group.status || group.Status || (items[0] && (items[0].status || items[0].Status))) === "Transit"
+                                                ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 animate-pulse"><i class="fas fa-clock text-amber-500"></i> Transit (On-Hold)</span>`
+                                                : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fas fa-check-circle text-emerald-500"></i> Diterima</span>`
+                                        }
+                                    </div>
                                 </td>
                                 <td class="hidden sm:table-cell px-3.5 py-3 sm:px-5 sm:py-4 text-slate-500 font-bold text-xs whitespace-nowrap">${formattedDate}</td>
                                 <td class="hidden sm:table-cell px-3.5 py-3 sm:px-5 sm:py-4 whitespace-nowrap">
@@ -1099,6 +1130,15 @@
                                             <button onclick="toggleDetailRow(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-1.5 sm:p-2 rounded-lg sm:rounded-xl transition-all cursor-pointer" title="Lihat Item">
                                                 <i id="toggle-icon-${idx}" class="fas fa-chevron-down text-[10px] sm:text-xs transition-transform duration-200"></i>
                                             </button>
+                                        `
+                                                : ""
+                                        }
+                                        ${
+                                            canModifyPurchase && (group.status || group.Status || (items[0] && (items[0].status || items[0].Status))) === "Transit"
+                                                ? `
+                                        <button onclick="releaseTransitPurchase('${escapeHTML(notaNo)}')" class="bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-600 border border-emerald-200 px-2 py-1.5 sm:px-2.5 sm:py-2 rounded-lg sm:rounded-xl transition-all shadow-sm cursor-pointer font-bold text-[10px] sm:text-xs inline-flex items-center gap-1" title="Rilis Stok Transit ke Gudang/Toko">
+                                            <i class="fas fa-box-open"></i><span class="hidden md:inline">Rilis</span>
+                                        </button>
                                         `
                                                 : ""
                                         }
@@ -1275,6 +1315,18 @@
                 const curUser = (typeof getUserDataFromToken === "function" ? getUserDataFromToken() : null) || {};
                 const curRole = (curUser.role || "").toLowerCase().replace(/[-_]/g, "");
                 const canModifyPurchase = (curRole === "admin" || curRole === "superadmin");
+                const grpData = localPurchaseData[idx] || {};
+                const grpItems = grpData.items || grpData.Items || [];
+                const grpStatus = grpData.status || grpData.Status || (grpItems[0] && (grpItems[0].status || grpItems[0].Status)) || "Received";
+                if (canModifyPurchase && grpStatus === "Transit") {
+                    actions.push({
+                        label: "Rilis Barang ke Stok",
+                        icon: "fas fa-box-open",
+                        color: "emerald",
+                        desc: "Masukkan stok barang Transit pasca SO",
+                        onClick: () => releaseTransitPurchase(notaNo),
+                    });
+                }
                 if (canModifyPurchase) {
                     actions.push({
                         label: "Batalkan Transaksi (Hapus)",
@@ -1326,9 +1378,16 @@
                 document.getElementById("supplierSearch").value = "";
                 resetItemInput();
 
-                // Set otomatis lokasi toko dari session akun login
+                // Set otomatis lokasi toko dari session akun login & reset status stok
                 const userData = getUserDataFromToken() || {};
                 const userLoc = userData.location || "Toko Utama";
+                const locSelect = document.getElementById("purchaseLocationSelect");
+                if (locSelect) {
+                    const hasOpt = Array.from(locSelect.options).some((o) => o.value === userLoc);
+                    locSelect.value = hasOpt ? userLoc : "Toko Utama";
+                }
+                const statusSelect = document.getElementById("purchaseStatusSelect");
+                if (statusSelect) statusSelect.value = "Received";
                 const displayLoc = document.getElementById(
                     "displayUserLocation",
                 );
@@ -1494,7 +1553,13 @@
                 }
 
                 const userData = getUserDataFromToken() || {};
-                const location = userData.location || "Toko Utama";
+                const location =
+                    document.getElementById("purchaseLocationSelect")?.value ||
+                    userData.location ||
+                    "Toko Utama";
+                const status =
+                    document.getElementById("purchaseStatusSelect")?.value ||
+                    "Received";
 
                 const docType =
                     document.getElementById("doc_type")?.value || "Nota Faktur";
@@ -1508,6 +1573,7 @@
                         : "",
                     location: location,
                     doc_type: docType,
+                    status: status,
                     user_id: String(
                         userData.user_id || userData.id || userData.ID || "",
                     ).trim(),
@@ -1544,7 +1610,9 @@
 
                     await Swal.fire(
                         "Berhasil",
-                        "Purchase Order per-nota berhasil disimpan dan stok produk telah bertambah!",
+                        status === "Transit"
+                            ? "Purchase Order berstatus Transit (On-Hold) berhasil disimpan! Stok baru akan masuk saat Anda menekan tombol Rilis setelah Stock Opname selesai."
+                            : "Purchase Order per-nota berhasil disimpan dan stok produk telah bertambah!",
                         "success",
                     );
                     closeModal();
@@ -2087,6 +2155,45 @@
                     document.body.classList.remove("overflow-hidden");
                 }
             });
-        </script>
+        
+            // Fungsi Rilis Pembelian Berstatus Transit ke Stok Fisik
+            async function releaseTransitPurchase(nota) {
+                const conf = await Swal.fire({
+                    title: "Rilis Barang ke Stok?",
+                    html: `<p class="text-xs text-slate-600">Barang dari nota <b>${escapeHTML(nota)}</b> akan resmi ditambahkan ke saldo stok produk toko/gudang terkait.</p>`,
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="fas fa-box-open mr-1"></i> Ya, Rilis ke Stok',
+                    cancelButtonText: "Batal",
+                    confirmButtonColor: "#059669",
+                });
+                if (!conf.isConfirmed) return;
+
+                Swal.fire({
+                    title: "Memproses Penerimaan Barang...",
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading(),
+                });
+
+                try {
+                    const token = localStorage.getItem("token");
+                    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+                    const res = await fetch(`${API_URL}/purchases/nota/${encodeURIComponent(nota)}/release`, {
+                        method: "PUT",
+                        headers,
+                    });
+                    const data = await res.json().catch(() => ({}));
+                    if (res.ok) {
+                        Swal.fire("Berhasil", data.message || "Stok barang berhasil dirilis ke persediaan!", "success");
+                        fetchPurchases(currentPage);
+                    } else {
+                        Swal.fire("Gagal", data.message || data.error || "Gagal merilis stok pembelian", "error");
+                    }
+                } catch (e) {
+                    Swal.fire("Error", "Gagal terhubung ke server", "error");
+                }
+            }
+
+</script>
     </body>
 </html>
